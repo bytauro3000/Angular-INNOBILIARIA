@@ -9,6 +9,8 @@ import { Cliente } from '../../models/cliente.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
 import { Distrito } from '../../models/distrito.model';
+import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
+
 
 // ✅ Importa tu servicio de clientes
 import { ClienteService } from '../../services/cliente-listar.service';
@@ -16,9 +18,10 @@ import { ClienteService } from '../../services/cliente-listar.service';
 @Component({
   selector: 'app-cliente-insertar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterModule],
   templateUrl: './cliente-insertar.html',
   styleUrls: ['./cliente-insertar.scss']
+  
 })
 export class ClienteInsertarComponent implements OnInit {
 
