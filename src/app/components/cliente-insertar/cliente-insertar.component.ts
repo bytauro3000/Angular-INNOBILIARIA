@@ -11,7 +11,7 @@ import { TipoCliente } from '../../enums/tipocliente.enum';
 import { Distrito } from '../../models/distrito.model';
 
 // ✅ Importa tu servicio de clientes
-import { ClienteService } from '../../services/cliente.service';
+import { ClienteService } from '../../services/cliente-listar.service';
 
 @Component({
   selector: 'app-cliente-insertar',

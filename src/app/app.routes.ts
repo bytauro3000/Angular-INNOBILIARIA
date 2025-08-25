@@ -7,8 +7,8 @@ import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
 import { AdminMenuComponent } from './components/menu-admin/admin-menu.component';
 
-import { ClientesComponent } from './components/clientes/cliente-listar.component';
-import { ClienteInsertarComponent } from './components/clienteinsertar/cliente-insertar.component';
+import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
+import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },

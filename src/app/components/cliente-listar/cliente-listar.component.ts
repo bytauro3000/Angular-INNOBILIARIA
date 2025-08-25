@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ClienteService } from '../../services/cliente.service';
+import { ClienteService } from '../../services/cliente-listar.service';
 import { FormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente.model';
 import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
