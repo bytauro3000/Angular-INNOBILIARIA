@@ -1,0 +1,30 @@
+// src/app/app.routes.ts
+import { Routes } from '@angular/router';
+import { LoginLayoutComponent } from './auth/login/login-layout.component';
+
+// ✅ Importa los nuevos componentes de menú
+import { SecretariaMenuComponent } from './components/secretaria-menu/secretaria-menu.component';
+import { SoporteMenuComponent } from './components/soporte-menu/soporte-menu.component';
+import { AdminMenuComponent } from './components/admin-menu/admin-menu.component';
+
+import { ClientesComponent } from './components/clientes/clientes';
+import { ClienteInsertarComponent } from './components/clienteinsertar/clienteinsertar.component';
+
+export const routes: Routes = [
+  { path: 'login', component: LoginLayoutComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+
+  // ✅ Ruta para el menú de Secretaria
+  {
+    path: 'secretaria-menu',
+    component: SecretariaMenuComponent,
+    children: [
+      { path: 'clientes', component: ClientesComponent }, // Esta es la ruta hija para Clientes
+      { path: 'clientes/insertar', component: ClienteInsertarComponent }, // ✅ Nueva ruta para insertar cliente
+    ]
+  },
+
+  // ✅ Otras rutas protegidas por roles (sin cambios aquí)
+  { path: 'soporte-menu', component: SoporteMenuComponent },
+  { path: 'admin-menu', component: AdminMenuComponent },
+];

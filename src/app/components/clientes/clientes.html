@@ -1,0 +1,75 @@
+<div class="clientes-container">
+  <h2>Gestión de Clientes</h2>
+
+  <div class="filtros">
+    <select [(ngModel)]="tipoFiltro" (change)="filtrarClientes()" class="filtro-select">
+      <option value="nombres">Nombres y Apellidos</option>
+      <option value="documento">Documento (DNI/RUC)</option>
+    </select>
+
+    <input type="text"
+           [(ngModel)]="terminoBusqueda"
+           (input)="filtrarClientes()"
+           placeholder="Ingresa el término de búsqueda..."
+           class="filtro-input" style="width: 250px;">
+
+    <button [routerLink]="['/secretaria-menu/clientes/insertar']" class="btn btn-success" style="margin-left: 10px;">
+      <i class="bi bi-plus-lg"></i> Agregar
+    </button>
+  </div>
+
+  <div class="tabla-clientes">
+      <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Tipo</th>
+                <th>Documento</th>
+                <th>Celular</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let cliente of paginatedClientes">
+                <td>{{ cliente.idCliente }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.apellidos || '' }}</td>
+                <td>{{ cliente.tipoCliente }}</td>
+                <td>{{ cliente.dni || cliente.ruc || '-' }}</td>
+                <td>{{ cliente.celular }}</td>
+                <td>{{ cliente.estado }}</td>
+                <td class="acciones-cell">
+                    <button class="btn btn-outline-info btn-sm me-1" title="Ver cliente">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm me-1" title="Editar cliente">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" (click)="eliminarCliente(cliente.idCliente)" title="Eliminar cliente">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div *ngIf="paginatedClientes.length === 0" class="no-results">
+      No se encontraron clientes que coincidan con la búsqueda.
+    </div>
+  </div>
+
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
+
+    <button *ngFor="let page of getPagesArray()"
+            (click)="goToPage(page)"
+            [class.active]="currentPage === page"
+            class="btn btn-outline-secondary">
+      {{ page }}
+    </button>
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
+  </div>
+</div>

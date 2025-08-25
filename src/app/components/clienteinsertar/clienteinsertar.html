@@ -1,0 +1,97 @@
+<div class="insert-container">
+  <div class="form-wrapper">
+    <h2 class="form-title">Insertar Nuevo Cliente</h2>
+    <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-section">
+
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required>
+          </div>
+          <div class="form-group">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required>
+        </div>
+      </div>
+
+      <div class="form-section">
+
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipoCliente">Tipo de Cliente</label>
+            <select id="tipoCliente" formControlName="tipoCliente" required>
+              <option value="NATURAL">Natural</option>
+              <option value="JURIDICO">Jurídico</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dni">DNI</label>
+            <input type="text" id="dni" formControlName="dni" placeholder="DNI del cliente">
+          </div>
+          <div class="form-group">
+            <label for="ruc">RUC</label>
+            <input type="text" id="ruc" formControlName="ruc" placeholder="RUC del cliente">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="celular">Celular</label>
+            <input type="tel" id="celular" formControlName="celular" placeholder="Celular" required>
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required>
+          </div>
+          <div class="form-group" formGroupName="distrito">
+            <label for="idDistrito">Distrito</label>
+            <select id="idDistrito" formControlName="idDistrito" required>
+              <option value="">Selecciona un distrito</option>
+              <option value="1">Distrito 1</option>
+              <option value="2">Distrito 2</option>
+              <option value="3">Distrito 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <select id="estado" formControlName="estado" required>
+            <option value="ACTIVO">Activo</option>
+            <option value="INACTIVO">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-btn" [disabled]="!clienteForm.valid">
+          Insertar Cliente
+        </button>
+        <button type="button" class="cancel-btn" (click)="router.navigate(['/secretaria-menu/clientes'])">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

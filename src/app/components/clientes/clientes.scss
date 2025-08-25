@@ -1,0 +1,184 @@
+/* Estilos principales del contenedor */
+.clientes-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    /* ❌ Quitamos la línea debajo del título */
+    /* border-bottom: 2px solid #3498db; */
+    padding-bottom: 0.5rem;
+  }
+
+  /* Estilos para la sección de filtros */
+  .filtros {
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    .filtro-select,
+    .filtro-input {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      flex-grow: 1; // Para que el input se expanda
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+    }
+    .filtro-select {
+      flex-grow: 0; // El select no se expande tanto
+      min-width: 180px;
+    }
+  }
+
+  /* Estilos para la tabla responsive */
+  .tabla-clientes {
+    overflow-x: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem; // Espacio entre tabla y paginación
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+      font-size: 0.9rem; /* ✅ Reducimos tamaño de texto */
+
+
+      th,
+      td {
+        padding: 0.4rem 0.75rem; /* ✅ Menos padding */
+        text-align: left;
+        border-bottom: 1px solid #ecf0f1;
+        color: #333; // Color del texto
+      }
+
+      th {
+        background-color: #5d6d7e; /* Azul marino oscuro */
+        color: #fff; /* Texto blanco */
+        border-bottom: 2px solid #2ecc71; /* Línea verde */
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      tr:hover {
+        background-color: #f2f6fb; /* ✅ Hover más sutil */
+      }
+
+      /* Estilos para los estados */
+      .estado-activo {
+        color: #27ae60;
+        font-weight: 500;
+        &::before {
+          content: "●";
+          margin-right: 0.5rem;
+          font-size: 0.8rem;
+        }
+      }
+
+      .estado-moroso {
+        color: #f39c12;
+        font-weight: 500;
+        &::before {
+          content: "●";
+          margin-right: 0.5rem;
+          font-size: 0.8rem;
+        }
+      }
+
+      .estado-propietario {
+        color: #3498db;
+        font-weight: 500;
+        &::before {
+          content: "●";
+          margin-right: 0.5rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
+    .no-results {
+      text-align: center;
+      padding: 1rem;
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+
+  /* Estilos para los controles de paginación */
+  .paginacion-controles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+
+    .pagina-btn,
+    .pagina-numero-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+    }
+
+    .pagina-numero-btn {
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+
+      &.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+        font-weight: bold;
+      }
+      &:hover:not(.active):not(:disabled) {
+        background-color: #e2e6ea;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .filtros {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}
