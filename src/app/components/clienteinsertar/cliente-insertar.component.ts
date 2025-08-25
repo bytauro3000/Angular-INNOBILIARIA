@@ -17,8 +17,8 @@ import { ClienteService } from '../../services/cliente.service';
   selector: 'app-cliente-insertar',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './clienteinsertar.html',
-  styleUrls: ['./clienteinsertar.scss']
+  templateUrl: './cliente-insertar.html',
+  styleUrls: ['./cliente-insertar.scss']
 })
 export class ClienteInsertarComponent implements OnInit {
 

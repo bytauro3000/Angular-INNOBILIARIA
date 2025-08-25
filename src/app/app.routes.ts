@@ -3,12 +3,12 @@ import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 
 // ✅ Importa los nuevos componentes de menú
-import { SecretariaMenuComponent } from './components/secretaria-menu/secretaria-menu.component';
-import { SoporteMenuComponent } from './components/soporte-menu/soporte-menu.component';
-import { AdminMenuComponent } from './components/admin-menu/admin-menu.component';
+import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria-menu.component';
+import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
+import { AdminMenuComponent } from './components/menu-admin/admin-menu.component';
 
-import { ClientesComponent } from './components/clientes/clientes';
-import { ClienteInsertarComponent } from './components/clienteinsertar/clienteinsertar.component';
+import { ClientesComponent } from './components/clientes/cliente-listar.component';
+import { ClienteInsertarComponent } from './components/clienteinsertar/cliente-insertar.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },

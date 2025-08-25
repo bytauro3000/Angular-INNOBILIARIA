@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ClientesComponent } from './clientes';
+import { ClientesComponent } from './cliente-listar.component';
 import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
 import { of } from 'rxjs';
@@ -7,11 +7,11 @@ import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
 import { Cliente } from '../../models/cliente.model';
 import { Distrito } from '../../models/distrito.model';
-import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
+import { RouterModule } from '@angular/router'; 
 
 // Mock del servicio corregido para que coincida con el método real
 class MockClienteService {
-  listarClientes() { // ✅ Cambiado de getClientes() a listarClientes()
+  listarClientes() { 
     return of([
       {
         idCliente: 1,

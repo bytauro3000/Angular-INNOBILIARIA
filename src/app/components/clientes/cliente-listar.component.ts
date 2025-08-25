@@ -13,8 +13,8 @@ import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
     FormsModule,
     RouterModule // ✅ Añade RouterModule aquí para que routerLink funcione
 ],
-  templateUrl: './clientes.html',
-  styleUrls: ['./clientes.scss']
+  templateUrl: './cliente-listar.html',
+  styleUrls: ['./cliente-listar.scss']
 })
 export class ClientesComponent implements OnInit {
 
