@@ -1,9 +1,8 @@
-// src/app/auth/login/login.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// ✅ Las interfaces que ya creaste en tu carpeta 'interfaces'
+// ✅ Interfaces
 import { LoginRequest } from './interfaces/login-request';
 import { LoginResponse } from './interfaces/login-response';
 
@@ -16,8 +15,13 @@ export class LoginService {
   constructor(private http: HttpClient) { }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.apiUrl, credentials);
+    // 👇 Importante: aquí no mandamos el token en el login
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.post<LoginResponse>(this.apiUrl, credentials, { headers });
   }
 }
-// ✅ EXPORTA las interfaces para que otros módulos puedan acceder a ellas desde este servicio
+
 export type { LoginRequest, LoginResponse };

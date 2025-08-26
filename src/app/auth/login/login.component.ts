@@ -1,11 +1,10 @@
-// src/app/auth/login/login.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
-import { TokenService } from '../../services/token.service'; // ✅ Importa el TokenService
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-login',
@@ -24,21 +23,23 @@ export class LoginComponent {
   constructor(
     private loginService: LoginService,
     private router: Router,
-    private tokenService: TokenService // ✅ Inyecta el TokenService
+    private tokenService: TokenService
   ) { }
 
   onLogin(): void {
+    // 🔹 Limpia cualquier token viejo antes de loguear
+    this.tokenService.removeToken();
+
     this.loginService.login(this.loginRequest).subscribe({
       next: (response) => {
         const token = response.token;
-        // ✅ Usa el TokenService para guardar el token
-        this.tokenService.setToken(token); 
+        this.tokenService.setToken(token);
         this.errorMessage = null;
 
-        // ✅ Lógica de redirección basada en el rol
+        // 🔹 Decodificar el token para obtener el rol
         const decodedToken: any = jwtDecode(token);
         const userRole = decodedToken.rol;
-        
+
         switch (userRole) {
           case 'ROLE_SECRETARIA':
             this.router.navigate(['/secretaria-menu']);

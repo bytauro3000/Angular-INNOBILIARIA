@@ -13,7 +13,7 @@ export interface Cliente {
   telefono?: string;
   direccion: string;
   email: string;
-  fechaRegistro?: Date | string; // Flexible para recibir string del JSON y convertirlo a Date
+  fechaRegistro?: Date | string; // ✅ solo lectura, lo llena el backend
   estado: EstadoCliente;
   distrito: Distrito; // Relación ManyToOne
 }

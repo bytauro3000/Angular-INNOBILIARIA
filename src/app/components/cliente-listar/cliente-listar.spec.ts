@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientesComponent } from './cliente-listar.component';
 import { FormsModule } from '@angular/forms';
-import { ClienteService } from '../../services/cliente-listar.service';
+import { ClienteService } from '../../services/cliente.service';
 import { of } from 'rxjs';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';

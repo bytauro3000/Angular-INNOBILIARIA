@@ -1,4 +1,3 @@
-// src/app/services/token.service.ts
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -6,17 +5,21 @@ import { Injectable } from '@angular/core';
 })
 export class TokenService {
 
+  private readonly TOKEN_KEY = 'jwtToken';
+
   constructor() { }
 
   setToken(token: string): void {
-    localStorage.setItem('jwtToken', token);
+    // Limpia primero cualquier token viejo
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('jwtToken');
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   removeToken(): void {
-    localStorage.removeItem('jwtToken');
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 }

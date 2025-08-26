@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
 
 
 // ✅ Importa tu servicio de clientes
-import { ClienteService } from '../../services/cliente-listar.service';
+import { ClienteService } from '../../services/cliente.service';
 
 @Component({
   selector: 'app-cliente-insertar',
