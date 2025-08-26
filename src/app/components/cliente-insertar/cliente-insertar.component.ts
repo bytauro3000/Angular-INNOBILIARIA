@@ -1,77 +1,78 @@
 // src/app/components/cliente-insertar/cliente-insertar.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-
-// ✅ Importa tu modelo y los enums
+import { RouterModule } from '@angular/router';
 import { Cliente } from '../../models/cliente.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
 import { Distrito } from '../../models/distrito.model';
-import { RouterModule } from '@angular/router'; // ✅ Importa RouterModule
-
-
-// ✅ Importa tu servicio de clientes
 import { ClienteService } from '../../services/cliente.service';
+import { DistritoService } from '../../services/distrito.service';
+import { ToastrService } from 'ngx-toastr'; // ✅ Importa ToastrService
+
 
 @Component({
   selector: 'app-cliente-insertar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './cliente-insertar.html',
   styleUrls: ['./cliente-insertar.scss']
-  
 })
 export class ClienteInsertarComponent implements OnInit {
-
   clienteForm!: FormGroup;
+  distritos: Distrito[] = [];
 
   constructor(
     private fb: FormBuilder,
     private clienteService: ClienteService,
-    public router: Router
-  ) { }
+    private distritoService: DistritoService,
+    public router: Router,
+    private toastr: ToastrService // ✅ Inyecta ToastrService
+  ) {}
 
   ngOnInit(): void {
-    // ✅ Inicializa el formulario con todos los campos del modelo Cliente
-    // Usa un objeto anidado para la relación 'distrito'
     this.clienteForm = this.fb.group({
       nombre: ['', Validators.required],
       apellidos: [''],
       tipoCliente: [TipoCliente.NATURAL, Validators.required],
-      dni: [''],
-      ruc: [''],
+      numDoc: ['', Validators.required],
       celular: ['', Validators.required],
       telefono: [''],
       direccion: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       estado: [EstadoCliente.ACTIVO, Validators.required],
-      // ✅ Campo anidado para la relación 'distrito'
-      // Asume que necesitas el id del distrito para insertarlo
       distrito: this.fb.group({
         idDistrito: ['', Validators.required],
       }),
+    });
+
+    this.distritoService.listarDistritos().subscribe({
+      next: (data) => {
+        this.distritos = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar distritos:', err);
+      }
     });
   }
 
   onSubmit(): void {
     if (this.clienteForm.valid) {
-      // ✅ Convierte los datos del formulario a la interfaz Cliente
       const nuevoCliente: Cliente = this.clienteForm.value;
-
-      // ✅ Asegúrate de llamar al método 'agregarCliente' de tu servicio
       this.clienteService.agregarCliente(nuevoCliente).subscribe({
         next: (response) => {
-          console.log('Cliente insertado con éxito', response);
+          this.toastr.success('Cliente insertado correctamente.', '¡Éxito!'); // ✅ Muestra un toast de éxito
           this.router.navigate(['/secretaria-menu/clientes']);
         },
         error: (error) => {
           console.error('Error al insertar el cliente:', error);
+          this.toastr.error(error.message, 'Error'); // ✅ Muestra un toast de error con el mensaje del backend
         }
       });
     } else {
-      console.log('El formulario no es válido. Por favor, revisa los campos.');
       this.clienteForm.markAllAsTouched();
     }
   }

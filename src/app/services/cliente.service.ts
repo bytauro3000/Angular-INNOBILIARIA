@@ -1,44 +1,58 @@
+// src/app/services/cliente.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Cliente } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  // La URL base para todas las peticiones a la API de clientes
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = 'http://localhost:8080/api/clientes';
 
   constructor(private http: HttpClient) { }
 
   // 🔹 Listar todos los clientes
   listarClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.apiUrl}/listarClientes`);
+    return this.http.get<Cliente[]>(`${this.apiUrl}/listar`);
   }
 
-  // 🔹 Buscar cliente por DNI
-  obtenerClientePorDni(dni: string): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.apiUrl}/obtenerClientePorDni/${dni}`);
+  // ✅ Modificación: Buscar cliente por número de documento (numDoc)
+  obtenerClientePorNumDoc(numDoc: string): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}/buscar/numDoc/${numDoc}`);
   }
 
-  // 🔹 Buscar clientes por apellidos
+  // 🔹 Buscar clientes por apellidos (este método ya está correcto)
   obtenerClientesPorApellidos(apellidos: string): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.apiUrl}/obtenerClientesPorApellidos/${apellidos}`);
+    return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/apellidos/${apellidos}`);
   }
 
   // 🔹 Agregar nuevo cliente
   agregarCliente(cliente: Cliente): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.apiUrl}/agregarCliente`, cliente);
+    return this.http.post<Cliente>(`${this.apiUrl}/agregar`, cliente).pipe(
+      catchError(error => {
+        let errorMessage = 'Ocurrió un error inesperado al insertar el cliente.';
+        if (error.error instanceof ErrorEvent) {
+          // Error del lado del cliente
+          errorMessage = `Error: ${error.error.message}`;
+        } else {
+          // Error del lado del servidor. El mensaje real viene en `error.error`.
+          errorMessage = error.error; 
+        }
+        console.error(errorMessage);
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   // 🔹 Actualizar cliente
   actualizarCliente(id: number, cliente: Cliente): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.apiUrl}/actualizarCliente/${id}`, cliente);
+    return this.http.put<Cliente>(`${this.apiUrl}/actualizar/${id}`, cliente);
   }
 
   // 🔹 Eliminar cliente
   eliminarCliente(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/eliminarCliente/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
   }
 }

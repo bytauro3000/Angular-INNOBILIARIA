@@ -1,4 +1,29 @@
-<div class="menu-container">
-  <h2>Menú de Soporte</h2>
-  <p>¡Bienvenida, Soporte! Accede a las funciones del sistema para gestionar la información de los clientes y propiedades.</p>
-  </div>
+<div class="menu-soporte-layout">
+  <aside class="sidebar-soporte">
+    <div class="user-profile-soporte">
+      <img src="img/logo.png" alt="Logo de la empresa" class="profile-img">
+      <h2 class="welcome-text">Hola, {{ usuarioLogueado?.nombre }}</h2>
+    </div>
+    
+    <nav class="nav-soporte">
+      <ul>
+        <li>
+          <a [routerLink]="['/soporte-menu/clientes']">Gestión de Clientes</a>
+        </li>
+        <li>
+          <a [routerLink]="['/soporte-menu/soportes']">Casos de Soporte</a>
+        </li>
+        <li>
+          <a [routerLink]="['/soporte-menu/reportes']">Reportes</a>
+        </li>
+        <li>
+          <a (click)="onLogout()">Cerrar Sesión</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content-soporte">
+    <router-outlet></router-outlet>
+  </main>
+</div>

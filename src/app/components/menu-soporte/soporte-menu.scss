@@ -1,16 +1,66 @@
-.menu-container {
+/* src/app/soporte/soporte-menu/soporte-menu.scss */
+.menu-soporte-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f4f9;
+}
+
+.sidebar-soporte {
+  width: 250px;
+  background-color: #34495e;
+  color: #ecf0f1;
   padding: 20px;
-  background-color: #f0f2f5;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.user-profile-soporte {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  background-color: white;
+  padding: 5px;
+}
+
+.welcome-text {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #2ecc71;
+}
+
+.nav-soporte ul {
+  list-style: none;
+  padding: 0;
+}
+
+.nav-soporte li {
+  margin-bottom: 10px;
+}
+
+.nav-soporte a {
+  display: block;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #ecf0f1;
   border-radius: 8px;
-  margin-top: 20px;
+  transition: background-color 0.3s, transform 0.3s;
+  font-weight: 500;
 }
 
-h2 {
-  color: #1e3c72;
-  font-weight: bold;
+.nav-soporte a:hover {
+  background-color: #2c3e50;
+  transform: translateX(5px);
 }
 
-p {
-  color: #555;
-  line-height: 1.6;
+.content-soporte {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
 }

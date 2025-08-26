@@ -1,8 +1,9 @@
+<!-- src/app/components/cliente-insertar/cliente-insertar.html -->
+
 <div class="insert-container">
   <div class="form-wrapper">
     <h2 class="form-title">Insertar Nuevo Cliente</h2>
-    <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
-
+    <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">  
       <div class="form-row form-2-col">
         <div class="form-group">
           <label for="nombre">Nombre</label>
@@ -30,21 +31,19 @@
             <option value="JURIDICO">Jurídico</option>
           </select>
         </div>
+        
         <div class="form-group">
-          <label for="dni">DNI</label>
-          <input type="text" id="dni" formControlName="dni" placeholder="DNI del cliente">
+          <label for="numDoc">DNI / RUC</label>
+          <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required>
         </div>
-        <div class="form-group">
-          <label for="ruc">RUC</label>
-          <input type="text" id="ruc" formControlName="ruc" placeholder="RUC del cliente">
-        </div>
-      </div>
 
-      <div class="form-row form-2-col">
         <div class="form-group">
           <label for="telefono">Teléfono</label>
           <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono">
         </div>
+      </div>
+
+      <div class="form-row form-2-col">
         <div class="form-group">
           <label for="estado">Estado</label>
           <select id="estado" formControlName="estado" required>
@@ -52,20 +51,20 @@
             <option value="INACTIVO">Inactivo</option>
           </select>
         </div>
-      </div>
-      
-      <div class="form-row form-2-col">
         <div class="form-group">
           <label for="direccion">Dirección</label>
           <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required>
         </div>
+      </div>
+      
+      <div class="form-row form-1-col">
         <div class="form-group" formGroupName="distrito">
           <label for="idDistrito">Distrito</label>
           <select id="idDistrito" formControlName="idDistrito" required>
             <option value="">Selecciona un distrito</option>
-            <option value="1">Distrito 1</option>
-            <option value="2">Distrito 2</option>
-            <option value="3">Distrito 3</option>
+            <option *ngFor="let d of distritos" [value]="d.idDistrito">
+              {{ d.nombre }}
+            </option>
           </select>
         </div>
       </div>
