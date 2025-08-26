@@ -10,6 +10,7 @@ import { AdminMenuComponent } from './components/menu-admin/admin-menu.component
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';//} ✅ Agregado: Importa el componente de edición
+import { LotesComponent } from './components/lote/lote.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
@@ -29,4 +30,6 @@ export const routes: Routes = [
   // ✅ Otras rutas protegidas por roles (sin cambios aquí)
   { path: 'soporte-menu', component: SoporteMenuComponent },
   { path: 'admin-menu', component: AdminMenuComponent },
+ //Ruta Lote
+  { path: 'lotes', component: LotesComponent }
 ];
