@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { TokenService } from '../../services/token.service';
+import { TokenService } from '../../auth/token.service';
 import { LogoutService } from '../../auth/logout.service';
 
 @Component({

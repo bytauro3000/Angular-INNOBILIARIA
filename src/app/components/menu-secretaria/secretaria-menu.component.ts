@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
-import { TokenService } from '../../services/token.service';
+import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { LogoutService } from '../../auth/logout.service';
 

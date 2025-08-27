@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
-import { TokenService } from '../../services/token.service';
+import { TokenService } from '../token.service';
 
 @Component({
   selector: 'app-login',

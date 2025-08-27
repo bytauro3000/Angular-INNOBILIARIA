@@ -1,7 +1,7 @@
 // src/app/services/logout.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TokenService } from '../services/token.service';
+import { TokenService } from './token.service';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 

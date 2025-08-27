@@ -1,7 +1,7 @@
 import { EstadoUsuario } from "../enums/estadousuario.enum";
-import { RolUsuario } from "./rolusuario..model";
+import { RolUsuario } from "./rolusuario.model";
 
-export interface usuario{
+export interface Usuario{
      id: number;
     nombres: string;
     apellidos: string;

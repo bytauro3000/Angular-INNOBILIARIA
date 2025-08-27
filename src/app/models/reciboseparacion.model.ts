@@ -1,11 +1,11 @@
 import { Separacion } from "./separacion.model";
-import { usuario } from "./usuario.model";
+import { Usuario } from "./usuario.model";
 
 export interface ReciboSeparacion{
     idRecibo : number;
     separacion : Separacion;
     numeroRecibo? : string;
-    usuario : usuario;
+    usuario : Usuario;
     fechaEmision : string;
 
 }
