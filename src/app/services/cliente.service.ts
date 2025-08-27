@@ -1,4 +1,3 @@
-// src/app/services/cliente.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -18,12 +17,17 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`${this.apiUrl}/listar`);
   }
 
-  // ✅ Modificación: Buscar cliente por número de documento (numDoc)
+  // ✅ Nuevo: Obtener cliente por ID para la edición
+  obtenerClientePorId(id: number): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}/buscar/${id}`);
+  }
+
+  // 🔹 Buscar cliente por número de documento (numDoc)
   obtenerClientePorNumDoc(numDoc: string): Observable<Cliente> {
     return this.http.get<Cliente>(`${this.apiUrl}/buscar/numDoc/${numDoc}`);
   }
 
-  // 🔹 Buscar clientes por apellidos (este método ya está correcto)
+  // 🔹 Buscar clientes por apellidos
   obtenerClientesPorApellidos(apellidos: string): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/apellidos/${apellidos}`);
   }
@@ -34,10 +38,8 @@ export class ClienteService {
       catchError(error => {
         let errorMessage = 'Ocurrió un error inesperado al insertar el cliente.';
         if (error.error instanceof ErrorEvent) {
-          // Error del lado del cliente
           errorMessage = `Error: ${error.error.message}`;
         } else {
-          // Error del lado del servidor. El mensaje real viene en `error.error`.
           errorMessage = error.error; 
         }
         console.error(errorMessage);
