@@ -1,18 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SecretariaMenuComponent } from './secretaria-menu.component';
 
-import { SecretariaMenu } from './secretaria-menu.component';
+
 
 describe('SecretariaMenu', () => {
-  let component: SecretariaMenu;
-  let fixture: ComponentFixture<SecretariaMenu>;
+  let component: SecretariaMenuComponent;
+  let fixture: ComponentFixture<SecretariaMenuComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SecretariaMenu]
+      imports: [SecretariaMenuComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SecretariaMenu);
+    fixture = TestBed.createComponent(SecretariaMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

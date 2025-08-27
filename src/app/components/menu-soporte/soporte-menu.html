@@ -8,13 +8,16 @@
     <nav class="nav-soporte">
       <ul>
         <li>
-          <a [routerLink]="['/soporte-menu/clientes']">Gestión de Clientes</a>
+          <a [routerLink]="['/soporte-menu/']">Principal</a>
         </li>
         <li>
-          <a [routerLink]="['/soporte-menu/soportes']">Casos de Soporte</a>
+          <a [routerLink]="['/soporte-menu/lotes']">Gestión de Lotes</a>
         </li>
         <li>
-          <a [routerLink]="['/soporte-menu/reportes']">Reportes</a>
+          <a [routerLink]="['/soporte-menu/soportes']">Gestion de Programas</a>
+        </li>
+        <li>
+          <a [routerLink]="['/soporte-menu/reportes']">Gestion de Parceleros</a>
         </li>
         <li>
           <a (click)="onLogout()">Cerrar Sesión</a>

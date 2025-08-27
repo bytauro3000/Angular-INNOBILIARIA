@@ -28,8 +28,14 @@ export const routes: Routes = [
   },
 
   // ✅ Otras rutas protegidas por roles (sin cambios aquí)
-  { path: 'soporte-menu', component: SoporteMenuComponent },
-  { path: 'admin-menu', component: AdminMenuComponent },
- //Ruta Lote
+ //Soporte Links
+  { path: 'soporte-menu', 
+  component: SoporteMenuComponent ,
+  children:[
   { path: 'lotes', component: LotesComponent }
+  ]
+},
+  
+  { path: 'admin-menu', component: AdminMenuComponent },
+  
 ];

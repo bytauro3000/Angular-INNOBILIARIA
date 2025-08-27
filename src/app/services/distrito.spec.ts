@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Distrito } from './distrito.service';
+import { DistritoService } from './distrito.service';
 
 describe('Distrito', () => {
-  let service: Distrito;
+  let service: DistritoService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Distrito);
+    service = TestBed.inject(DistritoService);
   });
 
   it('should be created', () => {
