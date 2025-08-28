@@ -7,6 +7,7 @@ import { Programa } from '../../models/programa.model';
 import { ProgramaService } from '../../services/programa.service';
 import { Parcelero } from '../../models/parcelero.model';
 import { Distrito } from '../../models/distrito.model';
+import { DistritoService } from '../../services/distrito.service'; // ✅ import
 
 @Component({
   selector: 'app-programa',
@@ -17,6 +18,7 @@ import { Distrito } from '../../models/distrito.model';
 })
 export class ProgramaComponent implements OnInit, AfterViewInit {
   programas: Programa[] = [];
+  distritos: Distrito[] = []; // ✅ lista de distritos
 
   nuevoPrograma: Programa = {
     nombrePrograma: '',
@@ -31,10 +33,14 @@ export class ProgramaComponent implements OnInit, AfterViewInit {
   programaEditando: Programa | null = null;
   private modal?: bootstrap.Modal;
 
-  constructor(private programaService: ProgramaService) {}
+  constructor(
+    private programaService: ProgramaService,
+    private distritoService: DistritoService // ✅ inyectamos el service
+  ) {}
 
   ngOnInit(): void {
     this.cargarProgramas();
+    this.cargarDistritos(); // ✅ cargamos distritos al iniciar
   }
 
   ngAfterViewInit(): void {
@@ -44,13 +50,18 @@ export class ProgramaComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // ✅ Método nuevo
+  cargarDistritos() {
+    this.distritoService.listarDistritos().subscribe(data => {
+      this.distritos = data;
+    });
+  }
+
   abrirModal(programa?: Programa) {
     if (programa) {
-      // Editar
       this.programaEditando = { ...programa };
       this.nuevoPrograma = { ...programa };
     } else {
-      // Crear
       this.programaEditando = null;
       this.resetForm();
     }
@@ -69,14 +80,12 @@ export class ProgramaComponent implements OnInit, AfterViewInit {
 
   guardarPrograma() {
     if (this.programaEditando && this.programaEditando.idPrograma) {
-      // EDITAR
       this.programaService.actualizarPrograma(this.programaEditando.idPrograma, this.nuevoPrograma).subscribe(() => {
         this.cargarProgramas();
         this.resetForm();
         this.cerrarModal();
       });
     } else {
-      // CREAR
       this.programaService.crearPrograma(this.nuevoPrograma).subscribe(() => {
         this.cargarProgramas();
         this.resetForm();

@@ -1,27 +1,29 @@
-// src/app/services/distrito.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Distrito } from '../models/distrito.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'
 })
 export class DistritoService {
-  // ✅ URL base actualizada
-  private apiUrl = 'http://localhost:8080/api/distritos';
+  private apiUrl = 'http://localhost:8080/api/distritos';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-  // 🔹 Listar todos los distritos
-  listarDistritos(): Observable<Distrito[]> {
-    // ✅ Endpoint actualizado
-    return this.http.get<Distrito[]>(`${this.apiUrl}/listar`);
-  }
+  // Obtener el token desde localStorage
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token'); // 👈 cuando hagas login, guarda el JWT aquí
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
 
-  // 🔹 Obtener un distrito por ID
-  obtenerDistritoPorId(id: number): Observable<Distrito> {
-    // ✅ Endpoint actualizado
-    return this.http.get<Distrito>(`${this.apiUrl}/obtener/${id}`);
-  }
+  listarDistritos(): Observable<Distrito[]> {
+    return this.http.get<Distrito[]>(`${this.apiUrl}/listar`, { headers: this.getHeaders() });
+  }
+
+  obtenerDistritoPorId(id: number): Observable<Distrito> {
+    return this.http.get<Distrito>(`${this.apiUrl}/obtener/${id}`, { headers: this.getHeaders() });
+  }
 }

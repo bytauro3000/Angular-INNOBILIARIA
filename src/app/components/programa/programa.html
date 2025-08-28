@@ -74,9 +74,14 @@
           </div>
 
           <div class="mb-3">
-            <label>Distrito</label>
-            <input [(ngModel)]="nuevoPrograma.distrito.nombre" name="distrito" class="form-control" />
-          </div>
+  <label>Distrito</label>
+  <select [(ngModel)]="nuevoPrograma.distrito" name="distrito" class="form-select">
+    <option *ngFor="let d of distritos" [ngValue]="d">
+      {{ d.nombre }}
+    </option>
+  </select>
+</div>
+
         </form>
       </div>
 
