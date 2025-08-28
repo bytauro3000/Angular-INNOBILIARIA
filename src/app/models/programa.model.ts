@@ -9,5 +9,5 @@ export interface Programa {
   precioM2?: number;
   costoTotal?: number;
   parcelero?: Parcelero;
-  distrito?: Distrito;
+  distrito: Distrito;
 }

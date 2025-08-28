@@ -15,6 +15,7 @@ import { ContratoListarComponent } from './components/contrato-listar/contrato-l
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
 import { ParceleroComponent } from './components/parcelero/parcelero';
 import { VendedorComponent } from './components/vendedor/vendedor';
+import { ProgramaComponent } from './components/programa/programa';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
@@ -41,7 +42,8 @@ export const routes: Routes = [
     children:[
       { path: 'lotes', component: LotesComponent },
       { path: 'parceleros', component: ParceleroComponent },
-      { path: 'vendedores', component: VendedorComponent }
+      { path: 'vendedores', component: VendedorComponent },
+      { path: 'programas', component: ProgramaComponent }
     ]
   },
   
