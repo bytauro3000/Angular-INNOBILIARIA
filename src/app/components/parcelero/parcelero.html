@@ -1,0 +1,75 @@
+<div class="container mt-4">
+  <!-- Título -->
+  <h2 class="text-center mb-4 text-primary">📋 Listado de Parceleros</h2>
+
+  <!-- Botón agregar -->
+  <div class="mb-3 text-end">
+    <button class="btn btn-success" (click)="abrirModal()">+ Agregar Parcelero</button>
+  </div>
+
+  <!-- Tabla -->
+  <table class="table table-striped table-bordered text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>DNI</th>
+        <th>Celular</th>
+        <th>Email</th>
+        <th>Distrito</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of parceleros">
+        <td>{{ p.idParcelero }}</td>
+        <td>{{ p.nombres }}</td>
+        <td>{{ p.apellidos }}</td>
+        <td>{{ p.dni }}</td>
+        <td>{{ p.celular }}</td>
+        <td>{{ p.email }}</td>
+        <td>{{ p.distrito.nombre }}</td>
+        <td>
+          <button class="btn btn-sm btn-warning me-1" (click)="abrirModal(p)">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminarParcelero(p.idParcelero!)">
+            🗑 Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="parceleroModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form (ngSubmit)="guardarParcelero()">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ parceleroEditando ? '✏️ Editar Parcelero' : '➕ Agregar Parcelero' }}
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+        </div>
+        <div class="modal-body">
+          <input class="form-control mb-2" type="text" placeholder="Nombres" [(ngModel)]="nuevoParcelero.nombres" name="nombres" required>
+          <input class="form-control mb-2" type="text" placeholder="Apellidos" [(ngModel)]="nuevoParcelero.apellidos" name="apellidos" required>
+          <input class="form-control mb-2" type="text" placeholder="DNI" [(ngModel)]="nuevoParcelero.dni" name="dni" required>
+          <input class="form-control mb-2" type="text" placeholder="Celular" [(ngModel)]="nuevoParcelero.celular" name="celular">
+          <input class="form-control mb-2" type="text" placeholder="Dirección" [(ngModel)]="nuevoParcelero.direccion" name="direccion">
+          <input class="form-control mb-2" type="email" placeholder="Email" [(ngModel)]="nuevoParcelero.email" name="email">
+          <input class="form-control mb-2" type="number" placeholder="ID Distrito" [(ngModel)]="nuevoParcelero.distrito.idDistrito" name="idDistrito" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ parceleroEditando ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

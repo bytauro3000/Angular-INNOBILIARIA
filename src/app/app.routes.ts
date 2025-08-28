@@ -13,6 +13,8 @@ import { ClienteEditarComponent } from './components/cliente-editar/cliente-edit
 import { LotesComponent } from './components/lote/lote.component';
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
+import { ParceleroComponent } from './components/parcelero/parcelero';
+import { VendedorComponent } from './components/vendedor/vendedor';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
@@ -37,7 +39,9 @@ export const routes: Routes = [
     path: 'soporte-menu', 
     component: SoporteMenuComponent ,
     children:[
-      { path: 'lotes', component: LotesComponent }
+      { path: 'lotes', component: LotesComponent },
+      { path: 'parceleros', component: ParceleroComponent },
+      { path: 'vendedores', component: VendedorComponent }
     ]
   },
   
