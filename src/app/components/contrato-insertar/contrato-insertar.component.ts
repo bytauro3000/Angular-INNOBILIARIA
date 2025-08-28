@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-
+//probando errores 
 @Component({
   selector: 'app-contrato-insertar',
   imports: [],
