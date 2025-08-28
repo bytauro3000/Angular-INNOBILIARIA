@@ -1,3 +1,4 @@
+// src/app/services/programa.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,19 +8,13 @@ import { Programa } from '../models/programa.model';
   providedIn: 'root'
 })
 export class ProgramaService {
-
   private apiUrl = 'http://localhost:8080/api/programas';
 
   constructor(private http: HttpClient) {}
 
-  // LISTAR TODOS
+  // LISTAR
   listarProgramas(): Observable<Programa[]> {
     return this.http.get<Programa[]>(this.apiUrl);
-  }
-
-  // OBTENER POR ID
-  obtenerProgramaPorId(id: number): Observable<Programa> {
-    return this.http.get<Programa>(`${this.apiUrl}/${id}`);
   }
 
   // CREAR
@@ -36,4 +31,10 @@ export class ProgramaService {
   eliminarPrograma(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  // 📥 DESCARGAR EXCEL
+descargarExcel(): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/reporte-excel`, { responseType: 'blob' });
+}
+
 }

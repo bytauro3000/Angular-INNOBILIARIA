@@ -111,4 +111,16 @@ export class ProgramaComponent implements OnInit, AfterViewInit {
       distrito: { idDistrito: 1, nombre: '' }
     };
   }
+
+  descargarExcel() {
+  this.programaService.descargarExcel().subscribe((data: Blob) => {
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'programas.xlsx'; // nombre del archivo
+    a.click();
+    window.URL.revokeObjectURL(url);
+  });
+
+  }
 }

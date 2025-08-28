@@ -101,4 +101,6 @@ export class VendedorComponent implements OnInit, AfterViewInit {
       distrito: { idDistrito: 1, nombre: '' }
     };
   }
+
+  
 }
