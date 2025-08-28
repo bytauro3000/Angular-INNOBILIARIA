@@ -27,9 +27,9 @@ export class ClienteService {
     return this.http.get<Cliente>(`${this.apiUrl}/buscar/numDoc/${numDoc}`);
   }
 
-  // 🔹 Buscar clientes por apellidos
-  obtenerClientesPorApellidos(apellidos: string): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/apellidos/${apellidos}`);
+  // Nuevo método para buscar clientes por filtro combinado (apellidos + nombres)
+  buscarClientesPorFiltro(filtro: string): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/filtro/${filtro}`);
   }
 
   // 🔹 Agregar nuevo cliente

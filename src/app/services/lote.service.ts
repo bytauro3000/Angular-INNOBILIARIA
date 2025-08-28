@@ -5,6 +5,7 @@ import { LoteResumen } from '../dto/loteresumen.dto';
 import { EstadoLote } from '../enums/estadolote.enum';
 import { Lote } from '../models/lote.model';
 import { Programa } from '../models/programa.model';
+import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
 
 
 @Injectable({
@@ -34,6 +35,11 @@ private programaUrl = 'http://localhost:8080/api/programas'; // Programas
 //Listado Completo
 listarLotes(): Observable<Lote[]>{
 return this.http.get<Lote[]>(this.apiUrl+`/lotes`);
+}
+
+// Listar lotes por programa usando el DTO optimizado
+listarLotesPorPrograma(idPrograma: number): Observable<LoteProgramaDTO[]> {
+  return this.http.get<LoteProgramaDTO[]>(`${this.apiUrl}/listarPorPrograma/${idPrograma}`);
 }
 
 //Obtener a un objLote por Id
