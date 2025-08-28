@@ -7,7 +7,7 @@ import { ContratoLote } from "./contrato-lote.model";
 import { LetraCambio } from "./letra-cambio.model";
 
 export interface Contrato {
-  idContrato?: number;
+  idContrato: number;
   separacion?: Separacion;
   vendedor?: Vendedor;
   usuario: Usuario;
@@ -20,7 +20,7 @@ export interface Contrato {
   observaciones?: string;
   
   // Relaciones, representadas como arreglos de las interfaces correspondientes
-  letrasCambio?: LetraCambio[];
-  clientes?: ContratoCliente[];
-  lotes?: ContratoLote[];
+  letrasCambio: LetraCambio[];
+  clientes: ContratoCliente[];
+  lotes: ContratoLote[];
 }

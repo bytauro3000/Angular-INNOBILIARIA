@@ -11,6 +11,8 @@ import { ClientesComponent } from './components/cliente-listar/cliente-listar.co
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';
 import { LotesComponent } from './components/lote/lote.component';
+import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
+import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
@@ -24,6 +26,9 @@ export const routes: Routes = [
       { path: 'clientes', component: ClientesComponent }, //Ruta Hija
       { path: 'clientes/insertar', component: ClienteInsertarComponent }, //Ruta Hija
       { path: 'clientes/editar/:id', component: ClienteEditarComponent }, //Rutas Hija
+      { path: '', redirectTo: 'contratos', pathMatch: 'full' },
+      { path: 'contratos', component: ContratoListarComponent },
+      { path: 'contratos/registrar', component: ContratoInsertarComponent },
     ]
   },
 //Otras rutas protegidas por roles (sin cambios aquí)

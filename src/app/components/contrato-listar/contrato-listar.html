@@ -1,0 +1,105 @@
+<div class="contratos-container">
+  <h2 class="text-center">Lista de Contratos</h2>
+
+  <div class="filtros mb-3 d-flex align-items-center gap-2">
+    <input
+      type="text"
+      [(ngModel)]="terminoBusqueda"
+      (input)="filtrarContratos()"
+      placeholder="🔍 Buscar por ID Contrato"
+      class="form-control filtro-input"
+      style="max-width: 300px;"
+    />
+
+    <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-success ms-auto">
+      <i class="bi bi-plus-lg"></i> Nuevo Contrato
+    </button>
+  </div>
+
+  <div class="tabla-contratos table-responsive">
+    <table class="table table-bordered table-hover text-center align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Nombre(s) del Cliente</th>
+          <th>Documento de Identidad</th>
+          <th>Fecha</th>
+          <th>Tipo Contrato</th>
+          <th>Monto Total</th>
+          <th>Inicial</th>
+          <th>Saldo</th>
+          <th>N° Letras</th>
+          
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
+          <td>{{ contrato.idContrato }}</td>
+          <td>
+            <ng-container *ngFor="let cliente of contrato.clientes">
+              {{ cliente.nombre }} {{ cliente.apellidos }}<br>
+            </ng-container>
+          </td>
+          <td>
+            <ng-container *ngFor="let cliente of contrato.clientes">
+              {{ cliente.numDoc }}<br>
+            </ng-container>
+          </td>
+          <td>{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ contrato.tipoContrato }}</td>
+          <td>{{ contrato.montoTotal | currency: 'USD':'symbol':'1.2-2' }}</td>
+          <td>{{ contrato.inicial | currency: 'USD':'symbol':'1.2-2' }}</td>
+          <td>{{ contrato.saldo | currency: 'USD':'symbol':'1.2-2' }}</td>
+          <td>{{ contrato.cantidadLetras }}</td>
+        
+          <td class="acciones-cell">
+            <button
+              [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
+              class="btn btn-outline-primary btn-sm me-1"
+              title="Editar contrato"
+            >
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              (click)="eliminarContrato(contrato.idContrato)"
+              title="Eliminar contrato"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+            <ng-container *ngIf="contrato.tipoContrato === TipoContrato.FINANCIADO">
+              <a
+                [routerLink]="['/secretaria-menu/letras/contrato', contrato.idContrato, 'generar']"
+                class="btn btn-outline-info btn-sm"
+                title="Generar letras de cambio"
+              >
+                <i class="bi bi-file-earmark-plus"></i>
+              </a>
+            </ng-container>
+          </td>
+        </tr>
+
+        <tr *ngIf="paginatedContratos.length === 0">
+          <td colspan="11" class="text-center text-muted">No hay contratos para mostrar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="d-flex justify-content-center">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="previousPage()">Anterior</button>
+      </li>
+      <li class="page-item" *ngFor="let page of getPagesArray()" [class.active]="page === currentPage">
+        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="nextPage()">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
+</div>

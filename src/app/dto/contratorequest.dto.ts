@@ -1,7 +1,7 @@
 import { Contrato } from '../models/contrato.model';
 
 
-export interface ContratoRequest {
+export interface ContratoRequestDTO {
   contrato: Contrato;
   idClientes: number[];
   idLotes: number[];

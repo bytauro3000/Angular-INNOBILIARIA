@@ -15,7 +15,7 @@ export interface LetraCambio {
   fechaVencimiento: string;
   importe: number;
   importeLetras?: string;
-  estado?: EstadoLetra;
+  estadoLetra?: EstadoLetra;
   fechaPago?: string;
   tipoComprobante?: TipoComprobante;
   numeroComprobante?: string;

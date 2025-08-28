@@ -17,7 +17,7 @@ export class SecretariaMenuComponent implements OnInit {
   usuarioLogueado: any;
   
   isClientesSubmenuOpen: boolean = false;
-  isProveedoresSubmenuOpen: boolean = false;
+  isContratoSubmenuOpen: boolean = false;
 
   constructor(
     private tokenService: TokenService,
@@ -43,13 +43,13 @@ export class SecretariaMenuComponent implements OnInit {
   }
 
   toggleClientesSubmenu() {
-    this.isProveedoresSubmenuOpen = false;
+    this.isContratoSubmenuOpen = false;
     this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen;
   }
 
-  toggleProveedoresSubmenu() {
+  toggleContratoSubmenu() {
     this.isClientesSubmenuOpen = false;
-    this.isProveedoresSubmenuOpen = !this.isProveedoresSubmenuOpen;
+    this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen;
   }
 
   @HostListener('document:click', ['$event'])
@@ -57,7 +57,7 @@ export class SecretariaMenuComponent implements OnInit {
     const target = event.target as HTMLElement;
     if (!target.closest('.has-submenu')) {
       this.isClientesSubmenuOpen = false;
-      this.isProveedoresSubmenuOpen = false;
+      this.isContratoSubmenuOpen = false;
     }
   }
 

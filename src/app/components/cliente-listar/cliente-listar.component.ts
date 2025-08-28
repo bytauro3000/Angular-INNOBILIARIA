@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente.model';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import Swal from 'sweetalert2'; // ✅ Importa SweetAlert2
+import Swal from 'sweetalert2'; //Importa SweetAlert2
 
 @Component({
   selector: 'app-clientes',
