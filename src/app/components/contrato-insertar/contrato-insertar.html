@@ -1,0 +1,180 @@
+<div class="contratos-container">
+  <h2>Registro de Contrato</h2>
+
+  <div class="form-wrapper">
+    <form [formGroup]="contratoForm" (ngSubmit)="guardarContrato()">
+
+      <div class="form-row form-3-col">
+        <div class="form-group">
+          <label for="modalidadContrato">Modalidad de Contrato</label>
+          <select id="modalidadContrato" formControlName="modalidadContrato">
+            <option *ngFor="let modo of modalidadContratoValues" [value]="modo">{{ modo }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="tipoContrato">Tipo de Contrato</label>
+          <select id="tipoContrato" formControlName="tipoContrato">
+            <option *ngFor="let tipo of tipoContratoValues" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="fechaContrato">Fecha del Contrato</label>
+          <input type="date" id="fechaContrato" formControlName="fechaContrato" />
+        </div>
+      </div>
+      
+      <!-- Bloque para modalidadContrato = DIRECTO (antes MANUAL) -->
+      <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
+        <div class="form-group">
+          <label for="vendedorId">Vendedor</label>
+          <select id="vendedorId" formControlName="vendedorId">
+            <option [ngValue]="null" disabled>Seleccione un vendedor</option>
+            <option *ngFor="let vendedor of vendedores" [value]="vendedor.idVendedor">
+              {{ vendedor.nombre }} {{ vendedor.apellidos }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="idPrograma">Programa</label>
+          <select id="idPrograma" formControlName="idPrograma">
+            <option [ngValue]="null" disabled>Seleccione un programa</option>
+            <option *ngFor="let prog of programas" [value]="prog.idPrograma">
+              {{ prog.nombrePrograma }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bloque para modalidadContrato = SEPARACION -->
+      <div class="form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'SEPARACION'">
+        <div class="form-group full-width">
+          <label>Buscar Separación</label>
+          <input
+            type="text"
+            (input)="buscarSeparaciones($event)"
+            placeholder="Buscar..."
+            [(ngModel)]="terminoBusquedaSeparacion"
+            [ngModelOptions]="{standalone: true}"
+          />
+          <ul class="separaciones-list" *ngIf="showSeparacionList && separaciones.length > 0">
+            <li *ngFor="let sep of separaciones" (click)="contratoForm.get('idSeparacion')?.setValue(sep.id)">
+              {{ sep.id }} - {{ sep.text }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+     <div class="form-row form-3-col">
+  <div class="form-group">
+    <label for="montoTotal">Monto Total</label>
+    <input
+      type="text"
+      id="montoTotal"
+      formControlName="montoTotal"
+      (focus)="limpiarSiEsCero('montoTotal')"
+    />
+  </div>
+
+  <div class="form-group" *ngIf="!esContado">
+    <label for="inicial">Inicial</label>
+    <input
+      type="text"
+      id="inicial"
+      formControlName="inicial"
+      (focus)="limpiarSiEsCero('inicial')"
+      
+    />
+  </div>
+
+  <div class="form-group"  *ngIf="!esContado">
+    <label for="saldo">Saldo</label>
+    <input
+      type="text"
+      id="saldo"
+      formControlName="saldo"
+      [disabled]="true"
+     
+    />
+  </div>
+</div>
+
+<!-- Cantidad de Letras -->
+<div class="form-row form-2-col" *ngIf="!esContado">
+  <div class="form-group">
+    <label for="cantidadLetras">Cantidad de Letras</label>
+    <input
+      type="text"
+      id="cantidadLetras"
+      formControlName="cantidadLetras"
+      (focus)="limpiarSiEsCero('cantidadLetras')"
+    />
+  </div>
+  <div class="form-group">
+    <label for="observaciones">Observaciones</label>
+    <input
+      type="text"
+      id="observaciones"
+      formControlName="observaciones"
+    />
+  </div>
+</div>
+
+<!-- Observaciones se mantiene en segunda fila si es contado -->
+<div class="form-row form-2-col" *ngIf="esContado">
+  <div class="form-group">
+    <label for="observaciones">Observaciones</label>
+    <input
+      type="text"
+      id="observaciones"
+      formControlName="observaciones"
+    />
+  </div>
+</div>
+      <!-- Bloque para modalidadContrato = DIRECTO (antes MANUAL) -->
+      <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
+        <div class="form-group">
+          <label>Agregar Cliente</label>
+          <select (change)="agregarCliente($event)">
+            <option [ngValue]="null" disabled selected>Seleccione un cliente</option>
+            <option *ngFor="let c of clientes" [value]="c.idCliente">
+              {{ c.nombre }} {{ c.apellidos }}
+            </option>
+          </select>
+          <ul>
+            <li *ngFor="let cli of clientesSeleccionados">
+              {{ cli.nombre }} {{ cli.apellidos }}
+              <button type="button" (click)="eliminarCliente(cli.idCliente)">❌</button>
+            </li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label>Agregar Lote</label>
+          <select (change)="agregarLote($event)">
+            <option [ngValue]="null" disabled selected>Seleccione un lote</option>
+            <option *ngFor="let l of lotes" [value]="l.idLote" [disabled]="isLoteSeleccionado(l.idLote)">
+              Manzana {{ l.manzana }} - Lote {{ l.numeroLote }}
+            </option>
+          </select>
+          <ul>
+            <li *ngFor="let lote of lotesSeleccionados">
+              Manzana {{ lote.manzana }} - Lote {{ lote.numeroLote }}
+              <button type="button" (click)="eliminarLote(lote.idLote)">❌</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="!contratoForm.valid">
+          <i class="bi bi-save"></i> Guardar Contrato
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/secretaria-menu/contratos'])">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

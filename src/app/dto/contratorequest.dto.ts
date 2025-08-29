@@ -1,9 +1,14 @@
-import { Contrato } from '../models/contrato.model';
-
-
 export interface ContratoRequestDTO {
-  contrato: Contrato;
+  fechaContrato: string;
+  tipoContrato: string;
+  montoTotal: number;
+  inicial: number;
+  saldo: number;
+  cantidadLetras: number;
+  observaciones?: string;
+  idVendedor?: number;
+  idUsuario?: number;
+  idSeparacion?: number;
   idClientes: number[];
   idLotes: number[];
-  idSeparacion?: number; // Opcional
 }

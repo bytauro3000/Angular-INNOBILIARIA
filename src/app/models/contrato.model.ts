@@ -9,7 +9,7 @@ import { LetraCambio } from "./letra-cambio.model";
 export interface Contrato {
   idContrato: number;
   separacion?: Separacion;
-  vendedor?: Vendedor;
+  vendedor: Vendedor;
   usuario: Usuario;
   tipoContrato: TipoContrato;
   fechaContrato: string; // Usamos 'string' para fechas desde la API

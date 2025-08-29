@@ -29,7 +29,7 @@ export const routes: Routes = [
       { path: 'clientes', component: ClientesComponent }, //Ruta Hija
       { path: 'clientes/insertar', component: ClienteInsertarComponent }, //Ruta Hija
       { path: 'clientes/editar/:id', component: ClienteEditarComponent }, //Rutas Hija
-      { path: '', redirectTo: 'contratos', pathMatch: 'full' },
+    
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
     ]

@@ -29,7 +29,6 @@
           <th>Inicial</th>
           <th>Saldo</th>
           <th>N° Letras</th>
-          
           <th>Acciones</th>
         </tr>
       </thead>
@@ -52,7 +51,6 @@
           <td>{{ contrato.inicial | currency: 'USD':'symbol':'1.2-2' }}</td>
           <td>{{ contrato.saldo | currency: 'USD':'symbol':'1.2-2' }}</td>
           <td>{{ contrato.cantidadLetras }}</td>
-        
           <td class="acciones-cell">
             <button
               [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"

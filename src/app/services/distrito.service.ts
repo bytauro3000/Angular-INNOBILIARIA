@@ -15,13 +15,13 @@ export class DistritoService {
 
   // 🔹 Listar todos los distritos
   listarDistritos(): Observable<Distrito[]> {
-    // ✅ Endpoint actualizado
+    //Endpoint actualizado
     return this.http.get<Distrito[]>(`${this.apiUrl}/listar`);
   }
 
   // 🔹 Obtener un distrito por ID
   obtenerDistritoPorId(id: number): Observable<Distrito> {
-    // ✅ Endpoint actualizado
+    //Endpoint actualizado
     return this.http.get<Distrito>(`${this.apiUrl}/obtener/${id}`);
   }
 }
