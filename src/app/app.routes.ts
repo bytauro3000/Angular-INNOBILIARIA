@@ -37,8 +37,7 @@ export const routes: Routes = [
       { path: 'clientes', component: ClientesComponent }, 
       { path: 'clientes/insertar', component: ClienteInsertarComponent }, 
       { path: 'clientes/editar/:id', component: ClienteEditarComponent }, 
-      { path: '', redirectTo: 'contratos', pathMatch: 'full' },
-      
+
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
     ]
