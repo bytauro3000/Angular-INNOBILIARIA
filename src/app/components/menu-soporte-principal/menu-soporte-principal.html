@@ -1,0 +1,23 @@
+<div class="principal-container">
+  <h1 class="titulo">
+    <i class="bi bi-bar-chart-fill"></i> Panel de Soporte
+  </h1>
+  <p class="subtitulo">Bienvenido al sistema de gestión.</p>
+
+  <div class="cards-container">
+    <div class="card shadow-sm" *ngFor="let card of cards" [ngClass]="card.color">
+      <div class="card-header">
+        <i class="{{ card.icon }} icon"></i>
+      </div>
+      <div class="card-body">
+        <h3 class="title">{{ card.title }}</h3>
+        <p class="total">{{ card.total }}</p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="card.link" class="btn-ver">
+          Ver detalles <i class="bi bi-arrow-right-circle"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -125,4 +125,26 @@ export class VendedorComponent implements OnInit, AfterViewInit {
       window.URL.revokeObjectURL(url);
     });
   }
+
+  exportarPDF() {
+  import('jspdf').then(jsPDF => {
+    const doc = new jsPDF.jsPDF();
+
+    doc.setFontSize(14);
+    doc.text('Listado de Vendedores', 10, 10);
+
+    this.vendedores.forEach((v, i) => {
+      doc.setFontSize(11);
+      doc.text(
+        `${i + 1}. ${v.nombre} ${v.apellidos} - DNI: ${v.dni} - Cel: ${v.celular || 'N/A'} - Email: ${v.email || 'N/A'} - Distrito: ${v.distrito?.nombre || 'N/A'}`,
+        10,
+        20 + i * 10
+      );
+    });
+
+    doc.save('vendedores.pdf');
+  });
+}
+
+
 }

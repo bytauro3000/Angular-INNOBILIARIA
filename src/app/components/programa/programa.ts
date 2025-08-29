@@ -121,6 +121,28 @@ export class ProgramaComponent implements OnInit, AfterViewInit {
     a.click();
     window.URL.revokeObjectURL(url);
   });
-
   }
+
+  exportarPDF() {
+  import('jspdf').then(jsPDF => {
+    const doc = new jsPDF.jsPDF();
+
+    doc.text('Listado de Programas', 10, 10);
+
+    this.programas.forEach((p, i) => {
+      doc.text(
+        `${i + 1}. ${p.nombrePrograma} - Ubicación: ${p.ubicacion || 'N/A'} 
+        Área: ${p.areaTotal} m² - Precio: ${p.precioM2 || 0} x m² 
+        Total: ${p.costoTotal || 0} 
+        Parcelero: ${p.parcelero ? (p.parcelero.nombres + ' ' + p.parcelero.apellidos) : 'N/A'} 
+        Distrito: ${p.distrito?.nombre || 'N/A'}`,
+        10,
+        20 + i * 30 // 👈 más espacio porque son varias líneas por programa
+      );
+    });
+
+    doc.save('programas.pdf');
+  });
+}
+
 }

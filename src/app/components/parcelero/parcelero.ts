@@ -123,4 +123,26 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
   });
 }
 
+exportarPDF() {
+  import('jspdf').then(jsPDF => {
+    const doc = new jsPDF.jsPDF();
+
+    doc.setFontSize(14);
+    doc.text('Listado de Parceleros', 10, 10);
+
+    this.parceleros.forEach((p, i) => {
+      doc.setFontSize(11);
+      doc.text(
+        `${i + 1}. ${p.nombres} ${p.apellidos} - DNI: ${p.dni} - Cel: ${p.celular || 'N/A'} - Distrito: ${p.distrito?.nombre || 'N/A'}`,
+        10,
+        20 + i * 10
+      );
+    });
+
+    doc.save('parceleros.pdf');
+  });
+}
+
+
+
 }
