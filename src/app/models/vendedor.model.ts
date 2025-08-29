@@ -1,4 +1,3 @@
-import { Genero } from "../enums/Genero.enum";
 import { Distrito } from "./distrito.model";
 
 export interface Vendedor{

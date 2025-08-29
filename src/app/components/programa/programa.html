@@ -1,16 +1,16 @@
 <div class="container mt-4">
   <h2 class="text-center mb-4 text-primary">🏠 Gestión de Programas</h2>
 
-  <!-- Botón Crear -->
-  <div class="text-end mb-3">
-    <button class="btn btn-success" (click)="abrirModal()">➕ Nuevo Programa</button>
-  </div>
-
-  <!-- Botones -->
-<div class="d-flex justify-content-between mb-3">
-  <button class="btn btn-success" (click)="abrirModal()">➕ Nuevo Programa</button>
-  <button class="btn btn-outline-primary" (click)="descargarExcel()">📥 Descargar Excel</button>
+  <!-- Botones de acciones -->
+<div class="d-flex justify-content-end gap-2 mb-3">
+  <button class="btn btn-success" (click)="abrirModal()">
+    ➕ Nuevo Programa
+  </button>
+  <button class="btn btn-outline-primary" (click)="descargarExcel()">
+    📥 Exportar Excel
+  </button>
 </div>
+
 
 
   <!-- Tabla -->

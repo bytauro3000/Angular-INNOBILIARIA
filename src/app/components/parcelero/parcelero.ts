@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Parcelero } from '../../models/parcelero.model';
 import { ParceleroService } from '../../services/parcelero.service';
+import { Distrito } from '../../models/distrito.model';
+import { DistritoService } from '../../services/distrito.service';
 
 import * as bootstrap from 'bootstrap';
 
@@ -15,6 +17,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class ParceleroComponent implements OnInit, AfterViewInit {
   parceleros: Parcelero[] = [];
+  distritos: Distrito[] = []; // 👈 lista de distritos
+
   nuevoParcelero: Parcelero = {
     nombres: '',
     apellidos: '',
@@ -22,16 +26,20 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
     celular: '',
     direccion: '',
     email: '',
-    distrito: { idDistrito: 1, nombre: '' }
+    distrito: { idDistrito: 0, nombre: '' }
   };
 
-  parceleroEditando: Parcelero | null = null; // 👈 Nuevo para edición
+  parceleroEditando: Parcelero | null = null;
   private modal?: bootstrap.Modal;
 
-  constructor(private parceleroService: ParceleroService) {}
+  constructor(
+    private parceleroService: ParceleroService,
+    private distritoService: DistritoService
+  ) {}
 
   ngOnInit(): void {
     this.cargarParceleros();
+    this.cargarDistritos(); // 👈 cargar distritos en el combo
   }
 
   ngAfterViewInit(): void {
@@ -43,11 +51,9 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
 
   abrirModal(parcelero?: Parcelero) {
     if (parcelero) {
-      // Editar
-      this.parceleroEditando = { ...parcelero }; // copia
-      this.nuevoParcelero = { ...parcelero };    // carga en form
+      this.parceleroEditando = { ...parcelero };
+      this.nuevoParcelero = { ...parcelero };
     } else {
-      // Crear
       this.parceleroEditando = null;
       this.resetForm();
     }
@@ -64,9 +70,14 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
     });
   }
 
+  cargarDistritos() {
+    this.distritoService.listarDistritos().subscribe(data => {
+      this.distritos = data;
+    });
+  }
+
   guardarParcelero() {
     if (this.parceleroEditando && this.parceleroEditando.idParcelero) {
-      // 🔹 EDITAR
       this.parceleroService
         .actualizarParcelero(this.parceleroEditando.idParcelero, this.nuevoParcelero)
         .subscribe(() => {
@@ -75,7 +86,6 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
           this.cerrarModal();
         });
     } else {
-      // 🔹 CREAR
       this.parceleroService.crearParcelero(this.nuevoParcelero).subscribe(() => {
         this.cargarParceleros();
         this.resetForm();
@@ -98,7 +108,19 @@ export class ParceleroComponent implements OnInit, AfterViewInit {
       celular: '',
       direccion: '',
       email: '',
-      distrito: { idDistrito: 1, nombre: '' }
+      distrito: { idDistrito: 0, nombre: '' }
     };
   }
+
+  exportarExcel() {
+  this.parceleroService.exportarExcel().subscribe((data: Blob) => {
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'parceleros.xlsx'; // 👈 nombre del archivo
+    a.click();
+    window.URL.revokeObjectURL(url);
+  });
+}
+
 }
