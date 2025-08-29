@@ -1,3 +1,4 @@
+// src/app/services/parcelero.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -36,5 +37,11 @@ export class ParceleroService {
   eliminarParcelero(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-}
 
+  // ✅ EXPORTAR A EXCEL
+  exportarExcel(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reporte-excel`, {
+      responseType: 'blob'
+    });
+  }
+}

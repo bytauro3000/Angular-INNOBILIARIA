@@ -1,90 +1,49 @@
 <div class="container mt-4">
-  <h2 class="text-center mb-4 text-primary">🏠 Gestión de Programas</h2>
+  <h2 class="text-center mb-4 text-primary fw-bold">🏠 Gestión de Programas</h2>
 
-  <!-- Botón Crear -->
-  <div class="text-end mb-3">
-    <button class="btn btn-success" (click)="abrirModal()">➕ Nuevo Programa</button>
+  <!-- Botones de acciones -->
+  <div class="d-flex justify-content-end gap-2 mb-3">
+    <button class="btn btn-success shadow-sm" (click)="abrirModal()">
+      ➕ Nuevo Programa
+    </button>
+    <button class="btn btn-outline-primary shadow-sm" (click)="descargarExcel()">
+      📥 Exportar Excel
+    </button>
+    <button class="btn btn-outline-danger shadow-sm" (click)="exportarPDF()">
+      📄 Exportar PDF
+    </button>
   </div>
 
   <!-- Tabla -->
-  <table class="table table-bordered table-striped">
-    <thead class="table-primary">
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Ubicación</th>
-        <th>Área Total</th>
-        <th>Precio m²</th>
-        <th>Costo Total</th>
-        <th>Distrito</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let programa of programas">
-        <td>{{ programa.idPrograma }}</td>
-        <td>{{ programa.nombrePrograma }}</td>
-        <td>{{ programa.ubicacion }}</td>
-        <td>{{ programa.areaTotal }}</td>
-        <td>{{ programa.precioM2 }}</td>
-        <td>{{ programa.costoTotal }}</td>
-        <td>{{ programa.distrito.nombre }}</td>
-        <td>
-          <button class="btn btn-warning btn-sm me-2" (click)="abrirModal(programa)">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" (click)="eliminarPrograma(programa.idPrograma!)">🗑 Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="programaModal" tabindex="-1" aria-labelledby="programaModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="programaModalLabel">
-          {{ programaEditando ? 'Editar Programa' : 'Nuevo Programa' }}
-        </h5>
-        <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Close"></button>
-      </div>
-
-      <div class="modal-body">
-        <form>
-          <div class="row mb-3">
-            <div class="col">
-              <label>Nombre</label>
-              <input [(ngModel)]="nuevoPrograma.nombrePrograma" name="nombrePrograma" class="form-control" required />
-            </div>
-            <div class="col">
-              <label>Ubicación</label>
-              <input [(ngModel)]="nuevoPrograma.ubicacion" name="ubicacion" class="form-control" />
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col">
-              <label>Área Total</label>
-              <input type="number" [(ngModel)]="nuevoPrograma.areaTotal" name="areaTotal" class="form-control" required />
-            </div>
-            <div class="col">
-              <label>Precio m²</label>
-              <input type="number" [(ngModel)]="nuevoPrograma.precioM2" name="precioM2" class="form-control" />
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label>Distrito</label>
-            <input [(ngModel)]="nuevoPrograma.distrito.nombre" name="distrito" class="form-control" />
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn btn-primary" (click)="guardarPrograma()">Guardar</button>
-      </div>
-    </div>
+  <div class="table-responsive shadow-sm rounded-3">
+    <table class="table align-middle table-hover">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Área Total</th>
+          <th>Precio m²</th>
+          <th>Costo Total</th>
+          <th>Distrito</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="text-center">
+        <tr *ngFor="let programa of programas">
+          <td class="fw-semibold">{{ programa.idPrograma }}</td>
+          <td>{{ programa.nombrePrograma }}</td>
+          <td>{{ programa.ubicacion }}</td>
+          <td>{{ programa.areaTotal }}</td>
+          <td>{{ programa.precioM2 | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td class="fw-bold text-success">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td><span class="badge bg-info text-dark px-3 py-2">{{ programa.distrito.nombre }}</span></td>
+          <td>
+            <button class="btn btn-warning btn-sm me-2 shadow-sm" (click)="abrirModal(programa)">✏️</button>
+            <button class="btn btn-danger btn-sm shadow-sm" (click)="eliminarPrograma(programa.idPrograma!)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-

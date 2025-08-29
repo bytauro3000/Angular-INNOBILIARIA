@@ -36,4 +36,11 @@ export class VendedorService {
   eliminarVendedor(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  // ✅ EXPORTAR EXCEL
+  exportarExcel(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reporte-excel`, {
+      responseType: 'blob'  // <- importante
+    });
+  }
 }

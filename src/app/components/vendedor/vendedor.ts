@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Vendedor } from '../../models/vendedor.model';
 import { VendedorService } from '../../services/vendedor.service';
-
+import { Distrito } from '../../models/distrito.model';
+import { DistritoService } from '../../services/distrito.service'; // 👈 importar service
 import * as bootstrap from 'bootstrap';
 
 @Component({
@@ -15,6 +16,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class VendedorComponent implements OnInit, AfterViewInit {
   vendedores: Vendedor[] = [];
+  distritos: Distrito[] = []; // ✅ lista de distritos
+
   nuevoVendedor: Vendedor = {
     nombre: '',
     apellidos: '',
@@ -28,10 +31,14 @@ export class VendedorComponent implements OnInit, AfterViewInit {
   vendedorEditando: Vendedor | null = null;
   private modal?: bootstrap.Modal;
 
-  constructor(private vendedorService: VendedorService) {}
+  constructor(
+    private vendedorService: VendedorService,
+    private distritoService: DistritoService // ✅ inyectar
+  ) {}
 
   ngOnInit(): void {
     this.cargarVendedores();
+    this.cargarDistritos(); // ✅
   }
 
   ngAfterViewInit(): void {
@@ -41,13 +48,17 @@ export class VendedorComponent implements OnInit, AfterViewInit {
     }
   }
 
+  cargarDistritos() {
+    this.distritoService.listarDistritos().subscribe(data => {
+      this.distritos = data;
+    });
+  }
+
   abrirModal(vendedor?: Vendedor) {
     if (vendedor) {
-      // EDITAR
       this.vendedorEditando = { ...vendedor };
       this.nuevoVendedor = { ...vendedor };
     } else {
-      // CREAR
       this.vendedorEditando = null;
       this.resetForm();
     }
@@ -66,7 +77,6 @@ export class VendedorComponent implements OnInit, AfterViewInit {
 
   guardarVendedor() {
     if (this.vendedorEditando && this.vendedorEditando.idVendedor) {
-      // EDITAR
       this.vendedorService
         .actualizarVendedor(this.vendedorEditando.idVendedor, this.nuevoVendedor)
         .subscribe(() => {
@@ -75,7 +85,6 @@ export class VendedorComponent implements OnInit, AfterViewInit {
           this.cerrarModal();
         });
     } else {
-      // CREAR
       this.vendedorService.crearVendedor(this.nuevoVendedor).subscribe(() => {
         this.cargarVendedores();
         this.resetForm();
@@ -101,4 +110,41 @@ export class VendedorComponent implements OnInit, AfterViewInit {
       distrito: { idDistrito: 1, nombre: '' }
     };
   }
+
+  // ✅ DESCARGAR EXCEL
+  descargarExcel() {
+    this.vendedorService.exportarExcel().subscribe((data: Blob) => {
+      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vendedores.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  exportarPDF() {
+  import('jspdf').then(jsPDF => {
+    const doc = new jsPDF.jsPDF();
+
+    doc.setFontSize(14);
+    doc.text('Listado de Vendedores', 10, 10);
+
+    this.vendedores.forEach((v, i) => {
+      doc.setFontSize(11);
+      doc.text(
+        `${i + 1}. ${v.nombre} ${v.apellidos} - DNI: ${v.dni} - Cel: ${v.celular || 'N/A'} - Email: ${v.email || 'N/A'} - Distrito: ${v.distrito?.nombre || 'N/A'}`,
+        10,
+        20 + i * 10
+      );
+    });
+
+    doc.save('vendedores.pdf');
+  });
+}
+
+
 }

@@ -1,54 +1,68 @@
 <div class="container mt-4">
   <!-- Título -->
-  <h2 class="text-center mb-4 text-primary">📋 Listado de Parceleros</h2>
+  <h2 class="text-center mb-4 text-primary fw-bold">📋 Listado de Parceleros</h2>
 
-  <!-- Botón agregar -->
-  <div class="mb-3 text-end">
-    <button class="btn btn-success" (click)="abrirModal()">+ Agregar Parcelero</button>
+  <!-- Botones de acciones -->
+  <div class="d-flex justify-content-end gap-2 mb-3">
+    <button class="btn btn-success shadow-sm" (click)="abrirModal()">
+      ➕ Agregar Parcelero
+    </button>
+    <button class="btn btn-outline-primary shadow-sm" (click)="exportarExcel()">
+      📥 Exportar Excel
+    </button>
+    <button class="btn btn-outline-danger shadow-sm" (click)="exportarPDF()">
+      📄 Exportar PDF
+    </button>
   </div>
 
   <!-- Tabla -->
-  <table class="table table-striped table-bordered text-center align-middle">
-    <thead class="table-dark">
-      <tr>
-        <th>ID</th>
-        <th>Nombres</th>
-        <th>Apellidos</th>
-        <th>DNI</th>
-        <th>Celular</th>
-        <th>Email</th>
-        <th>Distrito</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of parceleros">
-        <td>{{ p.idParcelero }}</td>
-        <td>{{ p.nombres }}</td>
-        <td>{{ p.apellidos }}</td>
-        <td>{{ p.dni }}</td>
-        <td>{{ p.celular }}</td>
-        <td>{{ p.email }}</td>
-        <td>{{ p.distrito.nombre }}</td>
-        <td>
-          <button class="btn btn-sm btn-warning me-1" (click)="abrirModal(p)">
-            ✏️ Editar
-          </button>
-          <button class="btn btn-sm btn-danger" (click)="eliminarParcelero(p.idParcelero!)">
-            🗑 Eliminar
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive shadow-sm rounded-3">
+    <table class="table align-middle table-hover text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nombres</th>
+          <th>Apellidos</th>
+          <th>DNI</th>
+          <th>Celular</th>
+          <th>Email</th>
+          <th>Distrito</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of parceleros">
+          <td class="fw-semibold">{{ p.idParcelero }}</td>
+          <td>{{ p.nombres }}</td>
+          <td>{{ p.apellidos }}</td>
+          <td>{{ p.dni }}</td>
+          <td>{{ p.celular }}</td>
+          <td class="text-muted">{{ p.email }}</td>
+          <td>
+            <span class="badge bg-info text-dark px-3 py-2">
+              {{ p.distrito.nombre }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-warning btn-sm me-1 shadow-sm" (click)="abrirModal(p)">
+              ✏️
+            </button>
+            <button class="btn btn-danger btn-sm shadow-sm" (click)="eliminarParcelero(p.idParcelero!)">
+              🗑
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="parceleroModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content shadow-lg rounded-3">
       <form (ngSubmit)="guardarParcelero()">
-        <div class="modal-header">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title">
             {{ parceleroEditando ? '✏️ Editar Parcelero' : '➕ Agregar Parcelero' }}
           </h5>
@@ -61,11 +75,18 @@
           <input class="form-control mb-2" type="text" placeholder="Celular" [(ngModel)]="nuevoParcelero.celular" name="celular">
           <input class="form-control mb-2" type="text" placeholder="Dirección" [(ngModel)]="nuevoParcelero.direccion" name="direccion">
           <input class="form-control mb-2" type="email" placeholder="Email" [(ngModel)]="nuevoParcelero.email" name="email">
-          <input class="form-control mb-2" type="number" placeholder="ID Distrito" [(ngModel)]="nuevoParcelero.distrito.idDistrito" name="idDistrito" required>
+
+          <!-- Select de distritos -->
+          <select class="form-select mb-2" [(ngModel)]="nuevoParcelero.distrito.idDistrito" name="idDistrito" required>
+            <option value="" disabled selected>Seleccione un distrito</option>
+            <option *ngFor="let d of distritos" [value]="d.idDistrito">
+              {{ d.nombre }}
+            </option>
+          </select>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary shadow-sm">
             {{ parceleroEditando ? 'Actualizar' : 'Guardar' }}
           </button>
         </div>

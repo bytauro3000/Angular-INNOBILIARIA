@@ -17,6 +17,9 @@ import { ParceleroComponent } from './components/parcelero/parcelero';
 import { VendedorComponent } from './components/vendedor/vendedor';
 import { ProgramaComponent } from './components/programa/programa';
 
+// 👇 Importa tu dashboard principal
+import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-soporte-principal';
+
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -26,20 +29,27 @@ export const routes: Routes = [
     path: 'secretaria-menu',
     component: SecretariaMenuComponent,
     children: [
+
       { path: 'clientes', component: ClientesComponent }, //Ruta Hija
       { path: 'clientes/insertar', component: ClienteInsertarComponent }, //Ruta Hija
       { path: 'clientes/editar/:id', component: ClienteEditarComponent }, //Rutas Hija
     
+      { path: 'clientes', component: ClientesComponent }, 
+      { path: 'clientes/insertar', component: ClienteInsertarComponent }, 
+      { path: 'clientes/editar/:id', component: ClienteEditarComponent }, 
+      { path: '', redirectTo: 'contratos', pathMatch: 'full' },
+      
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
     ]
   },
-//Otras rutas protegidas por roles (sin cambios aquí)
- //Soporte Links
+
+  //Soporte Links
   { 
     path: 'soporte-menu', 
     component: SoporteMenuComponent ,
     children:[
+      { path: '', component: MenuSoportePrincipal },   // 👈 Principal
       { path: 'lotes', component: LotesComponent },
       { path: 'parceleros', component: ParceleroComponent },
       { path: 'vendedores', component: VendedorComponent },
@@ -48,5 +58,4 @@ export const routes: Routes = [
   },
   
   { path: 'admin-menu', component: AdminMenuComponent },
-  
 ];
