@@ -174,12 +174,6 @@
     margin-top: 0.25rem;
   }
 
-  // 🎯 Estilos específicos para campos con Cleave (montoTotal e inicial)
-  #montoTotal, #inicial {
-    padding-left: 2rem; // espacio para el símbolo $
-    font-variant-numeric: tabular-nums;
-  }
-
   // 🎯 Estilo especial para el campo "saldo" deshabilitado
   #saldo {
     background-color: #3e566e;

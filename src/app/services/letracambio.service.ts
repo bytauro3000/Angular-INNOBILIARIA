@@ -10,14 +10,14 @@ import { LetraCambio } from '../models/letra-cambio.model';
   providedIn: 'root'
 })
 export class LetrasCambioService {
-  private apiUrl = '/api/letras';
+  private apiUrl = 'http://localhost:8080/api/letras';
 
   constructor(private http: HttpClient) {}
 
-  listarPorContrato(idContrato: number): Observable<LetraCambio[]> {
-    const url = `${this.apiUrl}/contrato/${idContrato}`;
+ listarPorContrato(idContrato: number): Observable<LetraCambio[]> {
+    const url = `${this.apiUrl}/listar/${idContrato}`; 
     return this.http.get<LetraCambio[]>(url);
-  }
+}
 
   generarLetras(idContrato: number, request: GenerarLetrasRequest): Observable<void> {
     const url = `${this.apiUrl}/contrato/${idContrato}`;

@@ -192,13 +192,14 @@ limpiarSiEsCero(controlName: string) {
 }
 private extractNumericValue(value: any): number {
   if (typeof value !== 'string') {
-    // Si no es string, intentar convertir a string o devolver 0
     if (value === null || value === undefined) return 0;
     value = value.toString();
   }
-  const numericValue = value.replace(/[^0-9.-]+/g, "");
+  // Mantener los símbolos de moneda y eliminar solo los caracteres no numéricos
+  const numericValue = value.replace(/[^\d.-]+/g, "");  // Elimina todo lo que no sea número o punto
   return parseFloat(numericValue) || 0;
 }
+
   //Método modificado para controlar la visibilidad y el servicio de búsqueda
   buscarSeparaciones(event: Event) {
     const input = event.target as HTMLInputElement;
