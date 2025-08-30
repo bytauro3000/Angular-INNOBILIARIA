@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <h4 class="text-center mb-4">Letras de Cambio del Contrato #{{ idContrato }}</h4>
+
+  <div *ngIf="cargando" class="text-center text-muted">Cargando letras...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <table *ngIf="!cargando && letras.length > 0" class="table table-bordered table-striped">
+    <thead class="table-primary text-center">
+      <tr>
+        <th>#</th>
+        <th>Número Letra</th>
+        <th>Estado</th>
+        <th>Fecha Giro</th>
+        <th>Fecha Vencimiento</th>
+        <th>Importe</th>
+        <th>Importe Texto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let letra of letras; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ letra.numeroLetra }}</td>
+        <td>{{ letra.estadoLetra }}</td>
+        <td>{{ letra.fechaGiro | date:'dd/MM/yyyy' }}</td>
+        <td>{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+        <td>${{ letra.importe | number:'1.2-2' }}</td>
+        <td>{{ letra.importeLetras }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!cargando && letras.length === 0" class="text-center text-muted">
+    No hay letras registradas para este contrato.
+  </div>
+</div>

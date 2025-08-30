@@ -68,7 +68,7 @@
             </button>
             <ng-container *ngIf="contrato.tipoContrato === TipoContrato.FINANCIADO">
               <a
-                [routerLink]="['/secretaria-menu/letras/contrato', contrato.idContrato, 'generar']"
+                [routerLink]="['/secretaria-menu/letras/listar', contrato.idContrato]"
                 class="btn btn-outline-info btn-sm"
                 title="Generar letras de cambio"
               >
