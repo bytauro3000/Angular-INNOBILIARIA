@@ -25,7 +25,7 @@
         </div>
       </div>
       
-      <!-- Bloque para modalidadContrato = DIRECTO (antes MANUAL) -->
+      <!-- Bloque para modalidadContrato = DIRECTO -->
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label for="vendedorId">Vendedor</label>
@@ -67,73 +67,73 @@
         </div>
       </div>
 
-     <div class="form-row form-3-col">
-  
-  <div class="form-group">
-    <label for="montoTotal">Monto Total</label>
-    <input
-      type="text"
-      id="montoTotal"
-      formControlName="montoTotal"
-      (focus)="limpiarSiEsCero('montoTotal')"
-    />
-  </div>
+      <div class="form-row form-3-col">
+        <div class="form-group">
+          <label for="montoTotal">Monto Total</label>
+          <input
+            type="text"
+            id="montoTotal"
+            formControlName="montoTotal"
+            (focus)="onFocusInput($event, 'montoTotal')"
+            (blur)="onCurrencyInput($event, 'montoTotal')"
+          />
+        </div>
 
-  <div class="form-group" *ngIf="!esContado">
-    <label for="inicial">Inicial</label>
-    <input
-      type="text"
-      id="inicial"
-      formControlName="inicial"
-      (focus)="limpiarSiEsCero('inicial')"
-    />
-  </div>
+        <div class="form-group" *ngIf="!esContado">
+          <label for="inicial">Inicial</label>
+          <input
+            type="text"
+            id="inicial"
+            formControlName="inicial"
+            (focus)="onFocusInput($event, 'inicial')"
+            (blur)="onCurrencyInput($event, 'inicial')"
+          />
+        </div>
 
-  <div class="form-group"  *ngIf="!esContado">
-    <label for="saldo">Saldo</label>
-    <input
-      type="text"
-      id="saldo"
-      formControlName="saldo"
-      [disabled]="true"
-     
-    />
-  </div>
-</div>
+        <div class="form-group" *ngIf="!esContado">
+          <label for="saldo">Saldo</label>
+          <input
+            type="text"
+            id="saldo"
+            formControlName="saldo"
+            [disabled]="true"
+          />
+        </div>
+      </div>
 
-<!-- Cantidad de Letras -->
-<div class="form-row form-2-col" *ngIf="!esContado">
-  <div class="form-group">
-    <label for="cantidadLetras">Cantidad de Letras</label>
-    <input
-      type="text"
-      id="cantidadLetras"
-      formControlName="cantidadLetras"
-      (focus)="limpiarSiEsCero('cantidadLetras')"
-    />
-  </div>
-  <div class="form-group">
-    <label for="observaciones">Observaciones</label>
-    <input
-      type="text"
-      id="observaciones"
-      formControlName="observaciones"
-    />
-  </div>
-</div>
+      <!-- Cantidad de Letras -->
+      <div class="form-row form-2-col" *ngIf="!esContado">
+        <div class="form-group">
+          <label for="cantidadLetras">Cantidad de Letras</label>
+          <input
+            type="text"
+            id="cantidadLetras"
+            formControlName="cantidadLetras"
+          />
+        </div>
+        <div class="form-group">
+          <label for="observaciones">Observaciones</label>
+          <input
+            type="text"
+            id="observaciones"
+            formControlName="observaciones"
+          />
+        </div>
+      </div>
 
-<!-- Observaciones se mantiene en segunda fila si es contado -->
-<div class="form-row form-2-col" *ngIf="esContado">
-  <div class="form-group">
-    <label for="observaciones">Observaciones</label>
-    <input
-      type="text"
-      id="observaciones"
-      formControlName="observaciones"
-    />
-  </div>
-</div>
-      <!-- Bloque para modalidadContrato = DIRECTO (antes MANUAL) -->
+      <!-- Observaciones se mantiene en segunda fila si es contado -->
+      <div class="form-row form-2-col" *ngIf="esContado">
+        <div class="form-group">
+          <label for="observaciones">Observaciones</label>
+          <input
+            type="text"
+            id="observaciones"
+            formControlName="observaciones"
+          />
+        </div>
+      </div>
+      
+      <!-- Bloque para modalidadContrato = DIRECTO -->
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label>Agregar Cliente</label>

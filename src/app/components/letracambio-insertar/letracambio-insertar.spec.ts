@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LetracambioInsertar } from './letracambio-insertar.component';
+import { LetracambioInsertarComponent } from './letracambio-insertar.component';
 
 describe('LetracambioInsertar', () => {
-  let component: LetracambioInsertar;
-  let fixture: ComponentFixture<LetracambioInsertar>;
+  let component: LetracambioInsertarComponent;
+  let fixture: ComponentFixture<LetracambioInsertarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LetracambioInsertar]
+      imports: [LetracambioInsertarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LetracambioInsertar);
+    fixture = TestBed.createComponent(LetracambioInsertarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

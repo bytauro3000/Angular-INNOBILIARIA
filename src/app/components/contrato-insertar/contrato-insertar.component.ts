@@ -1,16 +1,12 @@
-// contrato-insertar.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormBuilder,FormGroup,Validators,ReactiveFormsModule,FormsModule} from '@angular/forms';
-import Cleave from 'cleave.js';
 import { ContratoService } from '../../services/contrato.service';
 import { ProgramaService } from '../../services/programa.service';
 import { VendedorService } from '../../services/vendedor.service';
 import { SeparacionService } from '../../services/separacion.service';
 import { ClienteService } from '../../services/cliente.service';
 import { LoteService } from '../../services/lote.service';
-
 import { Cliente } from '../../models/cliente.model';
 import { Lote } from '../../models/lote.model';
 import { Programa } from '../../models/programa.model';
@@ -24,11 +20,10 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-contrato-insertar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule], // ✅ Añade FormsModule aquí
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule],
   templateUrl: './contrato-insertar.html',
   styleUrls: ['./contrato-insertar.scss']
 })
-
 
 export class ContratoInsertarComponent implements OnInit {
   contratoForm!: FormGroup;
@@ -45,7 +40,6 @@ export class ContratoInsertarComponent implements OnInit {
   modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
   
-  // Nuevas propiedades para la lógica de búsqueda de separaciones
   terminoBusquedaSeparacion: string = '';
   showSeparacionList: boolean = false;
 
@@ -65,47 +59,39 @@ export class ContratoInsertarComponent implements OnInit {
     this.initForm();
     this.cargarCombos();
     this.handleFormChanges();
- // Inicializa Cleave aquí para formatear montoTotal
-    new Cleave('#montoTotal', {
-      prefix: '$ ', // Símbolo de moneda
-      numeral: true,
-      numeralThousandsGroupStyle: 'thousand',
-    });
-
-    // Agregar formateo a inicial y saldo
-    new Cleave('#inicial', {
-      prefix: '$ ', // Símbolo de moneda
-      numeral: true,
-      numeralThousandsGroupStyle: 'thousand',
-    });
-
-    new Cleave('#saldo', {
-      prefix: '$ ', // Símbolo de moneda
-      numeral: true,
-      numeralThousandsGroupStyle: 'thousand',
-    });
-    
   }
 
-limpiarSiEsCero(controlName: string) {
-  const control = this.contratoForm.get(controlName);
-  if (control?.value === 0 || control?.value === '0') {
-    control.setValue('');
+  // Se encarga de aplicar el formato de moneda a los campos numéricos al salir del foco
+  onCurrencyInput(event: Event, controlName: string) {
+    const input = event.target as HTMLInputElement;
+    const numericValue = this.extractNumericValue(input.value);
+    const formattedValue = this.formatCurrency(numericValue);
+    this.contratoForm.get(controlName)?.setValue(formattedValue, { emitEvent: false });
   }
-}
+
+  // Se encarga de limpiar el valor numérico manteniendo el símbolo de moneda cuando se hace clic en el campo
+  onFocusInput(event: Event, controlName: string) {
+    const control = this.contratoForm.get(controlName);
+    const numericValue = this.extractNumericValue(control?.value);
+    if (numericValue === 0) {
+      control?.setValue('', { emitEvent: false });
+    } else {
+      control?.setValue(numericValue.toString(), { emitEvent: false });
+    }
+  }
   
   private initForm() {
     this.contratoForm = this.fb.group({
       modalidadContrato: ['DIRECTO', Validators.required],
-      tipoContrato: ['FINANCIADO', Validators.required], //Inicializado con valor por defecto
+      tipoContrato: ['FINANCIADO', Validators.required],
       fechaContrato: ['', Validators.required],
       vendedorId: [null, Validators.required],
       idPrograma: [null, Validators.required],
       idSeparacion: [null],
-      // Campos numéricos inicializados con 0
-      montoTotal: [0, [Validators.required, Validators.min(0)]],
-      inicial: [0, [Validators.min(0)]],
-      saldo: [{ value: 0, disabled: true }],
+      // Inicializar con valores formateados
+      montoTotal: [this.formatCurrency(0), [Validators.required, Validators.min(0)]],
+      inicial: [this.formatCurrency(0), [Validators.min(0)]],
+      saldo: [{ value: this.formatCurrency(0), disabled: true }],
       cantidadLetras: [0, [Validators.min(0)]],
       observaciones: [''],
       idClientes: [[], Validators.required],
@@ -120,23 +106,25 @@ limpiarSiEsCero(controlName: string) {
   }
 
   private handleFormChanges() {
-  this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
-  this.contratoForm.get('inicial')?.valueChanges.subscribe(() => this.actualizarSaldo());
+    this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
+    this.contratoForm.get('inicial')?.valueChanges.subscribe(() => this.actualizarSaldo());
 
-  this.contratoForm.get('tipoContrato')?.valueChanges.subscribe(tipo => {
-    if (tipo === 'CONTADO') {
-      this.contratoForm.get('inicial')?.disable();
-      this.contratoForm.get('cantidadLetras')?.disable();
-    } else {
-      this.contratoForm.get('inicial')?.enable();
-      this.contratoForm.get('cantidadLetras')?.enable();
-    }
-  });
-
-  
+    this.contratoForm.get('tipoContrato')?.valueChanges.subscribe(tipo => {
+      if (tipo === 'CONTADO') {
+        this.contratoForm.get('inicial')?.disable();
+        this.contratoForm.get('cantidadLetras')?.disable();
+        this.contratoForm.get('inicial')?.setValue(this.formatCurrency(this.extractNumericValue(this.contratoForm.value.montoTotal)));
+        this.contratoForm.get('saldo')?.setValue(this.formatCurrency(0));
+        this.contratoForm.get('cantidadLetras')?.setValue(0);
+      } else {
+        this.contratoForm.get('inicial')?.enable();
+        this.contratoForm.get('cantidadLetras')?.enable();
+        this.actualizarSaldo();
+      }
+    });
 
     this.contratoForm.get('modalidadContrato')?.valueChanges.subscribe(modo => {
-  if (modo === 'DIRECTO') {
+      if (modo === 'DIRECTO') {
         this.contratoForm.get('idSeparacion')?.reset();
         this.separaciones = [];
         this.enableClienteLoteControls(true);
@@ -155,8 +143,8 @@ limpiarSiEsCero(controlName: string) {
         this.contratoForm.get('vendedorId')?.reset();
         this.contratoForm.get('idPrograma')?.reset();
         if (this.terminoBusquedaSeparacion.trim().length === 0) {
-            this.showSeparacionList = false;
-            this.separaciones = [];
+          this.showSeparacionList = false;
+          this.separaciones = [];
         }
       }
 
@@ -181,26 +169,29 @@ limpiarSiEsCero(controlName: string) {
   }
 
   actualizarSaldo() {
-  const rawMonto = this.contratoForm.get('montoTotal')?.value || '0';
-  const rawInicial = this.contratoForm.get('inicial')?.value || '0';
+    const rawMonto = this.contratoForm.get('montoTotal')?.value || '0';
+    const rawInicial = this.contratoForm.get('inicial')?.value || '0';
 
-  const total = this.extractNumericValue(rawMonto);
-  const inicial = this.extractNumericValue(rawInicial);
+    const total = this.extractNumericValue(rawMonto);
+    const inicial = this.extractNumericValue(rawInicial);
 
-  const saldo = total - inicial;
-  this.contratoForm.get('saldo')?.setValue(saldo >= 0 ? saldo : 0, { emitEvent: false });
-}
-private extractNumericValue(value: any): number {
-  if (typeof value !== 'string') {
-    if (value === null || value === undefined) return 0;
-    value = value.toString();
+    const saldo = total - inicial;
+    this.contratoForm.get('saldo')?.setValue(this.formatCurrency(saldo >= 0 ? saldo : 0), { emitEvent: false });
   }
-  // Mantener los símbolos de moneda y eliminar solo los caracteres no numéricos
-  const numericValue = value.replace(/[^\d.-]+/g, "");  // Elimina todo lo que no sea número o punto
-  return parseFloat(numericValue) || 0;
-}
 
-  //Método modificado para controlar la visibilidad y el servicio de búsqueda
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD' }).format(value);
+  }
+
+  private extractNumericValue(value: any): number {
+    if (typeof value !== 'string') {
+      if (value === null || value === undefined) return 0;
+      value = value.toString();
+    }
+    const numericValue = value.replace(/[^\d.]/g, "");
+    return parseFloat(numericValue) || 0;
+  }
+
   buscarSeparaciones(event: Event) {
     const input = event.target as HTMLInputElement;
     this.terminoBusquedaSeparacion = input.value;
@@ -261,31 +252,31 @@ private extractNumericValue(value: any): number {
   }
 
   guardarContrato() {
-  if (this.contratoForm.invalid) {
-    this.contratoForm.markAllAsTouched();
-    return;
-  }
+    if (this.contratoForm.invalid) {
+      this.contratoForm.markAllAsTouched();
+      this.toastr.error('Por favor, completa todos los campos requeridos.', 'Formulario Inválido');
+      return;
+    }
 
-  // Convertir los campos numéricos a valores numéricos
-  const montoTotal = this.extractNumericValue(this.contratoForm.value.montoTotal);
-  const inicial = this.extractNumericValue(this.contratoForm.value.inicial);
-  const saldo = this.extractNumericValue(this.contratoForm.get('saldo')?.value);
+    const montoTotal = this.extractNumericValue(this.contratoForm.value.montoTotal);
+    const inicial = this.extractNumericValue(this.contratoForm.value.inicial);
+    const saldo = this.extractNumericValue(this.contratoForm.get('saldo')?.value);
 
-  const request: ContratoRequestDTO = {
-    fechaContrato: this.contratoForm.value.fechaContrato,
-    tipoContrato: this.contratoForm.value.tipoContrato,
-    montoTotal: montoTotal,  // Se asegura que es un número
-    inicial: inicial,        // Se asegura que es un número
-    saldo: saldo,            // Se asegura que es un número
-    cantidadLetras: this.contratoForm.value.cantidadLetras,
-    observaciones: this.contratoForm.value.observaciones,
-    idVendedor: this.contratoForm.value.vendedorId,
-    idSeparacion: this.contratoForm.value.idSeparacion,
-    idClientes: this.contratoForm.value.idClientes,
-    idLotes: this.contratoForm.value.idLotes
-  };
+    const request: ContratoRequestDTO = {
+      fechaContrato: this.contratoForm.value.fechaContrato,
+      tipoContrato: this.contratoForm.value.tipoContrato,
+      montoTotal: montoTotal,
+      inicial: inicial,
+      saldo: saldo,
+      cantidadLetras: this.contratoForm.value.cantidadLetras,
+      observaciones: this.contratoForm.value.observaciones,
+      idVendedor: this.contratoForm.value.vendedorId,
+      idSeparacion: this.contratoForm.value.idSeparacion,
+      idClientes: this.contratoForm.value.idClientes,
+      idLotes: this.contratoForm.value.idLotes
+    };
 
-   this.contratoService.guardarContrato(request).subscribe({
+    this.contratoService.guardarContrato(request).subscribe({
       next: () => {
         this.toastr.success('Contrato guardado con éxito', '¡Éxito!');
         this.resetFormulario();
@@ -295,25 +286,25 @@ private extractNumericValue(value: any): number {
         this.toastr.error('❌ Error al guardar el contrato', 'Error');
       }
     });
-}
+  }
 
   private resetFormulario() {
     this.contratoForm.reset({
       modalidadContrato: 'DIRECTO',
       tipoContrato: 'FINANCIADO',
-      montoTotal: 0,
-      inicial: 0,
-      saldo: 0,
+      montoTotal: this.formatCurrency(0),
+      inicial: this.formatCurrency(0),
+      saldo: this.formatCurrency(0),
       cantidadLetras: 0
     });
     this.clientesSeleccionados = [];
     this.lotesSeleccionados = [];
     this.separaciones = [];
     this.lotes = [];
-    this.showSeparacionList = false; //Reinicia el estado de visibilidad
-    this.terminoBusquedaSeparacion = ''; //Reinicia el campo de búsqueda
+    this.showSeparacionList = false;
+    this.terminoBusquedaSeparacion = '';
   }
-  // ✅ Aquí lo agregas
+
   get esContado(): boolean {
     return this.contratoForm.get('tipoContrato')?.value === 'CONTADO';
   }

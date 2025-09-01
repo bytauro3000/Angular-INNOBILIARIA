@@ -1,1 +1,68 @@
-<p>letracambio-insertar works!</p>
+<div class="generar-letras-container">
+  <h2>Generar Nuevas Letras de Cambio</h2> <!-- Usamos h2 para mantener la consistencia -->
+
+  <div class="form-wrapper">
+    <form (ngSubmit)="onGenerarLetras()">
+      <div class="form-row form-2-col">
+        <div class="form-group">
+          <label for="idDistrito">Distrito</label>
+          <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required>
+            <option value="0" disabled>-- Seleccione un distrito --</option>
+            <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">{{ distrito.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fechaGiro">Fecha de Giro</label>
+          <input type="date" id="fechaGiro" [(ngModel)]="generarLetrasRequest.fechaGiro" name="fechaGiro" required>
+        </div>
+      </div>
+
+      <div class="form-row form-2-col">
+        <div class="form-group">
+          <label for="fechaVencimientoInicial">Fecha Vencimiento Inicial</label>
+          <input type="date" id="fechaVencimientoInicial" [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial" name="fechaVencimientoInicial" required>
+        </div>
+
+        <div class="form-group">
+          <label for="importe">Importe Total</label>
+          <input 
+            type="text" 
+            id="importe" 
+            [(ngModel)]="generarLetrasRequest.importe" 
+            name="importe" 
+            (ngModelChange)="onImporteChange($event)"
+            (blur)="onImporteBlur()"
+            (focus)="onImporteFocus()"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="importeLetras">Importe de cada letra</label>
+          <input type="text" id="importeLetras" [(ngModel)]="generarLetrasRequest.importeLetras" name="importeLetras" readonly>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Generar Letras
+        </button>
+
+        <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-secondary">
+          Cancelar
+        </a>
+
+        <a [routerLink]="['/secretaria-menu/letras/listar', idContrato]" class="btn btn-info">
+          Ver Letras
+        </a>
+        
+      </div>
+    </form>
+
+    <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
+  </div>
+</div>
