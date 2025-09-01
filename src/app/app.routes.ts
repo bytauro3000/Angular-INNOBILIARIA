@@ -19,7 +19,7 @@ import { ProgramaComponent } from './components/programa/programa';
 
 // 👇 Importa tu dashboard principal
 import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-soporte-principal';
-import { LetracambioListarComponent } from './components/letracambio-listar/letracambio-listar.component';
+import { LetracambioListarComponent } from './components/letracambio-listar/letracambios-listar.component';
 import { LetracambioInsertarComponent } from './components/letracambio-insertar/letracambio-insertar.component';
 
 export const routes: Routes = [
@@ -36,7 +36,7 @@ export const routes: Routes = [
       { path: 'clientes/insertar', component: ClienteInsertarComponent }, //Ruta Hija
       { path: 'clientes/editar/:id', component: ClienteEditarComponent }, //Rutas Hija 
 
-      { path: 'letras/listar/:idContrato', component: LetracambioListarComponent },
+      { path: 'letras/listar/:idContrato', component: LetracambioListarComponent},
       { path: 'letras/insertar/:idContrato', component: LetracambioInsertarComponent },
 
 

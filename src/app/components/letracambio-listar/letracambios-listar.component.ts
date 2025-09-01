@@ -8,8 +8,8 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-letracambio-listar',
   standalone: true,
-  templateUrl: './letracambio-listar.html',
-  styleUrls: ['./letracambio-listar.scss'],
+  templateUrl: './letracambios-listar.html',
+  styleUrls: ['./letracambios-listar.scss'],
   imports: [CommonModule, FormsModule],
 })
 export class LetracambioListarComponent implements OnInit {

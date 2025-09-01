@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LetracambioListar } from './letracambio-listar.component';
+import { LetracambioListarComponent } from './letracambios-listar.component';
 
 describe('LetracambioListar', () => {
-  let component: LetracambioListar;
-  let fixture: ComponentFixture<LetracambioListar>;
+  let component: LetracambioListarComponent;
+  let fixture: ComponentFixture<LetracambioListarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LetracambioListar]
+      imports: [LetracambioListarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LetracambioListar);
+    fixture = TestBed.createComponent(LetracambioListarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
