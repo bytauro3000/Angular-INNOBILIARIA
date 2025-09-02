@@ -20,6 +20,8 @@ export class LetracambioInsertarComponent implements OnInit {
   idContrato!: number; // Ahora se obtiene desde la URL
   @Output() letrasGeneradas = new EventEmitter<void>();
 
+  tieneLetras: boolean = false; // <-- bandera para saber si existen letras ya generadas
+
   generarLetrasRequest: GenerarLetrasRequest = this.crearRequestConFechaLocal();
   distritos: Distrito[] = [];
   cargando = false;
@@ -30,7 +32,7 @@ export class LetracambioInsertarComponent implements OnInit {
     private letrasService: LetrasCambioService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private router: Router 
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +45,22 @@ export class LetracambioInsertarComponent implements OnInit {
       const id = params.get('idContrato');
       this.idContrato = id ? +id : 0;
       console.log('ID de contrato recibido:', this.idContrato);
+
+      if (this.idContrato > 0) {
+        this.verificarLetrasExistentes();
+      }
+    });
+  }
+
+  verificarLetrasExistentes(): void {
+    this.letrasService.listarPorContrato(this.idContrato).subscribe({
+      next: (letras) => {
+        this.tieneLetras = letras.length > 0;
+      },
+      error: (err) => {
+        console.error('Error al verificar letras existentes', err);
+        this.tieneLetras = false;
+      }
     });
   }
 
@@ -66,49 +84,78 @@ export class LetracambioInsertarComponent implements OnInit {
       fechaVencimientoInicial: todayString,
       importe: '',
       importeLetras: '',
+      modoAutomatico: true,
     };
   }
 
   onGenerarLetras(): void {
-  if (!this.idContrato || this.idContrato <= 0) {
-    this.toastr.error('No se puede generar letras sin un ID de contrato válido.');
-    return;
+    if (!this.idContrato || this.idContrato <= 0) {
+      this.toastr.error('No se puede generar letras sin un ID de contrato válido.');
+      return;
+    }
+
+    this.cargando = true;
+    this.success = null;
+
+    if (!this.generarLetrasRequest.modoAutomatico) {
+      // En modo manual, desformateamos importe antes de enviar
+      const importeDesformateado = this.unformatCurrency(this.generarLetrasRequest.importe);
+      this.generarLetrasRequest.importe = importeDesformateado;
+    }
+
+    this.letrasService.generarLetras(this.idContrato, this.generarLetrasRequest).subscribe({
+      next: () => {
+        this.toastr.success('Las letras de cambio se generaron exitosamente.', 'Éxito');
+        this.cargando = false;
+        this.tieneLetras = true;
+        this.letrasGeneradas.emit();
+
+        if (this.generarLetrasRequest.modoAutomatico) {
+          // En modo automático, traemos las letras generadas para actualizar el importe y texto en frontend
+          this.letrasService.listarPorContrato(this.idContrato).subscribe({
+            next: (letras) => {
+              if (letras.length > 0) {
+                // Suponemos que todas las letras tienen el mismo importe, tomamos la primera
+                const importe = letras[0].importe;
+                this.generarLetrasRequest.importe = importe.toString();
+                this.convertirImporteALetras(this.generarLetrasRequest.importe);
+              }
+            },
+            error: (err) => {
+              console.error('Error al obtener letras generadas', err);
+            }
+          });
+        }
+
+        // Redirige al listado de letras del contrato generado
+        this.router.navigate(['/secretaria-menu/letras/listar', this.idContrato]);
+      },
+      error: (err) => {
+        this.toastr.error('Error al generar letras. Revise los datos.', 'Error');
+        this.cargando = false;
+        console.error(err);
+      },
+    });
   }
 
-  this.cargando = true;
-  this.success = null;
-
-  const importeDesformateado = this.unformatCurrency(this.generarLetrasRequest.importe);
-  this.generarLetrasRequest.importe = importeDesformateado;
-
-  this.letrasService.generarLetras(this.idContrato, this.generarLetrasRequest).subscribe({
-    next: () => {
-      this.toastr.success('Las letras de cambio se generaron exitosamente.', 'Éxito');
-      this.cargando = false;
-
-      // ✅ Redirige al listado de letras del contrato generado
-      this.router.navigate(['/secretaria-menu/letras/listar', this.idContrato]);
-    },
-    error: (err) => {
-      this.toastr.error('Error al generar letras. Revise los datos.', 'Error');
-      this.cargando = false;
-      console.error(err);
-    },
-  });
-}
-
   onImporteChange(value: string): void {
-    const rawValue = value.replace(/[^0-9.]/g, '');
-    this.generarLetrasRequest.importe = rawValue;
-    this.convertirImporteALetras(rawValue);
+    if (!this.generarLetrasRequest.modoAutomatico) {
+      const rawValue = value.replace(/[^0-9.]/g, '');
+      this.generarLetrasRequest.importe = rawValue;
+      this.convertirImporteALetras(rawValue);
+    }
   }
 
   onImporteBlur(): void {
-    this.generarLetrasRequest.importe = this.formatCurrency(this.generarLetrasRequest.importe);
+    if (!this.generarLetrasRequest.modoAutomatico) {
+      this.generarLetrasRequest.importe = this.formatCurrency(this.generarLetrasRequest.importe);
+    }
   }
 
   onImporteFocus(): void {
-    this.generarLetrasRequest.importe = this.unformatCurrency(this.generarLetrasRequest.importe);
+    if (!this.generarLetrasRequest.modoAutomatico) {
+      this.generarLetrasRequest.importe = this.unformatCurrency(this.generarLetrasRequest.importe);
+    }
   }
 
   private convertirImporteALetras(valor: string): void {

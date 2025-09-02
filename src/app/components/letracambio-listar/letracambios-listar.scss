@@ -15,8 +15,15 @@
   .filtros {
     margin-bottom: 1.5rem;
     display: flex;
-    gap: 1rem;
     align-items: center;
+    gap: 0.75rem;
+
+    .label-buscar {
+      font-weight: 600;
+      font-size: 1rem;
+      white-space: nowrap;
+      color: #2c3e50;
+    }
 
     .filtro-input {
       padding: 0.5rem 1rem;
@@ -25,12 +32,33 @@
       background-color: white;
       font-size: 1rem;
       transition: all 0.3s ease;
-      flex-grow: 1;
+      width: 250px;
 
       &:focus {
         outline: none;
         border-color: #3498db;
         box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+    }
+
+    .btn-eliminar {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #c0392b;
+      }
+
+      &:disabled {
+        background-color: #f1948a;
+        cursor: not-allowed;
       }
     }
   }
@@ -54,6 +82,7 @@
         text-align: left;
         border-bottom: 1px solid #ecf0f1;
         color: #333;
+        transition: background-color 0.2s ease;
       }
 
       th {
@@ -68,6 +97,47 @@
 
       tr:hover {
         background-color: #f2f6fb;
+      }
+
+      /* Cursor pointer en celdas editables */
+      td {
+        &.editable {
+          cursor: pointer;
+        }
+      }
+
+      /* Celda en edición con fondo claro y borde */
+      td.editing {
+        background-color: #f0f8ff;
+        border: 1px solid #3498db;
+        padding: 0.3rem 0.5rem; /* Ajustar padding si es necesario */
+      }
+
+      .input-edicion {
+        width: 100%;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:focus {
+          border-color: #3498db;
+          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+      }
+
+      /* Input solo lectura para importeLetras (deshabilitado) */
+      .input-lectura {
+        width: 100%;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.9rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        color: #555;
+        cursor: default;
       }
     }
 
@@ -155,9 +225,18 @@
     .filtros {
       flex-direction: column;
       align-items: stretch;
+      gap: 0.5rem;
+
+      .label-buscar {
+        white-space: normal;
+        margin-bottom: 0.2rem;
+      }
 
       .filtro-input {
-        flex-grow: unset;
+        width: 100%;
+      }
+
+      .btn-eliminar {
         width: 100%;
       }
     }

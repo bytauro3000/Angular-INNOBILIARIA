@@ -4,4 +4,5 @@ export interface GenerarLetrasRequest {
     fechaVencimientoInicial: string;
     importe: string;
     importeLetras: string;
+    modoAutomatico: boolean; 
 }

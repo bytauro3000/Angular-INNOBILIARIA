@@ -23,4 +23,12 @@ export class LetrasCambioService {
     const url = `${this.apiUrl}/contrato/${idContrato}`;
     return this.http.post<void>(url, request);
   }
+  
+  actualizarLetra(idLetra: number, letra: LetraCambio): Observable<LetraCambio> {
+    return this.http.put<LetraCambio>(`${this.apiUrl}/actualizar/${idLetra}`, letra);
+  }
+
+  eliminarPorContrato(idContrato: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/eliminar/${idContrato}`);
+  }
 }

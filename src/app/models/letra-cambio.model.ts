@@ -7,7 +7,7 @@ import { Distrito } from './distrito.model';
 
 
 export interface LetraCambio {
-  idLetra?: number;
+  idLetra: number;
   contrato: Contrato;
   distrito: Distrito;
   numeroLetra: string;

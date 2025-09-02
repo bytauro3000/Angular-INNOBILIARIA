@@ -1,53 +1,101 @@
 <div class="generar-letras-container">
-  <h2>Generar Nuevas Letras de Cambio</h2> <!-- Usamos h2 para mantener la consistencia -->
+  <h2>Generar Nuevas Letras de Cambio</h2>
 
   <div class="form-wrapper">
     <form (ngSubmit)="onGenerarLetras()">
+
+      <!-- Primera fila: Distrito y Fecha Giro -->
       <div class="form-row form-2-col">
         <div class="form-group">
-          <label for="idDistrito">Distrito</label>
+          <label for="idDistrito">Distrito de Giro</label>
           <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required>
             <option value="0" disabled>-- Seleccione un distrito --</option>
-            <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">{{ distrito.nombre }}</option>
+            <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">
+              {{ distrito.nombre }}
+            </option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="fechaGiro">Fecha de Giro</label>
-          <input type="date" id="fechaGiro" [(ngModel)]="generarLetrasRequest.fechaGiro" name="fechaGiro" required>
-        </div>
-      </div>
-
-      <div class="form-row form-2-col">
-        <div class="form-group">
-          <label for="fechaVencimientoInicial">Fecha Vencimiento Inicial</label>
-          <input type="date" id="fechaVencimientoInicial" [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial" name="fechaVencimientoInicial" required>
-        </div>
-
-        <div class="form-group">
-          <label for="importe">Importe Total</label>
-          <input 
-            type="text" 
-            id="importe" 
-            [(ngModel)]="generarLetrasRequest.importe" 
-            name="importe" 
-            (ngModelChange)="onImporteChange($event)"
-            (blur)="onImporteBlur()"
-            (focus)="onImporteFocus()"
+          <input
+            type="date"
+            id="fechaGiro"
+            [(ngModel)]="generarLetrasRequest.fechaGiro"
+            name="fechaGiro"
             required
           >
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group full-width">
-          <label for="importeLetras">Importe de cada letra</label>
-          <input type="text" id="importeLetras" [(ngModel)]="generarLetrasRequest.importeLetras" name="importeLetras" readonly>
+      <!-- Segunda fila: Fecha Vencimiento Inicial y Monto -->
+      <div class="form-row form-2-col">
+        <div class="form-group">
+          <label for="fechaVencimientoInicial">Fecha Vencimiento Inicial</label>
+          <input
+            type="date"
+            id="fechaVencimientoInicial"
+            [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial"
+            name="fechaVencimientoInicial"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="importe">Importe</label>
+          <input
+            type="text"
+            id="importe"
+            [(ngModel)]="generarLetrasRequest.importe"
+            name="importe"
+            (ngModelChange)="onImporteChange($event)"
+            (blur)="onImporteBlur()"
+            (focus)="onImporteFocus()"
+            [disabled]="generarLetrasRequest.modoAutomatico"
+            [class.disabled-field]="generarLetrasRequest.modoAutomatico"
+            required
+          >
         </div>
       </div>
 
+      <!-- Tercera fila: Checkbox alineado -->
+      <div class="form-row form-2-col">
+        <div></div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="generarLetrasRequest.modoAutomatico"
+              name="modoAutomatico"
+            >
+            Calcular automáticamente el importe de la Letra
+          </label>
+        </div>
+      </div>
+
+      <!-- Importe Letras (read-only) -->
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="importeLetras">Importe en texto</label>
+          <input
+            type="text"
+            id="importeLetras"
+            [(ngModel)]="generarLetrasRequest.importeLetras"
+            name="importeLetras"
+            readonly
+            [disabled]="generarLetrasRequest.modoAutomatico"
+            [class.disabled-field]="generarLetrasRequest.modoAutomatico"
+          >
+        </div>
+      </div>
+
+      <!-- Botones -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="cargando">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="cargando || tieneLetras"
+        >
           <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Generar Letras
         </button>
@@ -56,13 +104,19 @@
           Cancelar
         </a>
 
-        <a [routerLink]="['/secretaria-menu/letras/listar', idContrato]" class="btn btn-info">
+        <a
+          [routerLink]="['/secretaria-menu/letras/listar', idContrato]"
+          class="btn btn-info"
+          [class.disabled]="!tieneLetras"
+          [attr.aria-disabled]="!tieneLetras"
+          tabindex="{{ !tieneLetras ? -1 : 0 }}"
+        >
           Ver Letras
         </a>
-        
       </div>
-    </form>
 
-    <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
+      <!-- Mensaje de éxito -->
+      <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
+    </form>
   </div>
 </div>
