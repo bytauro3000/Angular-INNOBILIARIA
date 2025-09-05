@@ -6,6 +6,8 @@ import { LetraCambio } from '../../models/letra-cambio.model';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { jsPDF } from 'jspdf';
+import { ReporteLetraCambioDTO } from '../../dto/reporteletracambio.dto';
 
 @Component({
   selector: 'app-letracambio-listar',
@@ -39,7 +41,7 @@ export class LetracambioListarComponent implements OnInit {
     private letrasService: LetrasCambioService,
     private route: ActivatedRoute,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -71,6 +73,101 @@ export class LetracambioListarComponent implements OnInit {
       }
     });
   }
+
+
+  imprimirLetras(): void {
+    this.cargando = true;
+
+    // Obtener el reporte de letras del contrato
+    this.letrasService.obtenerReportePorContrato(this.idContrato).subscribe({
+      next: (reportes: ReporteLetraCambioDTO[]) => {
+        const doc = new jsPDF({
+          orientation: 'landscape', // Orientación horizontal
+          unit: 'mm',
+          format: [220, 110],  // Tamaño de página 21 cm de ancho x 11 cm de alto
+        });
+
+        // Establecer la fuente para todo el documento (Times New Roman, negrita, tamaño 12)
+        doc.setFont('times');
+        doc.setFontSize(14);
+
+        const espaciadoVertical = 10;  // Espacio entre las filas de datos
+
+        // Iterar sobre los reportes para mostrarlos en el PDF
+        reportes.forEach((reporte, index) => {
+          // Si no es la primera letra, agregar una nueva página
+          if (index > 0) {
+            doc.addPage();  // Nueva página para cada letra
+          }
+
+          let y = 30;  // Reseteamos la posición Y para cada letra
+
+          // Añadir la información de cada letra en la posición adecuada
+          // Primera fila
+          doc.setFontSize(10);
+          doc.text(reporte.numeroLetra, 55, 25); // Número Letra
+          doc.text(reporte.distritoNombre, 75, 25); // Distrito Letra
+          doc.text(reporte.fechaGiro, 120, 25); // Fecha de Giro
+          doc.text(reporte.fechaVencimiento, 150, 25); // Fecha de Vencimiento
+          // Formatear el importe con separadores de miles y dos decimales
+          const importeFormateado = reporte.importe.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          doc.text(`$. ${importeFormateado}`, 180, 25); // Importe con separadores de miles y decimales
+          y += espaciadoVertical;
+
+          // Segunda fila
+          doc.text(reporte.importeLetras, 45, y); // Importe en Letras
+          y += espaciadoVertical;
+
+          // Tercera fila (Nombre completo del cliente 1)
+          if (reporte.cliente1Nombre) {
+            const cliente1Info = reporte.cliente1Apellidos
+              ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
+              : reporte.cliente1Nombre;
+
+            doc.text(cliente1Info, 49, y); // Cliente 1: Nombres, Apellidos (si existe)
+            y += espaciadoVertical;
+          }
+
+          // Cuarta fila (Nombre2 + Apellidos2 + DNI del Cliente 2)
+          if (reporte.cliente2Nombre) {
+            const cliente2Info = reporte.cliente2Apellidos
+              ? reporte.cliente2Nombre + ' ' + reporte.cliente2Apellidos
+              : reporte.cliente2Nombre;
+
+            doc.text(cliente2Info + ' ' + `DNI/RUC: ${reporte.cliente2NumDocumento}`, 49, y); // Cliente 2: Nombres, Apellidos (si existe) y DNI
+            y += espaciadoVertical;
+          }
+
+          // Quinta fila (DNI del cliente 1)
+          doc.text(reporte.cliente1NumDocumento, 45, y); // DNI Cliente 1
+          y += espaciadoVertical;
+
+          // Sexta fila (Dirección del cliente 1)
+          doc.text(reporte.cliente1Direccion, 45, y); // Dirección Cliente 1
+          y += espaciadoVertical;
+
+          // Séptima fila (Distrito del cliente 1)
+          doc.text(reporte.cliente1Distrito, 45, y); // Distrito Cliente 1
+          y += espaciadoVertical;
+
+          // Espacio adicional entre registros
+          y += espaciadoVertical;
+        });
+
+        // Abrir el PDF directamente en una nueva ventana
+        doc.output('dataurlnewwindow');
+
+        this.cargando = false;
+      },
+      error: () => {
+        this.toastr.error('Ocurrió un error al generar el reporte PDF.', 'Error');
+        this.cargando = false;
+      }
+    });
+  }
+
+
+
 
   filtrarLetras(): void {
     const termino = this.terminoBusqueda.trim().toLowerCase();
@@ -155,21 +252,21 @@ export class LetracambioListarComponent implements OnInit {
   // ------------------------------------------------
   // Convierte número a letras con moneda en dólares americanos
   // ------------------------------------------------
-convertirNumeroALetras(valor: number): string {
-  if (isNaN(valor) || valor === 0) return 'CERO CON 00/100 DÓLARES AMERICANOS';
+  convertirNumeroALetras(valor: number): string {
+    if (isNaN(valor) || valor === 0) return 'CERO CON 00/100 DÓLARES AMERICANOS';
 
-  // Separar la parte entera y decimal
-  const partes = valor.toFixed(2).split('.');
-  const entero = parseInt(partes[0], 10);
-  const decimal = partes[1]; // ya es string con dos dígitos
+    // Separar la parte entera y decimal
+    const partes = valor.toFixed(2).split('.');
+    const entero = parseInt(partes[0], 10);
+    const decimal = partes[1]; // ya es string con dos dígitos
 
-  let letras = this.numeroALetras(entero).toUpperCase();
+    let letras = this.numeroALetras(entero).toUpperCase();
 
-  // Siempre agregamos la parte decimal con el formato CON XX/100
-  letras += ` CON ${decimal}/100 DÓLARES AMERICANOS`;
+    // Siempre agregamos la parte decimal con el formato CON XX/100
+    letras += ` CON ${decimal}/100 DÓLARES AMERICANOS`;
 
-  return letras;
-}
+    return letras;
+  }
 
   // ------------------------------------------------
   // Función privada para convertir número entero a letras

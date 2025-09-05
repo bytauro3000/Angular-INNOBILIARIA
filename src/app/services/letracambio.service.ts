@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { GenerarLetrasRequest } from '../dto/generarletra.dto';
 import { LetraCambio } from '../models/letra-cambio.model';
+import { ReporteLetraCambioDTO } from '../dto/reporteletracambio.dto';
 
 
 @Injectable({
@@ -30,5 +31,11 @@ export class LetrasCambioService {
 
   eliminarPorContrato(idContrato: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/eliminar/${idContrato}`);
+  }
+  
+  // Obtener el reporte de letras de cambio
+  obtenerReportePorContrato(idContrato: number): Observable<ReporteLetraCambioDTO[]> {
+    const url = `${this.apiUrl}/reporte/${idContrato}`;
+    return this.http.get<ReporteLetraCambioDTO[]>(url);
   }
 }

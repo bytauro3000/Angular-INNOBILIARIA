@@ -20,6 +20,16 @@
     >
       Eliminar Letras
     </button>
+
+     <!-- Botón para imprimir el reporte en PDF -->
+  <button
+    (click)="imprimirLetras()"
+    [disabled]="cargando || letras.length === 0"
+    class="btn-imprimir"
+    aria-disabled="{{ cargando || letras.length === 0 }}"
+  >
+    Imprimir Letras
+  </button>
   </div>
 
   <div *ngIf="cargando" class="mensaje-cargando" role="status" aria-live="polite">Cargando letras...</div>
