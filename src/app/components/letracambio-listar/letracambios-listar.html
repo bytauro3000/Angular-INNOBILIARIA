@@ -30,6 +30,15 @@
   >
     Imprimir Letras
   </button>
+
+  <button
+    (click)="imprimirCronogramaPagos()"
+    [disabled]="cargando || letras.length === 0"
+    class="btn-imprimir"
+    aria-disabled="{{ cargando || letras.length === 0 }}"
+  >
+    Cronograma de Pagos
+  </button>
   </div>
 
   <div *ngIf="cargando" class="mensaje-cargando" role="status" aria-live="polite">Cargando letras...</div>

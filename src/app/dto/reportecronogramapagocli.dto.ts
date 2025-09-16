@@ -1,0 +1,30 @@
+// src/app/dtos/reporte-cronograma-pagos-clientes.dto.ts
+export interface ReporteCronogramaPagosClientesDTO {
+    idLetra: number;
+    cantidadLetras: number;
+    montoTotal: number;
+    inicial: number;
+    saldo: number;
+    vendedorNombre: string;
+    vendedorApellidos: string;
+    numeroLetra: string;
+    fechaVencimiento: string;
+    importe: number;
+    cliente1Nombre: string;
+    cliente1Apellidos: string;
+    cliente1NumDocumento: string;
+    cliente1Celular: string;
+    cliente1Telefono: string;
+    cliente1Direccion: string;
+    cliente1Distrito: string;
+    cliente2Nombre: string;
+    cliente2Apellidos: string;
+    cliente2NumDocumento: string;
+    lote1Manzana: string;
+    lote1NumeroLote: string;
+    lote1Area: number;
+    lote2Manzana: string;
+    lote2NumeroLote: string;
+    lote2Area: number;
+    programaNombre: string;
+}
