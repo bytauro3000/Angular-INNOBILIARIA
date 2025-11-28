@@ -1,0 +1,24 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SeparacionComponent } from './separacion-crud.component';
+
+
+
+describe('Separacion', () => {
+  let component: SeparacionComponent;
+  let fixture: ComponentFixture<SeparacionComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SeparacionComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(SeparacionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

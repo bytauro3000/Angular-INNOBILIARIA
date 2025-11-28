@@ -4,7 +4,6 @@ import { map, Observable } from 'rxjs';
 import { LoteResumen } from '../dto/loteresumen.dto';
 import { EstadoLote } from '../enums/estadolote.enum';
 import { Lote } from '../models/lote.model';
-import { Programa } from '../models/programa.model';
 import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
 
 
@@ -14,7 +13,6 @@ import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
 export class LoteService {
 constructor(private http: HttpClient) {}
 private apiUrl = 'http://localhost:8080/api/lotes';
-private programaUrl = 'http://localhost:8080/api/programas'; // Programas
 //Listado principal
   obtenerLotesResumen(): Observable<LoteResumen[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
@@ -34,7 +32,7 @@ private programaUrl = 'http://localhost:8080/api/programas'; // Programas
 
 //Listado Completo
 listarLotes(): Observable<Lote[]>{
-return this.http.get<Lote[]>(this.apiUrl+`/lotes`);
+return this.http.get<Lote[]>(this.apiUrl);
 }
 
 // Listar lotes por programa usando el DTO optimizado
@@ -60,8 +58,5 @@ eliminarLote(id : number): Observable<void>{
 return this.http.delete<void>(`${this.apiUrl}/${id}`);
 }
   
-//Combobox Programa
-listarPrograma(): Observable<Programa[]> {
-  return this.http.get<Programa[]>(this.programaUrl);
-}
+
 }

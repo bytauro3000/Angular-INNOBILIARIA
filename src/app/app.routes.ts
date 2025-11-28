@@ -10,7 +10,7 @@ import { AdminMenuComponent } from './components/menu-admin/admin-menu.component
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';
-import { LotesComponent } from './components/lote/lote.component';
+
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
 import { ParceleroComponent } from './components/parcelero/parcelero';
@@ -21,6 +21,8 @@ import { ProgramaComponent } from './components/programa/programa';
 import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-soporte-principal';
 import { LetracambioListarComponent } from './components/letracambio-listar/letracambios-listar.component';
 import { LetracambioInsertarComponent } from './components/letracambio-insertar/letracambio-insertar.component';
+import { SeparacionComponent } from './components/separacion-crud/separacion-crud.component';
+import { LoteComponent } from './components/lote/lote.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
@@ -39,6 +41,7 @@ export const routes: Routes = [
       { path: 'letras/listar/:idContrato', component: LetracambioListarComponent},
       { path: 'letras/insertar/:idContrato', component: LetracambioInsertarComponent },
 
+      { path: 'separaciones', component: SeparacionComponent},
 
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
@@ -51,7 +54,7 @@ export const routes: Routes = [
     component: SoporteMenuComponent ,
     children:[
       { path: '', component: MenuSoportePrincipal },   // 👈 Principal
-      { path: 'lotes', component: LotesComponent },
+      { path: 'lotes', component: LoteComponent },
       { path: 'parceleros', component: ParceleroComponent },
       { path: 'vendedores', component: VendedorComponent },
       { path: 'programas', component: ProgramaComponent }
