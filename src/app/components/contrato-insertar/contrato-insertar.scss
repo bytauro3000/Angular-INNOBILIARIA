@@ -97,8 +97,41 @@
         }
       }
     }
+
+    /* ------------------------------------- */
+    /* NUEVOS ESTILOS PARA INPUT CON BOTÓN */
+    /* ------------------------------------- */
+    .input-with-button {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .input-with-button select,
+    .input-with-button input {
+        flex-grow: 1; 
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        margin-right: -1px; 
+    }
   }
 
+  .btn-add-mini {
+    background-color: #249042; 
+    color: white;
+    padding: 0 10px; 
+    border-radius: 4px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    font-size: 1.1rem !important; 
+    min-width: 40px;
+    height: auto;
+    
+    &:hover {
+        background-color: #6bc680;
+    }
+}
+  
   .form-actions {
     display: flex;
     justify-content: flex-end;

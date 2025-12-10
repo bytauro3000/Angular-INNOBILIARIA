@@ -1,39 +1,34 @@
-<div class="container mt-4">
-  <!-- Encabezado -->
-  
-    <h2 class="text-center mb-4 text-primary fw-bold">📋 Listado de Vendedores</h2>
-  
+<div class="vendedor-container">
+  <h2>Listado de Vendedores</h2>
 
-  <!-- Botones de acciones -->
-  <div class="d-flex justify-content-end gap-2 mb-3">
-    <button class="btn btn-success shadow-sm" (click)="abrirModal()">
-      ➕ Agregar Vendedor
+  <div class="filtros">
+    <button class="btn btn-success" (click)="abrirModal()">
+      <i class="bi bi-plus-lg"></i> Agregar Vendedor
     </button>
-    <button class="btn btn-outline-primary shadow-sm" (click)="descargarExcel()">
+    <button class="btn btn-outline-primary" (click)="descargarExcel()">
       📥 Exportar Excel
     </button>
-    <button class="btn btn-outline-danger shadow-sm" (click)="exportarPDF()">
+    <button class="btn btn-outline-danger" (click)="exportarPDF()">
       📄 Exportar PDF
     </button>
   </div>
 
-  <!-- Tabla -->
-  <div class="table-responsive">
-    <table class="table table-hover table-bordered align-middle shadow-sm rounded custom-table">
-      <thead class="table-dark">
+  <div class="tabla-vendedor">
+    <table>
+      <thead>
         <tr>
-          <th style="width: 70px;">ID</th>
+          <th>ID</th>
           <th>Nombre</th>
           <th>Apellidos</th>
-          <th style="width:110px">DNI</th>
-          <th style="width:130px">Celular</th>
+          <th>DNI</th>
+          <th>Celular</th>
           <th>Email</th>
           <th>Dirección</th>
-          <th style="width:140px">Fecha Nac.</th>
-          <th style="width:110px">Género</th>
-          <th style="width:110px">Comisión</th>
+          <th>Fecha Nac.</th>
+          <th>Género</th>
+          <th>Comisión</th>
           <th>Distrito</th>
-          <th style="width:160px">Acciones</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -48,152 +43,29 @@
           <td>
             {{ v.fechaNacimiento ? (v.fechaNacimiento | date: 'yyyy-MM-dd') : '—' }}
           </td>
-          <td>{{ v.genero || '—' }}</td>
+          <td><span class="estado-activo">{{ v.genero || '—' }}</span></td>
           <td>
             {{ v.comision != null ? (v.comision | number:'1.2-2') + '%' : '—' }}
           </td>
           <td>{{ v.distrito.nombre || '—' }}</td>
-          <td>
-            <button class="btn btn-sm btn-warning me-2 shadow-sm" (click)="abrirModal(v)">✏️ Editar</button>
-            <button class="btn btn-sm btn-danger shadow-sm" (click)="eliminarVendedor(v.idVendedor!)">🗑️ Eliminar</button>
+          <td class="acciones-cell">
+            <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(v)" title="Editar">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarVendedor(v.idVendedor!)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+            </button>
           </td>
         </tr>
 
         <tr *ngIf="vendedores?.length === 0">
-          <td colspan="12" class="text-center text-muted">No hay vendedores registrados.</td>
+          <td colspan="12" class="no-results">No hay vendedores registrados.</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="vendedorModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content shadow-lg">
-      <form (ngSubmit)="guardarVendedor()" #vForm="ngForm">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title">{{ vendedorEditando ? '✏️ Editar Vendedor' : '➕ Nuevo Vendedor' }}</h5>
-          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
-        </div>
-
-        <div class="modal-body">
-          <div class="row g-3">
-            <!-- Nombre -->
-            <div class="col-md-6">
-              <label class="form-label">Nombre</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.nombre" name="nombre" required />
-            </div>
-
-            <!-- Apellidos -->
-            <div class="col-md-6">
-              <label class="form-label">Apellidos</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.apellidos" name="apellidos" required />
-            </div>
-
-            <!-- DNI -->
-            <div class="col-md-4">
-              <label class="form-label">DNI</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.dni" name="dni" required />
-            </div>
-
-            <!-- Celular -->
-            <div class="col-md-4">
-              <label class="form-label">Celular</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.celular" name="celular" />
-            </div>
-
-            <!-- Email -->
-            <div class="col-md-4">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" [(ngModel)]="nuevoVendedor.email" name="email" />
-            </div>
-
-            <!-- Dirección -->
-            <div class="col-md-6">
-              <label class="form-label">Dirección</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.direccion" name="direccion" />
-            </div>
-
-            <!-- Fecha de Nacimiento -->
-            <div class="col-md-3">
-              <label class="form-label">Fecha Nacimiento</label>
-              <input type="date" class="form-control" [(ngModel)]="nuevoVendedor.fechaNacimiento" name="fechaNacimiento" />
-            </div>
-
-            <!-- Género -->
-            <div class="col-md-3">
-              <label class="form-label">Género</label>
-              <select class="form-select" [(ngModel)]="nuevoVendedor.genero" name="genero">
-                <option value="">-- Seleccione --</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-                <option value="O">Otro</option>
-              </select>
-            </div>
-
-            <!-- Comisión -->
-            <div class="col-md-3">
-              <label class="form-label">Comisión (%)</label>
-              <input type="number" step="0.01" min="0" class="form-control" [(ngModel)]="nuevoVendedor.comision" name="comision" />
-            </div>
-
-            <!-- Distrito dinámico -->
-            <div class="col-md-3">
-              <label class="form-label">Distrito</label>
-              <select class="form-select" [(ngModel)]="nuevoVendedor.distrito" name="distrito" required>
-                <option *ngFor="let d of distritos" [ngValue]="d">
-                  {{ d.nombre }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary" [disabled]="vForm.invalid">
-            {{ vendedorEditando ? 'Actualizar' : 'Guardar' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Estilos extra -->
-<style>
-  .header-dark {
-    background: linear-gradient(135deg, #212529, #343a40);
-  }
-
-  .custom-table {
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .custom-table thead th {
-    text-align: center;
-    vertical-align: middle;
-    font-weight: 600;
-  }
-
-  .custom-table tbody tr:hover {
-    background-color: #f1f3f5 !important;
-    transition: background 0.2s ease-in-out;
-  }
-
-  .btn {
-    border-radius: 8px;
-    font-weight: 500;
-  }
-
-  .modal-content {
-    border-radius: 12px;
-  }
-
-  .modal-header {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-  }
-</style>
+<app-vendedor-insertar 
+  #registroModal 
+  (vendedorGuardado)="cargarVendedores()"> </app-vendedor-insertar>

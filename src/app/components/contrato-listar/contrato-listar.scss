@@ -1,3 +1,5 @@
+/* contrato-listar.scss */
+
 .contratos-container {
   padding: 2rem;
   max-width: 1200px;
@@ -99,53 +101,60 @@
     }
   }
 
-  .paginacion-controles {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
+  /* ⭐⭐⭐ PAGINACIÓN PERSONALIZADA ⭐⭐⭐ */
+.paginacion-controles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
 
-    .pagina-btn,
-    .pagina-numero-btn {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+  /* Estilos base para todos los botones */
+  .btn {
+    border-radius: 6px !important;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.55rem 1rem !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dcdcdc !important;
+    color: #333 !important;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+  }
 
-      &:hover:not(:disabled) {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-      }
+  /* BOTONES NUMERADOS */
+  .pagina-numero-btn {
+    min-width: 38px;
+    text-align: center;
 
-      &:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
-      }
+    &.active {
+      background-color: #3498db !important;
+      border-color: #3498db !important;
+      color: #fff !important;
+      font-weight: bold;
+      transform: scale(1.03);
     }
 
-    .pagina-numero-btn {
-      background-color: #f0f0f0;
-      color: #333;
-      border: 1px solid #ddd;
-
-      &.active {
-        background-color: #3498db;
-        color: white;
-        border-color: #3498db;
-        font-weight: bold;
-      }
-
-      &:hover:not(.active):not(:disabled) {
-        background-color: #e2e6ea;
-        transform: translateY(-2px);
-      }
+    &:hover:not(.active) {
+      background-color: #e6e6e6 !important;
+      transform: translateY(-2px);
     }
   }
+
+  /* Hover en botones Anterior/Siguiente */
+  .btn:not(.pagina-numero-btn):hover:not(:disabled) {
+    background-color: #e6e6e6 !important;
+    transform: translateY(-2px);
+  }
+
+  /* Botones deshabilitados */
+  .btn:disabled {
+    cursor: not-allowed;
+    background-color: #e9ecef !important;
+    color: #999 !important;
+    transform: none !important;
+  }
+}
+/* ⭐⭐⭐ FIN PAGINACIÓN PERSONALIZADA ⭐⭐⭐ */
 
   @media (max-width: 768px) {
     padding: 1rem;

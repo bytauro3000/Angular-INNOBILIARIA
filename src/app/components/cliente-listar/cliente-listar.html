@@ -13,9 +13,9 @@
            placeholder="Ingresa el término de búsqueda..."
            class="filtro-input" style="width: 250px;">
 
-    <button [routerLink]="['/secretaria-menu/clientes/insertar']" class="btn btn-success" style="margin-left: 10px;">
-      <i class="bi bi-plus-lg"></i> Agregar
-    </button>
+    <button (click)="abrirModal()" class="btn btn-success" style="margin-left: 10px;">
+      <i class="bi bi-plus-lg"></i> Agregar
+    </button>
   </div>
 
   <div class="tabla-clientes">
@@ -63,16 +63,22 @@
     </div>
   </div>
 
-  <div *ngIf="totalPages > 1" class="paginacion-controles">
+   <div *ngIf="totalPages > 1" class="paginacion-controles">
     <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
 
     <button *ngFor="let page of getPagesArray()"
-            (click)="goToPage(page)"
-            [class.active]="currentPage === page"
-            class="btn btn-outline-secondary">
-      {{ page }}
+        (click)="goToPage(page)"
+        [class.active]="currentPage === page"
+        class="btn pagina-numero-btn">
+        {{ page }}
     </button>
 
     <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
   </div>
+
+  <app-cliente-insertar 
+    #registroModal 
+    (clienteGuardado)="cargarClientes()"> 
+  </app-cliente-insertar>
+  
 </div>

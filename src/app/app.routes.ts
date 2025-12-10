@@ -45,6 +45,16 @@ export const routes: Routes = [
 
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
+
+      { path: 'programas', component: ProgramaComponent },
+
+      { path: 'vendedores', component: VendedorComponent },
+
+      { path: 'lotes', component: LoteComponent },
+
+       { path: 'parceleros', component: ParceleroComponent }
+
+
     ]
   },
 
@@ -54,10 +64,8 @@ export const routes: Routes = [
     component: SoporteMenuComponent ,
     children:[
       { path: '', component: MenuSoportePrincipal },   // 👈 Principal
-      { path: 'lotes', component: LoteComponent },
-      { path: 'parceleros', component: ParceleroComponent },
-      { path: 'vendedores', component: VendedorComponent },
-      { path: 'programas', component: ProgramaComponent }
+      
+     
     ]
   },
   

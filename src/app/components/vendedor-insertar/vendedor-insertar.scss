@@ -1,0 +1,311 @@
+/* ============================================================
+   ESTILOS DEL MODAL (GLASSMORPHISM)
+   ============================================================ */
+
+.modal-content {
+  background-color: rgba(0, 0, 0, 0.30);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: white !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-body {
+  background-color: transparent;
+
+  .form-label {
+    color: white !important;
+    text-align: left !important;
+    text-transform: capitalize;
+    display: block;
+  }
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   NGX-INTL-TEL-INPUT — CORRECCIÓN COMPLETA
+   ============================================================ */
+
+:host ::ng-deep ngx-intl-tel-input {
+  width: 100% !important;
+}
+
+/* Contenedor principal del plugin */
+:host ::ng-deep .iti {
+  width: 100% !important;
+  position: relative !important;
+  pointer-events: auto !important;
+  z-index: 9000 !important;
+}
+
+/* Contenedor bandera */
+:host ::ng-deep .iti__flag-container {
+  position: absolute !important;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  cursor: pointer !important;
+  z-index: 5 !important;
+  pointer-events:  auto !important;
+}
+
+/* Bandera dentro del input */
+:host ::ng-deep .iti__selected-flag {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  border-right: none !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Input */
+:host ::ng-deep .iti input.form-control {
+  width: 100% !important;
+  padding-left: 50px !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  height: 40px !important;
+}
+
+/* Estilos generales */
+:host ::ng-deep input.form-control,
+:host ::ng-deep select.form-select {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 6px !important;
+}
+
+/* Lista de países */
+:host ::ng-deep .iti__country-list {
+  z-index: 99999 !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  max-height: 250px !important;
+  overflow-y: auto !important;
+}
+
+/* Opciones */
+:host ::ng-deep .iti__country {
+  color: white !important;
+  cursor: pointer !important;
+}
+
+/* Para evitar bloqueos */
+:host ::ng-deep .phone-container {
+  position: relative;
+  width: 100%;
+  pointer-events: auto !important;
+}
+
+/* ============================================================
+   FOCUS VERDE
+   ============================================================ */
+:host ::ng-deep input.form-control:focus,
+:host ::ng-deep select.form-select:focus,
+:host ::ng-deep .iti input.form-control:focus {
+  border-color: #00c853 !important;
+  box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.35) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   TEXTO DE SELECT VISIBLE
+   ============================================================ */
+
+:host ::ng-deep select.form-select {
+  color: white !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+:host ::ng-deep select.form-select option {
+  background-color: #2e2e2e !important;
+  color: white !important;
+}
+
+:host ::ng-deep select.form-select option:hover {
+  background-color: #444 !important;
+}
+
+:host ::ng-deep select.form-select option:checked {
+  background-color: #555 !important;
+}
+
+/* ============================================================
+   SELECT PERSONALIZADO DISTRITOS + BUSCADOR
+   ============================================================ */
+
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  cursor: default;       /* 🔥 Corrección: permite escribir sin abrir la lista */
+  z-index: 5000;
+}
+
+/* Input del select */
+.custom-select-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 0px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.05);
+  color: white !important;
+}
+
+.custom-select-input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+/* Flecha */
+.custom-select-container .arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  pointer-events: none;
+  font-size: 14px;
+}
+
+/* LISTA */
+.custom-select-list {
+  position: absolute;
+  top: calc(100% + 4px); /* 🔥 SIEMPRE HACIA ABAJO */
+  left: 0;
+  width: 100%;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 0px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  max-height: 180px; /* 🔥 5–6 items */
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  z-index: 99999;
+}
+
+/* Scroll */
+.custom-select-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-select-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.4);
+  border-radius: 4px;
+}
+
+/* Items */
+.custom-select-list li {
+  padding: 10px;
+  color: white !important;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 13px !important;
+}
+
+.custom-select-list li:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Sin resultados */
+.custom-select-list .no-data {
+  text-align: center;
+  padding: 8px;
+  color: rgba(255,255,255,0.7);
+}
+
+/* ===== SELECT BÁSICO PERSONALIZADO (GÉNERO) ===== */
+.custom-select-basic {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  transition: 0.2s ease;
+  
+  /* Elimina estilos de Bootstrap */
+  box-shadow: none !important;
+}
+
+.custom-select-basic:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.custom-select-basic:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Flecha blanca */
+.custom-select-basic {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+/* ===== DROPDOWN INTERNO DEL SELECT (OPCIONES) ===== */
+.custom-select-basic option {
+  background-color: rgba(20, 20, 20, 0.95) !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px !important;
+}
+
+/* Hover NO funciona en todos los navegadores, pero sí en Chrome */
+.custom-select-basic option:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+/* Cuando una opción está seleccionada */
+.custom-select-basic option:checked {
+  background-color: rgba(255, 255, 255, 0.20) !important;
+  color: white !important;
+}
+
+/* Intento de bordes redondeados para el dropdown del SELECT (limitado por navegador) */
+.custom-select-basic {
+  border-radius: 6px !important; /* El input sí se redondea */
+
+  /* Chrome ignora esto en dropdown, pero otros navegadores sí lo toman */
+  overflow: hidden !important;
+}
+
+.custom-select-basic option {
+  border-radius: 8px !important;
+}

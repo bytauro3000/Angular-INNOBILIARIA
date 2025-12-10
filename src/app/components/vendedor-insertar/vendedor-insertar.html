@@ -1,0 +1,131 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <form (ngSubmit)="guardarVendedor()" #vForm="ngForm">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">{{ vendedorEditando ? '✏️ Editar Vendedor' : '➕ Nuevo Vendedor' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.nombre" name="nombre" required />
+            </div>
+            
+            <div class="col-md-6">
+              <label class="form-label">Apellidos</label>
+              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.apellidos" name="apellidos" required />
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">DNI</label>
+              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.dni" name="dni" required />
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Celular</label>
+
+              <ngx-intl-tel-input
+                [preferredCountries]="preferredCountries"
+                [enableAutoCountrySelect]="true"
+                [enablePlaceholder]="true"
+                [searchCountryFlag]="true"
+                [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"
+                [selectFirstCountry]="true"
+                [selectedCountryISO]="CountryISO.Peru"
+                [cssClass]="'form-control'"
+                [(ngModel)]="nuevoVendedor.celular"
+                name="celular"
+                [ngModelOptions]="{standalone: false}"
+                [attr.placeholder]="'Ej. 902 658 057'">
+              </ngx-intl-tel-input>
+
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" [(ngModel)]="nuevoVendedor.email" name="email" />
+            </div>
+            
+            <div class="col-md-8">
+              <label class="form-label">Dirección</label>
+              <input type="text" class="form-control" [(ngModel)]="nuevoVendedor.direccion" name="direccion" />
+            </div>
+
+            <!-- 🔥 SELECT DISTRITO CON FILTRO (IGUAL QUE PAÍSES) -->
+            <div class="col-md-4">
+              <label class="form-label">Distrito</label>
+
+              <div class="custom-select-container"
+                   (click)="toggleDistritos()"
+                   [class.open]="mostrarDistritos">
+
+                <!-- INPUT FILTRO -->
+                <input 
+                  type="text"
+                  class="form-control custom-select-input"
+                  placeholder="Buscar distrito..."
+                  [(ngModel)]="filtroDistrito"
+                  (input)="filtrarDistritos()"
+                  name="buscadorDistrito"
+                  autocomplete="off"
+                />
+
+                <!-- ICONO -->
+                <span class="arrow">&#9662;</span>
+
+                <!-- LISTA -->
+                <ul class="custom-select-list" *ngIf="mostrarDistritos">
+                  <li *ngFor="let item of distritosFiltrados"
+                      (click)="seleccionarDistrito(item)">
+                    {{ item.nombre }}
+                  </li>
+
+                  <li *ngIf="distritosFiltrados.length === 0" class="no-data">
+                    No se encontraron resultados
+                  </li>
+                </ul>
+
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Fecha Nacimiento</label>
+              <input type="date" class="form-control" [(ngModel)]="nuevoVendedor.fechaNacimiento" name="fechaNacimiento" />
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Género</label>
+              <select class="custom-select-basic" [(ngModel)]="nuevoVendedor.genero" name="genero">
+                <option value="">-- Seleccione --</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="O">Otro</option>
+              </select>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Comisión (%)</label>
+              <input type="text" step="0.01" min="0" class="form-control" [(ngModel)]="nuevoVendedor.comision" name="comision" />
+            </div>
+
+
+            
+            <!-- 🔥 FIN SELECT DISTRITO -->
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="vForm.invalid">
+            {{ vendedorEditando ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -9,13 +9,16 @@ import Swal from 'sweetalert2';
 import { jsPDF } from 'jspdf';
 import { ReporteLetraCambioDTO } from '../../dto/reporteletracambio.dto';
 import { ReporteCronogramaPagosClientesDTO } from '../../dto/reportecronogramapagocli.dto';
-
+//Importa el módulo y la librería
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'; 
+//Importa los iconos específicos
+import { faPrint, faCalendarAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-letracambio-listar',
   standalone: true,
   templateUrl: './letracambios-listar.html',
   styleUrls: ['./letracambios-listar.scss'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
 })
 export class LetracambioListarComponent implements OnInit {
   letras: LetraCambio[] = [];
@@ -33,6 +36,11 @@ export class LetracambioListarComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 0;
 
+  //Define propiedades para usar los iconos en el HTML
+  faPrint = faPrint;
+  faCalendarAlt = faCalendarAlt;
+  faTrash = faTrash;
+
   // Edición en línea
   editingLetraId: number | null = null;
   campoEditando: 'importe' | 'importeLetras' | null = null;
@@ -41,8 +49,13 @@ export class LetracambioListarComponent implements OnInit {
   constructor(
     private letrasService: LetrasCambioService,
     private route: ActivatedRoute,
-    private toastr: ToastrService
-  ) { }
+    private toastr: ToastrService,
+  //Inyecta la librería de iconos en el constructor
+    library: FaIconLibrary 
+  ) { 
+    //Registra los iconos instalados
+    library.addIcons(faPrint, faCalendarAlt, faTrash);
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -167,212 +180,215 @@ export class LetracambioListarComponent implements OnInit {
     });
   }
 
-  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 
 // Nueva función para generar el PDF del cronograma de pagos
 imprimirCronogramaPagos(): void {
-  this.cargando = true;
+  this.cargando = true;
 
-  this.letrasService.obtenerReporteCronogramaPagosPorContrato(this.idContrato).subscribe({
-    next: (reporte: ReporteCronogramaPagosClientesDTO[]) => {
-      if (!reporte || reporte.length === 0) {
-        this.toastr.info('No hay datos para generar el cronograma de pagos.', 'Sin datos');
-        this.cargando = false;
-        return;
-      }
+  this.letrasService.obtenerReporteCronogramaPagosPorContrato(this.idContrato).subscribe({
+    next: (reporte: ReporteCronogramaPagosClientesDTO[]) => {
+      if (!reporte || reporte.length === 0) {
+        this.toastr.info('No hay datos para generar el cronograma de pagos.', 'Sin datos');
+        this.cargando = false;
+        return;
+      }
 
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
 
-      let y = 10;
-      const margin = 15;
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const headerHeight = 30;
-      const tableWidth = 124; // Definir un ancho fijo para la tabla
+      let y = 10;
+      const margin = 15;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const headerHeight = 30;
+      const tableWidth = 124; // Definir un ancho fijo para la tabla
 
-      // Calcular la posición de la tabla para centrarla
-      const tableStart = y + headerHeight + 25;
-      const tableX = (pageWidth - tableWidth) / 2; // Centrado en la página
-      const rowHeight = 7;
-      let currentPage = 1;
+      // Calcular la posición de la tabla para centrarla
+      const tableStart = y + headerHeight + 25;
+      const tableX = (pageWidth - tableWidth) / 2; // Centrado en la página
+      const rowHeight = 7;
+      let currentPage = 1;
 
-      // **Control de la primera página**: Solo se llama a addHeader en la primera página
-      this.addHeader(doc, reporte[0], currentPage, margin);
-      y = tableStart;
+      // **Control de la primera página**: Solo se llama a addHeader en la primera página
+      this.addHeader(doc, reporte[0], currentPage, margin);
+      y = tableStart;
 
-      // **Ajustar el ancho de las columnas de la tabla** (más estrechas)
-      const colWidths = {
-        'N°': 30,  // Reducir el ancho de la columna "N°"
-        'Vencimiento': 60, // Reducir la columna "Vencimiento"
-        'Importe': 40,  // Reducir la columna "Importe"
-      };
+      // **Ajustar el ancho de las columnas de la tabla** (más estrechas)
+      const colWidths = {
+        'N°': 30,  // Reducir el ancho de la columna "N°"
+        'Vencimiento': 60, // Reducir la columna "Vencimiento"
+        'Importe': 40,  // Reducir la columna "Importe"
+      };
 
-      const colStarts = {
-        'N°': tableX,  // Columna "N°" ajustada al centro
-        'Vencimiento': tableX + colWidths['N°'],
-        'Importe': tableX + colWidths['N°'] + colWidths['Vencimiento'],
-      };
+      const colStarts = {
+        'N°': tableX,  // Columna "N°" ajustada al centro
+        'Vencimiento': tableX + colWidths['N°'],
+        'Importe': tableX + colWidths['N°'] + colWidths['Vencimiento'],
+      };
 
-      // Dibujar encabezado de la tabla
-      this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
-      y += rowHeight;
-      doc.setFont('times', 'normal');
-      
-      let totalImporte = 0; // **Definir e inicializar** la variable `totalImporte`
+      // Dibujar encabezado de la tabla
+      this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
+      y += rowHeight;
+      doc.setFont('times', 'normal');
+      
+      let totalImporte = 0; // **Definir e inicializar** la variable `totalImporte`
 
-      reporte.forEach((letra, index) => {
-        // Añadir nueva página si es necesario
-        if (y + rowHeight > doc.internal.pageSize.getHeight() - margin) {
-          doc.addPage();
-          currentPage++;
-          y = margin;
+      reporte.forEach((letra, index) => {
+        // Añadir nueva página si es necesario
+        if (y + rowHeight > doc.internal.pageSize.getHeight() - margin) {
+          doc.addPage();
+          currentPage++;
+          y = margin;
 
-          // Solo añadir el encabezado completo en la primera página
-          if (currentPage === 1) {
-            this.addHeader(doc, reporte[0], currentPage, margin); // Mostrar encabezado en la primera página
-          } else {
-            // Si no es la primera página, dibujamos solo la cabecera de la tabla (sin encabezado completo)
-            this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
-          }
+          // Solo añadir el encabezado completo en la primera página
+          if (currentPage === 1) {
+            this.addHeader(doc, reporte[0], currentPage, margin); // Mostrar encabezado en la primera página
+          } else {
+            // Si no es la primera página, dibujamos solo la cabecera de la tabla (sin encabezado completo)
+            this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
+          }
 
-          y += rowHeight;
-          
-          doc.setFontSize(12);
-          doc.setFont('times', 'normal');
-        }
-        // Extraer el número antes del "/"
-        const numeroLetra = letra.numeroLetra.split('/')[0];
-        // Dibujar fila de datos
-        doc.setDrawColor(200, 200, 200); // Usamos el mismo color que las líneas horizontales
-        doc.rect(tableX, y, tableWidth, rowHeight);  // Dibujar la fila en la nueva posición centrada
+          y += rowHeight;
+        }
+        
+        doc.setFont('times', 'normal');
+        // Extraer el número antes del "/"
+        const numeroLetra = letra.numeroLetra.split('/')[0];
+        // Dibujar fila de datos
+        doc.setDrawColor(200, 200, 200); // Usamos el mismo color que las líneas horizontales
+        doc.rect(tableX, y, tableWidth, rowHeight);  // Dibujar la fila en la nueva posición centrada
 
-        // Dibujar los textos de la tabla con separador de miles
-        doc.text(numeroLetra, colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
-        doc.text(letra.fechaVencimiento.toString(), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
-        doc.text(`$ ${letra.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+        // Dibujar los textos de la tabla con separador de miles
+        doc.text(numeroLetra, colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
+        doc.text(letra.fechaVencimiento.toString(), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
+        doc.text(`$ ${letra.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
-        // Dibujar líneas verticales (separadores) con el mismo color que las líneas horizontales
-        doc.setDrawColor(200, 200, 200); // Color igual a las líneas horizontales
-        doc.line(colStarts['N°'] + colWidths['N°'], y, colStarts['N°'] + colWidths['N°'], y + rowHeight); // Línea vertical después de la columna "N°"
-        doc.line(colStarts['Vencimiento'] + colWidths['Vencimiento'], y, colStarts['Vencimiento'] + colWidths['Vencimiento'], y + rowHeight); // Línea vertical después de la columna "Vencimiento"
+        // Dibujar líneas verticales (separadores) con el mismo color que las líneas horizontales
+        doc.setDrawColor(200, 200, 200); // Color igual a las líneas horizontales
+        doc.line(colStarts['N°'] + colWidths['N°'], y, colStarts['N°'] + colWidths['N°'], y + rowHeight); // Línea vertical después de la columna "N°"
+        doc.line(colStarts['Vencimiento'] + colWidths['Vencimiento'], y, colStarts['Vencimiento'] + colWidths['Vencimiento'], y + rowHeight); // Línea vertical después de la columna "Vencimiento"
 
-        totalImporte += letra.importe; // **Acumulamos el importe para la suma**
+        totalImporte += letra.importe; // **Acumulamos el importe para la suma**
 
-        y += rowHeight;
-      });
+        y += rowHeight;
+      });
 
-      // Añadir la fila de "Suma de Importes" al final de la tabla con separador de miles
-      doc.setFont('times', 'bold');
-      doc.text('SUMA DE IMPORTE:', colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
-      doc.text(`$ ${totalImporte.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+      // Añadir la fila de "Suma de Importes" al final de la tabla con separador de miles
+      doc.setFont('times', 'bold');
+      doc.text('SUMA DE IMPORTE:', colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
+      doc.text(`$ ${totalImporte.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+      doc.setFont('times', 'normal');
 
-      // Paginación en todas las páginas (incluyendo la primera)
-      doc.setFontSize(8);
-      doc.text(`Página ${currentPage}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO DE LA MODIFICACIÓN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+      
+     // Recorrer todas las páginas para agregar la paginación correctamente
+      const pageCount = (doc.internal as any).getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.text(`Página ${i}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+      }
 
-      // Abrir PDF
-      doc.output('dataurlnewwindow');
-      this.cargando = false;
-    },
-    error: (e) => {
-      this.toastr.error('Error al generar el cronograma.', 'Error');
-      this.cargando = false;
-    }
-  });
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FIN DE LA MODIFICACIÓN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+
+      // Abrir PDF
+      doc.output('dataurlnewwindow');
+      this.cargando = false;
+    },
+    error: (e) => {
+      this.toastr.error('Error al generar el cronograma.', 'Error');
+      this.cargando = false;
+    }
+  });
 }
 
 // Dibuja el encabezado de la tabla
 private drawTableHeader(doc: jsPDF, y: number, margin: number, colWidths: any, colStarts: any, tableWidth: number): void {
-  doc.setFontSize(8);
-  doc.setFont('times', 'bold');
-  doc.setFillColor(200, 200, 200);
+  doc.setFontSize(8);
+  doc.setFont('times', 'bold');
+  doc.setFillColor(200, 200, 200);
 
-  // Dibuja el rectángulo de fondo para toda la cabecera
-  doc.rect(colStarts['N°'], y, tableWidth, 7, 'F');  // Usar el ancho de la tabla centrada
+  // Dibuja el rectángulo de fondo para toda la cabecera
+  doc.rect(colStarts['N°'], y, tableWidth, 7, 'F');  // Usar el ancho de la tabla centrada
 
-  // Dibuja los textos de la cabecera centrados en sus respectivas columnas
-  doc.text('N° Letra', colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
-  doc.text('Vencimiento', colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
-  doc.text('Importe', colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+  // Dibuja los textos de la cabecera centrados en sus respectivas columnas
+  doc.text('N° Letra', colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
+  doc.text('Vencimiento', colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
+  doc.text('Importe', colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
-  // Dibujar líneas verticales (separadores de las cabeceras) con el mismo color que las líneas horizontales
-  doc.setDrawColor(200, 200, 200); // Color igual a las líneas horizontales
-  doc.line(colStarts['N°'] + colWidths['N°'], y, colStarts['N°'] + colWidths['N°'], y + 7); // Línea vertical después de la columna "N°"
-  doc.line(colStarts['Vencimiento'] + colWidths['Vencimiento'], y, colStarts['Vencimiento'] + colWidths['Vencimiento'], y + 7); // Línea vertical después de la columna "Vencimiento"
+  // Dibujar líneas verticales (separadores de las cabeceras) con el mismo color que las líneas horizontales
+  doc.setDrawColor(200, 200, 200); // Color igual a las líneas horizontales
+  doc.line(colStarts['N°'] + colWidths['N°'], y, colStarts['N°'] + colWidths['N°'], y + 7); // Línea vertical después de la columna "N°"
+  doc.line(colStarts['Vencimiento'] + colWidths['Vencimiento'], y, colStarts['Vencimiento'] + colWidths['Vencimiento'], y + 7); // Línea vertical después de la columna "Vencimiento"
 }
 
 // La función 'addHeader' debe ir aquí, dentro de la clase, como un método privado.
 private addHeader(doc: jsPDF, data: ReporteCronogramaPagosClientesDTO, page: number, margin: number): void {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 15;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = 15;
 
-  // Título y fecha
-  doc.setFontSize(14);
-  doc.setFont('times', 'bold');
-  doc.text('CRONOGRAMA DE PAGOS', pageWidth / 2, y, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setFont('times', 'normal');
-  doc.text(`Fecha de Emisión: ${new Date().toLocaleDateString()}`, pageWidth - margin, y, { align: 'right' });
+  // Título y fecha
+  doc.setFontSize(14);
+  doc.setFont('times', 'bold');
+  doc.text('CRONOGRAMA DE PAGOS', pageWidth / 2, y, { align: 'center' });
+  doc.setFontSize(10);
+  doc.setFont('times', 'normal');
+  doc.text(`Fecha de Emisión: ${new Date().toLocaleDateString()}`, pageWidth - margin, y, { align: 'right' });
 
-  y += 10;
-  doc.setFontSize(10);
-  doc.text(`Proyecto: ${data.programaNombre}`, margin, y);
-  doc.text(`Vendedor: ${data.vendedorNombre} ${data.vendedorApellidos}`, 130, y);
+  y += 10;
+  doc.setFontSize(10);
+  doc.text(`Proyecto: ${data.programaNombre}`, margin, y);
+  doc.text(`Vendedor: ${data.vendedorNombre} ${data.vendedorApellidos}`, 130, y);
 
-  // Información del cliente
-  y += 5;
-  doc.setFont('times', 'bold');
-  doc.text('Datos del Cliente', margin, y);
-  doc.setFont('times', 'normal');
-  doc.text(`Nombre 1: ${data.cliente1Nombre} ${data.cliente1Apellidos ?? ''}`, margin, y + 5);
-  doc.text(`DNI: ${data.cliente1NumDocumento}`, 130, y + 5);
-  doc.text(`Dirección: ${data.cliente1Direccion}`, margin, y + 15);
-  doc.text(`Distrito: ${data.cliente1Distrito}`, 130, y + 15);
-  doc.text(`Teléfono: ${data.cliente1Telefono} - Celular: ${data.cliente1Celular}`, 130, y);
-  
-  doc.setFont('times', 'normal');
-  doc.text(`Nombre 2: ${data.cliente2Nombre ?? ''} ${data.cliente2Apellidos ?? ''}`, margin, y + 10);
-  doc.text(`DNI: ${data.cliente2NumDocumento ?? ''}`, 130, y + 10);
+  // Información del cliente
+  y += 5;
+  doc.setFont('times', 'bold');
+  doc.text('Datos del Cliente', margin, y);
+  doc.setFont('times', 'normal');
+  doc.text(`Nombre 1: ${data.cliente1Nombre} ${data.cliente1Apellidos ?? ''}`, margin, y + 5);
+  doc.text(`DNI: ${data.cliente1NumDocumento}`, 130, y + 5);
+  doc.text(`Dirección: ${data.cliente1Direccion}`, margin, y + 15);
+  doc.text(`Distrito: ${data.cliente1Distrito}`, 130, y + 15);
+  doc.text(`Teléfono: ${data.cliente1Telefono} - Celular: ${data.cliente1Celular}`, 130, y);
+  
+  doc.setFont('times', 'normal');
+  doc.text(`Nombre 2: ${data.cliente2Nombre ?? ''} ${data.cliente2Apellidos ?? ''}`, margin, y + 10);
+  doc.text(`DNI: ${data.cliente2NumDocumento ?? ''}`, 130, y + 10);
 
-  // Información del lote
-  y += 20;
-  doc.setFont('times', 'bold');
-  doc.text('Datos del Lote', margin, y);
-  doc.setFont('times', 'normal');
+  // Información del lote
+  y += 20;
+  doc.setFont('times', 'bold');
+  doc.text('Datos del Lote', margin, y);
+  doc.setFont('times', 'normal');
 
-  doc.text(`Lote 1: Manzana ${data.lote1Manzana ?? ''}, Lote ${data.lote1NumeroLote ?? ''} - Área: ${data.lote1Area ?? ''} m²`, margin, y + 5);
-  // Lote 2: Si hay datos, mostrar Lote 2, si no mostrar vacío
-  if (data.lote2Manzana && data.lote2NumeroLote && data.lote2Area) {
-    doc.text(
-      `Lote 2: Manzana ${data.lote2Manzana}, Lote ${data.lote2NumeroLote} - Área: ${data.lote2Area} m²`,
-      margin,
-      y + 10
-    );
-  } else {
-    // Si Lote 2 no tiene datos, mostrar solo "Lote 2:" vacío
-    doc.text('Lote 2: ', margin, y + 10);
-  }
-  doc.text(`N° de Letras:${data.cantidadLetras}`, 90, y + 5);
-  doc.setFont('times', 'bold');
-  doc.text(`Inicial: $. ${data.inicial?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 130, y + 5);
+  doc.text(`Lote 1: Manzana ${data.lote1Manzana ?? ''}, Lote ${data.lote1NumeroLote ?? ''} - Área: ${data.lote1Area ?? ''} m²`, margin, y + 5);
+  // Lote 2: Si hay datos, mostrar Lote 2, si no mostrar vacío
+  if (data.lote2Manzana && data.lote2NumeroLote && data.lote2Area) {
+    doc.text(
+      `Lote 2: Manzana ${data.lote2Manzana}, Lote ${data.lote2NumeroLote} - Área: ${data.lote2Area} m²`,
+      margin,
+      y + 10
+    );
+  } else {
+    // Si Lote 2 no tiene datos, mostrar solo "Lote 2:" vacío
+    doc.text('Lote 2: ', margin, y + 10);
+  }
+  doc.text(`N° de Letras:${data.cantidadLetras}`, 90, y + 5);
+  doc.setFont('times', 'bold');
+  doc.text(`Inicial: $. ${data.inicial?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 130, y + 5);
 
-  doc.text(`Monto Total: $. ${data.montoTotal?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 83, y + 10);
-  doc.text(`Saldo: $. ${data.saldo?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 130, y + 10);
+  doc.text(`Monto Total: $. ${data.montoTotal?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 83, y + 10);
+  doc.text(`Saldo: $. ${data.saldo?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 130, y + 10);
 
 
-  // Paginación solo en la primera página
-  if (page === 1) {  // Solo mostrar el número de página en la primera página
-    doc.setFontSize(8);
-    doc.text(`Página ${page}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
-  }
+  // **Eliminado el if(page === 1) para que no se imprima aquí, ya que se hará en un bucle al final**
 }
 
 
-
-  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
   filtrarLetras(): void {
     const termino = this.terminoBusqueda.trim().toLowerCase();
 

@@ -3,6 +3,7 @@
 
   <div class="filtros">
     <label for="buscar-input" class="label-buscar">Buscar:</label>
+
     <input
       id="buscar-input"
       type="text"
@@ -12,36 +13,47 @@
       class="filtro-input"
       aria-label="Buscar número de letra"
     />
-    <button
-      (click)="eliminarLetras()"
-      [disabled]="cargando || letras.length === 0"
-      class="btn-eliminar"
-      aria-disabled="{{ cargando || letras.length === 0 }}"
-    >
-      Eliminar Letras
-    </button>
 
-     <!-- Botón para imprimir el reporte en PDF -->
-  <button
-    (click)="imprimirLetras()"
-    [disabled]="cargando || letras.length === 0"
-    class="btn-imprimir"
-    aria-disabled="{{ cargando || letras.length === 0 }}"
-  >
-    Imprimir Letras
-  </button>
+    <!-- CONTENEDOR DE BOTONES — NUEVO -->
+    <div class="acciones-botones">
 
-  <button
-    (click)="imprimirCronogramaPagos()"
-    [disabled]="cargando || letras.length === 0"
-    class="btn-imprimir"
-    aria-disabled="{{ cargando || letras.length === 0 }}"
-  >
-    Cronograma de Pagos
-  </button>
+      <button
+        (click)="eliminarLetras()"
+        [disabled]="cargando || letras.length === 0"
+        class="btn-eliminar"
+        aria-disabled="{{ cargando || letras.length === 0 }}"
+      >
+        <fa-icon [icon]="faTrash" class="icono-btn"></fa-icon> 
+        Eliminar Letras
+      </button>
+
+      <button
+        (click)="imprimirLetras()"
+        [disabled]="cargando || letras.length === 0"
+        class="btn-imprimirletra"
+      >
+        <fa-icon [icon]="faPrint" class="icono-btn"></fa-icon> 
+        Imprimir Letras
+      </button>
+
+      <button
+        (click)="imprimirCronogramaPagos()"
+        [disabled]="cargando || letras.length === 0"
+        class="btn-imprimircronograma"
+        aria-disabled="{{ cargando || letras.length === 0 }}"
+      >
+        <fa-icon [icon]="faCalendarAlt" class="icono-btn"></fa-icon> 
+        Cronograma de Pagos
+      </button>
+
+    </div>
+    <!-- FIN CONTENEDOR DE BOTONES -->
   </div>
 
-  <div *ngIf="cargando" class="mensaje-cargando" role="status" aria-live="polite">Cargando letras...</div>
+  <div *ngIf="cargando" class="mensaje-cargando" role="status" aria-live="polite">
+    Cargando letras...
+  </div>
+
   <div *ngIf="error" class="alerta-error" role="alert">{{ error }}</div>
 
   <div class="tabla-letras">
@@ -56,6 +68,7 @@
           <th scope="col">Importe Texto</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let letra of paginatedLetras; let i = index">
           <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
@@ -63,8 +76,13 @@
           <td>{{ letra.fechaGiro | date: 'dd/MM/yyyy' }}</td>
           <td>{{ letra.fechaVencimiento | date: 'dd/MM/yyyy' }}</td>
 
-          <!-- IMPORTE (editable) -->
-          <td (dblclick)="iniciarEdicion(letra, 'importe')" tabindex="0" role="textbox" aria-label="Editar importe">
+          <!-- IMPORTE editable -->
+          <td
+            (dblclick)="iniciarEdicion(letra, 'importe')"
+            tabindex="0"
+            role="textbox"
+            aria-label="Editar importe"
+          >
             <input
               *ngIf="editingLetraId === letra.idLetra && campoEditando === 'importe'"
               [value]="valorTemporal"
@@ -78,15 +96,17 @@
               autofocus
               aria-live="polite"
             />
+
             <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'importe')">
               ${{ letra.importe | number: '1.2-2' }}
             </span>
           </td>
 
-          <!-- IMPORTE LETRAS (solo lectura, no editable) -->
+          <!-- IMPORTE TEXTO solo lectura -->
           <td>
-            <!-- Cambié input disabled por un span para mejor accesibilidad -->
-            <span class="importe-texto" aria-readonly="true">{{ letra.importeLetras }}</span>
+            <span class="importe-texto" aria-readonly="true">
+              {{ letra.importeLetras }}
+            </span>
           </td>
         </tr>
       </tbody>
@@ -98,7 +118,12 @@
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles" role="navigation" aria-label="Paginación">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagina-btn" aria-disabled="{{ currentPage === 1 }}">
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 1"
+      class="pagina-btn"
+      aria-disabled="{{ currentPage === 1 }}"
+    >
       Anterior
     </button>
 
@@ -112,7 +137,12 @@
       {{ page }}
     </button>
 
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="pagina-btn" aria-disabled="{{ currentPage === totalPages }}">
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+      class="pagina-btn"
+      aria-disabled="{{ currentPage === totalPages }}"
+    >
       Siguiente
     </button>
   </div>

@@ -1,5 +1,5 @@
 // src/app/components/cliente-listar/cliente-listar.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClienteService } from '../../services/cliente.service';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { Cliente } from '../../models/cliente.model';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2'; //Importa SweetAlert2
+import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 
 @Component({
   selector: 'app-clientes',
@@ -14,12 +15,16 @@ import Swal from 'sweetalert2'; //Importa SweetAlert2
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    ClienteInsertarComponent
   ],
   templateUrl: './cliente-listar.html',
   styleUrls: ['./cliente-listar.scss']
 })
 export class ClientesComponent implements OnInit {
+
+  // ✅ 1. REFERENCIA AL COMPONENTE MODAL HIJO
+  @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
 
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
@@ -28,7 +33,7 @@ export class ClientesComponent implements OnInit {
   terminoBusqueda: string = '';
   tipoFiltro: string = 'nombres';
 
-  pageSize: number = 9;
+  pageSize: number = 7;
   currentPage: number = 1;
   totalPages: number = 0;
 
@@ -36,6 +41,12 @@ export class ClientesComponent implements OnInit {
     private clienteService: ClienteService,
     private toastr: ToastrService
   ) { }
+
+  // ✅ 2. MÉTODO PARA ABRIR EL MODAL
+  abrirModal(cliente?: Cliente) {
+    // LLama al método abrirModal del componente hijo (que debe ser implementado)
+    this.registroModal.abrirModalCliente(cliente); 
+  }
 
   ngOnInit(): void {
     this.cargarClientes();

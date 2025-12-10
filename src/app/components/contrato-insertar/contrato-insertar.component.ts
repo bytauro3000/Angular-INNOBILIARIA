@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild,ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormBuilder,FormGroup,Validators,ReactiveFormsModule,FormsModule} from '@angular/forms';
 import { ContratoService } from '../../services/contrato.service';
@@ -16,18 +16,31 @@ import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
+import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
+import { ClientesComponent } from '../cliente-listar/cliente-listar.component';
 
 @Component({
   selector: 'app-contrato-insertar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule,FontAwesomeModule,VendedorInsertar, ClienteInsertarComponent],
   templateUrl: './contrato-insertar.html',
-  styleUrls: ['./contrato-insertar.scss']
+  styleUrls: ['./contrato-insertar.scss'],
+  
 })
 
 export class ContratoInsertarComponent implements OnInit {
-  contratoForm!: FormGroup;
+    // USANDO @ViewChild CON EL TIPO DE CLASE CONFIRMADO: VendedorInsertar
+    @ViewChild('vendedorModalContrato') vendedorModalContrato!: VendedorInsertar;
 
+     // ✅ 1. REFERENCIA AL COMPONENTE MODAL HIJO
+  @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
+
+
+  
+  contratoForm!: FormGroup;
   programas: Programa[] = [];
   lotes: Lote[] = [];
   vendedores: Vendedor[] = [];
@@ -43,6 +56,8 @@ export class ContratoInsertarComponent implements OnInit {
   terminoBusquedaSeparacion: string = '';
   showSeparacionList: boolean = false;
 
+  faPlus = faPlus;
+
   constructor(
     private fb: FormBuilder,
     private contratoService: ContratoService,
@@ -54,6 +69,24 @@ export class ContratoInsertarComponent implements OnInit {
     public router: Router,
     private toastr: ToastrService
   ) {}
+
+  abrirModalVendedor() {
+    this.vendedorModalContrato.abrirModal();
+  }
+
+  // ✅ 2. MÉTODO PARA ABRIR EL MODAL
+  abrirModalCliente(cliente?: Cliente) {
+    // LLama al método abrirModal del componente hijo (que debe ser implementado)
+    this.registroModal.abrirModalCliente(cliente); 
+  }
+
+  recargarVendedores() {
+    this.vendedorService.listarVendedores().subscribe(v => (this.vendedores = v));
+  }
+
+  RecargarClientes(): void {
+    this.clienteService.listarClientes().subscribe(v => (this.clientes = v));
+  }
 
   ngOnInit(): void {
     this.initForm();

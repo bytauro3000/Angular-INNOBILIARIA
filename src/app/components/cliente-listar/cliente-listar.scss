@@ -181,5 +181,60 @@
       align-items: stretch;
     }
   }
+
+  /* ⭐⭐⭐ PAGINACIÓN PERSONALIZADA (MISMA DE CONTRATOS) ⭐⭐⭐ */
+.paginacion-controles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  /* Estilos base de todos los botones */
+  .btn {
+    border-radius: 6px !important;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.55rem 1rem !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dcdcdc !important;
+    color: #333 !important;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+  }
+
+  /* BOTONES NUMERADOS */
+  .pagina-numero-btn {
+    min-width: 38px;
+    text-align: center;
+
+    &.active {
+      background-color: #3498db !important;
+      border-color: #3498db !important;
+      color: #fff !important;
+      font-weight: bold;
+      transform: scale(1.03);
+    }
+
+    &:hover:not(.active) {
+      background-color: #e6e6e6 !important;
+      transform: translateY(-2px);
+    }
+  }
+
+  /* Hover para Anterior/Siguiente */
+  .btn:not(.pagina-numero-btn):hover:not(:disabled) {
+    background-color: #e6e6e6 !important;
+    transform: translateY(-2px);
+  }
+
+  /* Botones deshabilitados */
+  .btn:disabled {
+    cursor: not-allowed;
+    background-color: #e9ecef !important;
+    color: #999 !important;
+    transform: none !important;
+  }
+}
+/* ⭐⭐⭐ FIN PAGINACIÓN PERSONALIZADA ⭐⭐⭐ */
 }
 

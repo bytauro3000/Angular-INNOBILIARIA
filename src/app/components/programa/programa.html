@@ -1,23 +1,21 @@
-<div class="container mt-4">
-  <h2 class="text-center mb-4 text-primary fw-bold">🏠 Gestión de Programas</h2>
+<div class="clientes-container">
+  <h2>Gestión de Programas</h2>
 
-  <!-- Botones de acciones -->
-  <div class="d-flex justify-content-end gap-2 mb-3">
-    <button class="btn btn-success shadow-sm" (click)="abrirModal()">
-      ➕ Nuevo Programa
+  <div class="filtros">
+    <button class="btn btn-success" (click)="abrirModal()">
+      <i class="bi bi-plus-lg"></i> Nuevo Programa
     </button>
-    <button class="btn btn-outline-primary shadow-sm" (click)="descargarExcel()">
+    <button class="btn btn-outline-primary" (click)="descargarExcel()">
       📥 Exportar Excel
     </button>
-    <button class="btn btn-outline-danger shadow-sm" (click)="exportarPDF()">
+    <button class="btn btn-outline-danger" (click)="exportarPDF()">
       📄 Exportar PDF
     </button>
   </div>
 
-  <!-- Tabla -->
-  <div class="table-responsive shadow-sm rounded-3">
-    <table class="table align-middle table-hover">
-      <thead class="table-dark text-center">
+  <div class="tabla-clientes">
+    <table>
+      <thead>
         <tr>
           <th>ID</th>
           <th>Nombre</th>
@@ -29,21 +27,28 @@
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody class="text-center">
+      <tbody>
         <tr *ngFor="let programa of programas">
-          <td class="fw-semibold">{{ programa.idPrograma }}</td>
+          <td>{{ programa.idPrograma }}</td>
           <td>{{ programa.nombrePrograma }}</td>
           <td>{{ programa.ubicacion }}</td>
           <td>{{ programa.areaTotal }}</td>
           <td>{{ programa.precioM2 | currency:'USD':'symbol':'1.0-2' }}</td>
-          <td class="fw-bold text-success">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
-          <td><span class="badge bg-info text-dark px-3 py-2">{{ programa.distrito.nombre }}</span></td>
-          <td>
-            <button class="btn btn-warning btn-sm me-2 shadow-sm" (click)="abrirModal(programa)">✏️</button>
-            <button class="btn btn-danger btn-sm shadow-sm" (click)="eliminarPrograma(programa.idPrograma!)">🗑</button>
+          <td class="fw-bold">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td><span class="estado-propietario">{{ programa.distrito.nombre }}</span></td>
+          <td class="acciones-cell">
+            <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(programa)" title="Editar">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarPrograma(programa.idPrograma!)" title="Eliminar">
+              <i class="bi bi-trash"></i>
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+    <div *ngIf="programas.length === 0" class="no-results">
+        No se encontraron programas disponibles.
+    </div>
   </div>
 </div>

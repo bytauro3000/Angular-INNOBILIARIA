@@ -25,30 +25,36 @@
         </div>
       </div>
       
-      <!-- Bloque para modalidadContrato = DIRECTO -->
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label for="vendedorId">Vendedor</label>
-          <select id="vendedorId" formControlName="vendedorId">
-            <option [ngValue]="null" disabled>Seleccione un vendedor</option>
-            <option *ngFor="let vendedor of vendedores" [value]="vendedor.idVendedor">
-              {{ vendedor.nombre }} {{ vendedor.apellidos }}
-            </option>
-          </select>
+          <div class="input-with-button"> <select id="vendedorId" formControlName="vendedorId">
+              <option [ngValue]="null" disabled>Seleccione un vendedor</option>
+              <option *ngFor="let vendedor of vendedores" [value]="vendedor.idVendedor">
+                {{ vendedor.nombre }} {{ vendedor.apellidos }}
+              </option>
+            </select>
+            <button type="button" class="btn btn-add-mini" (click)="abrirModalVendedor()">
+            <fa-icon [icon]="faPlus"></fa-icon> 
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="idPrograma">Programa</label>
-          <select id="idPrograma" formControlName="idPrograma">
-            <option [ngValue]="null" disabled>Seleccione un programa</option>
-            <option *ngFor="let prog of programas" [value]="prog.idPrograma">
-              {{ prog.nombrePrograma }}
-            </option>
-          </select>
+          <div class="input-with-button"> <select id="idPrograma" formControlName="idPrograma">
+              <option [ngValue]="null" disabled>Seleccione un programa</option>
+              <option *ngFor="let prog of programas" [value]="prog.idPrograma">
+                {{ prog.nombrePrograma }}
+              </option>
+            </select>
+            <button type="button" class="btn btn-add-mini" >
+              <fa-icon [icon]="faPlus"></fa-icon> 
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Bloque para modalidadContrato = SEPARACION -->
       <div class="form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'SEPARACION'">
         <div class="form-group full-width">
           <label>Buscar Separación</label>
@@ -101,7 +107,6 @@
         </div>
       </div>
 
-      <!-- Cantidad de Letras -->
       <div class="form-row form-2-col" *ngIf="!esContado">
         <div class="form-group">
           <label for="cantidadLetras">Cantidad de Letras</label>
@@ -121,7 +126,6 @@
         </div>
       </div>
 
-      <!-- Observaciones se mantiene en segunda fila si es contado -->
       <div class="form-row form-2-col" *ngIf="esContado">
         <div class="form-group">
           <label for="observaciones">Observaciones</label>
@@ -133,16 +137,19 @@
         </div>
       </div>
       
-      <!-- Bloque para modalidadContrato = DIRECTO -->
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label>Agregar Cliente</label>
-          <select (change)="agregarCliente($event)">
-            <option [ngValue]="null" disabled selected>Seleccione un cliente</option>
-            <option *ngFor="let c of clientes" [value]="c.idCliente">
-              {{ c.nombre }} {{ c.apellidos }}
-            </option>
-          </select>
+          <div class="input-with-button"> <select (change)="agregarCliente($event)">
+              <option [ngValue]="null" disabled selected>Seleccione un cliente</option>
+              <option *ngFor="let c of clientes" [value]="c.idCliente">
+                {{ c.nombre }} {{ c.apellidos }}
+              </option>
+            </select>
+            <button type="button" class="btn btn-add-mini" (click)="abrirModalCliente()">
+              <fa-icon [icon]="faPlus"></fa-icon> 
+            </button>
+          </div>
           <ul>
             <li *ngFor="let cli of clientesSeleccionados">
               {{ cli.nombre }} {{ cli.apellidos }}
@@ -152,12 +159,16 @@
         </div>
         <div class="form-group">
           <label>Agregar Lote</label>
-          <select (change)="agregarLote($event)">
-            <option [ngValue]="null" disabled selected>Seleccione un lote</option>
-            <option *ngFor="let l of lotes" [value]="l.idLote" [disabled]="isLoteSeleccionado(l.idLote)">
-              Manzana {{ l.manzana }} - Lote {{ l.numeroLote }}
-            </option>
-          </select>
+          <div class="input-with-button"> <select (change)="agregarLote($event)">
+              <option [ngValue]="null" disabled selected>Seleccione un lote</option>
+              <option *ngFor="let l of lotes" [value]="l.idLote" [disabled]="isLoteSeleccionado(l.idLote)">
+                Manzana {{ l.manzana }} - Lote {{ l.numeroLote }}
+              </option>
+            </select>
+            <button type="button" class="btn btn-add-mini" >
+              <fa-icon [icon]="faPlus"></fa-icon> 
+            </button>
+          </div>
           <ul>
             <li *ngFor="let lote of lotesSeleccionados">
               Manzana {{ lote.manzana }} - Lote {{ lote.numeroLote }}
@@ -178,3 +189,13 @@
     </form>
   </div>
 </div>
+
+<app-vendedor-insertar 
+  #vendedorModalContrato
+  (vendedorGuardado)="recargarVendedores()"> 
+</app-vendedor-insertar>
+ <app-cliente-insertar 
+    #registroModal 
+    (clienteGuardado)="RecargarClientes()"> 
+  </app-cliente-insertar>
+
