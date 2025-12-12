@@ -5,7 +5,7 @@ import { Distrito } from './distrito.model';
 export interface Cliente {
   idCliente: number;
   nombre: string;
-  apellidos?: string;
+  apellidos: string;
   tipoCliente: TipoCliente;
   numDoc: string;
   celular: string;

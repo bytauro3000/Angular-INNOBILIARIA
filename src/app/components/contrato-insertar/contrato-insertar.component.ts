@@ -44,6 +44,11 @@ export class ContratoInsertarComponent implements OnInit {
   programas: Programa[] = [];
   lotes: Lote[] = [];
   vendedores: Vendedor[] = [];
+  // 🚀 NUEVAS PROPIEDADES PARA EL FILTRO DE VENDEDOR
+  vendedoresFiltrados: Vendedor[] = [];
+  filtroVendedor: string = '';
+  mostrarVendedores: boolean = false;
+
   clientes: Cliente[] = [];
   separaciones: SeparacionDTO[] = [];
 
@@ -133,10 +138,44 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   private cargarCombos() {
-    this.programaService.listarProgramas().subscribe(p => (this.programas = p));
-    this.vendedorService.listarVendedores().subscribe(v => (this.vendedores = v));
-    this.clienteService.listarClientes().subscribe(c => (this.clientes = c));
+  this.programaService.listarProgramas().subscribe(p => (this.programas = p));
+  this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v;
+  this.vendedoresFiltrados = [...v];
+  });
+  this.clienteService.listarClientes().subscribe(c => (this.clientes = c));
+}
+
+toggleVendedores() {
+  this.mostrarVendedores = !this.mostrarVendedores;
+  if (this.mostrarVendedores && this.filtroVendedor.trim() === '') {
+    this.vendedoresFiltrados = [...this.vendedores];
   }
+}
+
+
+filtrarVendedores() {
+  const filtro = this.filtroVendedor.toLowerCase().trim();
+  // Incluye la lógica de búsqueda de la cadena completa
+  this.vendedoresFiltrados = this.vendedores.filter(v => {
+    // Crea la cadena combinada (Nombre + Apellidos) en minúsculas
+    const nombreCompleto = `${v.nombre} ${v.apellidos}`.toLowerCase();
+    // Comprueba si el filtro está incluido en cualquiera de estas tres opciones:
+    return (
+      // 1. En la cadena completa (nombre + apellidos)
+      nombreCompleto.includes(filtro) ||
+      // 2. En el DNI (como antes)
+      v.dni.toLowerCase().includes(filtro)
+    );
+  });
+  
+  this.mostrarVendedores = true;
+}
+
+seleccionarVendedor(vendedor: Vendedor) {
+  this.contratoForm.get('vendedorId')?.setValue(vendedor.idVendedor);
+  this.filtroVendedor = `${vendedor.nombre} ${vendedor.apellidos}`;
+  this.mostrarVendedores = false;
+}
 
   private handleFormChanges() {
     this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
@@ -333,6 +372,8 @@ export class ContratoInsertarComponent implements OnInit {
     this.clientesSeleccionados = [];
     this.lotesSeleccionados = [];
     this.separaciones = [];
+    this.filtroVendedor = '';
+    this.vendedoresFiltrados = [...this.vendedores];
     this.lotes = [];
     this.showSeparacionList = false;
     this.terminoBusquedaSeparacion = '';

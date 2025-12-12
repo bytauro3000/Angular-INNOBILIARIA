@@ -18,26 +18,36 @@
             <option *ngFor="let tipo of tipoContratoValues" [value]="tipo">{{ tipo }}</option>
           </select>
         </div>
-        
+
         <div class="form-group">
           <label for="fechaContrato">Fecha del Contrato</label>
           <input type="date" id="fechaContrato" formControlName="fechaContrato" />
         </div>
       </div>
-      
+
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
-          <label for="vendedorId">Vendedor</label>
-          <div class="input-with-button"> <select id="vendedorId" formControlName="vendedorId">
-              <option [ngValue]="null" disabled>Seleccione un vendedor</option>
-              <option *ngFor="let vendedor of vendedores" [value]="vendedor.idVendedor">
-                {{ vendedor.nombre }} {{ vendedor.apellidos }}
-              </option>
-            </select>
+          <label for="vendedorBusqueda">Vendedor</label>
+          <div class="input-with-button custom-select-container" (click)="toggleVendedores()">
+
+            <input type="text" id="vendedorBusqueda" placeholder="Buscar por nombre, apellido o DNI"
+              [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()"
+              escribir [ngModelOptions]="{standalone: true}" autocomplete="off" />
+
             <button type="button" class="btn btn-add-mini" (click)="abrirModalVendedor()">
-            <fa-icon [icon]="faPlus"></fa-icon> 
+              <fa-icon [icon]="faPlus"></fa-icon>
             </button>
+
+            <ul class="custom-select-list" *ngIf="mostrarVendedores">
+              <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
+                {{ v.nombre }} {{ v.apellidos }} (DNI: {{ v.dni }})
+              </li>
+              <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">
+                No se encontraron vendedores
+              </li>
+            </ul>
           </div>
+
         </div>
 
         <div class="form-group">
@@ -48,8 +58,8 @@
                 {{ prog.nombrePrograma }}
               </option>
             </select>
-            <button type="button" class="btn btn-add-mini" >
-              <fa-icon [icon]="faPlus"></fa-icon> 
+            <button type="button" class="btn btn-add-mini">
+              <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
         </div>
@@ -58,13 +68,8 @@
       <div class="form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'SEPARACION'">
         <div class="form-group full-width">
           <label>Buscar Separación</label>
-          <input
-            type="text"
-            (input)="buscarSeparaciones($event)"
-            placeholder="Buscar..."
-            [(ngModel)]="terminoBusquedaSeparacion"
-            [ngModelOptions]="{standalone: true}"
-          />
+          <input type="text" (input)="buscarSeparaciones($event)" placeholder="Buscar..."
+            [(ngModel)]="terminoBusquedaSeparacion" [ngModelOptions]="{standalone: true}" />
           <ul class="separaciones-list" *ngIf="showSeparacionList && separaciones.length > 0">
             <li *ngFor="let sep of separaciones" (click)="contratoForm.get('idSeparacion')?.setValue(sep.id)">
               {{ sep.id }} - {{ sep.text }}
@@ -76,67 +81,40 @@
       <div class="form-row form-3-col">
         <div class="form-group">
           <label for="montoTotal">Monto Total</label>
-          <input
-            type="text"
-            id="montoTotal"
-            formControlName="montoTotal"
-            (focus)="onFocusInput($event, 'montoTotal')"
-            (blur)="onCurrencyInput($event, 'montoTotal')"
-          />
+          <input type="text" id="montoTotal" formControlName="montoTotal" (focus)="onFocusInput($event, 'montoTotal')"
+            (blur)="onCurrencyInput($event, 'montoTotal')" />
         </div>
 
         <div class="form-group" *ngIf="!esContado">
           <label for="inicial">Inicial</label>
-          <input
-            type="text"
-            id="inicial"
-            formControlName="inicial"
-            (focus)="onFocusInput($event, 'inicial')"
-            (blur)="onCurrencyInput($event, 'inicial')"
-          />
+          <input type="text" id="inicial" formControlName="inicial" (focus)="onFocusInput($event, 'inicial')"
+            (blur)="onCurrencyInput($event, 'inicial')" />
         </div>
 
         <div class="form-group" *ngIf="!esContado">
           <label for="saldo">Saldo</label>
-          <input
-            type="text"
-            id="saldo"
-            formControlName="saldo"
-            [disabled]="true"
-          />
+          <input type="text" id="saldo" formControlName="saldo" [disabled]="true" />
         </div>
       </div>
 
       <div class="form-row form-2-col" *ngIf="!esContado">
         <div class="form-group">
           <label for="cantidadLetras">Cantidad de Letras</label>
-          <input
-            type="text"
-            id="cantidadLetras"
-            formControlName="cantidadLetras"
-          />
+          <input type="text" id="cantidadLetras" formControlName="cantidadLetras" />
         </div>
         <div class="form-group">
           <label for="observaciones">Observaciones</label>
-          <input
-            type="text"
-            id="observaciones"
-            formControlName="observaciones"
-          />
+          <input type="text" id="observaciones" formControlName="observaciones" />
         </div>
       </div>
 
       <div class="form-row form-2-col" *ngIf="esContado">
         <div class="form-group">
           <label for="observaciones">Observaciones</label>
-          <input
-            type="text"
-            id="observaciones"
-            formControlName="observaciones"
-          />
+          <input type="text" id="observaciones" formControlName="observaciones" />
         </div>
       </div>
-      
+
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label>Agregar Cliente</label>
@@ -147,7 +125,7 @@
               </option>
             </select>
             <button type="button" class="btn btn-add-mini" (click)="abrirModalCliente()">
-              <fa-icon [icon]="faPlus"></fa-icon> 
+              <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
           <ul>
@@ -165,8 +143,8 @@
                 Manzana {{ l.manzana }} - Lote {{ l.numeroLote }}
               </option>
             </select>
-            <button type="button" class="btn btn-add-mini" >
-              <fa-icon [icon]="faPlus"></fa-icon> 
+            <button type="button" class="btn btn-add-mini">
+              <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
           <ul>
@@ -190,12 +168,7 @@
   </div>
 </div>
 
-<app-vendedor-insertar 
-  #vendedorModalContrato
-  (vendedorGuardado)="recargarVendedores()"> 
+<app-vendedor-insertar #vendedorModalContrato (vendedorGuardado)="recargarVendedores()">
 </app-vendedor-insertar>
- <app-cliente-insertar 
-    #registroModal 
-    (clienteGuardado)="RecargarClientes()"> 
-  </app-cliente-insertar>
-
+<app-cliente-insertar #registroModal (clienteGuardado)="RecargarClientes()">
+</app-cliente-insertar>
