@@ -1,50 +1,47 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content shadow-lg">
-      
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-person-plus"></i> Insertar Nuevo Cliente
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
-      </div>
+      <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-plus"></i> Insertar Nuevo Cliente
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
+        </div>
 
-      <div class="modal-body">
-        
-        <div class="form-wrapper">
-          <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-wrapper">
             <div class="form-row form-2-col">
-              
               <div class="form-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required>
+                <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required />
               </div>
               <div class="form-group">
                 <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente">
+                <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente" />
               </div>
               
               <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required>
+                <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required />
               </div>
               
               <div class="form-group">
-  <label for="celular">Celular</label>
-  <ngx-intl-tel-input
-    [preferredCountries]="preferredCountries"
-    [enableAutoCountrySelect]="true"
-    [enablePlaceholder]="true"
-    [searchCountryFlag]="true"
-    [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"
-    [selectFirstCountry]="true"
-    [selectedCountryISO]="CountryISO.Peru"
-    [cssClass]="'form-control'"
-    formControlName="celular"
-    [attr.placeholder]="'Celular'"
-  >
-  </ngx-intl-tel-input>
-</div>
+                <label for="celular">Celular</label>
+                <ngx-intl-tel-input
+                  [preferredCountries]="preferredCountries"
+                  [enableAutoCountrySelect]="true"
+                  [enablePlaceholder]="true"
+                  [searchCountryFlag]="true"
+                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"
+                  [selectFirstCountry]="true"
+                  [selectedCountryISO]="CountryISO.Peru"
+                  [cssClass]="'form-control'"
+                  formControlName="celular"
+                  [attr.placeholder]="'Ej. 902 658 057'">
+                </ngx-intl-tel-input>
+                
+              </div>
             </div>
 
             <div class="form-row form-3-col">
@@ -58,19 +55,19 @@
 
               <div class="form-group">
                 <label for="numDoc">DNI / RUC</label>
-                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required>
+                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required />
               </div>
 
               <div class="form-group">
                 <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono">
+                <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono" />
               </div>
             </div>
 
             <div class="form-row form-2-col form-2-col-direccion">
               <div class="form-group">
                 <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required>
+                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required />
               </div>
               
               <div class="form-group" formGroupName="distrito">
@@ -83,21 +80,21 @@
                 </select>
               </div>
             </div>
-            
-            </form>
-        </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
-          <i class="bi bi-x-lg"></i> Cancelar
-        </button>
-        
-        <button type="submit" form="clienteForm" class="btn btn-primary" [disabled]="!clienteForm.valid" (click)="onSubmit()">
-          <i class="bi bi-person-plus"></i> Guardar Cliente
-        </button>
-      </div>
 
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </button>
+          
+          <button type="submit" form="clienteForm" class="btn btn-primary" [disabled]="!clienteForm.valid" (click)="onSubmit()">
+            <i class="bi bi-person-plus"></i> Guardar Cliente
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
 </div>

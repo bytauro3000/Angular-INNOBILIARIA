@@ -12,7 +12,7 @@ import { EstadoSeparacion } from '../enums/estadoseparacion.enum';
 export class SeparacionService {
 
   // URL base de tu API de Spring Boot para separaciones
-  private apiUrl = 'http://localhost:8080/api/separaciones'; 
+  private apiUrl = 'http://localhost:8081/api/separaciones'; 
 
   constructor(private http: HttpClient) { }
 //Listado principal

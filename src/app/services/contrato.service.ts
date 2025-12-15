@@ -9,7 +9,7 @@ import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 })
 export class ContratoService {
 
-  private apiUrl = 'http://localhost:8080/api/contratos'; 
+  private apiUrl = 'http://localhost:8081/api/contratos'; 
 
   constructor(private http: HttpClient) { }
 

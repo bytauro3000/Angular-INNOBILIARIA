@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class LogoutService {
-  private apiUrl = 'http://localhost:8080/api/auth/logout';
+  private apiUrl = 'http://localhost:8081/api/auth/logout';
 
   constructor(
     private http: HttpClient,

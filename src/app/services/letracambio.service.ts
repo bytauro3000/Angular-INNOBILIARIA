@@ -12,7 +12,7 @@ import { ReporteCronogramaPagosClientesDTO } from '../dto/reportecronogramapagoc
   providedIn: 'root'
 })
 export class LetrasCambioService {
-  private apiUrl = 'http://localhost:8080/api/letras';
+  private apiUrl = 'http://localhost:8081/api/letras';
 
   constructor(private http: HttpClient) {}
 

@@ -1,10 +1,9 @@
 /* ============================================================
-    ESTILOS DEL MODAL (GLASSMORPHISM)
-    ============================================================ */
+   ESTILOS DEL MODAL (GLASSMORPHISM)
+   ============================================================ */
 
-/* Estilos de la ventana modal general */
+/* Estilos generales del modal */
 .modal-content {
-  /* Vidrio Polarizado (Dark Glass) */
   background-color: rgba(0, 0, 0, 0.30);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -14,7 +13,6 @@
 }
 
 .modal-header {
-  /* Encabezado semitransparente para el efecto cristal */
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: white !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -30,6 +28,7 @@
     text-align: left !important;
     text-transform: capitalize;
     display: block;
+    font-size: 0.9rem !important;
   }
 }
 
@@ -44,10 +43,10 @@
 
 /* ============================================================
     ESTRUCTURA DEL FORMULARIO (GRID)
-    ============================================================ */
+   ============================================================ */
 
 .form-wrapper {
-  padding: 0; 
+  padding: 0;
   box-shadow: none;
   width: 100%;
 }
@@ -69,19 +68,19 @@
 
 .form-group {
   display: flex;
-  flex-direction: column; 
-  gap: 0.5rem; 
-  
+  flex-direction: column;
+  gap: 0.5rem;
+
   label {
     font-weight: 500;
-    color: white; 
+    color: white;
     font-size: 0.9rem;
     text-align: left;
   }
-  
+
   /* Estilos base de los inputs */
   input, select {
-    padding: 8px 12px; 
+    padding: 8px 12px;
     border-radius: 6px;
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -94,72 +93,57 @@
 
 /* ============================================================
     NGX-INTL-TEL-INPUT — CORRECCIÓN DE ALINEACIÓN FINAL
-    ============================================================ */
+   ============================================================ */
 
 :host ::ng-deep ngx-intl-tel-input {
-  width: 100% !important;
+  width: 100% !important; /* Asegura que el componente ocupe todo el ancho disponible */
 }
 
-/* Contenedor principal: CRÍTICO */
+/* Contenedor principal: asegura que todo esté alineado correctamente */
 :host ::ng-deep .iti {
+  display: flex !important; /* Usar flex para alinear la bandera con el input */
   width: 100% !important;
-  /* La solución más estable para forzar la integración */
-  display: table !important; 
   position: relative !important;
   z-index: 9000 !important;
 }
 
-/* Contenedor bandera (Selector) */
+/* Contenedor de la bandera */
 :host ::ng-deep .iti__flag-container {
-  /* Debe comportarse como una celda de tabla */
-  display: table-cell !important; 
-  vertical-align: middle !important;
-  position: relative !important; /* Desactiva cualquier posición absoluta flotante */
-  top: auto !important; 
-  bottom: auto !important;
-  left: auto !important; 
-  
-  height: 100% !important;
-  padding-left: 8px !important;
-  padding-right: 8px !important;
-  
-  /* Estilos de Cristal */
-  background-color: rgba(255, 255, 255, 0.05) !important; 
+  display: inline-flex !important;
+  align-items: center !important; /* Centra verticalmente la bandera */
+  justify-content: center !important;
+  padding: 8px !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
   border-radius: 6px 0 0 6px !important;
   border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
-  z-index: 5 !important; 
+  z-index: 9999 !important;
+  pointer-events: auto !important;
 }
 
-/* Bandera dentro del input */
+/* Bandera dentro del input, sin borde */
 :host ::ng-deep .iti__selected-flag {
   display: flex !important;
-  align-items: center !important; 
+  align-items: center !important;
   height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
   background-color: transparent !important;
   border-right: none !important;
+  cursor: pointer !important;
 }
 
-/* Input de texto para el número */
 :host ::ng-deep .iti input.form-control {
-  /* Debe ser una celda de tabla */
-  display: table-cell !important;
-  
-  /* Ajuste de PADDING CRÍTICO */
-  padding-left: 70px !important; /* Valor optimizado para bandera + código */
-  
-  /* Estilos de Cristal */
+  padding-left: 100px !important; /* Asegura que haya espacio suficiente para la bandera */
+  padding: 8px 12px !important; /* Asegura que el contenido dentro del input esté bien alineado */
+}
+
+/* Opcional: Para mejorar la alineación del texto dentro del input */
+:host ::ng-deep .iti input.form-control,
+:host ::ng-deep select.form-select {
   background-color: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: white !important;
-  
-  /* Unificar con la bandera */
-  border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
-  
-  height: 40px !important; /* Altura fija para unificación visual */
-  width: 100% !important;
+  border-radius: 6px !important;
+  padding: 8px 12px;
+  text-align: left !important;
 }
 
 /* Estilos generales de inputs/selects (Unificamos estilos) */
@@ -169,7 +153,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: white !important;
   border-radius: 6px !important;
-  padding: 8px 12px; 
+  padding: 8px 12px;
 }
 
 /* Lista de países */
@@ -186,8 +170,8 @@
 }
 
 /* ============================================================
-    FOCUS, AUTOFILL Y SELECTORES GENERALES
-    ============================================================ */
+   FOCUS, AUTOFILL Y SELECTORES GENERALES
+   ============================================================ */
 
 /* Autofill Fix (Necesario para tu tema oscuro) */
 .form-group input:-webkit-autofill,
