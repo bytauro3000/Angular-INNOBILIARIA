@@ -1,0 +1,107 @@
+<div class="modal fade" [ngClass]="{show: isVisible}" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header" [ngClass]="isEditMode ? 'bg-primary text-white' : 'bg-success text-white'">
+        <h5 class="modal-title">{{ isEditMode ? 'Editar Separación #' + separacion.idSeparacion : 'Nueva Separación' }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+
+      <form (ngSubmit)="guardar()">
+        <div class="modal-body row g-3 bg-light p-4">
+          
+          <div class="col-12">
+            <label class="form-label fw-bold text-dark">Agregar Clientes</label>
+            <div class="custom-select-container" #clienteContainer>
+              <input type="text" class="form-control" [(ngModel)]="filtroCliente" (input)="filtrarClientes()"
+                     [ngModelOptions]="{standalone: true}" placeholder="Buscar por nombre o DNI" autocomplete="off" (focus)="mostrarClientes = true">
+              <ul class="custom-select-list" *ngIf="mostrarClientes">
+                <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">
+                  {{ c.nombre }} {{ c.apellidos }} ({{ c.numDoc }})
+                </li>
+              </ul>
+            </div>
+            <div class="mt-2 d-flex flex-wrap gap-1">
+              <span *ngFor="let sc of separacion.clientes" class="badge bg-primary p-2">
+                {{sc.cliente.nombre}} {{sc.cliente.apellidos}}
+                <i class="bi bi-x-circle ms-2 cursor-pointer" (click)="quitarCliente(sc.cliente.idCliente)"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold text-dark">Vendedor</label>
+            <div class="custom-select-container" #vendedorContainer>
+              <input type="text" class="form-control" [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()"
+                     [ngModelOptions]="{standalone: true}" placeholder="Buscar vendedor..." autocomplete="off" (focus)="mostrarVendedores = true">
+              <ul class="custom-select-list" *ngIf="mostrarVendedores">
+                <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
+                  {{ v.nombre }} {{ v.apellidos }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold text-dark">Monto (S/.)</label>
+            <input type="number" class="form-control" [(ngModel)]="separacion.monto" name="monto" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold text-dark">Programa</label>
+            <div class="custom-select-container" #programaContainer>
+              <input type="text" class="form-control" [(ngModel)]="filtroPrograma" (input)="filtrarProgramas()"
+                     [ngModelOptions]="{standalone: true}" placeholder="Seleccionar programa..." autocomplete="off" (focus)="mostrarProgramas = true">
+              <ul class="custom-select-list" *ngIf="mostrarProgramas">
+                <li *ngFor="let p of programasFiltrados" (click)="seleccionarPrograma(p)">
+                  {{ p.nombrePrograma }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold text-dark">Agregar Lote</label>
+            <div class="custom-select-container" #loteContainer>
+              <input type="text" class="form-control" [(ngModel)]="filtroLote" (input)="filtrarLotes()"
+                     [disabled]="!programaSeleccionado" [ngModelOptions]="{standalone: true}" placeholder="Buscar lote..." autocomplete="off" (focus)="mostrarLotes = true">
+              <ul class="custom-select-list" *ngIf="mostrarLotes">
+                <li *ngFor="let l of lotesFiltrados" (click)="seleccionarLote(l)">
+                  Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-12 d-flex flex-wrap gap-1">
+            <span *ngFor="let sl of separacion.lotes" class="badge bg-success p-2">
+              Mz {{sl.lote.manzana}} Lt {{sl.lote.numeroLote}} 
+              <i class="bi bi-x-circle ms-2 cursor-pointer" (click)="quitarLote(sl.lote.idLote)"></i>
+            </span>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-dark fw-bold">Fecha Separación</label>
+            <input type="date" class="form-control" [(ngModel)]="separacion.fechaSeparacion" name="fSep">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label text-dark fw-bold">Fecha Límite</label>
+            <input type="date" class="form-control" [(ngModel)]="separacion.fechaLimite" name="fLim">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label text-dark fw-bold">Observaciones</label>
+            <textarea class="form-control" [(ngModel)]="separacion.observaciones" name="obs" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-white">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-success" [disabled]="separacion.clientes.length === 0 || separacion.lotes.length === 0">
+            {{ isEditMode ? 'Actualizar' : 'Guardar' }} Separación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

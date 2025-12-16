@@ -45,6 +45,12 @@ obtenerLotePorId(id: number): Observable<Lote>{
  return this.http.get<Lote>(`${this.apiUrl}/${id}`);
 }
 
+// Agregar este método para obtener la entidad completa y no el DTO limitado
+listarLotesEntidadPorPrograma(idPrograma: number): Observable<Lote[]> {
+  // Probamos con la ruta que parece estar fallando en tu log para corregirla
+  return this.http.get<Lote[]>(`${this.apiUrl}/programa/${idPrograma}`);
+}
+
 //Crear Lote
 crearLote(lote: Lote): Observable<Lote>{
 return this.http.post<Lote>(this.apiUrl,lote);

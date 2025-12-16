@@ -567,72 +567,72 @@ export class ContratoInsertarComponent implements OnInit {
 
 // 🟢 CORRECCIÓN: Usar SeparacionDTO para la lista, pero cargar el modelo Separacion para los detalles.
 seleccionarSeparacion(sep: SeparacionDTO) {
-    this.contratoForm.get('idSeparacion')?.setValue(sep.id);
-    this.terminoBusquedaSeparacion = sep.text;
-    this.showSeparacionList = false;
+    this.contratoForm.get('idSeparacion')?.setValue(sep.id);
+    this.terminoBusquedaSeparacion = sep.text;
+    this.showSeparacionList = false;
 
-    // 🟢 PASO 1: Obtener detalles completos de la separación usando el ID
-    this.separacionService.obtenerSeparacionPorId(sep.id!).subscribe({ 
-        next: (separacionCompleta: Separacion) => {
-            
-            // 🟢 PASO 2: Cargar el Monto Total (y otros campos si aplican)
-            const montoSeparacion = separacionCompleta.monto || 0;
-            this.contratoForm.get('montoTotal')?.setValue(this.formatCurrency(montoSeparacion));
-            // Al cargar monto, actualizamos el saldo
+    // 🟢 PASO 1: Obtener detalles completos de la separación usando el ID
+    this.separacionService.obtenerSeparacionPorId(sep.id!).subscribe({ 
+        next: (separacionCompleta: Separacion) => {
+            
+            // 🟢 PASO 2: Cargar el Monto Total
+            const montoSeparacion = separacionCompleta.monto || 0;
+            this.contratoForm.get('montoTotal')?.setValue(this.formatCurrency(montoSeparacion));
             this.actualizarSaldo(); 
-            
-            // -------------------------------------------------------------
-            // 🟢 PASO 3: ASIGNAR IDs AL FORMULARIO DE CONTRATO
-            // -------------------------------------------------------------
-            
-            // 3.1 Clientes
-            if (separacionCompleta.cliente) {
-                this.clientesSeleccionados = [separacionCompleta.cliente];
-                this.actualizarIdsClientes(); // Establece idClientes: [ID_CLIENTE]
-            } else {
-                this.clientesSeleccionados = [];
-                this.actualizarIdsClientes();
-                this.toastr.warning('La separación no tiene un cliente principal asociado.', 'Aviso');
-            }
+            
+            // -------------------------------------------------------------
+            // 🟢 PASO 3: ASIGNAR LISTAS AL FORMULARIO DE CONTRATO (Múltiples)
+            // -------------------------------------------------------------
+            
+            // 3.1 Clientes: Extraemos los clientes de la lista 'clientes' de la separación
+            if (separacionCompleta.clientes && separacionCompleta.clientes.length > 0) {
+                // Mapeamos los objetos de la relación a la lista simple de Clientes
+                this.clientesSeleccionados = separacionCompleta.clientes.map(sc => sc.cliente);
+                this.actualizarIdsClientes(); // Actualiza el formControl idClientes
+            } else {
+                this.clientesSeleccionados = [];
+                this.actualizarIdsClientes();
+                this.toastr.warning('La separación no tiene clientes asociados.', 'Aviso');
+            }
 
-            // 3.2 Lotes
-            if (separacionCompleta.lote) {
-                this.lotesSeleccionados = [separacionCompleta.lote];
-                this.actualizarIdsLotes(); // Establece idLotes: [ID_LOTE]
-                
-                // 3.3 Programa 
-                const idPrograma = separacionCompleta.lote.programa?.idPrograma || null;
-                this.contratoForm.get('idPrograma')?.setValue(idPrograma);
+            // 3.2 Lotes: Extraemos los lotes de la lista 'lotes' de la separación
+            if (separacionCompleta.lotes && separacionCompleta.lotes.length > 0) {
+                this.lotesSeleccionados = separacionCompleta.lotes.map(sl => sl.lote);
+                this.actualizarIdsLotes(); // Actualiza el formControl idLotes
+                
+                // 3.3 Programa (Tomamos el programa del primer lote de la lista)
+                const primerLote = separacionCompleta.lotes[0].lote;
+                const idPrograma = primerLote.programa?.idPrograma || null;
+                this.contratoForm.get('idPrograma')?.setValue(idPrograma);
 
-                // Opcional: Mostrar el nombre del programa en el input
-                if (separacionCompleta.lote.programa) {
-                    this.programaSeleccionado = separacionCompleta.lote.programa;
-                    this.filtroPrograma = separacionCompleta.lote.programa.nombrePrograma;
-                }
-                
-            } else {
-                this.lotesSeleccionados = [];
-                this.actualizarIdsLotes();
-                this.contratoForm.get('idPrograma')?.reset();
-                this.toastr.warning('La separación no tiene un lote asociado.', 'Aviso');
-            }
-            
-            // 3.4 Vendedor 
-            if (separacionCompleta.vendedor) {
-                this.contratoForm.get('vendedorId')?.setValue(separacionCompleta.vendedor.idVendedor);
-                this.filtroVendedor = `${separacionCompleta.vendedor.nombre} ${separacionCompleta.vendedor.apellidos}`;
-            } else {
-                this.contratoForm.get('vendedorId')?.reset();
-                this.filtroVendedor = '';
-            }
-            
-            this.toastr.success('Separación seleccionada y detalles cargados.', '¡Éxito!');
-        },
-        error: (err) => {
-            console.error('Error al cargar la separación completa:', err);
-            this.toastr.error('No se pudieron cargar los detalles de la separación.', 'Error');
-        }
-    });
+                if (primerLote.programa) {
+                    this.programaSeleccionado = primerLote.programa;
+                    this.filtroPrograma = primerLote.programa.nombrePrograma;
+                }
+                
+            } else {
+                this.lotesSeleccionados = [];
+                this.actualizarIdsLotes();
+                this.contratoForm.get('idPrograma')?.reset();
+                this.toastr.warning('La separación no tiene lotes asociados.', 'Aviso');
+            }
+            
+            // 3.4 Vendedor 
+            if (separacionCompleta.vendedor) {
+                this.contratoForm.get('vendedorId')?.setValue(separacionCompleta.vendedor.idVendedor);
+                this.filtroVendedor = `${separacionCompleta.vendedor.nombre} ${separacionCompleta.vendedor.apellidos}`;
+            } else {
+                this.contratoForm.get('vendedorId')?.reset();
+                this.filtroVendedor = '';
+            }
+            
+            this.toastr.success('Separación seleccionada y detalles cargados.', '¡Éxito!');
+        },
+        error: (err) => {
+            console.error('Error al cargar la separación completa:', err);
+            this.toastr.error('No se pudieron cargar los detalles de la separación.', 'Error');
+        }
+    });
 }
 
   // Guardar el contrato
