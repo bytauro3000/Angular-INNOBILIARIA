@@ -1,7 +1,5 @@
 import { EstadoSeparacion } from "../enums/estadoseparacion.enum";
 
-
-
 export interface SeparacionResumen{
 idSeparacion : number;
 dni : string;

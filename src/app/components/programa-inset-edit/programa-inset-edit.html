@@ -1,0 +1,93 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <form [formGroup]="programaForm" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-geo-alt"></i>
+            {{ programaEditando ? 'Editar Programa' : 'Insertar Nuevo Programa' }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-wrapper">
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label for="nombrePrograma">Nombre del Programa</label>
+                <input type="text" id="nombrePrograma" formControlName="nombrePrograma"
+                  placeholder="Nombre del programa" required
+                  [ngClass]="{'is-invalid': programaForm.get('nombrePrograma')?.invalid && programaForm.get('nombrePrograma')?.touched}" />
+              </div>
+              <div class="form-group" formGroupName="parcelero">
+                <label for="parcelero">Parcelero</label>
+                <select id="parcelero" formControlName="idParcelero" required
+                  [ngClass]="{'is-invalid': programaForm.get('parcelero.idParcelero')?.invalid && programaForm.get('parcelero.idParcelero')?.touched}">
+                  <option [ngValue]="null" disabled selected>Seleccione un Parcelero</option>
+                  <option *ngFor="let p of parceleros" [ngValue]="p.idParcelero">
+                    {{ p.nombres }} {{ p.apellidos }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <input type="text" id="ubicacion" formControlName="ubicacion" placeholder="Ubicación del programa"
+                  required
+                  [ngClass]="{'is-invalid': programaForm.get('ubicacion')?.invalid && programaForm.get('ubicacion')?.touched}" />
+              </div>
+              <div class="form-group" formGroupName="distrito">
+                <label for="distrito">Distrito</label>
+                <select id="distrito" formControlName="idDistrito" required
+                  [ngClass]="{'is-invalid': programaForm.get('distrito.idDistrito')?.invalid && programaForm.get('distrito.idDistrito')?.touched}">
+                  <option [ngValue]="null" disabled selected>Seleccione un Distrito</option>
+                  <option *ngFor="let d of distritos" [ngValue]="d.idDistrito">
+                    {{ d.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-3-col">
+
+              <div class="form-group">
+                <label for="areaTotal">Área Total (m²)</label>
+                <input type="text" id="areaTotal" formControlName="areaTotal" placeholder="Área total" required
+                  (input)="limpiarNoNumericos('areaTotal')"
+                  [ngClass]="{'is-invalid': programaForm.get('areaTotal')?.invalid && programaForm.get('areaTotal')?.touched}" />
+              </div>
+
+              <div class="form-group">
+                <label for="precioM2">Precio por m²</label>
+                <input type="text" id="precioM2" formControlName="precioM2" placeholder="Precio por m²" required
+                  appCurrencyFormatter currencySymbol="$"
+                  [ngClass]="{'is-invalid': programaForm.get('precioM2')?.invalid && programaForm.get('precioM2')?.touched}" />
+              </div>
+
+              <div class="form-group">
+                <label for="costoTotal">Costo Total</label>
+                <input type="text" id="costoTotal" placeholder="$ 0.00" readonly
+                  [value]="(programaForm.get('costoTotal')?.value | currency:'USD':'symbol':'1.2-2':'en-US') || '$ 0.00'"
+                  class="form-control" />
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="programaForm.invalid">
+            <i class="bi bi-save"></i> {{ programaEditando ? 'Actualizar' : 'Guardar Programa' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

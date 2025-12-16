@@ -1,5 +1,4 @@
-// vendedor-insertar.component.ts
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
@@ -60,6 +59,7 @@ export class VendedorInsertar implements OnInit, AfterViewInit {
   ];
 
   constructor(
+    private renderer: Renderer2,
     private vendedorService: VendedorService,
     private distritoService: DistritoService,
     private toastr: ToastrService
@@ -69,7 +69,7 @@ export class VendedorInsertar implements OnInit, AfterViewInit {
     this.cargarDistritos();
 
     // Cierra solo si el click NO está dentro del contenedor
-    document.addEventListener('click', (event) => {
+    this.renderer.listen('document', 'click', (event: any) => {
       const target = event.target as HTMLElement;
 
       // Previene cierre cuando se hace clic dentro
@@ -105,13 +105,19 @@ export class VendedorInsertar implements OnInit, AfterViewInit {
     );
 
     // Mantener la lista abierta al escribir
-    this.mostrarDistritos = true;
+    if (!this.mostrarDistritos) {
+      this.mostrarDistritos = true;
+    }
   }
 
   seleccionarDistrito(item: Distrito) {
     this.nuevoVendedor.distrito = item;
     this.filtroDistrito = item.nombre;
-    this.mostrarDistritos = false;
+
+    // Forzar el cierre de la lista en el siguiente ciclo de eventos
+    setTimeout(() => {
+      this.mostrarDistritos = false;
+    }, 0);
   }
 
   // =======================

@@ -11,6 +11,7 @@
 
         <div class="modal-body">
           <div class="form-wrapper">
+
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label for="nombre">Nombre</label>
@@ -20,56 +21,45 @@
                 <label for="apellidos">Apellidos</label>
                 <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente" />
               </div>
-              
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required />
-              </div>
-              
-              <div class="form-group">
-                <label for="celular">Celular</label>
-                <ngx-intl-tel-input
-                  [preferredCountries]="preferredCountries"
-                  [enableAutoCountrySelect]="true"
-                  [enablePlaceholder]="true"
-                  [searchCountryFlag]="true"
-                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]"
-                  [selectFirstCountry]="true"
-                  [selectedCountryISO]="CountryISO.Peru"
-                  [cssClass]="'form-control'"
-                  formControlName="celular"
-                  [attr.placeholder]="'Ej. 902 658 057'">
-                </ngx-intl-tel-input>
-                
-              </div>
             </div>
-
             <div class="form-row form-3-col">
               <div class="form-group">
                 <label for="tipoCliente">Tipo de Cliente</label>
                 <select id="tipoCliente" formControlName="tipoCliente" required>
+                  <option [value]="null" disabled>Seleccione tipo</option>
                   <option value="NATURAL">Natural</option>
                   <option value="JURIDICO">Jurídico</option>
                 </select>
               </div>
+              <div class="form-group">
+    <label for="numDoc">DNI / RUC</label>
+    <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required
+        [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
+        (input)="limpiarNoNumericos('numDoc')"
+        
+        [attr.title]="getErrorMessage('numDoc')"
+        [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
+        
+        #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
+</div>
 
               <div class="form-group">
-                <label for="numDoc">DNI / RUC</label>
-                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required />
-              </div>
-
-              <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono" />
+                <label for="celular">Celular</label>
+                <ngx-intl-tel-input [preferredCountries]="preferredCountries" [enableAutoCountrySelect]="true"
+                  [enablePlaceholder]="true" [searchCountryFlag]="true"
+                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]" [selectFirstCountry]="true"
+                  [selectedCountryISO]="CountryISO.Peru" [cssClass]="'form-control'" formControlName="celular"
+                  [attr.placeholder]="'Ej. 902 658 057'">
+                </ngx-intl-tel-input>
               </div>
             </div>
-
             <div class="form-row form-2-col form-2-col-direccion">
               <div class="form-group">
                 <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required />
+                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa"
+                  required />
               </div>
-              
+
               <div class="form-group" formGroupName="distrito">
                 <label for="idDistrito">Distrito</label>
                 <select id="idDistrito" formControlName="idDistrito" required>
@@ -80,7 +70,22 @@
                 </select>
               </div>
             </div>
+            <div class="form-row form-2-col">
+              <div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required
+        
+        [attr.title]="getErrorMessage('email')"
+        [ngClass]="{'is-invalid': clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched}"
+        
+        #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" />
+</div>
 
+              <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -88,8 +93,9 @@
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
             <i class="bi bi-x-lg"></i> Cancelar
           </button>
-          
-          <button type="submit" form="clienteForm" class="btn btn-primary" [disabled]="!clienteForm.valid" (click)="onSubmit()">
+
+          <button type="submit" form="clienteForm" class="btn btn-primary" [disabled]="!clienteForm.valid"
+            (click)="onSubmit()">
             <i class="bi bi-person-plus"></i> Guardar Cliente
           </button>
         </div>

@@ -21,7 +21,7 @@ export class VendedorComponent implements OnInit {
   @ViewChild('registroModal') registroModal!: VendedorInsertar;
   
   vendedores: Vendedor[] = [];
-  // ELIMINAMOS TODA LA LÓGICA DE FORMULARIO/MODAL DE AQUÍ
+  
 
   constructor(
     private vendedorService: VendedorService

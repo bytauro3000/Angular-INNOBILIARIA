@@ -37,7 +37,7 @@
           <td class="fw-bold">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
           <td><span class="estado-propietario">{{ programa.distrito.nombre }}</span></td>
           <td class="acciones-cell">
-            <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(programa)" title="Editar">
+             <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(programa)" title="Editar">
               <i class="bi bi-pencil"></i>
             </button>
             <button class="btn btn-outline-danger btn-sm" (click)="eliminarPrograma(programa.idPrograma!)" title="Eliminar">
@@ -52,3 +52,8 @@
     </div>
   </div>
 </div>
+<!-- Aquí estamos invocando el modal -->
+<app-programa-inset-edit
+  #registroModal
+  (programaGuardado)="cargarProgramas()">
+</app-programa-inset-edit>

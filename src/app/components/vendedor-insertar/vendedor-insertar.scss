@@ -178,6 +178,8 @@
   border: 1px solid rgba(255,255,255,0.25);
   background: rgba(255,255,255,0.05);
   color: white !important;
+  text-align: left !important;
+  padding-right: 30px;
 }
 
 .custom-select-input::placeholder {
@@ -230,6 +232,7 @@
   cursor: pointer;
   transition: background 0.2s ease;
   font-size: 13px !important;
+  text-align: left;
 }
 
 .custom-select-list li:hover {

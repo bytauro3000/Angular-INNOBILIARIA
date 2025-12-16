@@ -77,15 +77,14 @@
 
                 <!-- LISTA -->
                 <ul class="custom-select-list" *ngIf="mostrarDistritos">
-                  <li *ngFor="let item of distritosFiltrados"
-                      (click)="seleccionarDistrito(item)">
-                    {{ item.nombre }}
-                  </li>
+    <li *ngFor="let item of distritosFiltrados"
+        (click)="seleccionarDistrito(item); mostrarDistritos = false" > {{ item.nombre }}
+    </li>
 
-                  <li *ngIf="distritosFiltrados.length === 0" class="no-data">
-                    No se encontraron resultados
-                  </li>
-                </ul>
+    <li *ngIf="distritosFiltrados.length === 0" class="no-data">
+        No se encontraron resultados
+    </li>
+</ul>
 
               </div>
             </div>
@@ -110,8 +109,6 @@
               <input type="text" step="0.01" min="0" class="form-control" [(ngModel)]="nuevoVendedor.comision" name="comision" />
             </div>
 
-
-            
             <!-- 🔥 FIN SELECT DISTRITO -->
 
           </div>

@@ -1,6 +1,6 @@
 /* ============================================================
-   ESTILOS DEL MODAL (GLASSMORPHISM)
-   ============================================================ */
+  ESTILOS DEL MODAL (GLASSMORPHISM)
+  ============================================================ */
 
 .modal-content {
   background-color: rgba(0, 0, 0, 0.30);
@@ -42,11 +42,11 @@
 
 
 /* ============================================================
-   ESTILOS PARA MENSAJES DE ERROR
-   ============================================================ */
+  ESTILOS PARA MENSAJES DE ERROR
+  ============================================================ */
 
 .text-danger-custom {
-    color: #b57878 !important; /* Un rojo claro para contrastar */
+    color: #b57878 !important; /* Rojo claro para contraste */
     font-size: 0.8rem;
     font-weight: 400;
     margin-top: -0.2rem; /* Subir un poco el mensaje */
@@ -58,9 +58,10 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+
 /* ============================================================
-   ESTRUCTURA DEL FORMULARIO (GRID) - AJUSTES DE ALINEACIÓN
-   ============================================================ */
+  ESTRUCTURA DEL FORMULARIO (GRID)
+  ============================================================ */
 
 .form-wrapper {
   padding: 0;
@@ -70,7 +71,7 @@
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr); 
   gap: 1.5rem;
   margin-bottom: 1rem;
   align-items: stretch;
@@ -80,8 +81,8 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
-.form-2-col-direccion {
-  grid-template-columns: 2fr 1fr;
+.form-3-col {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .form-group {
@@ -106,12 +107,18 @@
     transition: all 0.3s ease;
     width: 100%;
     flex-grow: 1; 
+    
+    // Estilo de invalidación
+    &.is-invalid {
+        border-color: #b57878 !important;
+        box-shadow: 0 0 0 0.25rem rgba(181, 120, 120, 0.35) !important;
+    }
   }
 }
 
 /* ============================================================
-   AJUSTE DE SELECTS NATIVOS (Uniformidad de altura y aspecto)
-   ============================================================ */
+  AJUSTE DE SELECTS NATIVOS (Uniformidad de altura y aspecto)
+  ============================================================ */
 
 .modal-body select,
 .form-group select {
@@ -127,90 +134,22 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     
+    // Icono SVG para el select (flecha blanca)
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ecf0f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 8px center;
     background-size: 16px;
 }
 
-/* ============================================================
-   NGX-INTL-TEL-INPUT — CORRECCIÓN DE ALINEACIÓN
-   ============================================================ */
-
-:host ::ng-deep ngx-intl-tel-input {
-  width: 100% !important;
-  height: 100%;
-}
-
-:host ::ng-deep .iti {
-  display: flex !important;
-  width: 100% !important;
-  position: relative !important;
-  z-index: 9000 !important;
-  height: 100%;
-}
-
-:host ::ng-deep .iti__flag-container {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 8px !important;
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border-radius: 6px 0 0 6px !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
-  z-index: 9999 !important;
-  pointer-events: auto !important;
-  height: 100%;
-}
-
-:host ::ng-deep .iti__selected-flag {
-  display: flex !important;
-  align-items: center !important;
-  height: 100% !important;
-  background-color: transparent !important;
-  border-right: none !important;
-  cursor: pointer !important;
-}
-
-:host ::ng-deep .iti input.form-control {
-  padding-left: 100px !important;
-  padding: 8px 12px !important;
-}
-
-:host ::ng-deep .iti input.form-control,
-:host ::ng-deep select.form-select {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+/* Estilos de opciones de SELECT */
+:host ::ng-deep select option {
+  background-color: rgba(20, 20, 20, 0.95) !important;
   color: white !important;
-  border-radius: 6px !important;
-  padding: 8px 12px;
-  text-align: left !important;
-}
-
-:host ::ng-deep input.form-control,
-:host ::ng-deep select {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  border-radius: 6px !important;
-  padding: 8px 12px;
-}
-
-:host ::ng-deep .iti__country-list {
-  z-index: 99999 !important;
-  background-color: rgba(0, 0, 0, 0.9) !important;
-  max-height: 250px !important;
-  overflow-y: auto !important;
-}
-
-:host ::ng-deep .iti__country {
-  color: white !important;
-  cursor: pointer !important;
-}
+}   
 
 /* ============================================================
-   FOCUS, AUTOFILL Y SELECTORES GENERALES
-   ============================================================ */
+  FOCUS Y AUTOFILL
+  ============================================================ */
 
 /* Autofill Fix */
 .form-group input:-webkit-autofill,
@@ -225,16 +164,9 @@
 }
 
 /* FOCUS VERDE */
-:host ::ng-deep input:focus,
-:host ::ng-deep select:focus,
-:host ::ng-deep .iti input.form-control:focus {
+input:focus,
+select:focus {
   border-color: #00c853 !important;
   box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.35) !important;
   outline: none !important;
-}
-
-/* Estilos de opciones de SELECT */
-:host ::ng-deep select option {
-  background-color: rgba(20, 20, 20, 0.95) !important;
-  color: white !important;
 }
