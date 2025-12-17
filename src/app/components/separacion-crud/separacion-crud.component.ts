@@ -10,7 +10,7 @@ import { SeparacionInsertEdit } from '../separacion-insert-edit/separacion-inser
 @Component({
   selector: 'app-separacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, SeparacionInsertEdit], // Importamos el modal
+  imports: [CommonModule, FormsModule, SeparacionInsertEdit],
   templateUrl: './separacion-crud.html',
   styleUrl: './separacion-crud.scss'
 })
@@ -45,12 +45,27 @@ export class SeparacionComponent implements OnInit {
   }
 
   filtrarSeparaciones() {
-    this.separacionesFiltradas = this.separaciones.filter(s => 
-      s.manLote.toLowerCase().includes(this.manzLote.toLowerCase()) &&
-      s.dni.includes(this.dni) &&
-      s.nomApeCli.toLowerCase().includes(this.nomApe.toLowerCase()) &&
-      (this.filtroEstado === '' || s.estadoSeparacion === this.filtroEstado)
-    );
+    this.separacionesFiltradas = this.separaciones.filter(s => {
+      // Filtrar por Manzana-Lote dentro de la lista de lotes
+      const coincideLote = s.lotes.some(l => 
+        `Mz. ${l.manzana} - Lt. ${l.numeroLote}`.toLowerCase().includes(this.manzLote.toLowerCase())
+      );
+
+      // Filtrar por DNI dentro de la lista de clientes
+      const coincideDni = s.clientes.some(c => c.numDoc.includes(this.dni));
+
+      // Filtrar por Nombre dentro de la lista de clientes
+      const coincideNombre = s.clientes.some(c => 
+        c.nombreCompleto.toLowerCase().includes(this.nomApe.toLowerCase())
+      );
+
+      // Filtrar por Estado
+      const coincideEstado = (this.filtroEstado === '' || s.estadoSeparacion === this.filtroEstado);
+
+      return coincideLote && coincideDni && coincideNombre && coincideEstado;
+    });
+    
+    this.currentPage = 1; // Resetear a la primera página al filtrar
     this.actualizarPaginacion();
   }
 
@@ -71,9 +86,10 @@ export class SeparacionComponent implements OnInit {
   }
 
   eliminar(item: SeparacionResumen) {
+    const loteInfo = item.lotes.map(l => `Mz ${l.manzana} Lt ${l.numeroLote}`).join(', ');
     Swal.fire({
       title: '¿Eliminar?',
-      text: `Se borrará la separación del lote ${item.manLote}`,
+      text: `Se borrará la separación de: ${loteInfo}`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar'
@@ -87,5 +103,11 @@ export class SeparacionComponent implements OnInit {
     });
   }
 
-  // Métodos de paginación (goToPage, etc) omitidos por brevedad pero deben mantenerse igual
+  // Métodos de navegación
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.actualizarPaginacion();
+    }
+  }
 }

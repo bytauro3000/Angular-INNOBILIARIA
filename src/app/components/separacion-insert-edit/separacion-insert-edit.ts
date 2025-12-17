@@ -113,14 +113,6 @@ export class SeparacionInsertEdit implements OnInit {
     this.mostrarClientes = true;
   }
 
-  seleccionarCliente(c: Cliente) {
-    if (!this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente)) {
-      this.separacion.clientes.push({ cliente: c, tipoPropietario: TipoPropietario.TITULAR, id: {} as any, separacion: {} as any });
-    }
-    this.filtroCliente = '';
-    this.mostrarClientes = false;
-  }
-
   quitarCliente(id?: number) {
     this.separacion.clientes = this.separacion.clientes.filter(sc => sc.cliente.idCliente !== id);
   }
@@ -166,13 +158,32 @@ export class SeparacionInsertEdit implements OnInit {
     this.mostrarLotes = true;
   }
 
-  seleccionarLote(l: Lote) {
-    if (!this.separacion.lotes.some(sl => sl.lote.idLote === l.idLote)) {
-      this.separacion.lotes.push({ lote: l, id: {} as any, separacion: {} as any });
-    }
-    this.filtroLote = '';
-    this.mostrarLotes = false;
+  seleccionarCliente(c: Cliente) {
+  if (!this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente)) {
+    // Mantenemos el objeto completo 'c' para que el HTML pueda mostrar el nombre
+    this.separacion.clientes.push({ 
+      cliente: c, 
+      tipoPropietario: TipoPropietario.TITULAR,
+      id: {} as any, 
+      separacion: {} as any
+    });
   }
+  this.filtroCliente = '';
+  this.mostrarClientes = false;
+}
+
+seleccionarLote(l: Lote) {
+  if (!this.separacion.lotes.some(sl => sl.lote.idLote === l.idLote)) {
+    // Mantenemos el objeto completo 'l' para que el HTML muestre Mz y Lote
+    this.separacion.lotes.push({ 
+      lote: l, 
+      id: {} as any, 
+      separacion: {} as any 
+    });
+  }
+  this.filtroLote = '';
+  this.mostrarLotes = false;
+}
 
   quitarLote(id?: number) {
     this.separacion.lotes = this.separacion.lotes.filter(sl => sl.lote.idLote !== id);

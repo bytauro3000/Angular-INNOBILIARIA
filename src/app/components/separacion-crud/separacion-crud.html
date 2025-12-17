@@ -2,12 +2,18 @@
   <h1 id="titPrin" class="mb-4">Gestión de Separaciones</h1>
 
   <div class="filtros row g-2 mb-2">
-    <div class="col-sm-3"><input type="text" class="form-control" placeholder="Manzana-Lote..." [(ngModel)]="manzLote" (input)="filtrarSeparaciones()"></div>
-    <div class="col-sm-3"><input type="text" class="form-control" placeholder="DNI..." [(ngModel)]="dni" (input)="filtrarSeparaciones()"></div>
-    <div class="col-sm-3"><input type="text" class="form-control" placeholder="Nombre..." [(ngModel)]="nomApe" (input)="filtrarSeparaciones()"></div>
+    <div class="col-sm-3">
+      <input type="text" class="form-control" placeholder="Manzana-Lote..." [(ngModel)]="manzLote" (input)="filtrarSeparaciones()">
+    </div>
+    <div class="col-sm-3">
+      <input type="text" class="form-control" placeholder="DNI..." [(ngModel)]="dni" (input)="filtrarSeparaciones()">
+    </div>
+    <div class="col-sm-3">
+      <input type="text" class="form-control" placeholder="Nombre..." [(ngModel)]="nomApe" (input)="filtrarSeparaciones()">
+    </div>
     <div class="col-sm-3">
       <select class="form-select" [(ngModel)]="filtroEstado" (change)="filtrarSeparaciones()">
-        <option value="">Todos</option>
+        <option value="">Todos los Estados</option>
         <option value="EN_PROCESO">EN PROCESO</option>
         <option value="CONCRETADO">CONCRETADO</option>
       </select>
@@ -18,27 +24,73 @@
     <button class="btn btn-success btn-sm" (click)="mostrarCrear()">+ Crear separación</button>
   </div>
 
-  <table class="table table-hover align-middle shadow-sm">
-    <thead class="table-dark">
-      <tr>
-        <th>Id</th><th>DNI</th><th>Cliente</th><th>Manzana-Lote</th><th>Monto</th><th>Estado</th><th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of paginasSeparaciones">
-        <td>{{s.idSeparacion}}</td>
-        <td>{{s.dni}}</td>
-        <td>{{s.nomApeCli}}</td>
-        <td>{{s.manLote}}</td>
-        <td>{{s.monto | currency:'PEN'}}</td>
-        <td><span class="badge" [ngClass]="s.estadoSeparacion === 'EN_PROCESO' ? 'bg-warning text-dark' : 'bg-success'">{{s.estadoSeparacion}}</span></td>
-        <td>
-          <button class="btn btn-sm btn-primary me-1" (click)="mostrarEditar(s)"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-sm btn-danger" (click)="eliminar(s)"><i class="bi bi-trash"></i></button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr>
+          <th>Id</th>
+          <th>Cliente (Nombre y Apellido)</th>
+          <th>DNI</th>
+          <th>Mz + Lt</th>
+          <th>Vendedor</th>
+          <th>F. Separación</th>
+          <th>F. Límite</th>
+          <th>Monto</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of paginasSeparaciones">
+          <td>{{s.idSeparacion}}</td>
+          
+          <td>
+            <ng-container *ngFor="let c of s.clientes">
+              {{ c.nombreCompleto }}<br>
+            </ng-container>
+          </td>
+          
+          <td>
+            <ng-container *ngFor="let c of s.clientes">
+              {{ c.numDoc }}<br>
+            </ng-container>
+          </td>
+
+          <td>
+            <ng-container *ngFor="let l of s.lotes">
+              Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}<br>
+            </ng-container>
+          </td>
+
+          <td>{{ s.nomVendedor }}</td>
+          <td>{{ s.fechaSepara | date:'dd/MM/yyyy' }}</td>
+          <td>{{ s.fechaLimite | date:'dd/MM/yyyy' }}</td>
+          <td>{{ s.monto | currency:'PEN' }}</td>
+          
+          <td>
+            <span class="badge" [ngClass]="s.estadoSeparacion === 'EN_PROCESO' ? 'bg-warning text-dark' : 'bg-success'">
+              {{ s.estadoSeparacion }}
+            </span>
+          </td>
+
+          <td>
+            <div class="d-flex">
+              <button class="btn btn-sm btn-primary me-1" (click)="mostrarEditar(s)" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="eliminar(s)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        
+        <tr *ngIf="paginasSeparaciones.length === 0">
+          <td colspan="10" class="text-center text-muted">No se encontraron registros.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <app-separacion-insert-edit #modalInsertEdit (operacionExitosa)="cargarDatos()"></app-separacion-insert-edit>
