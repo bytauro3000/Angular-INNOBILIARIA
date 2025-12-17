@@ -1,37 +1,295 @@
-/* Estilos para los buscadores manuales */
-.custom-select-container {
-  position: relative;
-  width: 100%;
+/* ============================================================
+   ESTILOS GENERALES DEL CONTENEDOR
+   ============================================================ */
+.contratos-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  h2 {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: 2px solid #2ecc71;
+  }
 }
 
-.custom-select-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: white;
-  border: 1px solid #ced4da;
-  border-radius: 0 0 4px 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1100; // Por encima del modal
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.form-wrapper {
+  background-color: #34495e;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  border-radius: 0 0 8px 8px;
+}
 
-  li {
-    padding: 8px 12px;
-    cursor: pointer;
-    color: #333;
-    border-bottom: 1px solid #f1f1f1;
+.form-row {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
 
-    &:hover {
-      background-color: #2ecc71;
-      color: white;
+.form-2-col {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-weight: 500;
+    color: #ecf0f1;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  input.custom-select-input, 
+  select, 
+  textarea.custom-select-input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #4a627a;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
+    }
+
+    &:disabled {
+      background-color: #3e566e;
+      color: #bdc3c7;
+      cursor: not-allowed;
     }
   }
 }
 
-.cursor-pointer { cursor: pointer; }
-.badge { font-size: 0.9rem; }
+/* ============================================================
+   SELECTS PERSONALIZADOS Y BOTONES +
+   ============================================================ */
+.input-with-button {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+
+  .custom-select-container {
+    flex-grow: 1;
+    position: relative;
+    z-index: 10;
+  }
+
+  .custom-select-input {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .btn-add-mini {
+    background-color: #249042;
+    color: white;
+    padding: 0 12px;
+    border-radius: 0 4px 4px 0;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    min-width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover { background-color: #2ecc71; }
+  }
+}
+
+.custom-select-container {
+  position: relative;
+  .arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdc3c7;
+    pointer-events: none;
+    font-size: 14px;
+    z-index: 11;
+  }
+}
+
+.custom-select-list {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  width: 100%;
+  background: #2c3e50;
+  border: 1px solid #4a627a;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    padding: 0.6rem 0.8rem;
+    color: #ecf0f1;
+    cursor: pointer;
+    text-align: left;
+    border-bottom: 1px solid #3e566e;
+    font-size: 0.9rem;
+    &:hover { background: #2ecc71; color: #2c3e50; }
+  }
+  .no-data { text-align: center; padding: 10px; color: #bdc3c7; font-size: 0.9rem; }
+}
+
+.selected-items-list {
+  margin-top: 0.2rem;
+  padding: 0;
+  list-style: none;
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3e566e;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    color: #ecf0f1;
+    font-size: 0.85rem;
+    border: 1px solid #4a627a;
+    button {
+      background: none; border: none; color: #e74c3c; cursor: pointer;
+      font-size: 1.1rem; padding: 0 5px;
+      &:hover { color: #ff5e4d; }
+    }
+  }
+}
+
+/* ============================================================
+   CALENDARIO MATERIAL DESIGN DARK - CORRECCIONES
+   ============================================================ */
+.datepicker-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  mat-datepicker-toggle {
+    position: absolute;
+    right: 5px;
+    z-index: 11;
+    ::ng-deep button {
+      color: #2ecc71 !important;
+      transform: scale(0.9);
+    }
+  }
+}
+
+/* Eliminar el espacio inferior rojo (subscript) */
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+/* Panel flotante del calendario */
+::ng-deep .mat-datepicker-content {
+  background-color: #1e2b37 !important; /* Fondo ultra oscuro */
+  color: #ecf0f1 !important;
+  border: 1px solid #2ecc71;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+
+  .mat-calendar-period-button {
+    color: #ecf0f1 !important;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+
+  .mat-calendar-arrow { fill: #ecf0f1 !important; }
+
+  /* Nombres de días corregidos */
+  .mat-calendar-table-header th {
+    color: #2ecc71 !important;
+    font-weight: bold;
+    padding-bottom: 10px;
+    font-size: 0.8rem;
+  }
+
+  .mat-calendar-table-header-row {
+    height: 40px !important; /* Separa los nombres de los números */
+  }
+
+  .mat-calendar-body-cell-content { color: #ecf0f1 !important; }
+
+  .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+    border-color: #f1c40f !important;
+  }
+
+  .mat-calendar-body-selected {
+    background-color: #2ecc71 !important;
+    color: #1e2b37 !important;
+    font-weight: bold;
+  }
+
+  .mat-calendar-previous-button, 
+  .mat-calendar-next-button { color: #2ecc71 !important; }
+}
+
+/* ============================================================
+   BOTONES DE ACCIÓN
+   ============================================================ */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem; /* Ajustado para estar más cerca */
+
+  .btn {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background-color: #2ecc71; color: white;
+    &:hover:not(:disabled) { background-color: #27ad60; transform: translateY(-1px); }
+  }
+
+  .btn-secondary {
+    background-color: #e74c3c; color: white;
+    &:hover { background-color: #c0392b; }
+  }
+
+  .btn:disabled { background-color: #7f8c8d; cursor: not-allowed; opacity: 0.6; }
+}
+/* Ocultar el nombre del mes que aparece dentro de la tabla de días */
+::ng-deep .mat-calendar-body-label {
+    display: none !important;
+}

@@ -1,22 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core'; // Removido ViewChild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // Importar Router
 import Swal from 'sweetalert2';
 
 import { SeparacionResumen } from '../../dto/separacionresumen.dto';
 import { SeparacionService } from '../../services/separacion.service';
-import { SeparacionInsertEdit } from '../separacion-insert-edit/separacion-insert-edit';
 
 @Component({
   selector: 'app-separacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, SeparacionInsertEdit],
+  imports: [CommonModule, FormsModule], // Removido SeparacionInsertEdit de imports ya que no es modal
   templateUrl: './separacion-crud.html',
   styleUrl: './separacion-crud.scss'
 })
 export class SeparacionComponent implements OnInit {
-  @ViewChild('modalInsertEdit') modalInsertEdit!: SeparacionInsertEdit;
-
   separaciones: SeparacionResumen[] = [];
   separacionesFiltradas: SeparacionResumen[] = [];
   paginasSeparaciones: SeparacionResumen[] = [];
@@ -31,7 +29,10 @@ export class SeparacionComponent implements OnInit {
   currentPage = 1;
   totalPages = 0;
 
-  constructor(private separacionService: SeparacionService) {}
+  constructor(
+    private separacionService: SeparacionService,
+    private router: Router // Inyectar Router
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -46,26 +47,22 @@ export class SeparacionComponent implements OnInit {
 
   filtrarSeparaciones() {
     this.separacionesFiltradas = this.separaciones.filter(s => {
-      // Filtrar por Manzana-Lote dentro de la lista de lotes
       const coincideLote = s.lotes.some(l => 
         `Mz. ${l.manzana} - Lt. ${l.numeroLote}`.toLowerCase().includes(this.manzLote.toLowerCase())
       );
 
-      // Filtrar por DNI dentro de la lista de clientes
       const coincideDni = s.clientes.some(c => c.numDoc.includes(this.dni));
 
-      // Filtrar por Nombre dentro de la lista de clientes
       const coincideNombre = s.clientes.some(c => 
         c.nombreCompleto.toLowerCase().includes(this.nomApe.toLowerCase())
       );
 
-      // Filtrar por Estado
       const coincideEstado = (this.filtroEstado === '' || s.estadoSeparacion === this.filtroEstado);
 
       return coincideLote && coincideDni && coincideNombre && coincideEstado;
     });
     
-    this.currentPage = 1; // Resetear a la primera página al filtrar
+    this.currentPage = 1;
     this.actualizarPaginacion();
   }
 
@@ -75,14 +72,14 @@ export class SeparacionComponent implements OnInit {
     this.paginasSeparaciones = this.separacionesFiltradas.slice(start, start + this.pageSize);
   }
 
+  // MODIFICADO: Ahora navega a la ruta de registro
   mostrarCrear() {
-    this.modalInsertEdit.abrirModal();
+    this.router.navigate(['/secretaria-menu/separaciones/registrar']);
   }
 
+  // MODIFICADO: Ahora navega a la ruta de edición con el ID
   mostrarEditar(item: SeparacionResumen) {
-    this.separacionService.obtenerSeparacionPorId(item.idSeparacion).subscribe(data => {
-      this.modalInsertEdit.abrirModal(data);
-    });
+    this.router.navigate(['/secretaria-menu/separaciones/editar', item.idSeparacion]);
   }
 
   eliminar(item: SeparacionResumen) {
@@ -103,7 +100,6 @@ export class SeparacionComponent implements OnInit {
     });
   }
 
-  // Métodos de navegación
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
