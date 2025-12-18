@@ -12,7 +12,7 @@ import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
 })
 export class LoteService {
 constructor(private http: HttpClient) {}
-private apiUrl = 'http://localhost:8081/api/lotes';
+private apiUrl = 'https://inmobiliariaivan.onrender.com/api/lotes';
 //Listado principal
   obtenerLotesResumen(): Observable<LoteResumen[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(

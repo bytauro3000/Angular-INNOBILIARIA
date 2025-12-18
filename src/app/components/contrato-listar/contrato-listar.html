@@ -1,26 +1,28 @@
 <div class="contratos-container">
   <h2 class="text-center">Lista de Contratos</h2>
 
-  <div class="filtros mb-3 d-flex align-items-center gap-2">
-    <input
-      type="text"
-      [(ngModel)]="terminoBusqueda"
-      (input)="filtrarContratos()"
-      placeholder="🔍 Buscar por ID Contrato"
-      class="form-control filtro-input"
-      style="max-width: 300px;"
-    />
+  <div class="filtros-header">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        (input)="filtrarContratos()"
+        placeholder="Buscar por ID Contrato"
+        class="form-control"
+      />
+    </div>
 
-    <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-success ms-auto">
-      <i class="bi bi-plus-lg"></i> Nuevo Contrato
+    <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-nuevo">
+      + Nuevo Contrato
     </button>
   </div>
 
-  <div class="tabla-contratos table-responsive">
-    <table class="table table-bordered table-hover text-center align-middle">
-      <thead class="table-light">
+  <div class="tabla-wrapper">
+    <table class="table-custom">
+      <thead>
         <tr>
-          <th>ID</th>
+          <th style="width: 50px;">ID</th>
           <th>Nombre(s) del Cliente</th>
           <th>Documento de Identidad</th>
           <th>Fecha</th>
@@ -28,74 +30,57 @@
           <th>Monto Total</th>
           <th>Inicial</th>
           <th>Saldo</th>
-          <th>N° Letras</th>
-          <th>Acciones</th>
+          <th style="width: 80px;">N° Letras</th>
+          <th style="width: 120px;">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
-          <td>{{ contrato.idContrato }}</td>
+          <td class="text-center">{{ contrato.idContrato }}</td>
           <td>
-            <ng-container *ngFor="let cliente of contrato.clientes">
-              {{ cliente.nombre }} {{ cliente.apellidos }}<br>
-            </ng-container>
+            <div *ngFor="let cliente of contrato.clientes">
+              {{ cliente.nombre }} {{ cliente.apellidos }}
+            </div>
           </td>
-          <td>
-            <ng-container *ngFor="let cliente of contrato.clientes">
-              {{ cliente.numDoc }}<br>
-            </ng-container>
+          <td class="text-center">
+            <div *ngFor="let cliente of contrato.clientes">
+              {{ cliente.numDoc }}
+            </div>
           </td>
-          <td>{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
-          <td>{{ contrato.tipoContrato }}</td>
-          <td>{{ contrato.montoTotal | currency: 'USD':'symbol':'1.2-2' }}</td>
-          <td>{{ contrato.inicial | currency: 'USD':'symbol':'1.2-2' }}</td>
-          <td>{{ contrato.saldo | currency: 'USD':'symbol':'1.2-2' }}</td>
-          <td>{{ contrato.cantidadLetras }}</td>
+          <td class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+          <td class="text-center">{{ contrato.tipoContrato }}</td>
+          <td class="text-end">{{ contrato.montoTotal | currency: 'USD' }}</td>
+          <td class="text-end">{{ contrato.inicial | currency: 'USD' }}</td>
+          <td class="text-end">{{ contrato.saldo | currency: 'USD' }}</td>
+          <td class="text-center">{{ contrato.cantidadLetras }}</td>
           <td class="acciones-cell">
-            <button
-              [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
-              class="btn btn-outline-primary btn-sm me-1"
-              title="Editar contrato"
-            >
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button
-              class="btn btn-outline-danger btn-sm"
-              (click)="eliminarContrato(contrato.idContrato)"
-              title="Eliminar contrato"
-            >
-              <i class="bi bi-trash"></i>
-            </button>
-            <ng-container *ngIf="contrato.tipoContrato === TipoContrato.FINANCIADO">
-              <a
-                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
-                class="btn btn-outline-info btn-sm"
-                title="Generar letras de cambio"
-              >
+            <div class="acciones-container">
+              <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
+                      class="btn-action btn-edit" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button (click)="eliminarContrato(contrato.idContrato)" 
+                      class="btn-action btn-delete" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
+                 [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
+                 class="btn-action btn-info" title="Letras">
                 <i class="bi bi-file-earmark-plus"></i>
               </a>
-            </ng-container>
+            </div>
           </td>
         </tr>
-
         <tr *ngIf="paginatedContratos.length === 0">
-          <td colspan="11" class="text-center text-muted">No hay contratos para mostrar.</td>
+          <td colspan="10" class="no-data">No hay contratos para mostrar.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-   <div *ngIf="totalPages > 1" class="paginacion-controles">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
-
-    <button *ngFor="let page of getPagesArray()"
-        (click)="goToPage(page)"
-        [class.active]="currentPage === page"
-        class="btn pagina-numero-btn">
-        {{ page }}
-    </button>
-
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
+  <div *ngIf="totalPages > 1" class="paginacion-simple">
+    <button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</button>
+    <span class="page-info">Página {{currentPage}} de {{totalPages}}</span>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
   </div>
 </div>
-

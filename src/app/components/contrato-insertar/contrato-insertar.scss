@@ -40,10 +40,6 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
 .form-group {
   display: flex;
   flex-direction: column;
@@ -70,39 +66,97 @@
   width: 100%;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #2ecc71;
-  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
-}
+/* === SECCIÓN DE ITEMS SELECCIONADOS === */
 
 .selected-items-list {
   margin-top: 0.5rem;
-  padding-left: 0;
-  color: #ecf0f1;
+  padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.selected-items-list li {
+.item-pequeno {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.25rem 0;
   background-color: #3e566e;
   border: 1px solid #4a627a;
-  padding: 0.25rem 0.5rem;
+  padding: 4px 8px !important;
   border-radius: 4px;
+  font-size: 0.95rem !important;
+  color: #ecf0f1;
+  min-height: 28px;
 }
 
-.selected-items-list button {
+.info-texto {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.abreviatura {
+  color: #4fc3f7;
+  font-weight: bold;
+}
+
+.item-pequeno button {
   background: none;
   border: none;
   color: #e74c3c;
-  font-size: 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
 }
+
+.item-pequeno button:hover {
+  transform: scale(1.2);
+  color: #ff5252;
+}
+
+/* === BOTONES CORREGIDOS === */
+
+.btn-add-mini {
+  background-color: #249042;
+  color: white;
+  padding: 0 10px;
+  border-radius: 0 4px 4px 0; /* Ajustado para que encaje con el input */
+  font-size: 1.1rem !important;
+  min-width: 40px;
+  border: none;   /* 👈 Eliminado contorno extraño */
+  outline: none;  /* 👈 Eliminado borde azul al hacer clic */
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions .btn {
+  /* Estilo general para botones de acción */
+  border: none !important;   /* 👈 Fuerza la eliminación del borde azul */
+  outline: none !important;  /* 👈 Evita el foco azul del navegador */
+}
+
+.form-actions .btn-primary {
+  background-color: #2ecc71;
+  color: white;
+  box-shadow: none !important; /* 👈 Eliminada la capa blanca/brillo */
+}
+
+.form-actions .btn-secondary {
+  background-color: #e74c3c;
+  color: white;
+  box-shadow: none !important; /* 👈 Eliminada la capa blanca/brillo */
+}
+
+/* === RESTO DE ESTILOS === */
 
 .input-with-button {
   display: flex;
@@ -117,155 +171,6 @@
   z-index: 10;
 }
 
-.input-with-button .custom-select-container .custom-select-input {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.btn-add-mini {
-  background-color: #249042;
-  color: white;
-  padding: 0 10px;
-  border-radius: 4px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  font-size: 1.1rem !important;
-  min-width: 40px;
-  height: auto;
-}
-
-.btn-add-mini:hover:not(:disabled) {
-  background-color: #6bc680;
-}
-
-.btn-add-mini:disabled {
-  background-color: #7f8c8d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* === MODIFICACIONES DE ESPACIADO === */
-
-.last-form-row {
-  margin-bottom: 0rem; /* Ajuste para reducir espacio antes de los botones */
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 0rem; /* Reducción de 2rem a 1rem */
-}
-
-/* === FIN MODIFICACIONES DE ESPACIADO === */
-
-.form-actions .btn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.form-actions .btn-primary {
-  background-color: #2ecc71;
-  color: white;
-}
-
-.form-actions .btn-primary:hover:not(:disabled) {
-  background-color: #27ad60;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-}
-
-.form-actions .btn-secondary {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.form-actions .btn-secondary:hover {
-  background-color: #c0392b;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-}
-
-.form-actions .btn:disabled {
-  background-color: #7f8c8d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.separaciones-list {
-  margin-top: 0.5rem;
-  background-color: #2c3e50;
-  border: 1px solid #4a627a;
-  border-radius: 4px;
-  padding: 0.5rem;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.separaciones-list li {
-  color: #ecf0f1;
-  cursor: pointer;
-  padding: 0.25rem;
-}
-
-.separaciones-list li:hover {
-  background-color: #2ecc71;
-  color: #2c3e50;
-}
-
-.error {
-  color: #e74c3c;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-}
-
-#saldo {
-  background-color: #3e566e;
-  font-weight: bold;
-  color: #bdc3c7;
-}
-
-input[type=text]::-webkit-inner-spin-button,
-input[type=text]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.form-group input:-webkit-autofill,
-.form-group input:-webkit-autofill:hover,
-.form-group input:-webkit-autofill:focus,
-.form-group select:-webkit-autofill,
-.form-group select:-webkit-autofill:hover,
-.form-group select:-webkit-autofill:focus {
-  -webkit-text-fill-color: #ecf0f1;
-  -webkit-box-shadow: 0 0 0px 1000px #2c3e50 inset;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-#observaciones {
-  height: 40px;
-  resize: none;
-}
-
-/* ============================================================
-   ESTILOS PARA BUSCADORES TIPO SELECT PERSONALIZADO
-   ============================================================ */
-
-.custom-select-container {
-  position: relative;
-  width: 100%;
-  cursor: default;
-  z-index: 10;
-}
-
 .custom-select-container .arrow {
   position: absolute;
   right: 12px;
@@ -274,19 +179,6 @@ input[type=text]::-webkit-outer-spin-button {
   color: #bdc3c7;
   pointer-events: none;
   font-size: 14px;
-  z-index: 11;
-}
-
-.custom-select-container input.custom-select-input {
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #4a627a;
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  width: 100%;
-  padding-right: 30px;
 }
 
 .custom-select-list {
@@ -310,10 +202,7 @@ input[type=text]::-webkit-outer-spin-button {
   padding: 0.5rem 0.75rem;
   color: #ecf0f1 !important;
   cursor: pointer;
-  transition: background 0.2s ease;
   font-size: 0.9rem;
-  display: block !important;
-  text-align: left !important;
 }
 
 .custom-select-list li:hover {
@@ -321,18 +210,8 @@ input[type=text]::-webkit-outer-spin-button {
   color: #2c3e50 !important;
 }
 
-.custom-select-list .no-data {
-  text-align: center;
-  padding: 8px;
+.text-muted.small {
+  font-size: 0.7rem;
   color: #bdc3c7;
-  cursor: default;
-}
-
-.custom-select-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-select-list::-webkit-scrollbar-thumb {
-  background: rgba(236, 240, 241, 0.3);
-  border-radius: 4px;
+  margin-left: 5px;
 }

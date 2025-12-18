@@ -9,7 +9,7 @@ import { Distrito } from '../models/distrito.model';
 })
 export class DistritoService {
   // ✅ URL base actualizada
-  private apiUrl = 'http://localhost:8081/api/distritos';
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/distritos';
 
   constructor(private http: HttpClient) {}
 

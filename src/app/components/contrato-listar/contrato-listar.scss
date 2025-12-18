@@ -1,171 +1,143 @@
-/* contrato-listar.scss */
-
 .contratos-container {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 1.5rem;
+  max-width: 1300px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
 
   h2 {
     color: #2c3e50;
-    margin-bottom: 1.5rem;
     font-size: 1.8rem;
-    font-weight: 600;
-    padding-bottom: 0.5rem;
-  }
-
-  .filtros {
     margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+}
+
+/* Cabecera de Filtros */
+.filtros-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .search-box {
+    position: relative;
     display: flex;
-    gap: 1rem;
     align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 10px;
+    background: white;
+    width: 300px;
 
-    .filtro-select,
-    .filtro-input {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      background-color: white;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      flex-grow: 1;
-
-      &:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-      }
-    }
-
-    .filtro-select {
-      flex-grow: 0;
-      min-width: 180px;
-    }
-  }
-
-  .tabla-contratos {
-    overflow-x: auto;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem;
-
-    table {
+    input {
+      border: none;
+      padding: 8px;
       width: 100%;
-      border-collapse: collapse;
-      min-width: 800px;
+      outline: none;
       font-size: 0.9rem;
-
-      th,
-      td {
-        padding: 0.4rem 0.75rem;
-        text-align: left;
-        border-bottom: 1px solid #ecf0f1;
-        color: #333;
-      }
-
-      th {
-        background-color: #5d6d7e;
-        color: #fff;
-        border-bottom: 2px solid #2ecc71;
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-      }
-
-      tr:hover {
-        background-color: #f2f6fb;
-      }
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 1rem;
-      color: #6c757d;
-      font-style: italic;
-    }
-
-    .acciones-cell {
-      display: flex;
-      gap: 0.4rem;
-      align-items: center;
-      justify-content: flex-start;
-
-      button,
-      a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
     }
   }
 
-  /* ⭐⭐⭐ PAGINACIÓN PERSONALIZADA ⭐⭐⭐ */
-.paginacion-controles {
+  .btn-nuevo {
+    background-color: #198754;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover { background-color: #146c43; }
+  }
+}
+
+/* Tabla Estilo Profesional */
+.tabla-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+
+  thead th {
+    background-color: #5d6d7e;
+    color: white;
+    padding: 12px 10px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 3px solid #2ecc71;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    color: #333;
+  }
+
+  tbody tr:hover { background-color: #f9fbfd; }
+
+  .text-center { text-align: center; }
+  .text-end { text-align: right; }
+  .no-data { text-align: center; padding: 2rem; color: #999; }
+}
+
+/* ⭐ COLUMNA DE ACCIONES CORREGIDA ⭐ */
+.acciones-cell {
+  width: 120px;
+  
+  .acciones-container {
+    display: flex;
+    justify-content: flex-start; // Alineado a la izquierda para mantener posición
+    align-items: center; 
+    gap: 6px; 
+    height: 100%;
+    padding-left: 12px; // Espacio para que no toque el borde y se vea ordenado
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid;
+    background: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+
+    &.btn-edit { color: #0d6efd; border-color: #0d6efd; &:hover { background: #0d6efd; color: white; } }
+    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+    &.btn-info { color: #0dcaf0; border-color: #0dcaf0; &:hover { background: #0dcaf0; color: white; } }
+  }
+}
+
+/* Paginación */
+.paginacion-simple {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  gap: 1rem;
 
-  /* Estilos base para todos los botones */
-  .btn {
-    border-radius: 6px !important;
+  button {
+    padding: 6px 15px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
-    padding: 0.55rem 1rem !important;
-    background-color: #f8f9fa !important;
-    border: 1px solid #dcdcdc !important;
-    color: #333 !important;
-    transition: background-color 0.25s ease, transform 0.2s ease;
+    &:disabled { color: #ccc; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: #f0f0f0; }
   }
-
-  /* BOTONES NUMERADOS */
-  .pagina-numero-btn {
-    min-width: 38px;
-    text-align: center;
-
-    &.active {
-      background-color: #3498db !important;
-      border-color: #3498db !important;
-      color: #fff !important;
-      font-weight: bold;
-      transform: scale(1.03);
-    }
-
-    &:hover:not(.active) {
-      background-color: #e6e6e6 !important;
-      transform: translateY(-2px);
-    }
-  }
-
-  /* Hover en botones Anterior/Siguiente */
-  .btn:not(.pagina-numero-btn):hover:not(:disabled) {
-    background-color: #e6e6e6 !important;
-    transform: translateY(-2px);
-  }
-
-  /* Botones deshabilitados */
-  .btn:disabled {
-    cursor: not-allowed;
-    background-color: #e9ecef !important;
-    color: #999 !important;
-    transform: none !important;
-  }
-}
-/* ⭐⭐⭐ FIN PAGINACIÓN PERSONALIZADA ⭐⭐⭐ */
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-
-    h2 {
-      font-size: 1.5rem;
-    }
-
-    .filtros {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
+  .page-info { font-size: 0.9rem; color: #666; }
 }

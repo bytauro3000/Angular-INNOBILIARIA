@@ -26,7 +26,6 @@
       </div>
 
       <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
-
         <div class="form-group">
           <label>Vendedor</label>
           <div class="input-with-button">
@@ -34,16 +33,12 @@
               <input type="text" id="vendedorBusqueda" placeholder="Buscar por nombre, apellido o DNI"
                 class="custom-select-input" [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()"
                 [ngModelOptions]="{standalone: true}" autocomplete="off" />
-
               <span class="arrow">&#9662;</span>
-
               <ul class="custom-select-list" *ngIf="mostrarVendedores">
                 <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
                   {{ v.nombre }} {{ v.apellidos }} (DNI: {{ v.dni }})
                 </li>
-                <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">
-                  No se encontraron vendedores
-                </li>
+                <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">No se encontraron vendedores</li>
               </ul>
             </div>
             <button type="button" class="btn btn-add-mini" (click)="abrirModalVendedor()">
@@ -59,16 +54,12 @@
               <input type="text" id="programaBusqueda" placeholder="Buscar programa..." class="custom-select-input"
                 [(ngModel)]="filtroPrograma" (input)="filtrarProgramas()" [ngModelOptions]="{standalone: true}"
                 autocomplete="off" />
-
               <span class="arrow">&#9662;</span>
-
               <ul class="custom-select-list" *ngIf="mostrarProgramas">
                 <li *ngFor="let prog of programasFiltrados" (click)="seleccionarPrograma(prog)">
                   {{ prog.nombrePrograma }}
                 </li>
-                <li *ngIf="programasFiltrados.length === 0" class="no-data">
-                  No se encontraron programas
-                </li>
+                <li *ngIf="programasFiltrados.length === 0" class="no-data">No se encontraron programas</li>
               </ul>
             </div>
             <button type="button" class="btn btn-add-mini" (click)="abrirModalPrograma()">
@@ -76,22 +67,27 @@
             </button>
           </div>
         </div>
-
       </div>
 
       <div class="form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'SEPARACION'">
         <div class="form-group full-width">
           <label>Buscar Separación</label>
-          <div class="custom-select-container"> <input type="text" class="custom-select-input"
-              (input)="buscarSeparaciones($event)" placeholder="Buscar por ID, Cliente o Lote..."
-              [(ngModel)]="terminoBusquedaSeparacion" [ngModelOptions]="{standalone: true}" />
+          <div class="custom-select-container">
+            <input type="text" class="custom-select-input" (input)="buscarSeparaciones($event)"
+              placeholder="Buscar por ID, Cliente o Lote..." [(ngModel)]="terminoBusquedaSeparacion"
+              [ngModelOptions]="{standalone: true}" autocomplete="off" />
+
+            <span class="arrow">&#9662;</span>
+
             <ul class="custom-select-list" *ngIf="showSeparacionList && separaciones.length > 0">
               <li *ngFor="let sep of separaciones" (click)="seleccionarSeparacion(sep)">
-                ID: {{ sep.id }} - {{ sep.text }}
+                <strong>ID: {{ sep.id }}</strong> - {{ sep.text }}
               </li>
-              <li *ngIf="separaciones.length === 0" class="no-data">
-                No se encontraron separaciones
-              </li>
+            </ul>
+
+            <ul class="custom-select-list"
+              *ngIf="showSeparacionList && terminoBusquedaSeparacion && separaciones.length === 0">
+              <li class="no-data">No se encontraron registros únicos</li>
             </ul>
           </div>
         </div>
@@ -103,21 +99,19 @@
           <input type="text" id="montoTotal" formControlName="montoTotal" (focus)="onFocusInput($event, 'montoTotal')"
             (blur)="onCurrencyInput($event, 'montoTotal')" />
         </div>
-
         <div class="form-group" *ngIf="!esContado">
           <label for="inicial">Inicial</label>
           <input type="text" id="inicial" formControlName="inicial" (focus)="onFocusInput($event, 'inicial')"
             (blur)="onCurrencyInput($event, 'inicial')" />
         </div>
-
         <div class="form-group" *ngIf="!esContado">
           <label for="saldo">Saldo</label>
-          <input type="text" id="saldo" formControlName="saldo" [disabled]="true" />
+          <input type="text" id="saldo" formControlName="saldo" />
         </div>
       </div>
 
-      <div class="form-row form-2-col" *ngIf="!esContado">
-        <div class="form-group">
+      <div class="form-row form-2-col">
+        <div class="form-group" *ngIf="!esContado">
           <label for="cantidadLetras">Cantidad de Letras</label>
           <input type="text" id="cantidadLetras" formControlName="cantidadLetras" />
         </div>
@@ -127,15 +121,7 @@
         </div>
       </div>
 
-      <div class="form-row form-2-col" *ngIf="esContado">
-        <div class="form-group">
-          <label for="observaciones">Observaciones</label>
-          <input type="text" id="observaciones" formControlName="observaciones" />
-        </div>
-      </div>
-
       <div class="form-row form-2-col last-form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
-
         <div class="form-group">
           <label>Agregar Cliente</label>
           <div class="input-with-button">
@@ -143,16 +129,12 @@
               <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
                 [(ngModel)]="filtroCliente" (input)="filtrarClientes()" [ngModelOptions]="{standalone: true}"
                 autocomplete="off" />
-
               <span class="arrow">&#9662;</span>
-
               <ul class="custom-select-list" *ngIf="mostrarClientes">
                 <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">
                   {{ c.nombre }} {{ c.apellidos }} (DNI: {{ c.numDoc }})
                 </li>
-                <li *ngIf="clientesFiltrados.length === 0" class="no-data">
-                  No se encontraron clientes disponibles
-                </li>
+                <li *ngIf="clientesFiltrados.length === 0" class="no-data">No se encontraron clientes</li>
               </ul>
             </div>
             <button type="button" class="btn btn-add-mini" (click)="abrirModalCliente()">
@@ -160,7 +142,7 @@
             </button>
           </div>
           <ul class="selected-items-list">
-            <li *ngFor="let cli of clientesSeleccionados">
+            <li *ngFor="let cli of clientesSeleccionados" class="item-pequeno">
               {{ cli.nombre }} {{ cli.apellidos }}
               <button type="button" (click)="eliminarCliente(cli.idCliente)">❌</button>
             </li>
@@ -168,31 +150,28 @@
         </div>
 
         <div class="form-group">
-          <label>Agregar Lote (Programa Seleccionado)</label>
+          <label>Agregar Lote</label>
           <div class="input-with-button">
             <div class="custom-select-container" #loteBusquedaContainer (click)="toggleLotes()">
               <input type="text" placeholder="Buscar Manzana o Lote..." class="custom-select-input"
-                [disabled]="!contratoForm.get('idPrograma')?.value" [(ngModel)]="filtroLote" (input)="filtrarLotes()"
-                [ngModelOptions]="{standalone: true}" autocomplete="off" />
-
+                [(ngModel)]="filtroLote" (input)="filtrarLotes()" [ngModelOptions]="{standalone: true}"
+                autocomplete="off" />
               <span class="arrow">&#9662;</span>
-
               <ul class="custom-select-list" *ngIf="mostrarLotes">
                 <li *ngFor="let l of lotesFiltrados" (click)="seleccionarLote(l)">
-                  Manzana {{ l.manzana }} - Lote {{ l.numeroLote }}
-                </li>
-                <li *ngIf="lotesFiltrados.length === 0" class="no-data">
-                  No se encontraron lotes disponibles o no hay programa seleccionado
+                  Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }} 
+                  <span class="text-muted small">({{ getAbreviatura(l) }})</span>
                 </li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini" disabled>
-              <fa-icon [icon]="faPlus"></fa-icon>
-            </button>
+            <button type="button" class="btn btn-add-mini"><fa-icon [icon]="faPlus"></fa-icon></button>
           </div>
           <ul class="selected-items-list">
-            <li *ngFor="let lote of lotesSeleccionados">
-              Manzana {{ lote.manzana }} - Lote {{ lote.numeroLote }}
+            <li *ngFor="let lote of lotesSeleccionados" class="item-pequeno">
+              <div class="info-texto">
+                Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }} 
+                <span class="abreviatura">({{ getAbreviatura(lote) }})</span>
+              </div>
               <button type="button" (click)="eliminarLote(lote.idLote)">❌</button>
             </li>
           </ul>
@@ -207,16 +186,10 @@
           Cancelar
         </button>
       </div>
-
     </form>
   </div>
 </div>
 
-<app-vendedor-insertar #vendedorModalContrato (vendedorGuardado)="recargarVendedores()">
-</app-vendedor-insertar>
-
-<app-cliente-insertar #registroModal (clienteGuardado)="RecargarClientes()">
-</app-cliente-insertar>
-
-<app-programa-inset-edit #registroModalPrograma (ProgramaGuardado)="RecargarProgramas()">
-</app-programa-inset-edit>
+<app-vendedor-insertar #vendedorModalContrato (vendedorGuardado)="recargarVendedores()"></app-vendedor-insertar>
+<app-cliente-insertar #registroModal (clienteGuardado)="RecargarClientes()"></app-cliente-insertar>
+<app-programa-inset-edit #registroModalPrograma (ProgramaGuardado)="RecargarProgramas()"></app-programa-inset-edit>

@@ -8,7 +8,7 @@ import { Cliente } from '../models/cliente.model';
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'http://localhost:8081/api/clientes';
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/clientes';
 
   constructor(private http: HttpClient) { }
 
