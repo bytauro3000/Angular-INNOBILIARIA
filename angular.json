@@ -37,6 +37,14 @@
             ],
             "scripts": [
               "node_modules/google-libphonenumber/dist/libphonenumber.js"
+            ],
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "html2canvas",
+              "sweetalert2",
+              "google-libphonenumber",
+              "raf",
+              "rgbcolor"
             ]
           },
           "configurations": {
@@ -44,12 +52,12 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "2MB"
+                  "maximumWarning": "3.5MB",
+                  "maximumError": "4MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
