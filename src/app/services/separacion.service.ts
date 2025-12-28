@@ -10,7 +10,7 @@ import { SeparacionResumen } from '../dto/separacionresumen.dto';
 })
 export class SeparacionService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/separaciones'; 
+  private apiUrl = 'http://localhost:8081/api/separaciones'; 
 
   constructor(private http: HttpClient) { }
 

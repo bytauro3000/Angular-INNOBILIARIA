@@ -9,7 +9,7 @@ import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 })
 export class ContratoService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/contratos'; 
+  private apiUrl = 'http://localhost:8081/api/contratos'; 
 
   constructor(private http: HttpClient) { }
 

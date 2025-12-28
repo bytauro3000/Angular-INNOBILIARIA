@@ -51,7 +51,7 @@
     "inflight": "^1.0.6",
     "intl-tel-input": "^19.0.0",
     "jquery": "^3.7.1",
-    "jspdf": "^3.0.2",
+    "jspdf": "^3.0.4",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.12.31",
     "ngx-bootstrap": "^20.0.2",

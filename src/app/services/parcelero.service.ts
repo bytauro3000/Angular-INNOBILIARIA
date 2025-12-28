@@ -9,7 +9,7 @@ import { Parcelero } from '../models/parcelero.model';
 })
 export class ParceleroService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/parceleros';
+  private apiUrl = 'http://localhost:8081/api/parceleros';
 
   constructor(private http: HttpClient) {}
 

@@ -10,7 +10,7 @@ import { LoginResponse } from './interfaces/login-response';
   providedIn: 'root'
 })
 export class LoginService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/auth/login';
+  private apiUrl = 'http://localhost:8081/api/auth/login';
 
   constructor(private http: HttpClient) { }
 
