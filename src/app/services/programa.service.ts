@@ -8,7 +8,7 @@ import { Programa } from '../models/programa.model';
   providedIn: 'root'
 })
 export class ProgramaService {
-  private apiUrl = 'http://localhost:8081/api/programas';
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/programas';
 
   constructor(private http: HttpClient) {}
 

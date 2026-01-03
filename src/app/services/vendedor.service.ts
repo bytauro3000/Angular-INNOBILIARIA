@@ -8,7 +8,7 @@ import { Vendedor } from '../models/vendedor.model';
 })
 export class VendedorService {
 
-  private apiUrl = 'http://localhost:8081/api/vendedores';
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/vendedores';
 
   constructor(private http: HttpClient) {}
 

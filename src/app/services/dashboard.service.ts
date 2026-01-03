@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class DashboardService {
 
-  private apiUrl = 'http://localhost:8081/api/dashboard/totales'; // 👈 Corregido aquí
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/dashboard/totales'; // 👈 Corregido aquí
 
   constructor(private http: HttpClient) {}
 
