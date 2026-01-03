@@ -31,7 +31,7 @@ export class ClientesComponent implements OnInit {
   terminoBusqueda: string = '';
   tipoFiltro: string = 'nombres';
 
-  pageSize: number = 7;
+  pageSize: number = 6;
   currentPage: number = 1;
   totalPages: number = 0;
 

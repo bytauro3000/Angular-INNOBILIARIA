@@ -1,10 +1,13 @@
-/* --- ESTILOS BASE (MANTENIDOS) --- */
+/* ============================================================
+   ESTILOS GENERALES Y GLASSMORPHISM
+   ============================================================ */
 .modal-content {
-  background-color: rgba(0, 0, 0, 0.85); /* Un poco más sólido para legibilidad */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -14,18 +17,91 @@
 }
 
 .modal-body {
-  max-height: 70vh; /* Permite scroll interno si el formulario es largo */
+  background-color: transparent;
+  max-height: 70vh;
   overflow-y: auto;
-  padding: 1.5rem;
 }
 
+/* INPUTS Y SELECTS GENERALES (FOCO VERDE) */
+input, select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  height: 45px; /* Altura uniforme */
+
+  &:focus {
+    border-color: #00c853 !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.35) !important;
+    outline: none !important;
+  }
+}
+
+select option {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}
+
+/* ============================================================
+   CORRECCIÓN PROFUNDA: CAMPO CELULAR (NGX-INTL-TEL-INPUT)
+   ============================================================ */
+:host ::ng-deep .celular-wrapper {
+  ngx-intl-tel-input {
+    display: block;
+    width: 100%;
+    
+    .iti {
+      width: 100%;
+      display: flex;
+    }
+
+    /* Estilo del input interno */
+    input.form-control.custom-intl-input {
+      background-color: rgba(255, 255, 255, 0.05) !important; /* Fondo oscuro */
+      color: white !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 6px !important;
+      padding: 10px 12px !important;
+      padding-left: 52px !important; /* Espacio para bandera */
+      height: 45px !important; /* Altura igual a los demás campos */
+      font-size: 1rem !important;
+      width: 100% !important;
+
+      /* FOCO VERDE para el celular */
+      &:focus {
+        border-color: #00c853 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.35) !important;
+        outline: none !important;
+      }
+    }
+
+    /* Estilo de la bandera seleccionada */
+    .iti__selected-flag {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border-radius: 6px 0 0 6px;
+      height: 100%;
+    }
+
+    /* Lista de países */
+    .iti__country-list {
+      background-color: #1a1a1a !important;
+      color: white !important;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 1000;
+    }
+  }
+}
+
+/* GRID DEL FORMULARIO */
 .form-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 1rem;
 }
-
 .form-2-col { grid-template-columns: repeat(2, 1fr); }
 .form-2-col-direccion { grid-template-columns: 2fr 1fr; }
 
@@ -33,76 +109,34 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-
-  label {
-    font-weight: 500;
-    color: white;
-    font-size: 0.9rem;
-  }
-
-  input, select {
-    padding: 10px 12px;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 1rem;
-    width: 100%;
-  }
+  label { font-weight: 500; color: white; font-size: 0.9rem; text-align: left; }
 }
 
-/* --- AJUSTES RESPONSIVOS (NUEVO) --- */
+/* RESPONSIVO */
 @media (max-width: 768px) {
   .modal-dialog {
-    margin: 0.5rem;
+    margin: 1.5rem !important;
+    display: flex;
+    align-items: center;
   }
 
   .form-row {
-    grid-template-columns: 1fr !important; /* Fuerza una sola columna */
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .modal-body {
-    padding: 1rem;
-    max-height: 80vh;
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem;
   }
 
   .modal-footer {
-    flex-direction: column-reverse; /* Botón guardar arriba de cancelar en móvil */
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 12px;
 
     .btn {
-      width: 100%; /* Botones de ancho completo */
+      width: 100% !important;
       margin: 0 !important;
+      padding: 12px;
     }
+    .btn-save { order: 1; }
+    .btn-cancel { order: 2; }
   }
-
-  /* Ajuste para el input de teléfono internacional en móviles */
-  :host ::ng-deep .iti {
-    width: 100%;
-  }
-}
-
-/* --- ESTILOS DE SELECTS E INTL-TEL-INPUT (MANTENIDOS) --- */
-.modal-body select, .form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ecf0f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 16px;
-}
-
-:host ::ng-deep .iti__flag-container {
-  z-index: 10 !important;
-}
-
-:host ::ng-deep .iti__country-list {
-  background-color: #2c3e50 !important;
-  color: white;
-}
-
-:host ::ng-deep input:focus, :host ::ng-deep select:focus {
-  border-color: #00c853 !important;
-  box-shadow: 0 0 0 0.25rem rgba(0, 200, 83, 0.35) !important;
 }
