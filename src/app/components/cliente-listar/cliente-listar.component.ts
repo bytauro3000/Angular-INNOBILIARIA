@@ -1,4 +1,3 @@
-// src/app/components/cliente-listar/cliente-listar.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClienteService } from '../../services/cliente.service';
@@ -6,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente.model';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import Swal from 'sweetalert2'; //Importa SweetAlert2
+import Swal from 'sweetalert2'; 
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 
 @Component({
@@ -23,7 +22,6 @@ import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.c
 })
 export class ClientesComponent implements OnInit {
 
-  // ✅ 1. REFERENCIA AL COMPONENTE MODAL HIJO
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
 
   clientes: Cliente[] = [];
@@ -42,9 +40,7 @@ export class ClientesComponent implements OnInit {
     private toastr: ToastrService
   ) { }
 
-  // ✅ 2. MÉTODO PARA ABRIR EL MODAL
   abrirModal(cliente?: Cliente) {
-    // LLama al método abrirModal del componente hijo (que debe ser implementado)
     this.registroModal.abrirModalCliente(cliente); 
   }
 
@@ -116,7 +112,6 @@ export class ClientesComponent implements OnInit {
   }
 
   eliminarCliente(id: number): void {
-    // Reemplaza la confirmación del navegador con SweetAlert2
     Swal.fire({
       title: '¿Estás seguro?',
       text: '¡No podrás revertir esto!',

@@ -11,11 +11,11 @@
            [(ngModel)]="terminoBusqueda"
            (input)="filtrarClientes()"
            placeholder="Ingresa el término de búsqueda..."
-           class="filtro-input" style="width: 250px;">
+           class="filtro-input">
 
-    <button (click)="abrirModal()" class="btn btn-success" style="margin-left: 10px;">
-      <i class="bi bi-plus-lg"></i> Agregar
-    </button>
+    <button (click)="abrirModal()" class="btn btn-success btn-agregar">
+      <i class="bi bi-plus-lg"></i> <span>Agregar</span>
+    </button>
   </div>
 
   <div class="tabla-clientes">
@@ -34,14 +34,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let cliente of paginatedClientes">
-          <td>{{ cliente.idCliente }}</td>
-          <td>{{ cliente.nombre }}</td>
-          <td>{{ cliente.apellidos || '' }}</td>
-          <td>{{ cliente.tipoCliente }}</td>
-          <td>{{ cliente.numDoc || '-' }}</td>
-          <td>{{ cliente.celular }}</td>
-          <td>{{ cliente.estado }}</td>
-          <td class="acciones-cell">
+          <td data-label="Id">{{ cliente.idCliente }}</td>
+          <td data-label="Nombre">{{ cliente.nombre }}</td>
+          <td data-label="Apellidos">{{ cliente.apellidos || '-' }}</td>
+          <td data-label="Tipo">{{ cliente.tipoCliente }}</td>
+          <td data-label="Documento">{{ cliente.numDoc || '-' }}</td>
+          <td data-label="Celular">{{ cliente.celular }}</td>
+          <td data-label="Estado">{{ cliente.estado }}</td>
+          <td data-label="Acciones" class="acciones-cell">
             <button class="btn btn-outline-info btn-sm me-1" title="Ver cliente">
               <i class="bi bi-eye"></i>
             </button>
