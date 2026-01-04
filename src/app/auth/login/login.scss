@@ -3,34 +3,36 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Usa 100vh para que ocupe toda la altura de la ventana */
+    min-height: 100vh; /* Usa min-height para asegurar que se vea bien en móviles con teclado abierto */
     width: 100%;
-    /* Puedes agregar una imagen de fondo aquí para un efecto impresionante */
+    /* Imagen de fondo original */
     background: url('https://source.unsplash.com/1600x900/?buildings,realestate') no-repeat center center/cover;
+    padding: 20px; /* Margen de seguridad para que el cuadro no pegue a los bordes en el celular */
 }
 
-/* Estilo del recuadro de login con efecto de "vidrio esmerilado" (glassmorphism) */
+/* Estilo del recuadro de login con efecto esmerilado (Glassmorphism) */
 .login-box {
     background: rgba(255, 255, 255, 0.15); /* Fondo translúcido */
-    backdrop-filter: blur(15px); /* Aumenta el desenfoque para un efecto más fuerte */
+    backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
     padding: 40px 30px;
-    width: 380px; /* Un poco más ancho para mejor legibilidad */
+    width: 100%;
+    max-width: 380px; /* Ancho máximo para escritorio, flexible para móviles */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     text-align: center;
-    color: white; /* Color de texto base para el contenido de la caja */
+    color: white;
 }
 
-/* Estilos del título dentro de la caja de login */
+/* Título del Login */
 .login-title {
     font-weight: 600;
     color: white;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilos del avatar */
+/* Contenedor del Avatar */
 .avatar-container {
     display: flex;
     justify-content: center;
@@ -41,12 +43,11 @@
     height: 80px;
     background: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
-    /* Puedes agregar una imagen para el avatar */
     background-image: url('https://c0.klipartz.com/pngpicture/831/88/gratis-png-perfil-de-usuario-iconos-de-la-computadora-interfaz-de-usuario-mistica.png');
     background-size: cover;
 }
 
-/* Estilos para los campos de entrada modernos */
+/* Campos de entrada (Inputs) modernos */
 .input-group-modern {
     position: relative;
     display: flex;
@@ -56,7 +57,7 @@
 
 .input-icon-modern {
     position: absolute;
-    left: 15px; /* Un poco más de espacio */
+    left: 15px;
     color: rgba(255, 255, 255, 0.8);
     font-size: 1.2rem;
     z-index: 2;
@@ -64,26 +65,26 @@
 
 .form-control-modern {
     background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.5); /* Borde completo para un look más sólido */
-    border-radius: 10px; /* Bordes redondeados */
-    padding-left: 50px; /* Espacio para el icono */
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    padding-left: 50px;
     color: white;
     font-size: 1rem;
     height: 50px;
     width: 100%;
     transition: all 0.3s ease;
-}
 
-.form-control-modern::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
 
-.form-control-modern:focus {
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    border-color: white;
-    color: white;
-    outline: none; /* Eliminar el contorno por defecto */
+    &:focus {
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        border-color: white;
+        color: white;
+        outline: none;
+    }
 }
 
 /* Estilos para el autocompletado del navegador */
@@ -95,24 +96,32 @@ input:-webkit-autofill:hover {
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Estilos del enlace de "Olvidaste tu contraseña" */
+/* Opciones extras (Checkbox y Link) */
+.extra-options-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
 .forgot-password-link {
     color: rgba(255, 255, 255, 0.9);
     font-size: 0.9em;
-    transition: color 0.3s ease;
-}
-
-.forgot-password-link:hover {
     text-decoration: none;
-    color: white;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: white;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
 }
 
-/* Estilos del botón de login */
+/* Botón de Iniciar Sesión */
 .btn-login {
     background: linear-gradient(90deg, #1e3c72, #2a5298);
     border: none;
-    padding: 15px; /* Más padding para un mejor aspecto */
+    padding: 15px;
     font-size: 1.1em;
     border-radius: 10px;
     color: white;
@@ -120,18 +129,28 @@ input:-webkit-autofill:hover {
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
+
+    &:hover {
+        background: linear-gradient(90deg, #2a5298, #1e3c72);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
 }
 
-.btn-login:hover {
-    background: linear-gradient(90deg, #2a5298, #1e3c72);
-    transform: translateY(-3px); /* Efecto de "levantamiento" */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilos para pantallas pequeñas */
+/* ✅ AJUSTES PARA MÓVILES (RESPONSIVE) */
 @media (max-width: 576px) {
     .login-box {
-        width: 90%;
         padding: 30px 20px;
+        width: 100%; /* Ocupa el ancho disponible */
+    }
+
+    .extra-options-container {
+        flex-direction: column; /* Apila el checkbox y el link verticalmente */
+        gap: 15px;
+        align-items: center;
+    }
+
+    .forgot-password-link {
+        font-size: 0.85em;
     }
 }
