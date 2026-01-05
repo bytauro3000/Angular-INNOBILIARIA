@@ -129,7 +129,7 @@ export class LetracambioListarComponent implements OnInit {
           y += espaciadoVertical;
 
           // Segunda fila
-          doc.text(reporte.importeLetras, 43, y); // Importe en Letras
+          doc.text(reporte.importeLetras, 43, y-2); // Importe en Letras
           y += espaciadoVertical;
 
           // Tercera fila (Nombre completo del cliente 1)
