@@ -120,7 +120,7 @@ export class LetracambioListarComponent implements OnInit {
           // Primera fila
           doc.setFontSize(10);
           doc.text(reporte.numeroLetra, 50, 22); // Número Letra
-          doc.text(reporte.fechaGiro, 97, 24); // Fecha de Giro
+          doc.text(reporte.fechaGiro, 98, 24); // Fecha de Giro
           doc.text(reporte.distritoNombre, 129, 22); // Distrito Letra
           doc.text(reporte.fechaVencimiento, 155, 24); // Fecha de Vencimiento
           // Formatear el importe con separadores de miles y dos decimales
