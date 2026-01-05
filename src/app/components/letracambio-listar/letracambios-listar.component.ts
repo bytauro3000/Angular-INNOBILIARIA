@@ -129,7 +129,7 @@ export class LetracambioListarComponent implements OnInit {
           y += espaciadoVertical;
 
           // Segunda fila
-          doc.text(reporte.importeLetras, 43, y-2); // Importe en Letras
+          doc.text(reporte.importeLetras, 43, 38); // Importe en Letras
           y += espaciadoVertical;
 
           // Tercera fila (Nombre completo del cliente 1)
@@ -138,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
               : reporte.cliente1Nombre;
 
-            doc.text(cliente1Info, 53, y-2); // Cliente 1: Nombres, Apellidos (si existe)
+            doc.text(cliente1Info, 53, 48); // Cliente 1: Nombres, Apellidos (si existe)
             y += espaciadoVertical;
           }
 
@@ -148,21 +148,21 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente2Nombre + ' ' + reporte.cliente2Apellidos
               : reporte.cliente2Nombre;
 
-            doc.text(cliente2Info + ' ' + `DNI/RUC: ${reporte.cliente2NumDocumento}`, 44, y-7); // Cliente 2: Nombres, Apellidos (si existe) y DNI
+            doc.text(cliente2Info + ' ' + `DNI/RUC: ${reporte.cliente2NumDocumento}`, 44, 53); // Cliente 2: Nombres, Apellidos (si existe) y DNI
             y += espaciadoVertical;
           }
 
            // Sexta fila (Dirección del cliente 1)
-          doc.text(reporte.cliente1Direccion, 52, y-12); // Dirección Cliente 1
+          doc.text(reporte.cliente1Direccion, 52, 58); // Dirección Cliente 1
           y += espaciadoVertical;
 
           // Quinta fila (DNI del cliente 1)
-          doc.text(reporte.cliente1NumDocumento, 50, y-16); // DNI Cliente 1
+          doc.text(reporte.cliente1NumDocumento, 50, 64); // DNI Cliente 1
           y += espaciadoVertical;
 
          
           // Séptima fila (Distrito del cliente 1)
-          doc.text(reporte.cliente1Distrito, 80, y-29); // Distrito Cliente 1
+          doc.text(reporte.cliente1Distrito, 101, 62); // Distrito Cliente 1
           y += espaciadoVertical;
 
           // Espacio adicional entre registros
