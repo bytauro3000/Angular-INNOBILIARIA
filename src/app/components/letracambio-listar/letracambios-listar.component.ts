@@ -120,7 +120,7 @@ export class LetracambioListarComponent implements OnInit {
           // Primera fila
           doc.setFontSize(10);
           doc.text(reporte.numeroLetra, 50, 22); // Número Letra
-          doc.text(reporte.fechaGiro, 98, 24); // Fecha de Giro
+          doc.text(reporte.fechaGiro, 99, 24); // Fecha de Giro
           doc.text(reporte.distritoNombre, 129, 22); // Distrito Letra
           doc.text(reporte.fechaVencimiento, 155, 24); // Fecha de Vencimiento
           // Formatear el importe con separadores de miles y dos decimales
@@ -138,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
               : reporte.cliente1Nombre;
 
-            doc.text(cliente1Info, 53, 49); // Cliente 1: Nombres, Apellidos (si existe)
+            doc.text(cliente1Info, 54, 49); // Cliente 1: Nombres, Apellidos (si existe)
             y += espaciadoVertical;
           }
 
@@ -162,7 +162,7 @@ export class LetracambioListarComponent implements OnInit {
 
          
           // Séptima fila (Distrito del cliente 1)
-          doc.text(reporte.cliente1Distrito, 101, 62); // Distrito Cliente 1
+          doc.text(`distrito: ${reporte.cliente1Distrito}`, 88, 62); // Distrito Cliente 1
           y += espaciadoVertical;
 
           // Espacio adicional entre registros
