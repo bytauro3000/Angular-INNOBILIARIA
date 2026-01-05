@@ -120,9 +120,9 @@ export class LetracambioListarComponent implements OnInit {
           // Primera fila
           doc.setFontSize(10);
           doc.text(reporte.numeroLetra, 50, 22); // Número Letra
-          doc.text(reporte.fechaGiro, 99, 24); // Fecha de Giro
+          doc.text(this.formatearFechaVista(reporte.fechaGiro), 99, 24); // Fecha de Giro formateada
           doc.text(reporte.distritoNombre, 129, 22); // Distrito Letra
-          doc.text(reporte.fechaVencimiento, 155, 24); // Fecha de Vencimiento
+          doc.text(this.formatearFechaVista(reporte.fechaVencimiento), 155, 24); // Fecha de Vencimiento formateada
           // Formatear el importe con separadores de miles y dos decimales
           const importeFormateado = reporte.importe.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
           doc.text(`$. ${importeFormateado}`, 182, 22); // Importe con separadores de miles y decimales
@@ -259,7 +259,7 @@ export class LetracambioListarComponent implements OnInit {
           doc.rect(tableX, y, tableWidth, rowHeight);
 
           doc.text(numeroLetra, colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
-          doc.text(letra.fechaVencimiento.toString(), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
+          doc.text(this.formatearFechaVista(letra.fechaVencimiento), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
           doc.text(`$ ${letra.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
           // Líneas verticales
@@ -628,4 +628,14 @@ export class LetracambioListarComponent implements OnInit {
     this.campoEditando = null;
     this.valorTemporal = '';
   }
+
+  // Función auxiliar para formatear fechas de YYYY-MM-DD a DD/MM/YYYY
+private formatearFechaVista(fechaStr: string | Date): string {
+  if (!fechaStr) return '';
+  // Convertimos a string por si viene como objeto Date
+  const fecha = typeof fechaStr === 'string' ? fechaStr : fechaStr.toISOString().split('T')[0];
+  const [anio, mes, dia] = fecha.split('-');
+  return `${dia}/${mes}/${anio}`;
 }
+}
+
