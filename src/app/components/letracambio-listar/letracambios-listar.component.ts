@@ -138,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
               : reporte.cliente1Nombre;
 
-            doc.text(cliente1Info, 53, 48); // Cliente 1: Nombres, Apellidos (si existe)
+            doc.text(cliente1Info, 53, 49); // Cliente 1: Nombres, Apellidos (si existe)
             y += espaciadoVertical;
           }
 
