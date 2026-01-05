@@ -120,8 +120,8 @@ export class LetracambioListarComponent implements OnInit {
           // Primera fila
           doc.setFontSize(10);
           doc.text(reporte.numeroLetra, 50, 22); // Número Letra
-          doc.text(reporte.fechaGiro, 95, 24); // Fecha de Giro
-          doc.text(reporte.distritoNombre, 128, 22); // Distrito Letra
+          doc.text(reporte.fechaGiro, 97, 24); // Fecha de Giro
+          doc.text(reporte.distritoNombre, 129, 22); // Distrito Letra
           doc.text(reporte.fechaVencimiento, 155, 24); // Fecha de Vencimiento
           // Formatear el importe con separadores de miles y dos decimales
           const importeFormateado = reporte.importe.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -138,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
               : reporte.cliente1Nombre;
 
-            doc.text(cliente1Info, 54, y); // Cliente 1: Nombres, Apellidos (si existe)
+            doc.text(cliente1Info, 53, y-2); // Cliente 1: Nombres, Apellidos (si existe)
             y += espaciadoVertical;
           }
 
@@ -148,20 +148,21 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente2Nombre + ' ' + reporte.cliente2Apellidos
               : reporte.cliente2Nombre;
 
-            doc.text(cliente2Info + ' ' + `DNI/RUC: ${reporte.cliente2NumDocumento}`, 49, y); // Cliente 2: Nombres, Apellidos (si existe) y DNI
+            doc.text(cliente2Info + ' ' + `DNI/RUC: ${reporte.cliente2NumDocumento}`, 44, y-7); // Cliente 2: Nombres, Apellidos (si existe) y DNI
             y += espaciadoVertical;
           }
 
+           // Sexta fila (Dirección del cliente 1)
+          doc.text(reporte.cliente1Direccion, 52, y-12); // Dirección Cliente 1
+          y += espaciadoVertical;
+
           // Quinta fila (DNI del cliente 1)
-          doc.text(reporte.cliente1NumDocumento, 45, y); // DNI Cliente 1
+          doc.text(reporte.cliente1NumDocumento, 50, y-16); // DNI Cliente 1
           y += espaciadoVertical;
 
-          // Sexta fila (Dirección del cliente 1)
-          doc.text(reporte.cliente1Direccion, 45, y); // Dirección Cliente 1
-          y += espaciadoVertical;
-
+         
           // Séptima fila (Distrito del cliente 1)
-          doc.text(reporte.cliente1Distrito, 45, y); // Distrito Cliente 1
+          doc.text(reporte.cliente1Distrito, 80, y-29); // Distrito Cliente 1
           y += espaciadoVertical;
 
           // Espacio adicional entre registros
