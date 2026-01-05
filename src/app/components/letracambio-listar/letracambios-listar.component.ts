@@ -98,7 +98,7 @@ export class LetracambioListarComponent implements OnInit {
         const doc = new jsPDF({
           orientation: 'landscape', // Orientación horizontal
           unit: 'mm',
-          format: [220, 110],  // Tamaño de página 21 cm de ancho x 11 cm de alto
+          format: [216, 110],  // Tamaño de página 21 cm de ancho x 11 cm de alto
         });
 
         // Establecer la fuente para todo el documento (Times New Roman, negrita, tamaño 12)
@@ -119,17 +119,17 @@ export class LetracambioListarComponent implements OnInit {
           // Añadir la información de cada letra en la posición adecuada
           // Primera fila
           doc.setFontSize(10);
-          doc.text(reporte.numeroLetra, 55, 25); // Número Letra
-          doc.text(reporte.distritoNombre, 75, 25); // Distrito Letra
-          doc.text(reporte.fechaGiro, 120, 25); // Fecha de Giro
-          doc.text(reporte.fechaVencimiento, 150, 25); // Fecha de Vencimiento
+          doc.text(reporte.numeroLetra, 50, 22); // Número Letra
+          doc.text(reporte.fechaGiro, 105, 23); // Fecha de Giro
+          doc.text(reporte.distritoNombre, 130, 22); // Distrito Letra
+          doc.text(reporte.fechaVencimiento, 155, 23); // Fecha de Vencimiento
           // Formatear el importe con separadores de miles y dos decimales
           const importeFormateado = reporte.importe.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          doc.text(`$. ${importeFormateado}`, 180, 25); // Importe con separadores de miles y decimales
+          doc.text(`$. ${importeFormateado}`, 182, 21); // Importe con separadores de miles y decimales
           y += espaciadoVertical;
 
           // Segunda fila
-          doc.text(reporte.importeLetras, 45, y); // Importe en Letras
+          doc.text(reporte.importeLetras, 43, y); // Importe en Letras
           y += espaciadoVertical;
 
           // Tercera fila (Nombre completo del cliente 1)
@@ -138,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
               ? reporte.cliente1Nombre + ' ' + reporte.cliente1Apellidos
               : reporte.cliente1Nombre;
 
-            doc.text(cliente1Info, 49, y); // Cliente 1: Nombres, Apellidos (si existe)
+            doc.text(cliente1Info, 54, y); // Cliente 1: Nombres, Apellidos (si existe)
             y += espaciadoVertical;
           }
 
