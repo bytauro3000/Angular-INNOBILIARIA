@@ -12,7 +12,7 @@ import { BaseChartDirective } from 'ng2-charts'; // 👈 Importación esencial
     BaseChartDirective // 👈 Habilita el uso de <canvas baseChart>
   ],
   templateUrl: './secretaria-dashboard.html',
-  styleUrls: ['./secretaria-dashboard.css']
+  styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
 
