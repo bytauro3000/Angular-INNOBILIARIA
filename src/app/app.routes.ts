@@ -6,6 +6,9 @@ import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
 import { AdminMenuComponent } from './components/menu-admin/admin-menu.component';
 
+//Importa los dashboards para los menús
+import { SecretariaDashboard } from './components/secretaria-dashboard/secretaria-dashboard';
+
 // Clientes
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
@@ -40,6 +43,9 @@ export const routes: Routes = [
     path: 'secretaria-menu',
     component: SecretariaMenuComponent,
     children: [
+      // 🟢 DASHBOARD (Esta es la ruta que hace que aparezca al inicio)
+      { path: '', component: SecretariaDashboard },
+
       // Clientes
       { path: 'clientes', component: ClientesComponent },
       { path: 'clientes/insertar', component: ClienteInsertarComponent },
