@@ -1,48 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Necesario para componentes Standalone
-import { DashboardService, DashboardData } from '../../services/dashboard.service';
+import { CommonModule } from '@angular/common';
+import { DashboardService } from '../../services/dashboard.service';
+import { DashboardData } from '../../models/dashboard.model';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts'; // 👈 Importación esencial
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-secretaria-dashboard',
-  standalone: true, // 👈 Define que es un componente independiente
-  imports: [
-    CommonModule, 
-    BaseChartDirective // 👈 Habilita el uso de <canvas baseChart>
-  ],
+  standalone: true,
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './secretaria-dashboard.html',
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
 
-  // Variables para las tarjetas
   totalLotes: number = 0;
   totalParceleros: number = 0;
   totalVendedores: number = 0;
   totalProgramas: number = 0;
   totalClientes: number = 0;
 
-  // Configuración del Gráfico de Barras Apiladas
+  // ✅ Configuración corregida para evitar decimales en el eje Y
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // Permite controlar el tamaño desde el CSS
+    maintainAspectRatio: false,
     scales: {
-      x: { 
-        stacked: true, // Apila las barras en el eje X
-        grid: { display: false }
-      },
+      x: { stacked: true, grid: { display: false } },
       y: { 
-        stacked: true, // Apila las barras en el eje Y
-        beginAtZero: true 
+        stacked: true, 
+        beginAtZero: true,
+        ticks: {
+          precision: 0, // 👈 Fuerza a no mostrar decimales
+          stepSize: 1   // 👈 Asegura que el salto sea de 1 en 1
+        }
       }
     },
     plugins: {
-      legend: { 
-        display: true, 
-        position: 'bottom',
-        labels: { usePointStyle: true, padding: 20 }
-      },
+      legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
       tooltip: { enabled: true }
     }
   };
@@ -52,9 +46,17 @@ export class SecretariaDashboard implements OnInit {
   public barChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
-      { data: [], label: 'Disponible', backgroundColor: '#2ecc71', hoverBackgroundColor: '#27ae60' },
-      { data: [], label: 'Separado', backgroundColor: '#f1c40f', hoverBackgroundColor: '#f39c12' },
-      { data: [], label: 'Vendido', backgroundColor: '#e74c3c', hoverBackgroundColor: '#c0392b' }
+      { data: [], label: 'Disponible', backgroundColor: '#2ecc71' },
+      { data: [], label: 'Separado', backgroundColor: '#f1c40f' },
+      { data: [], label: 'Vendido', backgroundColor: '#e74c3c' }
+    ]
+  };
+
+  public contractChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [
+      { data: [], label: 'Contado', backgroundColor: '#3498db' },
+      { data: [], label: 'Financiado', backgroundColor: '#9b59b6' }
     ]
   };
 
@@ -67,24 +69,30 @@ export class SecretariaDashboard implements OnInit {
   cargarDatos() {
     this.dashboardService.getTotales().subscribe({
       next: (data: DashboardData) => {
-        // Asignar totales a las tarjetas
         this.totalLotes = data.lotes;
         this.totalParceleros = data.parceleros;
         this.totalVendedores = data.vendedores;
         this.totalProgramas = data.programas;
         this.totalClientes = data.clientes;
 
-        // Procesar datos para el gráfico de barras apiladas
-        const nombresProgramas = Object.keys(data.graficoLotes);
-        this.barChartData.labels = nombresProgramas;
+        const programasLotes = Object.keys(data.graficoLotes);
+        this.barChartData = {
+          labels: programasLotes,
+          datasets: [
+            { data: programasLotes.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
+            { data: programasLotes.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
+            { data: programasLotes.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
+          ]
+        };
 
-        // Mapeo de datos por estado para cada programa
-        this.barChartData.datasets[0].data = nombresProgramas.map(p => data.graficoLotes[p].Disponible || 0);
-        this.barChartData.datasets[1].data = nombresProgramas.map(p => data.graficoLotes[p].Separado || 0);
-        this.barChartData.datasets[2].data = nombresProgramas.map(p => data.graficoLotes[p].Vendido || 0);
-      },
-      error: (err) => {
-        console.error('Error al cargar datos del dashboard:', err);
+        const programasContratos = Object.keys(data.graficoContratos);
+        this.contractChartData = {
+          labels: programasContratos,
+          datasets: [
+            { data: programasContratos.map(p => data.graficoContratos[p].CONTADO || 0), label: 'Contado', backgroundColor: '#3498db' },
+            { data: programasContratos.map(p => data.graficoContratos[p].FINANCIADO || 0), label: 'Financiado', backgroundColor: '#9b59b6' }
+          ]
+        };
       }
     });
   }
