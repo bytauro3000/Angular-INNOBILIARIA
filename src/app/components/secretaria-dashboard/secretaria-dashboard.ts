@@ -22,12 +22,21 @@ export class SecretariaDashboard implements OnInit {
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // 🟢 Importante para el responsive
+    maintainAspectRatio: false,
     elements: {
       bar: { borderRadius: 8 } 
     },
     scales: {
-      x: { stacked: true, grid: { display: false } },
+      x: { 
+        stacked: true, 
+        grid: { display: false },
+        ticks: {
+          autoSkip: false,
+          maxRotation: 0,
+          minRotation: 0,
+          font: { size: 10 } 
+        }
+      },
       y: { 
         stacked: true, 
         beginAtZero: true,
@@ -45,7 +54,7 @@ export class SecretariaDashboard implements OnInit {
 
   public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // 🟢 Importante para el responsive
+    maintainAspectRatio: false,
     cutout: '70%', 
     plugins: {
       legend: { 
@@ -79,6 +88,28 @@ export class SecretariaDashboard implements OnInit {
     this.router.navigate([ruta]);
   }
 
+  // 🟢 Lógica de limpieza avanzada
+  private limpiarNombrePrograma(nombre: string): string {
+    if (!nombre) return '';
+
+    let resultado = nombre;
+
+    // 1. Eliminar prefijos comunes (Case Insensitive)
+    const prefijos = [/Programa de Viv\. /i, /Programa de /i, /Asoc\. /i];
+    prefijos.forEach(prefijo => {
+      resultado = resultado.replace(prefijo, '');
+    });
+
+    // 2. Ahora que quitamos el inicio, buscamos el " de " que indica la ubicación
+    // Ejemplo: "Los Claveles de Huacoy" -> buscamos el " de " después de "Los Claveles"
+    if (resultado.toLowerCase().includes(' de ')) {
+      // Dividimos y tomamos la primera parte
+      resultado = resultado.split(/ de /i)[0];
+    }
+
+    return resultado.trim();
+  }
+
   cargarDatos(): void {
     this.dashboardService.getTotales().subscribe({
       next: (data: DashboardData) => {
@@ -88,13 +119,17 @@ export class SecretariaDashboard implements OnInit {
         this.totalProgramas = data.programas;
         this.totalClientes = data.clientes;
 
-        const nombres = Object.keys(data.graficoLotes);
+        const nombresOriginales = Object.keys(data.graficoLotes);
+        
+        // 🟢 Aplicamos la nueva limpieza avanzada
+        const nombresLimpios = nombresOriginales.map(n => this.limpiarNombrePrograma(n));
+
         this.barChartData = {
-          labels: nombres,
+          labels: nombresLimpios,
           datasets: [
-            { data: nombres.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
-            { data: nombres.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
-            { data: nombres.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
+            { data: nombresOriginales.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
+            { data: nombresOriginales.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
+            { data: nombresOriginales.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
           ]
         };
 
