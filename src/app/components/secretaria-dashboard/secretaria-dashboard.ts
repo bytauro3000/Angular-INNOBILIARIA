@@ -22,7 +22,7 @@ export class SecretariaDashboard implements OnInit {
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // Fundamental para que use el alto definido en CSS
     elements: {
       bar: { borderRadius: 8 } 
     },
@@ -38,19 +38,19 @@ export class SecretariaDashboard implements OnInit {
     plugins: {
       legend: { 
         position: 'bottom', 
-        labels: { usePointStyle: true, pointStyle: 'circle', padding: 25 } 
+        labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } 
       }
     }
   };
 
   public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // Fundamental para que use el alto definido en CSS
     cutout: '70%', 
     plugins: {
       legend: { 
         position: 'bottom', 
-        labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } 
+        labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } 
       }
     }
   };
