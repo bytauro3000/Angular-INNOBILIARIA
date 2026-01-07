@@ -14,14 +14,12 @@ import { BaseChartDirective } from 'ng2-charts';
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
-  // Totales para las tarjetas
   totalLotes: number = 0;
   totalParceleros: number = 0;
   totalVendedores: number = 0;
   totalProgramas: number = 0;
   totalClientes: number = 0;
 
-  // CONFIGURACIÓN PARA BARRAS (Inventario)
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -45,7 +43,6 @@ export class SecretariaDashboard implements OnInit {
     }
   };
 
-  // CONFIGURACIÓN PARA DONA (Contratos)
   public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -58,7 +55,6 @@ export class SecretariaDashboard implements OnInit {
     }
   };
 
-  // Datos de los gráficos
   public barChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
@@ -92,7 +88,6 @@ export class SecretariaDashboard implements OnInit {
         this.totalProgramas = data.programas;
         this.totalClientes = data.clientes;
 
-        // Procesar Gráfico de Lotes
         const nombres = Object.keys(data.graficoLotes);
         this.barChartData = {
           labels: nombres,
@@ -103,7 +98,6 @@ export class SecretariaDashboard implements OnInit {
           ]
         };
 
-        // Procesar Gráfico de Contratos (Dona)
         const totalContado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.CONTADO || 0), 0);
         const totalFinanciado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.FINANCIADO || 0), 0);
 
