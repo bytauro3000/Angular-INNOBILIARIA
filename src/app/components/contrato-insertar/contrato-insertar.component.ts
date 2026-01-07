@@ -12,7 +12,6 @@ import { Lote } from '../../models/lote.model';
 import { Programa } from '../../models/programa.model';
 import { Vendedor } from '../../models/vendedor.model';
 import { SeparacionDTO } from '../../dto/separacion.dto';
-import { Separacion } from '../../models/separacion.model'; 
 import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
 import { RouterModule, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -21,11 +20,22 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 import { ProgramaInsetEdit } from '../programa-inset-edit/programa-inset-edit';
+import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar'; // 🟢 Importado
 
 @Component({
   selector: 'app-contrato-insertar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule, FontAwesomeModule, VendedorInsertar, ClienteInsertarComponent, ProgramaInsetEdit],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    RouterModule, 
+    FormsModule, 
+    FontAwesomeModule, 
+    VendedorInsertar, 
+    ClienteInsertarComponent, 
+    ProgramaInsetEdit,
+    LotesInsertarEditar // 🟢 Añadido a imports
+  ],
   templateUrl: './contrato-insertar.html',
   styleUrls: ['./contrato-insertar.scss'],
 })
@@ -33,6 +43,7 @@ export class ContratoInsertarComponent implements OnInit {
   @ViewChild('vendedorModalContrato') vendedorModalContrato!: VendedorInsertar;
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
   @ViewChild('registroModalPrograma') registroModalPrograma!: ProgramaInsetEdit;
+  @ViewChild('loteModalContrato') loteModalContrato!: LotesInsertarEditar; // 🟢 Añadido ViewChild
   
   @ViewChild('vendedorBusquedaContainer') vendedorBusquedaContainer!: ElementRef;
   @ViewChild('programaBusquedaContainer') programaBusquedaContainer!: ElementRef;
@@ -95,8 +106,8 @@ export class ContratoInsertarComponent implements OnInit {
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }
   abrirModalCliente(cliente?: Cliente) { this.registroModal.abrirModalCliente(cliente); }
   abrirModalPrograma(Programa?: Programa) { this.registroModalPrograma.abrirModal(Programa); }
+  abrirModalLote() { this.loteModalContrato.abrirModal(); } // 🟢 Función para abrir modal lote
 
-  // 🟢 Función para abreviar nombres de programas (Mejorada)
   getAbreviatura(lote: Lote): string {
     const nombre = lote.programa?.nombrePrograma || this.filtroPrograma;
     if (!nombre) return 'S/P';
@@ -127,6 +138,17 @@ export class ContratoInsertarComponent implements OnInit {
       this.programas = p;
       this.programasFiltrados = [...p];
     });
+  }
+
+  // 🟢 Recarga los lotes del programa actual para que aparezca el nuevo creado
+  RecargarLotes(): void {
+    const idProg = this.contratoForm.get('idPrograma')?.value;
+    if (idProg) {
+      this.loteService.listarLotesPorPrograma(idProg).subscribe(l => {
+        this.lotes = l || [];
+        this.lotesFiltrados = [...this.lotes];
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -281,7 +303,6 @@ export class ContratoInsertarComponent implements OnInit {
 
   seleccionarLote(lote: Lote) {
     if (!this.isLoteSeleccionado(lote.idLote)) {
-      // 🟢 Inyectamos el programa actual si no lo tiene para que getAbreviatura funcione
       if (!lote.programa) {
         lote.programa = { nombrePrograma: this.filtroPrograma } as Programa;
       }
@@ -357,7 +378,6 @@ export class ContratoInsertarComponent implements OnInit {
           this.lotesFiltrados = [];
           return;
       }
-      // ✅ SE ELIMINÓ 'this.lotesSeleccionados = [];' PARA MANTENER LA LISTA ACUMULADA
       this.loteService.listarLotesPorPrograma(id).subscribe(l => {
         this.lotes = l || [];
         this.lotesFiltrados = [...this.lotes];

@@ -1,0 +1,114 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <form [formGroup]="loteForm" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-grid-3x3-gap"></i> {{ isEditMode ? 'Editar Lote' : 'Insertar Nuevo Lote' }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-wrapper">
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Programa Inmobiliario</label>
+                <ng-select [items]="programas" 
+                           bindLabel="nombrePrograma" 
+                           formControlName="programa" 
+                           [searchable]="true" 
+                           appendTo="body" 
+                           [compareWith]="comparePrograma" 
+                           placeholder="Seleccione el proyecto">
+                </ng-select>
+              </div>
+            </div>
+
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label>Manzana</label>
+                <input type="text" formControlName="manzana" placeholder="Ej. MZ 01" (input)="formatearTexto($event, 'manzana')" required />
+              </div>
+              <div class="form-group">
+                <label>N° Lote</label>
+                <input type="text" formControlName="numeroLote" placeholder="Ej. 15" required />
+              </div>
+              <div class="form-group">
+                <label>Área (m²)</label>
+                <input type="text" formControlName="area" (input)="validarSoloNumeros($event, 'area')" placeholder="0.00" required />
+              </div>
+            </div>
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label>Precio por m²</label>
+                <input type="text" formControlName="precioM2" (input)="validarSoloNumeros($event, 'precioM2')" placeholder="0.00" required />
+              </div>
+              <div class="form-group">
+                <label>Estado</label>
+                <select formControlName="estado" required>
+                  <option value="Disponible">Disponible</option>
+                  <option value="Separado">Separado</option>
+                  <option value="Vendido">Vendido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-4-col">
+              <div class="form-group">
+                <label>Largo 1</label>
+                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Largo 2</label>
+                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Ancho 1</label>
+                <input type="text" formControlName="ancho1" (input)="validarSoloNumeros($event, 'ancho1')" placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Ancho 2</label>
+                <input type="text" formControlName="ancho2" (input)="validarSoloNumeros($event, 'ancho2')" placeholder="0.00" />
+              </div>
+            </div>
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label>Colindante Norte</label>
+                <input type="text" formControlName="colindanteNorte" (input)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
+              </div>
+              <div class="form-group">
+                <label>Colindante Sur</label>
+                <input type="text" formControlName="colindanteSur" (input)="formatearTexto($event, 'colindanteSur')" placeholder="Límite Sur" />
+              </div>
+            </div>
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label>Colindante Este</label>
+                <input type="text" formControlName="colindanteEste" (input)="formatearTexto($event, 'colindanteEste')" placeholder="Límite Este" />
+              </div>
+              <div class="form-group">
+                <label>Colindante Oeste</label>
+                <input type="text" formControlName="colindanteOeste" (input)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-save" [disabled]="!loteForm.valid">
+            <i class="bi bi-check-circle"></i> {{ isEditMode ? 'Actualizar Lote' : 'Guardar Lote' }}
+          </button>
+          <button type="button" class="btn btn-secondary btn-cancel" (click)="cerrarModal()">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

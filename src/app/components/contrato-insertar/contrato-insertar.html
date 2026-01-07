@@ -164,7 +164,9 @@
                 </li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini"><fa-icon [icon]="faPlus"></fa-icon></button>
+            <button type="button" class="btn btn-add-mini" (click)="abrirModalLote()">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
           </div>
           <ul class="selected-items-list">
             <li *ngFor="let lote of lotesSeleccionados" class="item-pequeno">
@@ -193,3 +195,4 @@
 <app-vendedor-insertar #vendedorModalContrato (vendedorGuardado)="recargarVendedores()"></app-vendedor-insertar>
 <app-cliente-insertar #registroModal (clienteGuardado)="RecargarClientes()"></app-cliente-insertar>
 <app-programa-inset-edit #registroModalPrograma (ProgramaGuardado)="RecargarProgramas()"></app-programa-inset-edit>
+<app-lotes-insertar-editar #loteModalContrato (loteGuardado)="RecargarLotes()"></app-lotes-insertar-editar>

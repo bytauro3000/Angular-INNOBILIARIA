@@ -1,0 +1,111 @@
+/* --- DISEÑO MIDNIGHT GLASS LOTES --- */
+.modal-content {
+  background-color: #2c3e50 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  .modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    i { color: #2ecc71; }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem 2rem 0.5rem 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  label {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+  }
+}
+
+input, select {
+  background-color: #34495e !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  font-size: 0.9rem !important;
+  height: 45px !important;
+  width: 100%; 
+  box-sizing: border-box; 
+  
+  &:focus {
+    border-color: #2ecc71 !important;
+    box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.15) !important;
+    outline: none !important;
+  }
+}
+
+/* --- GRID ESTRUCTURAL --- */
+.form-row {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.form-3-col { grid-template-columns: repeat(3, 1fr); }
+.form-4-col { 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 0.6rem;
+    input { padding: 10px 8px !important; }
+}
+
+/* --- SOLUCIÓN VISUAL NG-SELECT --- */
+::ng-deep .ng-select .ng-select-container {
+    background-color: #34495e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    min-height: 45px !important;
+    color: white !important;
+}
+
+::ng-deep .ng-dropdown-panel {
+    z-index: 9999 !important; 
+    background-color: #2c3e50 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 🟢 Efecto verde al deslizar el mouse igual que en Contratos */
+::ng-deep .ng-option.ng-option-marked {
+    background-color: #2ecc71 !important;
+    color: white !important;
+}
+
+::ng-deep .ng-option {
+    background-color: #2c3e50 !important;
+    color: white !important;
+    padding: 10px !important;
+}
+
+::ng-deep .ng-select .ng-value-label { color: white !important; }
+
+/* --- FOOTER --- */
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 2rem;
+  display: flex;
+  gap: 12px;
+  .btn-save { background-color: #2ecc71 !important; border: none !important; color: white; }
+  .btn-cancel { background-color: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: white; }
+}

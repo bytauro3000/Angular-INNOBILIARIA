@@ -13,19 +13,17 @@
           <div class="form-wrapper">
 
             <div class="form-row form-2-col">
-             <div class="form-group">
-  <label for="nombre">Nombre</label>
-  <input type="text" id="nombre" formControlName="nombre" 
-         placeholder="Nombre del cliente" required 
-         (input)="formatearTexto($event, 'nombre')" />
-</div>
+              <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required
+                  (input)="formatearTexto($event, 'nombre')" />
+              </div>
 
-<div class="form-group">
-  <label for="apellidos">Apellidos</label>
-  <input type="text" id="apellidos" formControlName="apellidos" 
-         placeholder="Apellidos del cliente" 
-         (input)="formatearTexto($event, 'apellidos')" />
-</div>
+              <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente"
+                  (input)="formatearTexto($event, 'apellidos')" />
+              </div>
             </div>
 
             <div class="form-row form-3-col">
@@ -40,26 +38,19 @@
               <div class="form-group">
                 <label for="numDoc">DNI / RUC</label>
                 <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required
-                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
-                    (input)="limpiarNoNumericos('numDoc')"
-                    [attr.title]="getErrorMessage('numDoc')"
-                    [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
-                    #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
+                  [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
+                  (input)="limpiarNoNumericos('numDoc')" [attr.title]="getErrorMessage('numDoc')"
+                  [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
+                  #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
               </div>
 
               <div class="form-group celular-wrapper">
                 <label for="celular">Celular</label>
-                <ngx-intl-tel-input 
-                  [preferredCountries]="preferredCountries" 
-                  [enableAutoCountrySelect]="true"
-                  [enablePlaceholder]="true" 
-                  [searchCountryFlag]="true"
-                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]" 
-                  [selectFirstCountry]="true"
-                  [selectedCountryISO]="CountryISO.Peru" 
-                  [cssClass]="'form-control custom-intl-input'" 
-                  formControlName="celular"
-                  [attr.placeholder]="'Ej. 902 658 057'">
+                <ngx-intl-tel-input [preferredCountries]="preferredCountries" [enableAutoCountrySelect]="true"
+                  [enablePlaceholder]="true" [searchCountryFlag]="true"
+                  [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]" [selectFirstCountry]="true"
+                  [selectedCountryISO]="CountryISO.Peru" [cssClass]="'form-control custom-intl-input'"
+                  formControlName="celular" [attr.placeholder]="'Ej. 902 658 057'">
                 </ngx-intl-tel-input>
               </div>
             </div>
@@ -67,7 +58,8 @@
             <div class="form-row form-2-col form-2-col-direccion">
               <div class="form-group">
                 <label for="direccion">Dirección</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required />
+                <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa"
+                  required />
               </div>
 
               <div class="form-group" formGroupName="distrito">
@@ -85,9 +77,9 @@
               <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required
-                    [attr.title]="getErrorMessage('email')"
-                    [ngClass]="{'is-invalid': clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched}"
-                    #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" />
+                  [attr.title]="getErrorMessage('email')"
+                  [ngClass]="{'is-invalid': clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched}"
+                  #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" />
               </div>
 
               <div class="form-group">

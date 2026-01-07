@@ -25,14 +25,12 @@
     border-radius: 6px;
     border: 1px solid #ddd;
     background-color: white;
-    font-size: 1rem;
     transition: all 0.3s ease;
 
     &:focus {
       outline: none;
       border-color: #3498db;
       box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
-      transform: scale(1.02);
     }
   }
 }
@@ -53,145 +51,26 @@
       color: #fff;
     }
 
-    th,
-    td {
+    th, td {
       padding: 0.75rem;
       text-align: left;
       border-bottom: 1px solid #ecf0f1;
     }
 
-    tr {
-      transition: background 0.3s ease;
-      &:hover {
-        background-color: #f2f6fb;
-      }
-    }
+    tr:hover { background-color: #f2f6fb; }
   }
 
   .badge {
     font-size: 0.85rem;
     padding: 0.4em 0.7em;
     border-radius: 0.5rem;
-    font-weight: 500;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.05);
-    }
   }
 }
 
-/* Animaciones para modales */
-.modal.fade .modal-dialog {
-  transform: translateY(-30px);
-  opacity: 0;
-  transition: all 0.3s ease-out;
-}
-
-.modal.show .modal-dialog {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.modal-content {
-  border-radius: 10px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  animation: fadeInUp 0.4s ease;
-}
-
-.modal-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.modal-title {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.modal-footer .btn {
-  min-width: 100px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-/* Animaciones Keyframes */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeOutDown {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(20px); }
-}
-
-/* Tabla más compacta */
-.tabla-ajustada th,
-.tabla-ajustada td {
-  padding: 0.35rem 0.5rem; /* menos espacio */
-  font-size: 0.85rem; /* tipografía más pequeña */
-}
-
-.tabla-ajustada thead {
-  font-size: 0.9rem;
-}
-
-.tabla-ajustada td button {
-  padding: 0.2rem 0.35rem; /* botones más compactos */
-}
-
-/* CORRECCIÓN AQUÍ */
-::ng-deep .ng-dropdown-panel {
-    z-index: 1060 !important; /* El modal de Bootstrap suele ser 1055, ponemos más */
-}
-
-::ng-deep .ng-select.ng-select-opened {
-    z-index: 1060 !important; 
-}
-/* ... tus otros estilos ... */
-
-
-
-/* SACA ESTO FUERA DE .table-responsive para que aplique al modal y al dropdown */
-.badge {
+.tabla-ajustada th, .tabla-ajustada td {
+  padding: 0.35rem 0.5rem;
   font-size: 0.85rem;
-  padding: 0.4em 0.7em;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  /* Asegura que tenga color de fondo por si Bootstrap falla */
-  background-color: #e9ecef; 
-  color: #333;
 }
 
-/* Y mantén tu corrección del z-index que ya te funcionó */
-::ng-deep .ng-dropdown-panel {
-    z-index: 1060 !important;
-    background-color: white !important; /* Forzamos fondo blanco por si acaso */
-    border: 1px solid #ddd; /* Un borde sutil */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Sombra para que destaque */
-}
-
-::ng-deep .ng-select.ng-select-opened {
-    z-index: 1060 !important; 
-}
-
-/* Ajuste para que los items dentro del select tengan espacio */
-::ng-deep .ng-option {
-    padding: 10px !important;
-    border-bottom: 1px solid #f0f0f0;
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
