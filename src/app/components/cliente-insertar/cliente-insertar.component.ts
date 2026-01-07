@@ -166,4 +166,20 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       this.clienteForm.markAllAsTouched();
     }
   }
+
+  // Método para convertir a formato Nombre Propio
+formatearTexto(event: any, controlName: string): void {
+  const input = event.target as HTMLInputElement;
+  let valor = input.value;
+
+  if (valor) {
+    // Convierte: "ever nick" -> "Ever Nick"
+    valor = valor.toLowerCase().split(' ')
+      .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+      .join(' ');
+
+    // Actualiza el valor en el formulario sin disparar eventos infinitos
+    this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+  }
+}
 }

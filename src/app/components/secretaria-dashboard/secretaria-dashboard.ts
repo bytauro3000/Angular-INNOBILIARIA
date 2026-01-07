@@ -1,53 +1,64 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; // Importación para navegación
+import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
 import { DashboardData } from '../../models/dashboard.model';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-secretaria-dashboard',
   standalone: true,
-  imports: [
-    CommonModule, 
-    BaseChartDirective, 
-    RouterModule // Habilita routerLink en el HTML
-  ],
+  imports: [CommonModule, BaseChartDirective, RouterModule],
   templateUrl: './secretaria-dashboard.html',
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
-
+  // Totales para las tarjetas
   totalLotes: number = 0;
   totalParceleros: number = 0;
   totalVendedores: number = 0;
   totalProgramas: number = 0;
   totalClientes: number = 0;
 
-  // Configuración de gráficos sin decimales
-  public barChartOptions: ChartConfiguration['options'] = {
+  // CONFIGURACIÓN PARA BARRAS (Inventario)
+  public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    elements: {
+      bar: { borderRadius: 8 } 
+    },
     scales: {
       x: { stacked: true, grid: { display: false } },
       y: { 
         stacked: true, 
         beginAtZero: true,
-        ticks: {
-          precision: 0, // Elimina decimales
-          stepSize: 1   // Fuerza saltos de 1 en 1
-        }
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { precision: 0, stepSize: 1 }
       }
     },
     plugins: {
-      legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
-      tooltip: { enabled: true }
+      legend: { 
+        position: 'bottom', 
+        labels: { usePointStyle: true, pointStyle: 'circle', padding: 25 } 
+      }
     }
   };
 
-  public barChartType: ChartType = 'bar';
-  
+  // CONFIGURACIÓN PARA DONA (Contratos)
+  public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '70%', 
+    plugins: {
+      legend: { 
+        position: 'bottom', 
+        labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } 
+      }
+    }
+  };
+
+  // Datos de los gráficos
   public barChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
@@ -57,24 +68,17 @@ export class SecretariaDashboard implements OnInit {
     ]
   };
 
-  public contractChartData: ChartData<'bar'> = {
-    labels: [],
-    datasets: [
-      { data: [], label: 'Contado', backgroundColor: '#3498db' },
-      { data: [], label: 'Financiado', backgroundColor: '#9b59b6' }
-    ]
+  public contractChartData: ChartData<'doughnut'> = {
+    labels: ['Contado', 'Financiado'],
+    datasets: [{ data: [], backgroundColor: ['#3498db', '#9b59b6'], hoverOffset: 15 }]
   };
 
-  constructor(
-    private dashboardService: DashboardService,
-    private router: Router // Inyectado para navegación por clic
-  ) { }
+  constructor(private dashboardService: DashboardService, private router: Router) { }
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
-  // Navegación programática para las tarjetas
   irARuta(ruta: string): void {
     this.router.navigate([ruta]);
   }
@@ -88,23 +92,24 @@ export class SecretariaDashboard implements OnInit {
         this.totalProgramas = data.programas;
         this.totalClientes = data.clientes;
 
-        const nombresProgramas = Object.keys(data.graficoLotes);
+        // Procesar Gráfico de Lotes
+        const nombres = Object.keys(data.graficoLotes);
         this.barChartData = {
-          labels: nombresProgramas,
+          labels: nombres,
           datasets: [
-            { data: nombresProgramas.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71', hoverBackgroundColor: '#27ae60' },
-            { data: nombresProgramas.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f', hoverBackgroundColor: '#f39c12' },
-            { data: nombresProgramas.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c', hoverBackgroundColor: '#c0392b' }
+            { data: nombres.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
+            { data: nombres.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
+            { data: nombres.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
           ]
         };
 
-        const programasContratos = Object.keys(data.graficoContratos);
+        // Procesar Gráfico de Contratos (Dona)
+        const totalContado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.CONTADO || 0), 0);
+        const totalFinanciado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.FINANCIADO || 0), 0);
+
         this.contractChartData = {
-          labels: programasContratos,
-          datasets: [
-            { data: programasContratos.map(p => data.graficoContratos[p].CONTADO || 0), label: 'Contado', backgroundColor: '#3498db' },
-            { data: programasContratos.map(p => data.graficoContratos[p].FINANCIADO || 0), label: 'Financiado', backgroundColor: '#9b59b6' }
-          ]
+          labels: ['Contado', 'Financiado'],
+          datasets: [{ data: [totalContado, totalFinanciado], backgroundColor: ['#3498db', '#9b59b6'] }]
         };
       },
       error: (err) => console.error('Error al cargar dashboard:', err)

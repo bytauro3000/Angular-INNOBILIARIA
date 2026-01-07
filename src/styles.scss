@@ -8,3 +8,7 @@ body {
     color: white;
     height: 100vh;
 }
+.modal-backdrop.show {
+  opacity: 0.4; /* Fondo más suave */
+  backdrop-filter: blur(4px); /* Desenfoque elegante */
+}
