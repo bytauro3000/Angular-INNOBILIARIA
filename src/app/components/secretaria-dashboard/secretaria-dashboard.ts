@@ -23,19 +23,12 @@ export class SecretariaDashboard implements OnInit {
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    elements: {
-      bar: { borderRadius: 8 } 
-    },
+    elements: { bar: { borderRadius: 8 } },
     scales: {
       x: { 
         stacked: true, 
         grid: { display: false },
-        ticks: {
-          autoSkip: false,
-          maxRotation: 0,
-          minRotation: 0,
-          font: { size: 10 } 
-        }
+        ticks: { autoSkip: false, maxRotation: 0, minRotation: 0, font: { size: 10 } }
       },
       y: { 
         stacked: true, 
@@ -45,10 +38,7 @@ export class SecretariaDashboard implements OnInit {
       }
     },
     plugins: {
-      legend: { 
-        position: 'bottom', 
-        labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } 
-      }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } }
     }
   };
 
@@ -57,10 +47,7 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     cutout: '70%', 
     plugins: {
-      legend: { 
-        position: 'bottom', 
-        labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } 
-      }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } }
     }
   };
 
@@ -88,25 +75,16 @@ export class SecretariaDashboard implements OnInit {
     this.router.navigate([ruta]);
   }
 
-  // 🟢 Lógica de limpieza avanzada
   private limpiarNombrePrograma(nombre: string): string {
     if (!nombre) return '';
-
     let resultado = nombre;
-
-    // 1. Eliminar prefijos comunes (Case Insensitive)
     const prefijos = [/Programa de Viv\. /i, /Programa de /i, /Asoc\. /i];
     prefijos.forEach(prefijo => {
       resultado = resultado.replace(prefijo, '');
     });
-
-    // 2. Ahora que quitamos el inicio, buscamos el " de " que indica la ubicación
-    // Ejemplo: "Los Claveles de Huacoy" -> buscamos el " de " después de "Los Claveles"
     if (resultado.toLowerCase().includes(' de ')) {
-      // Dividimos y tomamos la primera parte
       resultado = resultado.split(/ de /i)[0];
     }
-
     return resultado.trim();
   }
 
@@ -120,8 +98,6 @@ export class SecretariaDashboard implements OnInit {
         this.totalClientes = data.clientes;
 
         const nombresOriginales = Object.keys(data.graficoLotes);
-        
-        // 🟢 Aplicamos la nueva limpieza avanzada
         const nombresLimpios = nombresOriginales.map(n => this.limpiarNombrePrograma(n));
 
         this.barChartData = {
