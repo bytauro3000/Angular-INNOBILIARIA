@@ -22,7 +22,7 @@ export class SecretariaDashboard implements OnInit {
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // Fundamental para que use el alto definido en CSS
+    maintainAspectRatio: false, // 🟢 Importante para el responsive
     elements: {
       bar: { borderRadius: 8 } 
     },
@@ -45,7 +45,7 @@ export class SecretariaDashboard implements OnInit {
 
   public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // Fundamental para que use el alto definido en CSS
+    maintainAspectRatio: false, // 🟢 Importante para el responsive
     cutout: '70%', 
     plugins: {
       legend: { 
