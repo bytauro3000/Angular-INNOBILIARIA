@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router'; // Importación para navegación
 import { DashboardService } from '../../services/dashboard.service';
 import { DashboardData } from '../../models/dashboard.model';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
@@ -8,7 +9,11 @@ import { BaseChartDirective } from 'ng2-charts';
 @Component({
   selector: 'app-secretaria-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [
+    CommonModule, 
+    BaseChartDirective, 
+    RouterModule // Habilita routerLink en el HTML
+  ],
   templateUrl: './secretaria-dashboard.html',
   styleUrls: ['./secretaria-dashboard.scss'],
 })
@@ -20,7 +25,7 @@ export class SecretariaDashboard implements OnInit {
   totalProgramas: number = 0;
   totalClientes: number = 0;
 
-  // ✅ Configuración corregida para evitar decimales en el eje Y
+  // Configuración de gráficos sin decimales
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -30,8 +35,8 @@ export class SecretariaDashboard implements OnInit {
         stacked: true, 
         beginAtZero: true,
         ticks: {
-          precision: 0, // 👈 Fuerza a no mostrar decimales
-          stepSize: 1   // 👈 Asegura que el salto sea de 1 en 1
+          precision: 0, // Elimina decimales
+          stepSize: 1   // Fuerza saltos de 1 en 1
         }
       }
     },
@@ -60,13 +65,21 @@ export class SecretariaDashboard implements OnInit {
     ]
   };
 
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private router: Router // Inyectado para navegación por clic
+  ) { }
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
-  cargarDatos() {
+  // Navegación programática para las tarjetas
+  irARuta(ruta: string): void {
+    this.router.navigate([ruta]);
+  }
+
+  cargarDatos(): void {
     this.dashboardService.getTotales().subscribe({
       next: (data: DashboardData) => {
         this.totalLotes = data.lotes;
@@ -75,13 +88,13 @@ export class SecretariaDashboard implements OnInit {
         this.totalProgramas = data.programas;
         this.totalClientes = data.clientes;
 
-        const programasLotes = Object.keys(data.graficoLotes);
+        const nombresProgramas = Object.keys(data.graficoLotes);
         this.barChartData = {
-          labels: programasLotes,
+          labels: nombresProgramas,
           datasets: [
-            { data: programasLotes.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
-            { data: programasLotes.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
-            { data: programasLotes.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
+            { data: nombresProgramas.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71', hoverBackgroundColor: '#27ae60' },
+            { data: nombresProgramas.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f', hoverBackgroundColor: '#f39c12' },
+            { data: nombresProgramas.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c', hoverBackgroundColor: '#c0392b' }
           ]
         };
 
@@ -93,7 +106,8 @@ export class SecretariaDashboard implements OnInit {
             { data: programasContratos.map(p => data.graficoContratos[p].FINANCIADO || 0), label: 'Financiado', backgroundColor: '#9b59b6' }
           ]
         };
-      }
+      },
+      error: (err) => console.error('Error al cargar dashboard:', err)
     });
   }
 }
