@@ -22,7 +22,7 @@ export class SecretariaDashboard implements OnInit {
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // 🟢 Permite que el gráfico llene el contenedor CSS
     elements: { bar: { borderRadius: 8 } },
     scales: {
       x: { 
@@ -44,7 +44,7 @@ export class SecretariaDashboard implements OnInit {
 
   public doughnutOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // 🟢 Permite que el gráfico llene el contenedor CSS
     cutout: '70%', 
     plugins: {
       legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } }
