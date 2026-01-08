@@ -31,7 +31,7 @@
           <th>Inicial</th>
           <th>Saldo</th>
           <th style="width: 80px;">N° Letras</th>
-          <th style="width: 120px;">Acciones</th>
+          <th style="width: 150px;">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -55,14 +55,21 @@
           <td class="text-center">{{ contrato.cantidadLetras }}</td>
           <td class="acciones-cell">
             <div class="acciones-container">
+              <button (click)="imprimirContrato(contrato)" 
+                      class="btn-action btn-print" title="Imprimir Contrato">
+                <i class="bi bi-printer"></i>
+              </button>
+
               <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
                       class="btn-action btn-edit" title="Editar">
                 <i class="bi bi-pencil"></i>
               </button>
+
               <button (click)="eliminarContrato(contrato.idContrato)" 
                       class="btn-action btn-delete" title="Eliminar">
                 <i class="bi bi-trash"></i>
               </button>
+
               <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
                  [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
                  class="btn-action btn-info" title="Letras">

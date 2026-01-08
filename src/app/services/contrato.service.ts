@@ -5,30 +5,41 @@ import { ContratoResponseDTO } from '../dto/contratoreponse.dto';
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'
 })
 export class ContratoService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/contratos'; 
+  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/contratos'; 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-  }
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+  }
 
-  listarContrato(): Observable<ContratoResponseDTO[]> {
-    return this.http.get<ContratoResponseDTO[]>(`${this.apiUrl}/listar`);
-  }
+  listarContrato(): Observable<ContratoResponseDTO[]> {
+    return this.http.get<ContratoResponseDTO[]>(`${this.apiUrl}/listar`);
+  }
 
-  //Método modificado para reflejar el tipo de retorno del backend
-  guardarContrato(request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
-    return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request, { headers: this.getHeaders() });
-  }
+  obtenerContratoPorId(id: number): Observable<ContratoResponseDTO> {
+    return this.http.get<ContratoResponseDTO>(`${this.apiUrl}/${id}`);
+  }
 
-  eliminarContrato(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
-  }
+  guardarContrato(request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
+    return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request, { headers: this.getHeaders() });
+  }
+
+  eliminarContrato(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
+  }
+
+  // 🟢 NUEVO: Método para descargar el PDF generado en el Backend
+  imprimirContratoPdf(id: number): Observable<Blob> {
+    // Es vital usar { responseType: 'blob' } para que Angular entienda que recibe un archivo
+    return this.http.get(`${this.apiUrl}/${id}/imprimir`, { 
+      responseType: 'blob' 
+    });
+  }
 }

@@ -3,7 +3,6 @@
   <div class="form-wrapper">
     <form [formGroup]="clienteForm" (ngSubmit)="actualizarCliente()">
       
-      <!-- Fila 1 -->
       <div class="form-row">
         <div class="form-group">
           <label for="nombre">Nombre</label>
@@ -19,7 +18,6 @@
         </div>
       </div>
 
-      <!-- Fila 2 -->
       <div class="form-row">
         <div class="form-group">
           <label for="celular">Celular</label>
@@ -40,7 +38,6 @@
         </div>
       </div>
 
-      <!-- Fila 3 -->
       <div class="form-row">
         <div class="form-group">
           <label for="tipoCliente">Tipo de Cliente</label>
@@ -61,22 +58,32 @@
         </div>
       </div>
 
-      <!-- Fila 4 -->
       <div class="form-row">
         <div class="form-group">
           <label for="direccion">Dirección</label>
           <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required>
         </div>
-        <div class="form-group" formGroupName="distrito">
-          <label for="idDistrito">Distrito</label>
-          <select id="idDistrito" formControlName="idDistrito" required>
-            <option value="" disabled>Selecciona un distrito</option>
-            <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
-          </select>
+
+        <div class="form-group-combined">
+          <div class="sub-group" formGroupName="distrito">
+            <label for="idDistrito">Distrito</label>
+            <select id="idDistrito" formControlName="idDistrito" required>
+              <option value="" disabled>Selecciona...</option>
+              <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
+            </select>
+          </div>
+          <div class="sub-group">
+            <label for="genero">Género</label>
+            <select id="genero" formControlName="genero" required>
+              <option value="" disabled selected>Género</option>
+              <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
+            </select>
+          </div>
         </div>
+
+        <div class="form-group"></div>
       </div>
 
-      <!-- Acciones -->
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" [disabled]="!clienteForm.valid">
           <i class="bi bi-pencil-square"></i> Actualizar Cliente

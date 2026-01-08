@@ -40,7 +40,7 @@ export class ContratoListarComponent implements OnInit {
   constructor(
     private contratoService: ContratoService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef // 👈 Inyecta el servicio aquí
+    private cdr: ChangeDetectorRef 
   ) { }
 
   ngOnInit(): void {
@@ -52,12 +52,38 @@ export class ContratoListarComponent implements OnInit {
       next: (data) => {
         this.contratos = data;
         this.filtrarContratos();
-        this.cdr.detectChanges(); // 👈 Llama a este método después de actualizar los datos
+        this.cdr.detectChanges(); 
       },
       error: (error) => {
         console.error('Error al cargar contratos:', error);
         this.toastr.error('Error al cargar los contratos.', 'Error');
-        this.cdr.detectChanges(); // También es buena práctica en caso de error
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  imprimirContrato(contrato: ContratoResponseDTO): void {
+    if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
+      this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
+      return;
+    }
+
+    this.toastr.info('Generando documento...', 'Espere');
+
+    this.contratoService.imprimirContratoPdf(contrato.idContrato).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Contrato_${contrato.idContrato}_${contrato.clientes[0]?.nombre || 'Inmobiliaria'}.pdf`;
+        link.click();
+        
+        window.URL.revokeObjectURL(url);
+        this.toastr.success('Contrato descargado con éxito', 'Éxito');
+      },
+      error: (err: any) => { // 🟢 Corregido: se cambió -> por => y se añadió tipado
+        console.error('Error al descargar el PDF:', err);
+        this.toastr.error('No se pudo obtener el PDF desde el servidor.', 'Error');
       }
     });
   }
@@ -86,7 +112,7 @@ export class ContratoListarComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.aplicarPaginacion();
-      this.cdr.detectChanges(); // Llama a este método para actualizar la vista
+      this.cdr.detectChanges();
     }
   }
 

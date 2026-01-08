@@ -7,6 +7,7 @@ import * as bootstrap from 'bootstrap';
 import { Cliente } from '../../models/cliente.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
+import { Genero } from '../../enums/Genero.enum'; // 🟢 Importación añadida
 import { Distrito } from '../../models/distrito.model';
 import { ClienteService } from '../../services/cliente.service';
 import { DistritoService } from '../../services/distrito.service';
@@ -33,6 +34,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
 
   clienteForm!: FormGroup;
   distritos: Distrito[] = [];
+  Generos = Object.values(Genero); // 🟢 Para iterar en el HTML
 
   SearchCountryField = SearchCountryField;
   CountryISO = CountryISO;
@@ -98,6 +100,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       telefono: [''],
       direccion: ['', Validators.required],
       email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
+      genero: ['', Validators.required], // 🟢 Campo Género inicializado
       estado: [EstadoCliente.ACTIVO, Validators.required],
       distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
     });
@@ -136,7 +139,11 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   public abrirModalCliente(cliente?: Cliente): void {
     this.clienteForm.reset();
     if (cliente) {
-      this.clienteForm.patchValue({ ...cliente, distrito: { idDistrito: cliente.distrito?.idDistrito } });
+      this.clienteForm.patchValue({ 
+        ...cliente, 
+        genero: cliente.genero, // 🟢 Aseguramos que el género se cargue en edición
+        distrito: { idDistrito: cliente.distrito?.idDistrito } 
+      });
     } else {
       this.inicializarFormulario();
     }
@@ -167,19 +174,14 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     }
   }
 
-  // Método para convertir a formato Nombre Propio
-formatearTexto(event: any, controlName: string): void {
-  const input = event.target as HTMLInputElement;
-  let valor = input.value;
-
-  if (valor) {
-    // Convierte: "ever nick" -> "Ever Nick"
-    valor = valor.toLowerCase().split(' ')
-      .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
-      .join(' ');
-
-    // Actualiza el valor en el formulario sin disparar eventos infinitos
-    this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+  formatearTexto(event: any, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    let valor = input.value;
+    if (valor) {
+      valor = valor.toLowerCase().split(' ')
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+        .join(' ');
+      this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+    }
   }
-}
 }
