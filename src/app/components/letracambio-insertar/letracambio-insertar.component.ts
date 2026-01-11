@@ -190,7 +190,7 @@ export class LetracambioInsertarComponent implements OnInit {
 
   private numeroALetras(num: number): string {
     const unidades = ["", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
-    const especiales = ["diez", "once", "doce", "trece", "catorce", "quince"];
+    const especiales = ["diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve"];
     const decenas = ["", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"];
     const centenas = ["", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
 
@@ -224,7 +224,7 @@ export class LetracambioInsertarComponent implements OnInit {
       if (num > 0) letras += " ";
     }
 
-    if (num >= 10 && num <= 15) {
+    if (num >= 10 && num <= 19) {
       letras += especiales[num - 10];
     } else if (num < 10) {
       letras += unidades[num];

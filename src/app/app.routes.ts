@@ -13,6 +13,7 @@ import { SecretariaDashboard } from './components/secretaria-dashboard/secretari
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';
+import { ClienteVer } from './components/cliente-ver/cliente-ver';
 
 // Contratos
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
@@ -50,6 +51,7 @@ export const routes: Routes = [
       { path: 'clientes', component: ClientesComponent },
       { path: 'clientes/insertar', component: ClienteInsertarComponent },
       { path: 'clientes/editar/:id', component: ClienteEditarComponent },
+      { path: 'clientes/ver/:id', component: ClienteVer },
 
       // Letras de Cambio
       { path: 'letras/listar/:idContrato', component: LetracambioListarComponent },

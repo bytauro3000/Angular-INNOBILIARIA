@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import * as bootstrap from 'bootstrap'; 
 import { ToastrService } from 'ngx-toastr';
 
 import { ClienteService } from '../../services/cliente.service';
@@ -10,7 +10,8 @@ import { DistritoService } from '../../services/distrito.service';
 import { Distrito } from '../../models/distrito.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
-import { Genero } from '../../enums/Genero.enum'; // 🟢 Importación añadida
+import { Genero } from '../../enums/Genero.enum';
+import { EstadoCivil } from '../../enums/estadocivil.enum';
 
 @Component({
   selector: 'app-cliente-editar',
@@ -21,96 +22,106 @@ import { Genero } from '../../enums/Genero.enum'; // 🟢 Importación añadida
 })
 export class ClienteEditarComponent implements OnInit {
 
+  @ViewChild('modalEditarElement') modalElement!: ElementRef;
+  private modal?: bootstrap.Modal;
+
+  @Output() clienteActualizado = new EventEmitter<void>();
+
   clienteForm!: FormGroup;
   clienteId!: number;
   distritos: Distrito[] = [];
 
   estadosCliente = Object.values(EstadoCliente);
   tiposCliente = Object.values(TipoCliente);
-  generos = Object.values(Genero); // 🟢 Lista para el select de géneros
+  generos = Object.values(Genero);
+  estadosCiviles = Object.values(EstadoCivil);
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
     private clienteService: ClienteService,
     private distritoService: DistritoService,
-    private toastr: ToastrService,
-    public router: Router
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
+    this.inicializarFormulario();
+    this.distritoService.listarDistritos().subscribe({
+      next: (data) => this.distritos = data
+    });
+  }
+
+  // Método para que el Listado de Clientes abra este modal
+  public abrirModal(id: number): void {
+    this.clienteId = id;
+    if (!this.modal) {
+      this.modal = new bootstrap.Modal(this.modalElement.nativeElement);
+    }
+    this.cargarDatosCliente();
+    this.modal.show();
+  }
+
+  private inicializarFormulario(): void {
     this.clienteForm = this.fb.group({
       idCliente: [null],
-      nombre: ['', Validators.required],
-      apellidos: [''],
+      nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
+      apellidos: ['', [Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
       tipoCliente: [null, Validators.required],
       numDoc: ['', Validators.required],
+      genero: ['', Validators.required],
+      estadoCivil: [null, Validators.required],
       celular: ['', Validators.required],
-      telefono: [''],
-      direccion: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      genero: ['', Validators.required], // 🟢 Campo añadido
+      direccion: ['', Validators.required],
+      distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
       estado: [null, Validators.required],
-      fechaRegistro: ['', Validators.required],
-      distrito: this.fb.group({
-        idDistrito: ['', Validators.required]
-      })
+      telefono: [''],
+      fechaRegistro: [{ value: '', disabled: true }]
     });
 
-    this.distritoService.listarDistritos().subscribe({
-      next: (data) => this.distritos = data,
-      error: (err) => this.toastr.error('No se pudo cargar la lista de distritos.')
-    });
+    this.clienteForm.get('tipoCliente')?.valueChanges.subscribe(tipo => this.actualizarValidacionDocumento(tipo));
+  }
 
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.clienteId = Number(id);
-        this.cargarDatosCliente();
-      }
-    });
+  private actualizarValidacionDocumento(tipo: string): void {
+    const control = this.clienteForm.get('numDoc');
+    const length = tipo === 'NATURAL' ? 8 : 11;
+    control?.setValidators([Validators.required, Validators.minLength(length), Validators.maxLength(length)]);
+    control?.updateValueAndValidity();
   }
 
   cargarDatosCliente(): void {
     this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
       next: (cliente) => {
         if (cliente) {
-          const fechaFormato = cliente.fechaRegistro
-            ? new Date(cliente.fechaRegistro).toISOString().substring(0, 10)
-            : '';
-
+          const fechaFormato = cliente.fechaRegistro ? new Date(cliente.fechaRegistro).toISOString().substring(0, 10) : '';
           this.clienteForm.patchValue({
-            idCliente: cliente.idCliente,
-            nombre: cliente.nombre,
-            apellidos: cliente.apellidos,
-            tipoCliente: cliente.tipoCliente?.toString().toUpperCase(),
-            numDoc: cliente.numDoc,
-            celular: cliente.celular,
-            telefono: cliente.telefono,
-            direccion: cliente.direccion,
-            email: cliente.email,
-            genero: cliente.genero, // 🟢 Carga del valor de género
-            estado: cliente.estado?.toString().toUpperCase(),
+            ...cliente,
             fechaRegistro: fechaFormato,
-            distrito: {
-              idDistrito: cliente.distrito.idDistrito
-            }
+            distrito: { idDistrito: cliente.distrito?.idDistrito }
           });
+          this.actualizarValidacionDocumento(cliente.tipoCliente);
         }
-      },
-      error: () => this.router.navigate(['/secretaria-menu/clientes'])
+      }
     });
   }
 
-  actualizarCliente(): void {
+  onSubmit(): void {
     if (this.clienteForm.valid) {
-      this.clienteService.actualizarCliente(this.clienteId, this.clienteForm.value).subscribe({
+      this.clienteService.actualizarCliente(this.clienteId, this.clienteForm.getRawValue()).subscribe({
         next: () => {
-          this.toastr.success('Cliente actualizado con éxito.');
-          this.router.navigate(['/secretaria-menu/clientes']);
+          this.toastr.success('Cliente actualizado correctamente.');
+          this.modal?.hide();
+          this.clienteActualizado.emit();
         },
-        error: () => this.toastr.error('Error al actualizar el cliente.')
+        error: (err) => this.toastr.error('Error: ' + err.message)
       });
     }
+  }
+
+  cerrarModal(): void { this.modal?.hide(); }
+
+  formatearTexto(event: any, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    let valor = input.value.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
   }
 }

@@ -7,11 +7,8 @@
       <option value="documento">Documento (DNI/RUC)</option>
     </select>
 
-    <input type="text"
-           [(ngModel)]="terminoBusqueda"
-           (input)="filtrarClientes()"
-           placeholder="Ingresa el término de búsqueda..."
-           class="filtro-input">
+    <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarClientes()"
+      placeholder="Ingresa el término de búsqueda..." class="filtro-input">
 
     <button (click)="abrirModal()" class="btn btn-success btn-agregar">
       <i class="bi bi-plus-lg"></i> <span>Agregar</span>
@@ -42,16 +39,18 @@
           <td data-label="Celular">{{ cliente.celular }}</td>
           <td data-label="Estado">{{ cliente.estado }}</td>
           <td data-label="Acciones" class="acciones-cell">
-            <button class="btn btn-outline-info btn-sm me-1" title="Ver cliente">
+            <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]"
+              class="btn btn-outline-info btn-sm me-1" title="Ver cliente">
               <i class="bi bi-eye"></i>
             </button>
-            <button 
-            [routerLink]="['/secretaria-menu/clientes/editar', cliente.idCliente]" 
-              class="btn btn-outline-primary btn-sm me-1" 
-              title="Editar cliente">
+            
+            <button (click)="editarModal.abrirModal(cliente.idCliente)"
+              class="btn btn-outline-primary btn-sm me-1" title="Editar cliente">
               <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminarCliente(cliente.idCliente)" title="Eliminar cliente">
+
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarCliente(cliente.idCliente)"
+              title="Eliminar cliente">
               <i class="bi bi-trash"></i>
             </button>
           </td>
@@ -63,22 +62,22 @@
     </div>
   </div>
 
-   <div *ngIf="totalPages > 1" class="paginacion-controles">
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
     <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
 
-    <button *ngFor="let page of getPagesArray()"
-        (click)="goToPage(page)"
-        [class.active]="currentPage === page"
-        class="btn pagina-numero-btn">
-        {{ page }}
+    <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" [class.active]="currentPage === page"
+      class="btn pagina-numero-btn">
+      {{ page }}
     </button>
 
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+      class="btn btn-outline-secondary">Siguiente</button>
   </div>
 
-  <app-cliente-insertar 
-    #registroModal 
-    (clienteGuardado)="cargarClientes()"> 
+  <app-cliente-insertar #registroModal (clienteGuardado)="cargarClientes()">
   </app-cliente-insertar>
-  
+
+  <app-cliente-editar #editarModal (clienteActualizado)="cargarClientes()">
+  </app-cliente-editar>
+
 </div>

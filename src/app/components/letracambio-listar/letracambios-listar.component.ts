@@ -152,7 +152,7 @@ export class LetracambioListarComponent implements OnInit {
             y += espaciadoVertical;
           }
 
-           // Sexta fila (Dirección del cliente 1)
+          // Sexta fila (Dirección del cliente 1)
           doc.text(reporte.cliente1Direccion, 52, 58); // Dirección Cliente 1
           y += espaciadoVertical;
 
@@ -160,7 +160,7 @@ export class LetracambioListarComponent implements OnInit {
           doc.text(reporte.cliente1NumDocumento, 50, 64); // DNI Cliente 1
           y += espaciadoVertical;
 
-         
+
           // Séptima fila (Distrito del cliente 1)
           doc.text(`distrito: ${reporte.cliente1Distrito}`, 88, 62); // Distrito Cliente 1
           y += espaciadoVertical;
@@ -196,7 +196,7 @@ export class LetracambioListarComponent implements OnInit {
   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 
   // Nueva función para generar el PDF del cronograma de pagos
- imprimirCronogramaPagos(): void {
+  imprimirCronogramaPagos(): void {
     this.cargando = true;
 
     this.letrasService.obtenerReporteCronogramaPagosPorContrato(this.idContrato).subscribe({
@@ -219,7 +219,7 @@ export class LetracambioListarComponent implements OnInit {
         const tableWidth = 124;
         const tableX = (pageWidth - tableWidth) / 2;
         const rowHeight = 7;
-        
+
         let y = 10;
         let currentPage = 1;
 
@@ -246,7 +246,7 @@ export class LetracambioListarComponent implements OnInit {
             doc.addPage();
             currentPage++;
             y = margin; // Iniciar en el margen superior en páginas nuevas
-            
+
             // En páginas nuevas (2, 3...), solo dibujamos la cabecera de la tabla
             this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
             y += rowHeight;
@@ -272,8 +272,8 @@ export class LetracambioListarComponent implements OnInit {
 
         // FILA DE TOTALES
         if (y + rowHeight > pageHeight - margin) {
-            doc.addPage();
-            y = margin;
+          doc.addPage();
+          y = margin;
         }
         doc.setFont('times', 'bold');
         doc.rect(tableX, y, tableWidth, rowHeight);
@@ -316,7 +316,7 @@ export class LetracambioListarComponent implements OnInit {
           doc.text(`${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`, posXCentrado, y + 5, { align: 'center' });
           doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, posXCentrado, y + 9, { align: 'center' });
         }
-        
+
         // PAGINACIÓN FINAL
         const pageCount = (doc.internal as any).getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -386,7 +386,7 @@ export class LetracambioListarComponent implements OnInit {
     doc.text(`DNI: ${data.cliente1NumDocumento}`, 145, y + 5);
     doc.text(`Dirección: ${data.cliente1Direccion}`, margin, y + 15);
     doc.text(`Distrito: ${data.cliente1Distrito}`, 145, y + 15);
-    doc.text(`Celular: ${data.cliente1Celular}` , 145, y);
+    doc.text(`Celular: ${data.cliente1Celular}`, 145, y);
     doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, y + 20);
 
     doc.setFont('times', 'normal');
@@ -528,7 +528,7 @@ export class LetracambioListarComponent implements OnInit {
   // ------------------------------------------------
   private numeroALetras(num: number): string {
     const unidades = ["", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
-    const especiales = ["diez", "once", "doce", "trece", "catorce", "quince"];
+    const especiales = ["diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve"];
     const decenas = ["", "", "veinte", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"];
     const centenas = ["", "ciento", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
 
@@ -562,7 +562,7 @@ export class LetracambioListarComponent implements OnInit {
       if (num > 0) letras += " ";
     }
 
-    if (num >= 10 && num <= 15) {
+    if (num >= 10 && num <= 19) {
       letras += especiales[num - 10];
     } else if (num < 10) {
       letras += unidades[num];
@@ -579,6 +579,7 @@ export class LetracambioListarComponent implements OnInit {
 
     return letras.trim();
   }
+
 
   // ------------------------------
   // Métodos para edición en línea
@@ -630,12 +631,12 @@ export class LetracambioListarComponent implements OnInit {
   }
 
   // Función auxiliar para formatear fechas de YYYY-MM-DD a DD/MM/YYYY
-private formatearFechaVista(fechaStr: string | Date): string {
-  if (!fechaStr) return '';
-  // Convertimos a string por si viene como objeto Date
-  const fecha = typeof fechaStr === 'string' ? fechaStr : fechaStr.toISOString().split('T')[0];
-  const [anio, mes, dia] = fecha.split('-');
-  return `${dia}/${mes}/${anio}`;
-}
+  private formatearFechaVista(fechaStr: string | Date): string {
+    if (!fechaStr) return '';
+    // Convertimos a string por si viene como objeto Date
+    const fecha = typeof fechaStr === 'string' ? fechaStr : fechaStr.toISOString().split('T')[0];
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
 }
 

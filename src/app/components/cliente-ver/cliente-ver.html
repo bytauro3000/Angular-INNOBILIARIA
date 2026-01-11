@@ -1,1 +1,90 @@
-<p>cliente-ver works!</p>
+<div class="ver-cliente-container" *ngIf="!loading && cliente">
+  <div class="header-view">
+    <button class="btn-back" (click)="regresar()">
+      <i class="bi bi-arrow-left"></i> Regresar
+    </button>
+    <h2>Detalles del Cliente: {{ cliente.nombre }} {{ cliente.apellidos }}</h2>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card shadow-lg">
+      <div class="card-header">
+        <i class="bi bi-person-badge"></i> Información Personal
+      </div>
+      <div class="card-body">
+        <div class="data-item">
+          <label>Nombres y Apellidos:</label>
+          <span>{{ cliente.nombre }} {{ cliente.apellidos }}</span>
+        </div>
+        <div class="data-item">
+          <label>Tipo de Documento:</label>
+          <span>{{ cliente.tipoCliente }}</span>
+        </div>
+        <div class="data-item">
+          <label>N° Documento:</label>
+          <span>{{ cliente.numDoc || '-' }}</span>
+        </div>
+        <div class="data-item">
+          <label>Género:</label>
+          <span>{{ cliente.genero }}</span>
+        </div>
+        <div class="data-item">
+          <label>Estado Civil:</label>
+          <span class="badge-custom">{{ cliente.estadoCivil }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card shadow-lg">
+      <div class="card-header">
+        <i class="bi bi-telephone"></i> Contacto y Ubicación
+      </div>
+      <div class="card-body">
+        <div class="data-item">
+          <label>Celular:</label>
+          <span>{{ cliente.celular }}</span>
+        </div>
+        <div class="data-item">
+          <label>Email:</label>
+          <span>{{ cliente.email }}</span>
+        </div>
+        <div class="data-item">
+          <label>Dirección:</label>
+          <span>{{ cliente.direccion }}</span>
+        </div>
+        <div class="data-item">
+          <label>Distrito:</label>
+          <span>{{ cliente.distrito.nombre }}</span>
+        </div>
+        <div class="data-item">
+          <label>Teléfono Fijo:</label>
+          <span>{{ cliente.telefono || 'No registrado' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card shadow-lg full-width">
+      <div class="card-header">
+        <i class="bi bi-gear"></i> Estado en el Sistema
+      </div>
+      <div class="card-body system-info">
+        <div class="data-item">
+          <label>Estado Actual:</label>
+          <span class="status-pill" [ngClass]="cliente.estado.toLowerCase()">
+            {{ cliente.estado }}
+          </span>
+        </div>
+        <div class="data-item">
+          <label>Fecha de Registro:</label>
+          <span>{{ cliente.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-container" *ngIf="loading">
+  <div class="spinner-border text-success" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>

@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2'; 
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
+import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.component'; // 👈 IMPORTACIÓN AÑADIDA
 
 @Component({
   selector: 'app-clientes',
@@ -15,7 +16,8 @@ import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.c
     CommonModule,
     FormsModule,
     RouterModule,
-    ClienteInsertarComponent
+    ClienteInsertarComponent,
+    ClienteEditarComponent // 👈 REGISTRO AÑADIDO
   ],
   templateUrl: './cliente-listar.html',
   styleUrls: ['./cliente-listar.scss']
@@ -23,6 +25,7 @@ import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.c
 export class ClientesComponent implements OnInit {
 
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
+  @ViewChild('editarModal') editarModal!: ClienteEditarComponent; // 👈 REFERENCIA AL MODAL EDITAR
 
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
@@ -40,8 +43,14 @@ export class ClientesComponent implements OnInit {
     private toastr: ToastrService
   ) { }
 
+  // Abre el modal de inserción
   abrirModal(cliente?: Cliente) {
     this.registroModal.abrirModalCliente(cliente); 
+  }
+
+  // Abre el modal de edición por ID (nueva funcionalidad)
+  abrirModalEditar(id: number) {
+    this.editarModal.abrirModal(id);
   }
 
   ngOnInit(): void {

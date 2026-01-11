@@ -1,162 +1,83 @@
-.clientes-container {
-  padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* --- MODAL MIDNIGHT GLASS COMPACTO --- */
+.modal-content {
+  background-color: #2c3e50 !important;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  h2 {
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    font-size: 1.4rem;
-    font-weight: 600;
-    padding: 1rem 1.5rem;
-    text-align: center;
-    border-radius: 8px 8px 0 0;
-    margin-bottom: 0;
-    border-bottom: 2px solid #2ecc71;
-  }
+.custom-modal-width {
+  max-width: 850px; // Reducido de 1100px para que no sea tan ancho
+}
 
-  .form-wrapper {
-    background-color: #34495e;
-    padding: 2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    border-radius: 0 0 8px 8px;
-  }
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .modal-title { color: #ffffff; font-size: 1.1rem; i { color: #2ecc71; } }
+}
 
-  // 🔹 Grid principal de 3 columnas
-  .form-row {
-    display: grid;
-    // Forzamos 3 columnas para que la dirección mantenga su tamaño proporcional
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 1.5rem;
-    margin-bottom: 1rem;
+.compact-body {
+  padding: 1rem 1.5rem; // Padding reducido
+}
 
-    // Adaptabilidad para móviles
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
+.form-row {
+  display: grid;
+  gap: 1rem; // Espaciado entre campos reducido
+  margin-bottom: 0.8rem;
+  
+  &.form-2-col { grid-template-columns: 1fr 1fr; }
+  &.form-3-col { grid-template-columns: repeat(3, 1fr); }
+  &.form-2-col-direccion { grid-template-columns: 2fr 1fr; }
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-
-    label {
-      font-weight: 500;
-      color: #ecf0f1;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      text-align: left;
-    }
-
-    input,
-    select {
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-      border: 1px solid #4a627a;
-      background-color: #2c3e50;
-      color: #ecf0f1;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      width: 100%;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
-    }
-  }
-
-  // 🟢 NUEVO: Contenedor para que Distrito y Género compartan UNA sola columna
-  .form-group-combined {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end; // Alinea los campos por la base
-
-    .sub-group {
-      flex: 1; // Divide el espacio de la columna al 50% cada uno
-      display: flex;
-      flex-direction: column;
-
-      label {
-        font-weight: 500;
-        color: #ecf0f1;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-      }
-
-      select {
-        padding: 0.5rem 0.75rem;
-        border-radius: 4px;
-        border: 1px solid #4a627a;
-        background-color: #2c3e50;
-        color: #ecf0f1;
-        font-size: 1rem;
-        width: 100%;
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-
-    .btn {
-      padding: 0.5rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background-color: #2ecc71;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: #27ad60;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-      }
-    }
-
-    .btn-secondary {
-      background-color: #e74c3c;
-      color: white;
-
-      &:hover {
-        background-color: #c0392b;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-      }
-    }
-
-    .btn:disabled {
-      background-color: #7f8c8d;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr !important;
   }
 }
 
-// 🔹 Corrige el autofill de Chrome
-.form-group input:-webkit-autofill,
-.form-group input:-webkit-autofill:hover,
-.form-group input:-webkit-autofill:focus,
-.form-group select:-webkit-autofill,
-.form-group select:-webkit-autofill:hover,
-.form-group select:-webkit-autofill:focus {
-  -webkit-text-fill-color: #ecf0f1;
-  -webkit-box-shadow: 0 0 0px 1000px #2c3e50 inset;
-  transition: background-color 5000s ease-in-out 0s;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    color: #94a3b8;
+    font-size: 0.7rem; // Fuente de etiqueta más pequeña
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    background-color: #34495e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important; // Input más delgado
+    font-size: 0.85rem !important;
+    height: 38px !important; // Altura reducida
+
+    &:focus { border-color: #2ecc71 !important; outline: none; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+  .btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: 0.2s;
+  }
+
+  .btn-save {
+    background-color: #2ecc71; color: white;
+    &:hover:not(:disabled) { background-color: #27ae60; transform: translateY(-1px); }
+  }
+
+  .btn-cancel {
+    background-color: transparent; color: #bdc3c7; border: 1px solid #4a627a;
+    &:hover { background-color: rgba(255,255,255,0.05); color: white; }
+  }
 }

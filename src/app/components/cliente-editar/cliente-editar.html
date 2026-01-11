@@ -1,97 +1,107 @@
-<div class="clientes-container">
-  <h2>Editar Cliente</h2>
-  <div class="form-wrapper">
-    <form [formGroup]="clienteForm" (ngSubmit)="actualizarCliente()">
+<div class="modal fade" #modalEditarElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered custom-modal-width">
+    <div class="modal-content shadow-lg">
       
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required>
-        </div>
-        <div class="form-group">
-          <label for="apellidos">Apellidos</label>
-          <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente">
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required>
-        </div>
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square"></i> Editar Información del Cliente
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="celular">Celular</label>
-          <input type="tel" id="celular" formControlName="celular" placeholder="Celular" required>
-        </div>
-        <div class="form-group">
-          <label for="telefono">Teléfono</label>
-          <input type="tel" id="telefono" formControlName="telefono" placeholder="Teléfono">
-        </div>
-        <div class="form-group">
-          <label for="estado">Estado</label>
-          <select id="estado" formControlName="estado" required>
-            <option [ngValue]="null" disabled>Selecciona un estado</option>
-            <option *ngFor="let e of estadosCliente" [value]="e">
-              {{ e === 'ACTIVO' ? 'Activo' : e === 'MOROSO' ? 'Moroso' : 'Propietario' }}
-            </option>
-          </select>
-        </div>
-      </div>
+      <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body compact-body">
+          <div class="form-wrapper-modal">
+            
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" formControlName="nombre" (input)="formatearTexto($event, 'nombre')">
+              </div>
+              <div class="form-group">
+                <label>Apellidos</label>
+                <input type="text" formControlName="apellidos" (input)="formatearTexto($event, 'apellidos')">
+              </div>
+            </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="tipoCliente">Tipo de Cliente</label>
-          <select id="tipoCliente" formControlName="tipoCliente" required>
-            <option [ngValue]="null" disabled>Selecciona un tipo</option>
-            <option *ngFor="let t of tiposCliente" [value]="t">
-              {{ t | titlecase }}
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="numDoc">DNI / RUC</label>
-          <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required>
-        </div>
-        <div class="form-group">
-          <label for="fechaRegistro">Fecha de Registro</label>
-          <input type="date" id="fechaRegistro" formControlName="fechaRegistro" required>
-        </div>
-      </div>
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label>Tipo Cliente</label>
+                <select formControlName="tipoCliente">
+                  <option *ngFor="let t of tiposCliente" [value]="t">{{ t | titlecase }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>DNI / RUC</label>
+                <input type="text" formControlName="numDoc">
+              </div>
+              <div class="form-group">
+                <label>Género</label>
+                <select formControlName="genero">
+                  <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
+                </select>
+              </div>
+            </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="direccion">Dirección</label>
-          <input type="text" id="direccion" formControlName="direccion" placeholder="Dirección completa" required>
-        </div>
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label>Estado Civil</label>
+                <select formControlName="estadoCivil">
+                  <option *ngFor="let ec of estadosCiviles" [value]="ec">{{ ec }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Celular</label>
+                <input type="tel" formControlName="celular">
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" formControlName="email">
+              </div>
+            </div>
 
-        <div class="form-group-combined">
-          <div class="sub-group" formGroupName="distrito">
-            <label for="idDistrito">Distrito</label>
-            <select id="idDistrito" formControlName="idDistrito" required>
-              <option value="" disabled>Selecciona...</option>
-              <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
-            </select>
+            <div class="form-row form-2-col-direccion">
+              <div class="form-group">
+                <label>Dirección Completa</label>
+                <input type="text" formControlName="direccion">
+              </div>
+              <div class="form-group" formGroupName="distrito">
+                <label>Distrito</label>
+                <select formControlName="idDistrito">
+                  <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label>Estado del Cliente</label>
+                <select formControlName="estado">
+                  <option *ngFor="let e of estadosCliente" [value]="e">{{ e | titlecase }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Teléfono Fijo</label>
+                <input type="tel" formControlName="telefono" placeholder="Opcional">
+              </div>
+              <div class="form-group">
+                <label>F. Registro</label>
+                <input type="date" formControlName="fechaRegistro">
+              </div>
+            </div>
+
           </div>
-          <div class="sub-group">
-            <label for="genero">Género</label>
-            <select id="genero" formControlName="genero" required>
-              <option value="" disabled selected>Género</option>
-              <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
-            </select>
-          </div>
         </div>
 
-        <div class="form-group"></div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="!clienteForm.valid">
-          <i class="bi bi-pencil-square"></i> Actualizar Cliente
-        </button>
-        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/secretaria-menu/clientes'])">
-          <i class="bi bi-x-lg"></i> Cancelar
-        </button>
-      </div>
-    </form>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-save" [disabled]="!clienteForm.valid">
+            <i class="bi bi-check-circle"></i> Actualizar
+          </button>
+          <button type="button" class="btn btn-cancel" (click)="cerrarModal()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

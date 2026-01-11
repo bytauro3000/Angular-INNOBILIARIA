@@ -7,7 +7,8 @@ import * as bootstrap from 'bootstrap';
 import { Cliente } from '../../models/cliente.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
-import { Genero } from '../../enums/Genero.enum'; // 🟢 Importación añadida
+import { Genero } from '../../enums/Genero.enum';
+import { EstadoCivil } from '../../enums/estadocivil.enum'; // 👈 Importación añadida
 import { Distrito } from '../../models/distrito.model';
 import { ClienteService } from '../../services/cliente.service';
 import { DistritoService } from '../../services/distrito.service';
@@ -34,7 +35,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
 
   clienteForm!: FormGroup;
   distritos: Distrito[] = [];
-  Generos = Object.values(Genero); // 🟢 Para iterar en el HTML
+  Generos = Object.values(Genero);
+  EstadosCiviles = Object.values(EstadoCivil); // 👈 Para iterar en el HTML
 
   SearchCountryField = SearchCountryField;
   CountryISO = CountryISO;
@@ -96,11 +98,12 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       apellidos: ['', [Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
       tipoCliente: [TipoCliente.NATURAL, Validators.required],
       numDoc: ['', Validators.required],
+      estadoCivil: [EstadoCivil.SOLTERO, Validators.required], // 👈 Inicializado en Soltero
       celular: ['', Validators.required], 
       telefono: [''],
       direccion: ['', Validators.required],
       email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
-      genero: ['', Validators.required], // 🟢 Campo Género inicializado
+      genero: ['', Validators.required],
       estado: [EstadoCliente.ACTIVO, Validators.required],
       distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
     });
@@ -141,7 +144,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     if (cliente) {
       this.clienteForm.patchValue({ 
         ...cliente, 
-        genero: cliente.genero, // 🟢 Aseguramos que el género se cargue en edición
+        estadoCivil: cliente.estadoCivil, // 👈 Se carga en edición
+        genero: cliente.genero,
         distrito: { idDistrito: cliente.distrito?.idDistrito } 
       });
     } else {
@@ -183,5 +187,5 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
         .join(' ');
       this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
     }
-  }
+  }    
 }
