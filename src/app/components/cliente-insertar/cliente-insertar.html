@@ -1,7 +1,8 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered custom-modal-width">
     <div class="modal-content shadow-lg">
       <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+        
         <div class="modal-header">
           <h5 class="modal-title">
             <i class="bi bi-person-plus"></i> Insertar Nuevo Cliente
@@ -9,8 +10,8 @@
           <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
         </div>
 
-        <div class="modal-body">
-          <div class="form-wrapper">
+        <div class="modal-body compact-body">
+          <div class="form-wrapper-modal">
 
             <div class="form-row form-2-col">
               <div class="form-group">
@@ -38,9 +39,10 @@
 
               <div class="form-group">
                 <label for="numDoc">DNI / RUC</label>
-                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Número de documento" required
+                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
                   [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
-                  (input)="limpiarNoNumericos('numDoc')" [attr.title]="getErrorMessage('numDoc')"
+                  (input)="limpiarNoNumericos('numDoc')" 
+                  [attr.title]="getErrorMessage('numDoc')"
                   [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
                   #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
               </div>
@@ -48,7 +50,7 @@
               <div class="form-group">
                 <label for="genero">Género</label>
                 <select id="genero" formControlName="genero" required>
-                  <option value="" disabled selected>Seleccione género</option>
+                  <option value="" disabled selected>Seleccione</option>
                   <option *ngFor="let g of Generos" [value]="g">{{ g }}</option>
                 </select>
               </div>
@@ -58,7 +60,7 @@
               <div class="form-group">
                 <label for="estadoCivil">Estado Civil</label>
                 <select id="estadoCivil" formControlName="estadoCivil" required>
-                  <option value="" disabled selected>Seleccione estado</option>
+                  <option value="" disabled selected>Seleccione</option>
                   <option *ngFor="let ec of EstadosCiviles" [value]="ec">{{ ec }}</option>
                 </select>
               </div>
@@ -69,13 +71,13 @@
                   [enablePlaceholder]="true" [searchCountryFlag]="true"
                   [searchCountryField]="[SearchCountryField.Iso2, SearchCountryField.Name]" [selectFirstCountry]="true"
                   [selectedCountryISO]="CountryISO.Peru" [cssClass]="'form-control custom-intl-input'"
-                  formControlName="celular" [attr.placeholder]="'Ej. 902 658 057'">
+                  formControlName="celular">
                 </ngx-intl-tel-input>
               </div>
               
               <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com" required
+                <input type="email" id="email" formControlName="email" placeholder="correo@ejemplo.com" required 
                   [attr.title]="getErrorMessage('email')"
                   [ngClass]="{'is-invalid': clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched}"
                   #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" />
@@ -85,8 +87,7 @@
             <div class="form-row form-1-col">
                <div class="form-group">
                 <label for="direccion">Dirección Completa</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Avenida, Mz y Lote..."
-                  required />
+                <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Avenida, Mz y Lote..." required />
               </div>
             </div>
 
@@ -94,10 +95,8 @@
               <div class="form-group" formGroupName="distrito">
                 <label for="idDistrito">Distrito</label>
                 <select id="idDistrito" formControlName="idDistrito" required>
-                  <option value="">Selecciona un distrito</option>
-                  <option *ngFor="let d of distritos" [value]="d.idDistrito">
-                    {{ d.nombre }}
-                  </option>
+                  <option value="">Selecciona distrito</option>
+                  <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
                 </select>
               </div>
 
@@ -111,11 +110,11 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary btn-save" [disabled]="!clienteForm.valid">
+          <button type="submit" class="btn btn-save" [disabled]="!clienteForm.valid">
             <i class="bi bi-person-plus"></i> Guardar Cliente
           </button>
           <button type="button" class="btn btn-secondary btn-cancel" (click)="cerrarModal()">
-            <i class="bi bi-x-lg"></i> Cancelar
+            Cancelar
           </button>
         </div>
 
