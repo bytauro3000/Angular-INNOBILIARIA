@@ -14,7 +14,7 @@
     </div>
 
     <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-nuevo">
-      + Nuevo Contrato
+      + <span class="btn-text">Nuevo Contrato</span>
     </button>
   </div>
 
@@ -24,55 +24,47 @@
         <tr>
           <th style="width: 50px;">ID</th>
           <th>Nombre(s) del Cliente</th>
-          <th>Documento de Identidad</th>
+          <th>Documento</th>
           <th>Fecha</th>
-          <th>Tipo Contrato</th>
-          <th>Monto Total</th>
+          <th>Tipo</th>
+          <th>Total</th>
           <th>Inicial</th>
           <th>Saldo</th>
-          <th style="width: 80px;">N° Letras</th>
+          <th style="width: 80px;">Letras</th>
           <th style="width: 150px;">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
-          <td class="text-center">{{ contrato.idContrato }}</td>
-          <td>
+          <td data-label="ID" class="text-center">{{ contrato.idContrato }}</td>
+          <td data-label="Cliente">
             <div *ngFor="let cliente of contrato.clientes">
               {{ cliente.nombre }} {{ cliente.apellidos }}
             </div>
           </td>
-          <td class="text-center">
+          <td data-label="DNI" class="text-center">
             <div *ngFor="let cliente of contrato.clientes">
               {{ cliente.numDoc }}
             </div>
           </td>
-          <td class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
-          <td class="text-center">{{ contrato.tipoContrato }}</td>
-          <td class="text-end">{{ contrato.montoTotal | currency: 'USD' }}</td>
-          <td class="text-end">{{ contrato.inicial | currency: 'USD' }}</td>
-          <td class="text-end">{{ contrato.saldo | currency: 'USD' }}</td>
-          <td class="text-center">{{ contrato.cantidadLetras }}</td>
-          <td class="acciones-cell">
+          <td data-label="Fecha" class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+          <td data-label="Tipo" class="text-center">{{ contrato.tipoContrato }}</td>
+          <td data-label="Monto Total" class="text-end fw-bold text-success">{{ contrato.montoTotal | currency: 'USD' }}</td>
+          <td data-label="Inicial" class="text-end">{{ contrato.inicial | currency: 'USD' }}</td>
+          <td data-label="Saldo" class="text-end">{{ contrato.saldo | currency: 'USD' }}</td>
+          <td data-label="N° Letras" class="text-center">{{ contrato.cantidadLetras }}</td>
+          <td data-label="Acciones" class="acciones-cell">
             <div class="acciones-container">
-              <button (click)="imprimirContrato(contrato)" 
-                      class="btn-action btn-print" title="Imprimir Contrato">
+              <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir">
                 <i class="bi bi-printer"></i>
               </button>
-
-              <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
-                      class="btn-action btn-edit" title="Editar">
+              <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]" class="btn-action btn-edit" title="Editar">
                 <i class="bi bi-pencil"></i>
               </button>
-
-              <button (click)="eliminarContrato(contrato.idContrato)" 
-                      class="btn-action btn-delete" title="Eliminar">
+              <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete" title="Eliminar">
                 <i class="bi bi-trash"></i>
               </button>
-
-              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
-                 [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
-                 class="btn-action btn-info" title="Letras">
+              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'" [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-info" title="Letras">
                 <i class="bi bi-file-earmark-plus"></i>
               </a>
             </div>
