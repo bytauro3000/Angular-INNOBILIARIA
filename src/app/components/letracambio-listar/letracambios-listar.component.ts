@@ -88,13 +88,21 @@ export class LetracambioListarComponent implements OnInit {
     });
   }
 
-  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
+  //>>>>>>>>>>>>>>>>>>>>>>>>> INICIO DE IMPRIMIR LETRAS <<<<<<<<<<<<<<<<<<<<<<<//
   imprimirLetras(): void {
     this.cargando = true;
 
     // Obtener el reporte de letras del contrato
     this.letrasService.obtenerReportePorContrato(this.idContrato).subscribe({
       next: (reportes: ReporteLetraCambioDTO[]) => {
+        // >>>>>>> BLOQUE DE CORRECCIÓN: ORDENAMIENTO ASCENDENTE <<<<<<<
+      // Esto ordena las letras comparando la parte numérica de "numeroLetra" (ej. "1/110")
+      reportes.sort((a, b) => {
+        const numA = parseInt(a.numeroLetra.split('/')[0]);
+        const numB = parseInt(b.numeroLetra.split('/')[0]);
+        return numA - numB;
+      });
+      // >>>>>>>>>>>>>>>>>>>>>>>>> FIN BLOQUE <<<<<<<<<<<<<<<<<<<<<<<<<<<
         const doc = new jsPDF({
           orientation: 'landscape', // Orientación horizontal
           unit: 'mm',
