@@ -12,14 +12,14 @@
   }
 }
 
-/* Cabecera de Filtros Responsiva */
+/* Filtros */
 .filtros-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  gap: 10px;
-  flex-wrap: wrap; // 🔹 Permite que bajen en pantallas muy pequeñas
+  gap: 15px;
+  flex-wrap: wrap;
 
   .search-box {
     display: flex;
@@ -29,15 +29,9 @@
     padding: 0 10px;
     background: white;
     width: 300px;
-    max-width: 100%; // 🔹 No se sale de la pantalla
+    max-width: 100%;
 
-    input {
-      border: none;
-      padding: 8px;
-      width: 100%;
-      outline: none;
-      font-size: 0.9rem;
-    }
+    input { border: none; padding: 8px; width: 100%; outline: none; font-size: 0.9rem; }
   }
 
   .btn-nuevo {
@@ -48,35 +42,31 @@
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
-
     &:hover { background-color: #146c43; }
   }
 }
 
-/* 🔹 TABLA RASPONSIVA: Mantiene el diseño original pero añade scroll horizontal */
+/* Tabla Wrapper */
 .tabla-wrapper {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  overflow-x: auto; // 👈 Activa el scroll horizontal en móviles
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .table-custom {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
-  min-width: 900px; // 👈 Asegura que la tabla no se aplaste y active el scroll
 
+  /* --- Estilo Escritorio (Tus colores originales) --- */
   thead th {
-    background-color: #5d6d7e; // 👈 Tu color original restaurado
+    background-color: #5d6d7e; // Gris original
     color: white;
     padding: 12px 10px;
     font-weight: 600;
     text-align: center;
-    border-bottom: 3px solid #2ecc71; // 👈 Tu borde verde original restaurado
+    border-bottom: 3px solid #2ecc71; // Verde original
     white-space: nowrap;
   }
 
@@ -85,45 +75,73 @@
     border-bottom: 1px solid #eee;
     vertical-align: middle;
     color: #333;
-    background-color: white;
+    text-align: center;
   }
 
+  .text-end { text-align: right; }
   tbody tr:hover { background-color: #f9fbfd; }
 
-  .text-center { text-align: center; }
-  .text-end { text-align: right; }
-  .no-data { text-align: center; padding: 2rem; color: #999; }
+  /* --- MODO RASPONSIVO (Efecto Tarjeta) --- */
+  @media screen and (max-width: 992px) {
+    thead { display: none; } /* Ocultar cabecera */
+
+    tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 2px solid #5d6d7e; /* Borde del color de tu cabecera */
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: right !important;
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #5d6d7e;
+        text-align: left;
+        flex: 1;
+      }
+
+      &:first-child {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        border-bottom: 2px solid #2ecc71; /* Línea verde decorativa en la ID */
+      }
+    }
+  }
 }
 
-/* ACCIONES */
-.acciones-cell {
-  width: 150px;
-  
-  .acciones-container {
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    gap: 6px; 
-  }
+/* Acciones */
+.acciones-container {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  @media screen and (max-width: 992px) { justify-content: flex-end; }
+}
 
-  .btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    border: 1px solid;
-    background: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
 
-    &.btn-print { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
-    &.btn-edit { color: #0d6efd; border-color: #0d6efd; &:hover { background: #0d6efd; color: white; } }
-    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
-    &.btn-info { color: #0dcaf0; border-color: #0dcaf0; &:hover { background: #0dcaf0; color: white; } }
-  }
+  &.btn-print { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
+  &.btn-edit { color: #0d6efd; border-color: #0d6efd; &:hover { background: #0d6efd; color: white; } }
+  &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+  &.btn-info { color: #0dcaf0; border-color: #0dcaf0; &:hover { background: #0dcaf0; color: white; } }
 }
 
 /* Paginación */
@@ -133,15 +151,12 @@
   align-items: center;
   margin-top: 1.5rem;
   gap: 1rem;
-
   button {
     padding: 6px 15px;
     border: 1px solid #ddd;
     background: white;
     border-radius: 4px;
     cursor: pointer;
-    &:disabled { color: #ccc; cursor: not-allowed; }
-    &:hover:not(:disabled) { background: #f0f0f0; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
   }
-  .page-info { font-size: 0.9rem; color: #666; }
 }
