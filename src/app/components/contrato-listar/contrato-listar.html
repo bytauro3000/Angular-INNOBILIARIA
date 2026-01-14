@@ -25,7 +25,7 @@
           <th style="width: 50px;">ID</th>
           <th>Nombre(s) del Cliente</th>
           <th>Documento</th>
-          <th>Fecha</th>
+          <th>Lote</th> <th>Fecha</th>
           <th>Tipo</th>
           <th>Total</th>
           <th>Inicial</th>
@@ -45,6 +45,11 @@
           <td data-label="DNI" class="text-center">
             <div *ngFor="let cliente of contrato.clientes">
               {{ cliente.numDoc }}
+            </div>
+          </td>
+          <td data-label="Lote" class="text-center">
+            <div *ngFor="let lote of contrato.lotes">
+              Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
             </div>
           </td>
           <td data-label="Fecha" class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
@@ -71,7 +76,7 @@
           </td>
         </tr>
         <tr *ngIf="paginatedContratos.length === 0">
-          <td colspan="10" class="no-data">No hay contratos para mostrar.</td>
+          <td colspan="11" class="no-data">No hay contratos para mostrar.</td>
         </tr>
       </tbody>
     </table>

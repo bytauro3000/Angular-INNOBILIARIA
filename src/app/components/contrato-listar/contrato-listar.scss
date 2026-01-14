@@ -76,9 +76,14 @@
     vertical-align: middle;
     color: #333;
     text-align: center;
+    line-height: 1.4; // Mejora lectura si hay múltiples lotes o clientes
   }
 
   .text-end { text-align: right; }
+  .text-center { text-align: center; }
+  .fw-bold { font-weight: bold; }
+  .text-success { color: #198754; }
+
   tbody tr:hover { background-color: #f9fbfd; }
 
   /* --- MODO RASPONSIVO (Efecto Tarjeta) --- */
@@ -88,7 +93,7 @@
     tbody tr {
       display: block;
       margin-bottom: 1rem;
-      border: 2px solid #5d6d7e; /* Borde del color de tu cabecera */
+      border: 2px solid #5d6d7e; /* Borde del color de tu cabecera original */
       border-radius: 8px;
       overflow: hidden;
     }
@@ -101,18 +106,26 @@
       padding: 10px 15px;
       border-bottom: 1px solid #eee;
 
+      /* Usa el data-label del HTML para mostrar el nombre de la columna */
       &::before {
         content: attr(data-label);
         font-weight: 700;
         color: #5d6d7e;
         text-align: left;
         flex: 1;
+        margin-right: 10px;
       }
 
+      /* Estilo especial para la primera fila (ID) de la tarjeta */
       &:first-child {
         background-color: #f8f9fa;
         font-weight: bold;
-        border-bottom: 2px solid #2ecc71; /* Línea verde decorativa en la ID */
+        border-bottom: 2px solid #2ecc71; /* Línea verde decorativa */
+      }
+
+      /* Quitar borde al último elemento de la tarjeta */
+      &:last-child {
+        border-bottom: none;
       }
     }
   }
@@ -123,18 +136,22 @@
   display: flex;
   justify-content: center;
   gap: 6px;
-  @media screen and (max-width: 992px) { justify-content: flex-end; }
+  @media screen and (max-width: 992px) { 
+    justify-content: flex-end; 
+    flex: 1;
+  }
 }
 
 .btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
   border-radius: 4px;
   border: 1px solid;
   background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 1rem;
   cursor: pointer;
   transition: 0.2s;
 
@@ -151,12 +168,28 @@
   align-items: center;
   margin-top: 1.5rem;
   gap: 1rem;
+  
   button {
     padding: 6px 15px;
     border: 1px solid #ddd;
     background: white;
     border-radius: 4px;
     cursor: pointer;
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    font-size: 0.9rem;
+    &:disabled { opacity: 0.5; cursor: not-allowed; color: #ccc; }
+    &:hover:not(:disabled) { background: #f8f9fa; border-color: #adb5bd; }
   }
+
+  .page-info {
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+/* Mensaje cuando no hay datos */
+.no-data {
+  text-align: center;
+  padding: 3rem !important;
+  color: #95a5a6;
+  font-style: italic;
 }
