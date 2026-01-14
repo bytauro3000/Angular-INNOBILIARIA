@@ -62,65 +62,32 @@ export class ContratoListarComponent implements OnInit {
     });
   }
 
-  
-imprimirContrato(contrato: ContratoResponseDTO): void {
-  if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
-    this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
-    return;
+  imprimirContrato(contrato: ContratoResponseDTO): void {
+    if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
+      this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
+      return;
+    }
+
+    this.toastr.info('Generando documento...', 'Espere');
+
+    this.contratoService.imprimirContratoPdf(contrato.idContrato).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Contrato_${contrato.idContrato}_${contrato.clientes[0]?.nombre || 'Inmobiliaria'}.pdf`;
+        link.click();
+        
+        window.URL.revokeObjectURL(url);
+        this.toastr.success('Contrato descargado con éxito', 'Éxito');
+      },
+      error: (err: any) => { // 🟢 Corregido: se cambió -> por => y se añadió tipado
+        console.error('Error al descargar el PDF:', err);
+        this.toastr.error('No se pudo obtener el PDF desde el servidor.', 'Error');
+      }
+    });
   }
 
-  this.toastr.info('Generando documento...', 'Espere');
-
-  this.contratoService.imprimirContratoPdf(contrato.idContrato).subscribe({
-    next: (blob: Blob) => {
-      // 1. 🔹 LÓGICA DE NOMBRE DINÁMICO (Se mantiene igual)
-      const listaLotes = contrato.lotes;
-      let nombreBase = '';
-      if (listaLotes.length === 1) {
-        nombreBase = `MZ. ${listaLotes[0].manzana} LT. ${listaLotes[0].numeroLote}`;
-      } else {
-        const todasMismaMz = listaLotes.every(l => l.manzana === listaLotes[0].manzana);
-        if (todasMismaMz) {
-          const lotesTexto = listaLotes.map(l => l.numeroLote).join(' y ');
-          nombreBase = `MZ. ${listaLotes[0].manzana} LT. ${lotesTexto}`;
-        } else {
-          nombreBase = listaLotes.map(l => `MZ. ${l.manzana} LT. ${l.numeroLote}`).join(' y ');
-        }
-      }
-      const tipo = contrato.tipoContrato.charAt(0).toUpperCase() + contrato.tipoContrato.slice(1).toLowerCase();
-      const nombreArchivoFinal = `${nombreBase} - ${tipo}.pdf`;
-
-      // 2. 🔹 SOLUCIÓN PARA MÓVILES
-      // Creamos un objeto URL del Blob
-      const data = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      
-      link.href = data;
-      link.download = nombreArchivoFinal;
-
-      // 🚨 CRUCIAL PARA MÓVILES: 
-      // El link debe estar físicamente en el DOM y ser invisible
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // Ejecutamos el click
-      link.click();
-
-      // 3. 🔹 LIMPIEZA (Con un pequeño retardo para asegurar que el móvil inicie la descarga)
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(data);
-      }, 100);
-
-      this.toastr.success('Contrato generado con éxito', 'Éxito');
-    },
-    error: (err: any) => {
-      console.error('Error al descargar el PDF:', err);
-      // Si sale este error en celular, revisa que el servidor acepte peticiones desde la IP del móvil (CORS)
-      this.toastr.error('No se pudo obtener el PDF del servidor.', 'Error');
-    }
-  });
-}
   filtrarContratos(): void {
     if (!this.terminoBusqueda) {
       this.contratosFiltrados = [...this.contratos];
