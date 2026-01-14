@@ -70,25 +70,29 @@ export class ClientesComponent implements OnInit {
     });
   }
 
-  filtrarClientes(): void {
-    if (!this.terminoBusqueda) {
-      this.clientesFiltrados = [...this.clientes];
-    } else {
-      const terminoMinusculas = this.terminoBusqueda.toLowerCase();
+filtrarClientes(): void {
+  const termino = this.terminoBusqueda.trim();
+  const tipo = this.tipoFiltro; // Este valor viene del [(ngModel)] de tu <select>
 
-      this.clientesFiltrados = this.clientes.filter(cliente => {
-        if (this.tipoFiltro === 'nombres') {
-          const nombreCompleto = `${cliente.nombre} ${cliente.apellidos || ''}`.toLowerCase();
-          return nombreCompleto.includes(terminoMinusculas);
-        } else if (this.tipoFiltro === 'documento') {
-          return cliente.numDoc && cliente.numDoc.toLowerCase().includes(terminoMinusculas);
-        }
-        return false;
-      });
-    }
-    this.currentPage = 1;
-    this.aplicarPaginacion();
+  // Si el buscador está vacío, cargamos la lista completa original
+  if (!termino) {
+    this.cargarClientes();
+    return;
   }
+
+  // Llamada al servicio con el término y el tipo de filtro (nombres o documento)
+  this.clienteService.buscarClientesPorFiltro(termino, tipo).subscribe({
+    next: (data) => {
+      this.clientesFiltrados = data;
+      this.currentPage = 1; // Reiniciamos a la primera página tras la búsqueda
+      this.aplicarPaginacion();
+    },
+    error: (error) => {
+      console.error('Error al filtrar clientes desde el servidor:', error);
+      this.toastr.error('No se pudo realizar la búsqueda.', 'Error');
+    }
+  });
+}
 
   aplicarPaginacion(): void {
     this.totalPages = Math.ceil(this.clientesFiltrados.length / this.pageSize);

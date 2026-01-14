@@ -27,9 +27,14 @@ export class ClienteService {
     return this.http.get<Cliente>(`${this.apiUrl}/buscar/numDoc/${numDoc}`);
   }
 
-  // Nuevo método para buscar clientes por filtro combinado (apellidos + nombres)
-  buscarClientesPorFiltro(filtro: string): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/filtro/${filtro}`);
+  buscarClientesPorFiltro(termino: string, tipo: string): Observable<Cliente[]> {
+    // Usamos HttpParams para enviar los parámetros de forma limpia en la URL
+    return this.http.get<Cliente[]>(`${this.apiUrl}/buscar/filtro`, {
+      params: {
+        termino: termino,
+        tipo: tipo
+      }
+    });
   }
 
   // 🔹 Agregar nuevo cliente
@@ -40,7 +45,7 @@ export class ClienteService {
         if (error.error instanceof ErrorEvent) {
           errorMessage = `Error: ${error.error.message}`;
         } else {
-          errorMessage = error.error; 
+          errorMessage = error.error;
         }
         console.error(errorMessage);
         return throwError(() => new Error(errorMessage));

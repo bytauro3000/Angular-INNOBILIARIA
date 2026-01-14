@@ -252,20 +252,47 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   toggleClientes() {
-    this.mostrarClientes = !this.mostrarClientes;
-    if (this.mostrarClientes && this.filtroCliente.trim() === '') {
-      this.clientesFiltrados = this.clientes.filter(c => !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente));
-    } else {
-      this.filtrarClientes();
-    }
+  this.mostrarClientes = !this.mostrarClientes;
+
+  // Si se abre el selector y no hay nada escrito, cargamos la lista general
+  if (this.mostrarClientes && this.filtroCliente.trim() === '') {
+    this.clienteService.listarClientes().subscribe({
+      next: (data) => {
+        // Mostramos todos los clientes excepto los que ya están seleccionados
+        this.clientesFiltrados = data.filter(c => 
+          !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente)
+        );
+      },
+      error: (err) => console.error('Error al cargar lista inicial:', err)
+    });
+  }
+}
+  filtrarClientes() {
+  const filtro = this.filtroCliente.trim();
+  
+  if (filtro.length < 2) {
+    this.clientesFiltrados = [];
+    return;
   }
 
-  filtrarClientes() {
-    const filtro = this.filtroCliente.toLowerCase().trim();
-    let disponibles = this.clientes.filter(c => !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente));
-    this.clientesFiltrados = filtro === '' ? disponibles : disponibles.filter(c => `${c.nombre} ${c.apellidos}`.toLowerCase().includes(filtro) || (c.numDoc && c.numDoc.includes(filtro)));
-    this.mostrarClientes = true;
-  }
+  // Detectar automáticamente si es búsqueda por Documento (si es número) o Nombres
+  const esNumero = /^\d+$/.test(filtro);
+  const tipoBusqueda = esNumero ? 'documento' : 'nombres';
+
+  // Llamamos al servicio del backend que configuramos previamente
+  this.clienteService.buscarClientesPorFiltro(filtro, tipoBusqueda).subscribe({
+    next: (data) => {
+      // Excluimos a los clientes que YA están seleccionados en la lista de abajo
+      this.clientesFiltrados = data.filter(c => 
+        !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente)
+      );
+      this.mostrarClientes = true;
+    },
+    error: (err) => {
+      console.error('Error en búsqueda de clientes:', err);
+    }
+  });
+}
 
   seleccionarCliente(cliente: Cliente) {
     if (!this.clientesSeleccionados.some(c => c.idCliente === cliente.idCliente)) {
