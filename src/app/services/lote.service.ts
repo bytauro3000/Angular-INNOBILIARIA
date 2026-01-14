@@ -63,6 +63,21 @@ return this.http.post<Lote>(`${this.apiUrl}/${id}`,lote);
 eliminarLote(id : number): Observable<void>{
 return this.http.delete<void>(`${this.apiUrl}/${id}`);
 }
-  
 
+// 🔹 NUEVO: Obtener todos los lotes de un programa (entidad completa para gestión)
+obtenerLotesPorProgramaGestion(idPrograma: number): Observable<LoteResumen[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/gestion/programa/${idPrograma}`).pipe(
+    map((lotes) =>
+      lotes.map((lote) => ({
+        idLote: lote.idLote,
+        manzana: lote.manzana,
+        numeroLote: lote.numeroLote,
+        area: lote.area,
+        precioM2: lote.precioM2,
+        estado: lote.estado as EstadoLote,
+        programaNombre: lote.programa?.nombrePrograma ?? 'Sin programa'
+      }))
+    )
+  );
+}
 }

@@ -1,7 +1,17 @@
 <div class="lotes-container">
   <h2>Gestión de Lotes</h2>
 
-  <div class="acciones-header">
+  <div class="filtros-header">
+    <div class="selector-programa">
+  <label for="progSelect">Filtrar por Programa:</label>
+  <select id="progSelect" class="form-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
+    <option [value]="null" disabled>-- Seleccione un programa --</option>
+    <option *ngFor="let prog of programas" [value]="prog.idPrograma">
+      {{ prog.nombrePrograma }}
+    </option>
+  </select>
+</div>
+
     <button (click)="abrirCrearLote()" class="btn btn-success btn-agregar">
       <i class="bi bi-plus-lg"></i> <span>Crear Lote</span>
     </button>
@@ -54,21 +64,18 @@
       </tbody>
     </table>
     <div *ngIf="paginatedLotes.length === 0" class="no-results">
-      No se encontraron lotes registrados.
+      {{ idProgramaSeleccionado ? 'No hay lotes en este programa.' : 'Seleccione un programa para ver los lotes.' }}
     </div>
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
     <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
-
     <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" [class.active]="currentPage === page"
       class="btn pagina-numero-btn">
       {{ page }}
     </button>
-
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-      class="btn btn-outline-secondary">Siguiente</button>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
   </div>
 
-  <app-lotes-insertar-editar #loteModal (loteGuardado)="cargarLotes()"></app-lotes-insertar-editar>
+  <app-lotes-insertar-editar #loteModal (loteGuardado)="onProgramaChange()"></app-lotes-insertar-editar>
 </div>
