@@ -63,30 +63,50 @@ export class ContratoListarComponent implements OnInit {
   }
 
   imprimirContrato(contrato: ContratoResponseDTO): void {
-    if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
-      this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
-      return;
-    }
-
-    this.toastr.info('Generando documento...', 'Espere');
-
-    this.contratoService.imprimirContratoPdf(contrato.idContrato).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Contrato_${contrato.idContrato}_${contrato.clientes[0]?.nombre || 'Inmobiliaria'}.pdf`;
-        link.click();
-        
-        window.URL.revokeObjectURL(url);
-        this.toastr.success('Contrato descargado con éxito', 'Éxito');
-      },
-      error: (err: any) => { // 🟢 Corregido: se cambió -> por => y se añadió tipado
-        console.error('Error al descargar el PDF:', err);
-        this.toastr.error('No se pudo obtener el PDF desde el servidor.', 'Error');
-      }
-    });
+  if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
+    this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
+    return;
   }
+
+  this.toastr.info('Generando documento...', 'Espere');
+
+  this.contratoService.imprimirContratoPdf(contrato.idContrato).subscribe({
+    next: (blob: Blob) => {
+      // --- INICIO CAMBIO DE NOMBRE ---
+      const listaLotes = contrato.lotes;
+      let nombreBase = '';
+
+      if (listaLotes.length === 1) {
+        nombreBase = `MZ. ${listaLotes[0].manzana} LT. ${listaLotes[0].numeroLote}`;
+      } else {
+        const todasMismaMz = listaLotes.every(l => l.manzana === listaLotes[0].manzana);
+        if (todasMismaMz) {
+          const lotesTexto = listaLotes.map(l => l.numeroLote).join(' y ');
+          nombreBase = `MZ. ${listaLotes[0].manzana} LT. ${lotesTexto}`;
+        } else {
+          nombreBase = listaLotes.map(l => `MZ. ${l.manzana} LT. ${l.numeroLote}`).join(' y ');
+        }
+      }
+
+      const tipo = contrato.tipoContrato.charAt(0).toUpperCase() + contrato.tipoContrato.slice(1).toLowerCase();
+      const nombreArchivoFinal = `${nombreBase} - ${tipo}.pdf`;
+      // --- FIN CAMBIO DE NOMBRE ---
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = nombreArchivoFinal; // 🔹 Nombre cambiado aquí
+      link.click();
+      
+      window.URL.revokeObjectURL(url);
+      this.toastr.success('Contrato descargado con éxito', 'Éxito');
+    },
+    error: (err: any) => {
+      console.error('Error al descargar el PDF:', err);
+      this.toastr.error('No se pudo obtener el PDF desde el servidor.', 'Error');
+    }
+  });
+}
 
   filtrarContratos(): void {
     if (!this.terminoBusqueda) {
