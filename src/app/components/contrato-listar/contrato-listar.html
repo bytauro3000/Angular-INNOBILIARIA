@@ -38,20 +38,28 @@
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
           <td data-label="ID" class="text-center">{{ contrato.idContrato }}</td>
           <td data-label="Cliente">
-            <div *ngFor="let cliente of contrato.clientes">
-              {{ cliente.nombre }} {{ cliente.apellidos }}
-            </div>
-          </td>
-          <td data-label="DNI" class="text-center">
-            <div *ngFor="let cliente of contrato.clientes">
-              {{ cliente.numDoc }}
-            </div>
-          </td>
-          <td data-label="Lote" class="text-center">
-            <div *ngFor="let lote of contrato.lotes">
-              Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
-            </div>
-          </td>
+  <div class="multi-item-container">
+    <div *ngFor="let cliente of contrato.clientes">
+      {{ cliente.nombre }} {{ cliente.apellidos }}
+    </div>
+  </div>
+</td>
+
+<td data-label="DNI" class="text-center">
+  <div class="multi-item-container">
+    <div *ngFor="let cliente of contrato.clientes">
+      {{ cliente.numDoc }}
+    </div>
+  </div>
+</td>
+
+<td data-label="Lote" class="text-center">
+  <div class="multi-item-container">
+    <div *ngFor="let lote of contrato.lotes">
+      Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
+    </div>
+  </div>
+</td>
           <td data-label="Fecha" class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
           <td data-label="Tipo" class="text-center">{{ contrato.tipoContrato }}</td>
           <td data-label="Total" class="text-end fw-bold">{{ contrato.montoTotal | currency: 'USD' }}</td>
