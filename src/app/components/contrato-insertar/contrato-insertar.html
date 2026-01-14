@@ -33,7 +33,6 @@
               <input type="text" id="vendedorBusqueda" placeholder="Buscar por nombre, apellido o DNI"
                 class="custom-select-input" [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()"
                 [ngModelOptions]="{standalone: true}" autocomplete="off" />
-              <span class="arrow">&#9662;</span>
               <ul class="custom-select-list" *ngIf="mostrarVendedores">
                 <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
                   {{ v.nombre }} {{ v.apellidos }} (DNI: {{ v.dni }})
@@ -41,7 +40,7 @@
                 <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">No se encontraron vendedores</li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini" (click)="abrirModalVendedor()">
+            <button type="button" class="btn-add-mini" (click)="abrirModalVendedor()">
               <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
@@ -54,7 +53,6 @@
               <input type="text" id="programaBusqueda" placeholder="Buscar programa..." class="custom-select-input"
                 [(ngModel)]="filtroPrograma" (input)="filtrarProgramas()" [ngModelOptions]="{standalone: true}"
                 autocomplete="off" />
-              <span class="arrow">&#9662;</span>
               <ul class="custom-select-list" *ngIf="mostrarProgramas">
                 <li *ngFor="let prog of programasFiltrados" (click)="seleccionarPrograma(prog)">
                   {{ prog.nombrePrograma }}
@@ -62,7 +60,7 @@
                 <li *ngIf="programasFiltrados.length === 0" class="no-data">No se encontraron programas</li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini" (click)="abrirModalPrograma()">
+            <button type="button" class="btn-add-mini" (click)="abrirModalPrograma()">
               <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
@@ -76,18 +74,10 @@
             <input type="text" class="custom-select-input" (input)="buscarSeparaciones($event)"
               placeholder="Buscar por ID, Cliente o Lote..." [(ngModel)]="terminoBusquedaSeparacion"
               [ngModelOptions]="{standalone: true}" autocomplete="off" />
-
-            <span class="arrow">&#9662;</span>
-
             <ul class="custom-select-list" *ngIf="showSeparacionList && separaciones.length > 0">
               <li *ngFor="let sep of separaciones" (click)="seleccionarSeparacion(sep)">
                 <strong>ID: {{ sep.id }}</strong> - {{ sep.text }}
               </li>
-            </ul>
-
-            <ul class="custom-select-list"
-              *ngIf="showSeparacionList && terminoBusquedaSeparacion && separaciones.length === 0">
-              <li class="no-data">No se encontraron registros únicos</li>
             </ul>
           </div>
         </div>
@@ -121,23 +111,21 @@
         </div>
       </div>
 
-      <div class="form-row form-2-col last-form-row" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
+      <div class="form-row form-2-col" *ngIf="contratoForm.get('modalidadContrato')?.value === 'DIRECTO'">
         <div class="form-group">
           <label>Agregar Cliente</label>
           <div class="input-with-button">
             <div class="custom-select-container" #clienteBusquedaContainer (click)="toggleClientes()">
-              <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
+              <input type="text" placeholder="Buscar por nombre o DNI" class="custom-select-input"
                 [(ngModel)]="filtroCliente" (input)="filtrarClientes()" [ngModelOptions]="{standalone: true}"
                 autocomplete="off" />
-              <span class="arrow">&#9662;</span>
               <ul class="custom-select-list" *ngIf="mostrarClientes">
                 <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">
-                  {{ c.nombre }} {{ c.apellidos }} (DNI: {{ c.numDoc }})
+                  {{ c.nombre }} {{ c.apellidos }}
                 </li>
-                <li *ngIf="clientesFiltrados.length === 0" class="no-data">No se encontraron clientes</li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini" (click)="abrirModalCliente()">
+            <button type="button" class="btn-add-mini" (click)="abrirModalCliente()">
               <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
@@ -156,24 +144,19 @@
               <input type="text" placeholder="Buscar Manzana o Lote..." class="custom-select-input"
                 [(ngModel)]="filtroLote" (input)="filtrarLotes()" [ngModelOptions]="{standalone: true}"
                 autocomplete="off" />
-              <span class="arrow">&#9662;</span>
               <ul class="custom-select-list" *ngIf="mostrarLotes">
                 <li *ngFor="let l of lotesFiltrados" (click)="seleccionarLote(l)">
-                  Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }} 
-                  <span class="text-muted small">({{ getAbreviatura(l) }})</span>
+                  Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}
                 </li>
               </ul>
             </div>
-            <button type="button" class="btn btn-add-mini" (click)="abrirModalLote()">
+            <button type="button" class="btn-add-mini" (click)="abrirModalLote()">
               <fa-icon [icon]="faPlus"></fa-icon>
             </button>
           </div>
           <ul class="selected-items-list">
             <li *ngFor="let lote of lotesSeleccionados" class="item-pequeno">
-              <div class="info-texto">
-                Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }} 
-                <span class="abreviatura">({{ getAbreviatura(lote) }})</span>
-              </div>
+              Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
               <button type="button" (click)="eliminarLote(lote.idLote)">❌</button>
             </li>
           </ul>
