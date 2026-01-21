@@ -61,7 +61,6 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
 
   private inicializarFormulario(): void {
     this.loteForm = this.fb.group({
-      // 🟢 Manzana ahora permite letras y números
       manzana: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s-]+$/)]],
       numeroLote: ['', [Validators.required]],
       area: ['', [Validators.required]],
@@ -79,25 +78,19 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
     });
   }
 
-  // 🟢 Función para restringir a solo números y decimales
   validarSoloNumeros(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;
-    // Solo permite números y un punto decimal
     let valor = input.value.replace(/[^0-9.]/g, '');
-    
-    // Evita más de un punto decimal
     const puntos = valor.split('.').length - 1;
     if (puntos > 1) {
       valor = valor.substring(0, valor.lastIndexOf('.'));
     }
-
     this.loteForm.get(controlName)?.setValue(valor, { emitEvent: false });
   }
 
   abrirModal(lote?: Lote): void {
     this.RecargarProgramas(); 
     this.loteForm.reset({ estado: EstadoLote.Disponible, area: '', precioM2: '' });
-    
     if (lote && lote.idLote) {
       this.isEditMode = true;
       this.idLoteEditar = lote.idLote;
@@ -114,9 +107,27 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
   formatearTexto(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;
     let valor = input.value;
+
     if (valor) {
+      // Capitalización original
       valor = valor.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
       this.loteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+
+      // Lógica para mantener teclado abierto en móviles
+      const opcionesAutocompletado = [
+        "Con El Lote N° ",
+        "Con La Calle N° ",
+        "Con La Calle ",
+        "Con La Avenida "
+      ];
+
+      if (opcionesAutocompletado.includes(valor)) {
+        setTimeout(() => {
+          input.focus();
+          // Coloca el cursor al final para seguir escribiendo el dato variable
+          input.setSelectionRange(valor.length, valor.length);
+        }, 0);
+      }
     }
   }
 
@@ -131,11 +142,9 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
     }
     const data = this.loteForm.value;
     Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
-
     const request = this.isEditMode 
       ? this.loteService.actualizarLote(this.idLoteEditar!, data)
       : this.loteService.crearLote(data);
-
     request.subscribe({
       next: () => {
         Swal.close();
