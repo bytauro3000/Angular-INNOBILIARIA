@@ -78,24 +78,31 @@
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label>Colindante Norte (Frente)</label>
-                <input type="text" formControlName="colindanteNorte" (input)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
+                <input type="text" formControlName="colindanteNorte" list="opcionesColindantes" (input)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
               </div>
               <div class="form-group">
                 <label>Colindante Sur (Fondo)</label>
-                <input type="text" formControlName="colindanteSur" (input)="formatearTexto($event, 'colindanteSur')" placeholder="Límite Sur" />
+                <input type="text" formControlName="colindanteSur" list="opcionesColindantes" (input)="formatearTexto($event, 'colindanteSur')" placeholder="Límite Sur" />
               </div>
             </div>
 
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label>Colindante Este (Derecha)</label>
-                <input type="text" formControlName="colindanteEste" (input)="formatearTexto($event, 'colindanteEste')" placeholder="Límite Este" />
+                <input type="text" formControlName="colindanteEste" list="opcionesColindantes" (input)="formatearTexto($event, 'colindanteEste')" placeholder="Límite Este" />
               </div>
               <div class="form-group">
                 <label>Colindante Oeste (Izquierda)</label>
-                <input type="text" formControlName="colindanteOeste" (input)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
+                <input type="text" formControlName="colindanteOeste" list="opcionesColindantes" (input)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
               </div>
             </div>
+
+            <datalist id="opcionesColindantes">
+              <option value="Con el lote N° ">
+              <option value="Con la calle N° ">
+              <option value="Con la calle ">
+              <option value="Con La Avenida ">
+            </datalist>
 
           </div>
         </div>
@@ -111,4 +118,4 @@
       </form>
     </div>
   </div>
-</div> 
+</div>

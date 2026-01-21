@@ -86,7 +86,6 @@ input, select {
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-/* 🟢 Efecto verde al deslizar el mouse igual que en Contratos */
 ::ng-deep .ng-option.ng-option-marked {
     background-color: #2ecc71 !important;
     color: white !important;
@@ -108,4 +107,11 @@ input, select {
   gap: 12px;
   .btn-save { background-color: #2ecc71 !important; border: none !important; color: white; }
   .btn-cancel { background-color: rgba(255, 255, 255, 0.1) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: white; }
+}
+
+/* --- AJUSTE ICONO AUTOCOMPLETADO --- */
+input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
 }
