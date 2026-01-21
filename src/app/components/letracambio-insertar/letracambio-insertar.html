@@ -4,7 +4,6 @@
   <div class="form-wrapper">
     <form (ngSubmit)="onGenerarLetras()">
 
-      <!-- Primera fila: Distrito y Fecha Giro -->
       <div class="form-row form-2-col">
         <div class="form-group">
           <label for="idDistrito">Distrito de Giro</label>
@@ -28,7 +27,6 @@
         </div>
       </div>
 
-      <!-- Segunda fila: Fecha Vencimiento Inicial y Monto -->
       <div class="form-row form-2-col">
         <div class="form-group">
           <label for="fechaVencimientoInicial">Fecha Vencimiento Inicial</label>
@@ -58,9 +56,8 @@
         </div>
       </div>
 
-      <!-- Tercera fila: Checkbox alineado -->
       <div class="form-row form-2-col">
-        <div></div>
+        <div class="empty-spacer"></div>
         <div class="form-group checkbox-group">
           <label>
             <input
@@ -73,7 +70,6 @@
         </div>
       </div>
 
-      <!-- Importe Letras (read-only) -->
       <div class="form-row">
         <div class="form-group full-width">
           <label for="importeLetras">Importe en texto</label>
@@ -89,33 +85,30 @@
         </div>
       </div>
 
-      <!-- Botones -->
       <div class="form-actions">
         <button
           type="submit"
           class="btn btn-primary"
           [disabled]="cargando || tieneLetras"
         >
-          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
           Generar Letras
         </button>
-
-        <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-secondary">
-          Cancelar
-        </a>
 
         <a
           [routerLink]="['/secretaria-menu/letras/listar', idContrato]"
           class="btn btn-info"
           [class.disabled]="!tieneLetras"
           [attr.aria-disabled]="!tieneLetras"
-          tabindex="{{ !tieneLetras ? -1 : 0 }}"
         >
           Ver Letras
         </a>
+
+        <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-secondary">
+          Cancelar
+        </a>
       </div>
 
-      <!-- Mensaje de éxito -->
       <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
     </form>
   </div>

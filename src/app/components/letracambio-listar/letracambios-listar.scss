@@ -16,7 +16,7 @@
     margin-bottom: 1.5rem;
     display: flex; 
     align-items: center;
-    gap: 0.75rem; /* Espaciado uniforme horizontal */
+    gap: 0.75rem;
 
     .label-buscar {
       font-weight: 600;
@@ -32,7 +32,6 @@
       background-color: white;
       font-size: 1rem;
       transition: all 0.3s ease;
-      
       flex-grow: 1; 
       min-width: 200px; 
 
@@ -43,25 +42,16 @@
       }
     }
 
-    /* NUEVO CONTENEDOR DE BOTONES (Contiene los 3 botones) */
     .acciones-botones {
       display: flex;
       align-items: center;
-      gap: 0.75rem; /* Este GAP controla el espaciado uniforme entre los 3 botones */
+      gap: 0.75rem;
       flex-shrink: 0;
     }
 
-
-    /* ESTILOS GENERALES PARA BOTONES DE ACCIÓN */
-    .btn-eliminar,
-    .btn-imprimirletra,
-    .btn-imprimircronograma {
-      /* Estilos comunes */
+    .btn-eliminar, .btn-imprimirletra, .btn-imprimircronograma {
       justify-content: center;
-      white-space: nowrap; /* Evita que el texto se envuelva */
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-
+      white-space: nowrap;
       color: white;
       border: none;
       padding: 0.5rem 1.2rem;
@@ -72,74 +62,17 @@
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
       display: flex;
       align-items: center;
-      flex-shrink: 0; 
     }
 
-    /* Reglas específicas para el tamaño */
-    .btn-eliminar,
-    .btn-imprimirletra {
-      width: 180px; /* Aplicamos el ancho fijo SOLO a los botones cortos */
-    }
+    .btn-eliminar, .btn-imprimirletra { width: 180px; }
+    .icono-btn { margin-right: 0.5rem; }
 
-    /* ¡El botón de Cronograma NO tiene ancho fijo, crecerá con su texto! */
-    .btn-imprimircronograma {
-      /* Le quitamos el width: 180px del estilo general. Ahora solo aplica el padding. */
-    }
-    
-    .icono-btn {
-      margin-right: 0.5rem;
-    }
-
-    /* ESTILOS ESPECÍFICOS PARA ELIMINAR (Rojo) */
-    .btn-eliminar {
-      background-color: #e74c3c;
-
-      &:hover:not(:disabled) {
-        background-color: #c0392b;
-        box-shadow: 0 2px 5px rgba(192, 57, 43, 0.3);
-      }
-
-      &:disabled {
-        background-color: #f1948a;
-        cursor: not-allowed;
-      }
-    }
-
-    /* ESTILOS ESPECÍFICOS PARA IMPRIMIR LETRAS (Verde) */
-    .btn-imprimirletra {
-      background-color: #2ecc71; /* Verde Esmeralda */
-
-      &:hover:not(:disabled) {
-        background-color: #27ae60;
-        box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
-      }
-
-      &:disabled {
-        background-color: #a9dfbf;
-        cursor: not-allowed;
-      }
-    }
-
-    /* ESTILOS ESPECÍFICOS PARA CRONOGRAMA DE PAGOS (Azul Cielo) */
-    .btn-imprimircronograma {
-      background-color: #3498db; /* Azul Cielo/Brillante */
-
-      &:hover:not(:disabled) {
-        background-color: #2980b9;
-        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-      }
-
-      &:disabled {
-        background-color: #a9cce3;
-        cursor: not-allowed;
-      }
-    }
+    .btn-eliminar { background-color: #e74c3c; &:hover:not(:disabled) { background-color: #c0392b; } &:disabled { background-color: #f1948a; } }
+    .btn-imprimirletra { background-color: #2ecc71; &:hover:not(:disabled) { background-color: #27ae60; } &:disabled { background-color: #a9dfbf; } }
+    .btn-imprimircronograma { background-color: #3498db; &:hover:not(:disabled) { background-color: #2980b9; } &:disabled { background-color: #a9cce3; } }
   } 
 
-  /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ESTILOS DEL LISTADO (SIN CAMBIOS) <<<<<<<<<<<<<<<<<<<<<<<<<<< */
-
   .tabla-letras {
-    overflow-x: auto;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -148,16 +81,13 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 800px;
       font-size: 0.9rem;
 
-      th,
-      td {
-        padding: 0.4rem 0.75rem;
+      th, td {
+        padding: 0.75rem;
         text-align: left;
         border-bottom: 1px solid #ecf0f1;
         color: #333;
-        transition: background-color 0.2s ease;
       }
 
       th {
@@ -165,171 +95,102 @@
         color: #fff;
         border-bottom: 2px solid #3498db;
         font-weight: 600;
-        position: sticky;
-        top: 0;
-        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
       }
 
-      tr:hover {
-        background-color: #f2f6fb;
+      tr:hover { background-color: #f2f6fb; }
+    }
+  }
+
+  /* --- RESPONSIVIDAD ESTILO TARJETAS (IGUAL QUE CLIENTES) --- */
+  @media (max-width: 992px) {
+    padding: 1rem;
+
+    .filtros {
+      flex-direction: column;
+      align-items: stretch;
+
+      .acciones-botones {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        
+        button { width: 100% !important; }
+      }
+    }
+
+    .tabla-letras {
+      background: transparent;
+      box-shadow: none;
+
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+
+      tr {
+        background: white;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 10px;
+        border: 1px solid #eee;
       }
 
-      /* Cursor pointer en celdas editables */
       td {
-        &.editable {
-          cursor: pointer;
+        border: none;
+        position: relative;
+        padding-left: 50% !important;
+        text-align: right;
+        border-bottom: 1px solid #f9f9f9;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        &:last-child { border-bottom: none; }
+
+        &::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 10px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+          color: #5d6d7e;
         }
       }
-
-      /* Celda en edición con fondo claro y borde */
-      td.editing {
-        background-color: #f0f8ff;
-        border: 1px solid #3498db;
-        padding: 0.3rem 0.5rem;
-      }
-
-      .input-edicion {
-        width: 100%;
-        padding: 0.3rem 0.5rem;
-        font-size: 0.9rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-        &:focus {
-          border-color: #3498db;
-          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-      }
-
-      /* Input solo lectura para importeLetras (deshabilitado) */
-      .input-lectura {
-        width: 100%;
-        padding: 0.3rem 0.5rem;
-        font-size: 0.9rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        color: #555;
-        cursor: default;
-      }
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 1rem;
-      color: #6c757d;
-      font-style: italic;
     }
   }
 
-  .mensaje-cargando,
-  .alerta-error {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  .mensaje-cargando {
-    color: #6c757d;
-    font-style: italic;
-  }
-
-  .alerta-error {
-    background-color: #f8d7da;
-    color: #842029;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-  }
-
+  /* PAGINACIÓN */
   .paginacion-controles {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
 
-    .pagina-btn,
-    .pagina-numero-btn {
+    .pagina-btn, .pagina-numero-btn {
       background-color: #3498db;
       color: white;
       border: none;
       padding: 0.6rem 1rem;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-
-      &:hover:not(:disabled) {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-      }
-
-      &:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
-      }
+      &:disabled { background-color: #cccccc; }
     }
 
     .pagina-numero-btn {
       background-color: #f0f0f0;
       color: #333;
       border: 1px solid #ddd;
-
-      &.active {
-        background-color: #3498db;
-        color: white;
-        border-color: #3498db;
-        font-weight: bold;
-      }
-
-      &:hover:not(.active):not(:disabled) {
-        background-color: #e2e6ea;
-        transform: translateY(-2px);
-      }
+      &.active { background-color: #3498db; color: white; border-color: #3498db; font-weight: bold; }
     }
   }
 
-  @media (max-width: 768px) {
-    padding: 1rem;
-
-    .titulo {
-      font-size: 1.5rem;
-    }
-
-    .filtros {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.5rem;
-
-      .label-buscar {
-        white-space: normal;
-        margin-bottom: 0.2rem;
-      }
-
-      .filtro-input {
-        width: 100%;
-      }
-
-      /* Asegurar que todos los botones ocupen el ancho completo en móvil */
-      .acciones-botones {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
-      }
-      .btn-eliminar,
-      .btn-imprimirletra,
-      .btn-imprimircronograma {
-        width: 100%;
-        justify-content: center; /* Centrar contenido (icono y texto) */
-      }
-    }
-
-    .tabla-letras {
-      table {
-        min-width: 100%;
-      }
-    }
+  .input-edicion {
+    width: 100%;
+    padding: 0.3rem;
+    border: 1px solid #3498db;
+    border-radius: 4px;
   }
 }

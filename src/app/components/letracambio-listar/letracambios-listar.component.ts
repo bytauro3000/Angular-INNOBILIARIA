@@ -96,13 +96,13 @@ export class LetracambioListarComponent implements OnInit {
     this.letrasService.obtenerReportePorContrato(this.idContrato).subscribe({
       next: (reportes: ReporteLetraCambioDTO[]) => {
         // >>>>>>> BLOQUE DE CORRECCIÓN: ORDENAMIENTO ASCENDENTE <<<<<<<
-      // Esto ordena las letras comparando la parte numérica de "numeroLetra" (ej. "1/110")
-      reportes.sort((a, b) => {
-        const numA = parseInt(a.numeroLetra.split('/')[0]);
-        const numB = parseInt(b.numeroLetra.split('/')[0]);
-        return numA - numB;
-      });
-      // >>>>>>>>>>>>>>>>>>>>>>>>> FIN BLOQUE <<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // Esto ordena las letras comparando la parte numérica de "numeroLetra" (ej. "1/110")
+        reportes.sort((a, b) => {
+          const numA = parseInt(a.numeroLetra.split('/')[0]);
+          const numB = parseInt(b.numeroLetra.split('/')[0]);
+          return numA - numB;
+        });
+        // >>>>>>>>>>>>>>>>>>>>>>>>> FIN BLOQUE <<<<<<<<<<<<<<<<<<<<<<<<<<<
         const doc = new jsPDF({
           orientation: 'landscape', // Orientación horizontal
           unit: 'mm',
@@ -241,7 +241,9 @@ export class LetracambioListarComponent implements OnInit {
 
         // ENCABEZADO INICIAL (Página 1)
         this.addHeader(doc, reporte[0], currentPage, margin);
-        y = 70; // Posición fija después del header de la primera página
+
+        // --- AJUSTE 1: Espacio reducido (de 70 a 60) ---
+        y = 65;
 
         this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
         y += rowHeight;
@@ -250,14 +252,11 @@ export class LetracambioListarComponent implements OnInit {
 
         reporte.forEach((letra, index) => {
           // CONTROL DE SALTO DE PÁGINA
-          if (y + rowHeight > pageHeight - 20) { // 20mm de margen inferior
+          if (y + rowHeight > pageHeight - 20) {
             doc.addPage();
             currentPage++;
-            y = margin; // Iniciar en el margen superior en páginas nuevas
-
-            // En páginas nuevas (2, 3...), solo dibujamos la cabecera de la tabla
-            this.drawTableHeader(doc, y, margin, colWidths, colStarts, tableWidth);
-            y += rowHeight;
+            // --- AJUSTE 2: Margen superior en paginas nuevas y NO dibujar cabecera ---
+            y = margin;
             doc.setFont('times', 'normal');
           }
 
@@ -270,7 +269,6 @@ export class LetracambioListarComponent implements OnInit {
           doc.text(this.formatearFechaVista(letra.fechaVencimiento), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
           doc.text(`$ ${letra.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
-          // Líneas verticales
           doc.line(colStarts['Vencimiento'], y, colStarts['Vencimiento'], y + rowHeight);
           doc.line(colStarts['Importe'], y, colStarts['Importe'], y + rowHeight);
 
@@ -289,43 +287,70 @@ export class LetracambioListarComponent implements OnInit {
         doc.text(`$ ${totalImporte.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
         // 2. LÓGICA DE FIRMAS
-        y += 35; // Espacio para que el cliente firme arriba de la línea
+        y += 28; // Espacio mínimo después de la tabla (reducido de 15 a 5)
 
-        // Verificar si hay espacio para las firmas (necesitamos unos 30mm)
-        if (y + 30 > pageHeight - margin) {
+        // Reducimos el bloque de seguridad de 20 a 12mm
+        // Esto permite que la firma se dibuje más cerca del final
+        if (y + 12 > pageHeight - 10) {
           doc.addPage();
-          y = margin + 25; // Si salta de página, dar espacio inicial
+          y = margin + 20;
         }
 
-        const lineWidth = 60; // Largo de la línea de firma
+        const lineWidth = 60;
         doc.setFontSize(9);
         doc.setFont('times', 'normal');
 
+        const maxWidth = 55;      // Ancho máximo del texto antes de saltar de línea
+        const lineHeight = 4.5;   // Espaciado entre líneas de texto
+        const anchoLinea = 65;    // Ancho fijo de la línea (Estilo iText - aprox 200pt)
+
         if (reporte[0].cliente2Nombre) {
           // --- DISEÑO PARA 2 CLIENTES ---
-          const posX1 = margin + 10;
-          const posX2 = pageWidth - margin - lineWidth - 10;
+          const centerX1 = margin + 40;            // Centro del bloque izquierdo
+          const centerX2 = pageWidth - margin - 40; // Centro del bloque derecho
 
-          // Firma Cliente 1 (Izquierda)
-          doc.text('__________________________', posX1 + lineWidth / 2, y, { align: 'center' });
-          doc.text(`${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`, posX1 + lineWidth / 2, y + 5, { align: 'center' });
-          doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, posX1 + lineWidth / 2, y + 9, { align: 'center' });
+          // --- CLIENTE 1 ---
+          const nombre1 = `${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`.toUpperCase();
+          const nombreLines1 = doc.splitTextToSize(nombre1, maxWidth); // Envolver texto
 
-          // Firma Cliente 2 (Derecha)
-          doc.text('__________________________', posX2 + lineWidth / 2, y, { align: 'center' });
-          doc.text(`${reporte[0].cliente2Nombre} ${reporte[0].cliente2Apellidos ?? ''}`, posX2 + lineWidth / 2, y + 5, { align: 'center' });
-          doc.text(`DNI: ${reporte[0].cliente2NumDocumento}`, posX2 + lineWidth / 2, y + 9, { align: 'center' });
+          doc.line(centerX1 - (anchoLinea / 2), y, centerX1 + (anchoLinea / 2), y); // Línea estética
+
+          nombreLines1.forEach((line: string, i: number) => {
+            doc.text(line, centerX1, y + 5 + (i * lineHeight), { align: 'center' });
+          });
+
+          // El DNI se dibuja dinámicamente debajo de la última línea del nombre
+          const dniY1 = y + 5 + (nombreLines1.length * lineHeight);
+          doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, centerX1, dniY1, { align: 'center' });
+
+          // --- CLIENTE 2 ---
+          const nombre2 = `${reporte[0].cliente2Nombre} ${reporte[0].cliente2Apellidos ?? ''}`.toUpperCase();
+          const nombreLines2 = doc.splitTextToSize(nombre2, maxWidth);
+
+          doc.line(centerX2 - (anchoLinea / 2), y, centerX2 + (anchoLinea / 2), y);
+
+          nombreLines2.forEach((line: string, i: number) => {
+            doc.text(line, centerX2, y + 5 + (i * lineHeight), { align: 'center' });
+          });
+
+          const dniY2 = y + 5 + (nombreLines2.length * lineHeight);
+          doc.text(`DNI: ${reporte[0].cliente2NumDocumento}`, centerX2, dniY2, { align: 'center' });
 
         } else {
           // --- DISEÑO PARA 1 SOLO CLIENTE (Centrado) ---
-          const posXCentrado = pageWidth / 2;
+          const centerX = pageWidth / 2;
+          const nombre = `${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`.toUpperCase();
+          const nombreLines = doc.splitTextToSize(nombre, maxWidth);
 
-          doc.text('__________________________', posXCentrado, y, { align: 'center' });
-          doc.text(`${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`, posXCentrado, y + 5, { align: 'center' });
-          doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, posXCentrado, y + 9, { align: 'center' });
+          doc.line(centerX - (anchoLinea / 2), y, centerX + (anchoLinea / 2), y);
+
+          nombreLines.forEach((line: string, i: number) => {
+            doc.text(line, centerX, y + 5 + (i * lineHeight), { align: 'center' });
+          });
+
+          const dniY = y + 5 + (nombreLines.length * lineHeight);
+          doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, centerX, dniY, { align: 'center' });
         }
-
-        // PAGINACIÓN FINAL
         const pageCount = (doc.internal as any).getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
           doc.setPage(i);

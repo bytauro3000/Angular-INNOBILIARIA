@@ -102,7 +102,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       celular: ['', Validators.required], 
       telefono: [''],
       direccion: ['', Validators.required],
-      email: ['', [Validators.required, Validators.pattern(EMAIL_REGEX)]],
+      email: ['', [Validators.pattern(EMAIL_REGEX)]],
       genero: ['', Validators.required],
       estado: [EstadoCliente.ACTIVO, Validators.required],
       distrito: this.fb.group({ idDistrito: ['', Validators.required] }),

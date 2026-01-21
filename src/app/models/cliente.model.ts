@@ -14,7 +14,7 @@ export interface Cliente {
   celular: string;
   telefono?: string;
   direccion: string;
-  email: string;
+  email?: string;
   genero: Genero;
   fechaRegistro?: Date | string; // ✅ solo lectura, lo llena el backend
   estado: EstadoCliente;
