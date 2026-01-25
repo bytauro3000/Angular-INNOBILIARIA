@@ -10,7 +10,7 @@
     font-size: 1.8rem;
     font-weight: 600;
     padding-bottom: 0.5rem;
-    text-align: center; // 🔹 Título centrado
+    text-align: center;
   }
 
   .filtros-header {
@@ -75,7 +75,7 @@
     .no-results { text-align: center; padding: 2rem; color: #6c757d; font-style: italic; }
   }
 
-  /* --- MÓVIL --- */
+  /* --- RESPONSIVIDAD TARJETAS --- */
   @media (max-width: 768px) {
     padding: 1rem;
     .filtros-header {
@@ -108,9 +108,76 @@
     }
   }
 
+  /* --- PAGINACIÓN CORREGIDA (DISEÑO PROFESIONAL) --- */
   .paginacion-controles {
-    display: flex; justify-content: center; gap: 0.5rem;
-    .btn { padding: 0.5rem 0.8rem; background: #f8f9fa; border: 1px solid #ddd; }
-    .active { background-color: #3498db !important; color: #fff; }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap; // 👈 Evita que los botones se salgan en móvil
+
+    .btn {
+      border-radius: 6px !important;
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0.5rem 0.8rem !important;
+      background-color: #f8f9fa !important;
+      border: 1px solid #dcdcdc !important;
+      color: #333 !important;
+      transition: all 0.2s;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover:not(:disabled) {
+        background-color: #e9ecef !important;
+        border-color: #3498db !important;
+        color: #3498db !important;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .pagina-numero-btn {
+      min-width: 38px;
+      height: 38px;
+
+      &.active {
+        background-color: #3498db !important; // Azul institucional
+        border-color: #3498db !important;
+        color: #fff !important;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+      }
+    }
+
+    .ellipsis-spacer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8; // Color gris suave para que no resalte más que los números
+  font-weight: bold;
+  min-width: 30px;
+  height: 38px;
+  user-select: none;
+}
+
+    /* Ajuste para móviles muy pequeños */
+    @media (max-width: 480px) {
+      gap: 0.3rem;
+      .btn {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem;
+      }
+      .pagina-numero-btn {
+        min-width: 32px;
+        height: 32px;
+      }
+    }
   }
 }

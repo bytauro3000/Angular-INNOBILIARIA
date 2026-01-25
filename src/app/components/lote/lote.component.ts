@@ -100,9 +100,47 @@ cargarProgramasYSeleccionar(): void {
     if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1);
   }
 
-  getPagesArray(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+ getPagesArray(): (number | string)[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+  const pages: (number | string)[] = [];
+
+  // Si hay 7 páginas o menos, las mostramos todas
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    // Siempre mostramos la página 1
+    pages.push(1);
+
+    // LÓGICA DE LOS TRES PUNTOS INICIALES
+    if (current > 3) {
+      pages.push('...');
+    }
+
+    // DETERMINAR RANGO CENTRAL (Tus 3 páginas dinámicas)
+    // Esto hace que si estás en la 3, aparezcan 2, 3, 4. Si vas a la 4, aparecen 3, 4, 5
+    let start = Math.max(2, current - 1);
+    let end = Math.min(total - 1, current + 1);
+
+    // Ajuste para mostrar siempre 3 números si es posible
+    if (current <= 3) end = 4;
+    if (current >= total - 2) start = total - 3;
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    // LÓGICA DE LOS TRES PUNTOS FINALES
+    if (current < total - 2) {
+      pages.push('...');
+    }
+
+    // Siempre mostramos la última página
+    pages.push(total);
   }
+
+  return pages;
+}
 
   abrirCrearLote(): void {
     this.loteModal.abrirModal();

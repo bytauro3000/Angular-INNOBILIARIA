@@ -69,13 +69,25 @@
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">Anterior</button>
-    <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" [class.active]="currentPage === page"
-      class="btn pagina-numero-btn">
+  <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">
+    Anterior
+  </button>
+
+  <ng-container *ngFor="let page of getPagesArray()">
+    <button *ngIf="page !== '...'" 
+            (click)="goToPage($any(page))" 
+            [class.active]="currentPage === page"
+            class="btn pagina-numero-btn">
       {{ page }}
     </button>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">Siguiente</button>
-  </div>
+
+    <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+  </ng-container>
+
+  <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">
+    Siguiente
+  </button>
+</div>
 
   <app-lotes-insertar-editar #loteModal (loteGuardado)="onProgramaChange()"></app-lotes-insertar-editar>
 </div>
