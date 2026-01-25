@@ -79,7 +79,7 @@ export class LetracambioInsertarComponent implements OnInit {
     const todayString = `${year}-${month}-${day}`;
 
     return {
-      idDistrito: 0,
+      idDistrito: 8,
       fechaGiro: todayString,
       fechaVencimientoInicial: todayString,
       importe: '',

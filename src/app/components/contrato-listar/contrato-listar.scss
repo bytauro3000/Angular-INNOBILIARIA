@@ -84,10 +84,10 @@
   .multi-item-container {
     display: flex;
     flex-direction: column;
-    gap: 8px; // Espacio entre cada cliente/lote
+    gap: 8px; 
     
     div:not(:last-child) {
-      border-bottom: 1px dashed #ccc; // Pequeña línea separadora
+      border-bottom: 1px dashed #ccc; 
       padding-bottom: 4px;
     }
   }
@@ -102,7 +102,6 @@
       border: 1px solid #5d6d7e; 
       border-radius: 10px;
       overflow: hidden;
-      /* 🔹 Hacemos la tarjeta más ancha aprovechando el borde */
       margin-left: 2px;
       margin-right: 2px;
     }
@@ -110,9 +109,9 @@
     tbody td {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start; // Alinea arriba para contenido largo
+      align-items: flex-start; 
       text-align: right !important;
-      padding: 12px 10px; // Más espacio interno
+      padding: 12px 10px; 
       border-bottom: 1px solid #f0f0f0;
 
       &::before {
@@ -120,7 +119,7 @@
         font-weight: 700;
         color: #5d6d7e;
         text-align: left;
-        min-width: 100px; // Espacio fijo para la etiqueta
+        min-width: 100px; 
         margin-right: 10px;
       }
 
@@ -129,13 +128,12 @@
         font-weight: bold;
         border-bottom: 2px solid #2ecc71; 
         justify-content: center;
-        &::before { display: none; } // Oculta "ID" en la cabecera de la tarjeta
+        &::before { display: none; } 
       }
     }
     
-    /* 🔹 Ajuste específico para las listas dentro de la tarjeta */
     td[data-label="Cliente"], td[data-label="DNI"], td[data-label="Lote"] {
-      flex-direction: row; // Mantiene el nombre a la derecha de la etiqueta
+      flex-direction: row; 
       
       .multi-item-container {
         width: 100%;
@@ -145,7 +143,7 @@
   }
 }
 
-/* Acciones y Paginación se mantienen igual */
+/* Acciones */
 .acciones-container {
   display: flex;
   justify-content: center;
@@ -169,17 +167,51 @@
   &.btn-info { color: #0dcaf0; border-color: #0dcaf0; }
 }
 
-.paginacion-simple {
+/* --- NUEVA PAGINACIÓN (ESTILO IMAGEN 2) --- */
+.paginacion-controles {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 0.5rem;
   margin-top: 1.5rem;
-  gap: 1rem;
-  button {
-    padding: 6px 15px;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 4px;
-    &:disabled { opacity: 0.5; }
+  flex-wrap: wrap;
+
+  .btn {
+    border-radius: 6px !important;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.8rem !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dcdcdc !important;
+    color: #333 !important;
+    transition: all 0.2s;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+      background-color: #e9ecef !important;
+      border-color: #3498db !important;
+      color: #3498db !important;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .pagina-numero-btn {
+    min-width: 38px;
+    height: 38px;
+
+    &.active {
+      background-color: #3498db !important; // Azul de la Imagen 2
+      border-color: #3498db !important;
+      color: #fff !important;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+    }
   }
 }

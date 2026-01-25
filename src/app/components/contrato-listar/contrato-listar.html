@@ -90,9 +90,20 @@
     </table>
   </div>
 
-  <div *ngIf="totalPages > 1" class="paginacion-simple">
-    <button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</button>
-    <span class="page-info">Página {{currentPage}} de {{totalPages}}</span>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">
+      Anterior
+    </button>
+
+    <button *ngFor="let page of getPagesArray()" 
+            (click)="goToPage(page)" 
+            [class.active]="currentPage === page"
+            class="btn pagina-numero-btn">
+      {{ page }}
+    </button>
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">
+      Siguiente
+    </button>
   </div>
 </div>
