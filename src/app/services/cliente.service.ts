@@ -3,6 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Cliente } from '../models/cliente.model';
+import { ConsultaDniDTO } from '../dto/consultadni.dto'; 
+
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +27,11 @@ export class ClienteService {
   // 🔹 Buscar cliente por número de documento (numDoc)
   obtenerClientePorNumDoc(numDoc: string): Observable<Cliente> {
     return this.http.get<Cliente>(`${this.apiUrl}/buscar/numDoc/${numDoc}`);
+  }
+
+  // 🔹 NUEVO: Consultar DNI en API externa a través del Backend
+  consultarDniExterno(dni: string): Observable<ConsultaDniDTO> {
+    return this.http.get<ConsultaDniDTO>(`${this.apiUrl}/externo/reniec/${dni}`);
   }
 
   buscarClientesPorFiltro(termino: string, tipo: string): Observable<Cliente[]> {

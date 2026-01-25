@@ -37,7 +37,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   distritos: Distrito[] = [];
   Generos = Object.values(Genero);
   EstadosCiviles = Object.values(EstadoCivil); // 👈 Para iterar en el HTML
-
+  cargandoDni: boolean = false;
   SearchCountryField = SearchCountryField;
   CountryISO = CountryISO;
   preferredCountries: CountryISO[] = [CountryISO.Peru, CountryISO.UnitedStates, CountryISO.Mexico, CountryISO.Colombia];
@@ -139,6 +139,35 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     return 'Error.';
   }
 
+  // 🔹 NUEVA FUNCIÓN: Autocompletado por DNI
+  public onDniInput(): void {
+    const dni = this.clienteForm.get('numDoc')?.value;
+    const tipo = this.clienteForm.get('tipoCliente')?.value;
+
+    // Solo busca si es NATURAL y tiene 8 dígitos
+    if (tipo === TipoCliente.NATURAL && dni && dni.length === 8) {
+      this.cargandoDni = true;
+
+      this.clienteService.consultarDniExterno(dni).subscribe({
+        next: (res) => {
+          if (res && res.success) {
+            // Actualizamos los campos del formulario reactivo
+            this.clienteForm.patchValue({
+              nombre: res.first_name,
+              // Concatenamos Apellido Paterno + Materno
+              apellidos: `${res.first_last_name} ${res.second_last_name}`.trim()
+            });
+            this.toastr.success('Datos recuperados de RENIEC');
+          }
+          this.cargandoDni = false;
+        },
+        error: () => {
+          this.cargandoDni = false;
+          this.toastr.info('No se pudo autocompletar. Ingrese los datos manualmente.');
+        }
+      });
+    }
+  }
   public abrirModalCliente(cliente?: Cliente): void {
     this.clienteForm.reset();
     if (cliente) {

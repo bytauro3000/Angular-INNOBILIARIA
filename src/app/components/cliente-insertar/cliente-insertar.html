@@ -28,33 +28,39 @@
             </div>
 
             <div class="form-row form-3-col">
-              <div class="form-group">
-                <label for="tipoCliente">Tipo de Cliente</label>
-                <select id="tipoCliente" formControlName="tipoCliente" required>
-                  <option [value]="null" disabled>Seleccione tipo</option>
-                  <option value="NATURAL">Natural</option>
-                  <option value="JURIDICO">Jurídico</option>
-                </select>
-              </div>
+  <div class="form-group">
+    <label for="tipoCliente">Tipo de Cliente</label>
+    <select id="tipoCliente" formControlName="tipoCliente" required>
+      <option [value]="null" disabled>Seleccione tipo</option>
+      <option value="NATURAL">Natural</option>
+      <option value="JURIDICO">Jurídico</option>
+    </select>
+  </div>
 
-              <div class="form-group">
-                <label for="numDoc">DNI / RUC</label>
-                <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
-                  [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
-                  (input)="limpiarNoNumericos('numDoc')" 
-                  [attr.title]="getErrorMessage('numDoc')"
-                  [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
-                  #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
-              </div>
+  <div class="form-group">
+    <label for="numDoc">DNI / RUC</label>
+    <div class="input-container-relative">
+      <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
+        [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
+        (input)="limpiarNoNumericos('numDoc'); onDniInput()" 
+        [attr.title]="getErrorMessage('numDoc')"
+        [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
+        #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
+      
+      <div *ngIf="cargandoDni" class="spinner-dni">
+        <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+      </div>
+    </div>
+  </div>
 
-              <div class="form-group">
-                <label for="genero">Género</label>
-                <select id="genero" formControlName="genero" required>
-                  <option value="" disabled selected>Seleccione</option>
-                  <option *ngFor="let g of Generos" [value]="g">{{ g }}</option>
-                </select>
-              </div>
-            </div>
+  <div class="form-group">
+    <label for="genero">Género</label>
+    <select id="genero" formControlName="genero" required>
+      <option value="" disabled selected>Seleccione</option>
+      <option *ngFor="let g of Generos" [value]="g">{{ g }}</option>
+    </select>
+  </div>
+</div>
 
             <div class="form-row form-3-col">
               <div class="form-group">
