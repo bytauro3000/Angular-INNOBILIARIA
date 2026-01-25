@@ -163,34 +163,55 @@
   }
 
   /* PAGINACIÓN */
-  .paginacion-controles {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
+  /* PAGINACIÓN CORREGIDA PARA MÓVILES */
+.paginacion-controles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem; // Espacio reducido entre botones
+  margin-top: 1.5rem;
+  flex-wrap: wrap; // 👈 Esto permite que los números bajen a la siguiente fila si no caben
 
-    .pagina-btn, .pagina-numero-btn {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      &:disabled { background-color: #cccccc; }
-    }
-
-    .pagina-numero-btn {
-      background-color: #f0f0f0;
-      color: #333;
-      border: 1px solid #ddd;
-      &.active { background-color: #3498db; color: white; border-color: #3498db; font-weight: bold; }
-    }
-  }
-
-  .input-edicion {
-    width: 100%;
-    padding: 0.3rem;
-    border: 1px solid #3498db;
+  .pagina-btn, .pagina-numero-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem; // 👈 Padding un poco más compacto
     border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    
+    &:disabled { 
+      background-color: #cccccc; 
+      cursor: not-allowed;
+    }
   }
+
+  .pagina-numero-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+    min-width: 35px; // 👈 Asegura que sean cuadrados
+    text-align: center;
+
+    &.active { 
+      background-color: #3498db; 
+      color: white; 
+      border-color: #3498db; 
+      font-weight: bold; 
+    }
+  }
+
+  /* --- AJUSTE EXTRA PARA PANTALLAS MUY PEQUEÑAS --- */
+  @media (max-width: 480px) {
+    gap: 0.25rem;
+    
+    .pagina-btn, .pagina-numero-btn {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      min-width: 30px;
+    }
+  }
+}
 }
