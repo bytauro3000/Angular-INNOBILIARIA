@@ -2,15 +2,25 @@
   <h2>Gestión de Lotes</h2>
 
   <div class="filtros-header">
-    <div class="selector-programa">
-  <label for="progSelect">Filtrar por Programa:</label>
-  <select id="progSelect" class="form-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
-    <option [value]="null" disabled>-- Seleccione un programa --</option>
-    <option *ngFor="let prog of programas" [value]="prog.idPrograma">
-      {{ prog.nombrePrograma }}
-    </option>
-  </select>
-</div>
+    <div class="busqueda-grupo">
+      <div class="selector-programa">
+        <label for="progSelect">Programa:</label>
+        <select id="progSelect" class="form-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
+          <option [value]="null" disabled>-- Seleccione --</option>
+          <option *ngFor="let prog of programas" [value]="prog.idPrograma">{{ prog.nombrePrograma }}</option>
+        </select>
+      </div>
+
+      <div class="input-busqueda">
+        <label>Manzana:</label>
+        <input type="text" [(ngModel)]="busquedaManzana" (input)="onProgramaChange()" placeholder="Ej: A" class="form-control">
+      </div>
+
+      <div class="input-busqueda">
+        <label>Lote:</label>
+        <input type="text" [(ngModel)]="busquedaLote" (input)="onProgramaChange()" placeholder="Ej: 15" class="form-control">
+      </div>
+    </div>
 
     <button (click)="abrirCrearLote()" class="btn btn-success btn-agregar">
       <i class="bi bi-plus-lg"></i> <span>Crear Lote</span>

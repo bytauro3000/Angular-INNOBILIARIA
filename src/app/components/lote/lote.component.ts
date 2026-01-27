@@ -5,8 +5,8 @@ import Swal from 'sweetalert2';
 
 import { LoteResumen } from '../../dto/loteresumen.dto';
 import { LoteService } from '../../services/lote.service';
-import { ProgramaService } from '../../services/programa.service'; // 🔹 Importado
-import { Programa } from '../../models/programa.model'; // 🔹 Importado
+import { ProgramaService } from '../../services/programa.service';
+import { Programa } from '../../models/programa.model';
 import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar';
 
 @Component({
@@ -21,8 +21,12 @@ export class LoteComponent implements OnInit {
 
   lotes: LoteResumen[] = [];
   paginatedLotes: LoteResumen[] = [];
-  programas: Programa[] = []; // 🔹 Lista para el select
-  idProgramaSeleccionado: number | null = null; // 🔹 ID seleccionado
+  programas: Programa[] = [];
+  idProgramaSeleccionado: number | null = null;
+
+  // 🔹 NUEVAS VARIABLES PARA BÚSQUEDA
+  busquedaManzana: string = '';
+  busquedaLote: string = '';
 
   // Paginación
   pageSize: number = 6;
@@ -31,53 +35,69 @@ export class LoteComponent implements OnInit {
 
   constructor(
     private loteService: LoteService,
-    private programaService: ProgramaService // 🔹 Inyectado
+    private programaService: ProgramaService
   ) {}
 
- ngOnInit(): void {
-  // 1. Asignamos el ID 4 por defecto al iniciar
-  this.idProgramaSeleccionado = 4;
-  this.cargarProgramasYSeleccionar();
-}
+  ngOnInit(): void {
+    this.idProgramaSeleccionado = 4;
+    this.cargarProgramasYSeleccionar();
+  }
 
-cargarProgramasYSeleccionar(): void {
-  this.programaService.listarProgramas().subscribe({
-    next: (data) => {
-      this.programas = data;
-      
-      // 2. Verificamos si el ID 4 existe en la data recibida y disparamos la carga de lotes
-      const existeProgramaDefault = this.programas.some(p => p.idPrograma === 4);
-      if (existeProgramaDefault) {
-        this.onProgramaChange();
-      }
-    },
-    error: (err) => console.error('Error al cargar programas:', err)
-  });
-}
-  cargarProgramas(): void {
+  cargarProgramasYSeleccionar(): void {
     this.programaService.listarProgramas().subscribe({
-      next: (data) => this.programas = data,
+      next: (data) => {
+        this.programas = data;
+        const existeProgramaDefault = this.programas.some(p => p.idPrograma === 4);
+        if (existeProgramaDefault) {
+          this.onProgramaChange();
+        }
+      },
       error: (err) => console.error('Error al cargar programas:', err)
     });
   }
 
-  // 🔹 Este método se dispara cuando cambias el select en el HTML
+  // 🔹 MÉTODO ACTUALIZADO PARA SOPORTAR BÚSQUEDA
   onProgramaChange(): void {
-  if (this.idProgramaSeleccionado) {
-    this.loteService.obtenerLotesPorProgramaGestion(this.idProgramaSeleccionado).subscribe({
-      next: (data) => {
-        this.lotes = data;
-        this.currentPage = 1;
-        this.aplicarPaginacion();
-      },
-      error: (err) => {
-        console.error('Error al cargar lotes del programa:', err);
-        this.lotes = [];
-        this.paginatedLotes = [];
+    if (this.idProgramaSeleccionado) {
+      // Si hay texto en los buscadores, usamos el servicio de búsqueda filtrada
+      if (this.busquedaManzana.trim() !== '' || this.busquedaLote.trim() !== '') {
+        this.loteService.buscarLotesGestion(
+          this.idProgramaSeleccionado, 
+          this.busquedaManzana, 
+          this.busquedaLote
+        ).subscribe({
+          next: (data) => {
+            this.lotes = data;
+            this.currentPage = 1;
+            this.aplicarPaginacion();
+          },
+          error: (err) => console.error('Error en búsqueda:', err)
+        });
+      } else {
+        // Si no hay texto, usamos la carga normal del programa
+        this.loteService.obtenerLotesPorProgramaGestion(this.idProgramaSeleccionado).subscribe({
+          next: (data) => {
+            this.lotes = data;
+            this.currentPage = 1;
+            this.aplicarPaginacion();
+          },
+          error: (err) => {
+            console.error('Error al cargar lotes:', err);
+            this.lotes = [];
+            this.paginatedLotes = [];
+          }
+        });
       }
-    });
+    }
   }
-}
+
+  // 🔹 Función para limpiar búsqueda rápidamente
+  limpiarBusqueda(): void {
+    this.busquedaManzana = '';
+    this.busquedaLote = '';
+    this.onProgramaChange();
+  }
+
   aplicarPaginacion(): void {
     this.totalPages = Math.ceil(this.lotes.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
@@ -85,9 +105,10 @@ cargarProgramasYSeleccionar(): void {
     this.paginatedLotes = this.lotes.slice(start, end);
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+  goToPage(page: number | any): void {
+    const pageNumber = typeof page === 'number' ? page : parseInt(page);
+    if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+      this.currentPage = pageNumber;
       this.aplicarPaginacion();
     }
   }
@@ -100,47 +121,26 @@ cargarProgramasYSeleccionar(): void {
     if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1);
   }
 
- getPagesArray(): (number | string)[] {
-  const total = this.totalPages;
-  const current = this.currentPage;
-  const pages: (number | string)[] = [];
+  getPagesArray(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const pages: (number | string)[] = [];
 
-  // Si hay 7 páginas o menos, las mostramos todas
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i);
-  } else {
-    // Siempre mostramos la página 1
-    pages.push(1);
-
-    // LÓGICA DE LOS TRES PUNTOS INICIALES
-    if (current > 3) {
-      pages.push('...');
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (current > 3) pages.push('...');
+      let start = Math.max(2, current - 1);
+      let end = Math.min(total - 1, current + 1);
+      if (current <= 3) end = 4;
+      if (current >= total - 2) start = total - 3;
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (current < total - 2) pages.push('...');
+      pages.push(total);
     }
-
-    // DETERMINAR RANGO CENTRAL (Tus 3 páginas dinámicas)
-    // Esto hace que si estás en la 3, aparezcan 2, 3, 4. Si vas a la 4, aparecen 3, 4, 5
-    let start = Math.max(2, current - 1);
-    let end = Math.min(total - 1, current + 1);
-
-    // Ajuste para mostrar siempre 3 números si es posible
-    if (current <= 3) end = 4;
-    if (current >= total - 2) start = total - 3;
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    // LÓGICA DE LOS TRES PUNTOS FINALES
-    if (current < total - 2) {
-      pages.push('...');
-    }
-
-    // Siempre mostramos la última página
-    pages.push(total);
+    return pages;
   }
-
-  return pages;
-}
 
   abrirCrearLote(): void {
     this.loteModal.abrirModal();
@@ -173,7 +173,7 @@ cargarProgramasYSeleccionar(): void {
         this.loteService.eliminarLote(loteResumen.idLote).subscribe({
           next: () => {
             Swal.fire('¡Eliminado!', 'El lote ha sido eliminado.', 'success');
-            this.onProgramaChange(); // 🔹 Recarga solo los lotes del programa actual
+            this.onProgramaChange();
           },
           error: () => Swal.fire('Error', 'No se pudo eliminar el lote.', 'error')
         });

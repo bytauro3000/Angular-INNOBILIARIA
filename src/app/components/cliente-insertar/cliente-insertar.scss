@@ -1,5 +1,5 @@
 /* ============================================================
-   DISEÑO "MIDNIGHT GLASS" COMPACTO - IGUALADO A EDICIÓN
+   DISEÑO "MIDNIGHT GLASS" COMPACTO - 100% RESPONSIVO Y ALINEADO
    ============================================================ */
 
 .modal-content {
@@ -10,18 +10,16 @@
 
 .custom-modal-width {
   max-width: 850px;
+  width: 95%;
+  margin: 10px auto;
 }
 
 .modal-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   .modal-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-weight: 700; font-size: 1.1rem; color: #ffffff;
+    display: flex; align-items: center; gap: 10px;
     i { color: #2ecc71; }
   }
 }
@@ -32,16 +30,17 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%; // Garantiza que el grupo ocupe su columna
+
   label {
-    color: #94a3b8;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #94a3b8; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
   }
 }
 
-/* --- INPUTS Y SELECTS COMPACTOS --- */
+.width-100 { grid-column: 1 / -1; } // Fuerza a ocupar todo el ancho del grid
+
+/* --- INPUTS Y SELECTS NORMALIZADOS --- */
 input, select {
   background-color: #34495e !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -49,7 +48,8 @@ input, select {
   border-radius: 6px !important;
   padding: 6px 12px !important;
   font-size: 0.85rem !important;
-  height: 38px !important;
+  height: 38px !important; // Altura fija para alineación perfecta
+  width: 100% !important;   // Ancho total
   transition: all 0.2s ease;
 
   &:focus {
@@ -58,116 +58,85 @@ input, select {
     box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15) !important;
     outline: none !important;
   }
-
-  /* Estilo para validación inválida */
-  &.is-invalid {
-    border-color: #e74c3c !important;
-    &:focus {
-      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2) !important;
-    }
-  }
 }
 
 /* --- GRID ESTRUCTURAL --- */
-.form-row { display: grid; gap: 1rem; margin-bottom: 0.8rem; }
+.form-row {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  width: 100%;
+}
+
 .form-1-col { grid-template-columns: 1fr; }
 .form-2-col { grid-template-columns: repeat(2, 1fr); }
 .form-3-col { grid-template-columns: repeat(3, 1fr); }
 
-/* --- BOTONES Y FOOTER --- */
-.modal-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 1.5rem;
-  display: flex;
-  gap: 10px;
-
-  .btn {
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .btn-save {
-    background-color: #2ecc71 !important;
-    color: white !important;
-    border: none !important;
-    &:hover:not(:disabled) { background-color: #27ae60 !important; transform: translateY(-1px); }
-  }
-
-  .btn-cancel {
-    background-color: transparent !important;
-    border: 1px solid #4a627a !important;
-    color: #bdc3c7 !important;
-    &:hover { background-color: rgba(255, 255, 255, 0.05) !important; color: white !important; }
-  }
-}
-
-/* --- AJUSTE CELULAR INTERNACIONAL COMPLETO --- */
-:host ::ng-deep .celular-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  .iti {
-    width: 100%; // Asegura que el contenedor ocupe todo el espacio
-  }
-
-  ngx-intl-tel-input input.form-control.custom-intl-input {
-    background-color: #34495e !important;
-    height: 38px !important; // Misma altura que DNI/RUC
-    font-size: 0.85rem !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
-    width: 100% !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease;
-
-    /* Efecto borde verde al estar seleccionado */
-    &:focus {
-      border-color: #2ecc71 !important;
-      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15) !important;
-      outline: none !important;
-      background-color: #3d566e !important;
-    }
-  }
-
-  /* Ajuste para la lista desplegable de países para que no pierda el estilo oscuro */
-  .iti__country-list {
-    background-color: #2c3e50 !important;
-    color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  }
-}
-/* --- POSICIONAMIENTO DEL SPINNER DNI A LA DERECHA --- */
+/* --- CONTENEDOR DNI (CORRECCIÓN DE TAMAÑO) --- */
 .input-container-relative {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  width: 100%; // Ocupa el 100% de la columna del grid
+  display: block;
 
   input {
-    width: 100%;
-    /* Añadimos padding a la derecha para que el número no se choque con el spinner */
-    padding-right: 35px !important; 
-    padding-left: 12px !important; /* Restauramos el padding izquierdo normal */
+    width: 100% !important;
+    padding-right: 35px !important; // Espacio para el spinner
   }
 
   .spinner-dni {
     position: absolute;
-    right: 12px; /* Ubicación al lado DERECHO dentro de la caja */
-    display: flex;
-    align-items: center;
-    pointer-events: none; 
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
     z-index: 5;
-    
-    .spinner-border {
-      width: 16px;
-      height: 16px;
-      border-width: 2px;
-    }
+    .spinner-border { width: 16px; height: 16px; border-width: 2px; }
+  }
+}
+
+/* --- AJUSTE CELULAR INTERNACIONAL --- */
+:host ::ng-deep .celular-wrapper {
+  width: 100%;
+  .iti { width: 100%; }
+  ngx-intl-tel-input input.form-control.custom-intl-input {
+    background-color: #34495e !important;
+    height: 38px !important;
+    width: 100% !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    &:focus { border-color: #2ecc71 !important; }
+  }
+}
+
+/* --- RESPONSIVIDAD --- */
+@media (max-width: 992px) {
+  .form-3-col { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 576px) {
+  .form-row { grid-template-columns: 1fr !important; }
+  .modal-footer {
+    flex-direction: column;
+    .btn { width: 100%; }
+  }
+}
+
+/* --- BOTONES --- */
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  display: flex; gap: 10px; justify-content: flex-end;
+
+  .btn {
+    padding: 8px 20px; border-radius: 6px; font-weight: 600;
+    font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-save {
+    background-color: #2ecc71 !important; color: white !important; border: none !important;
+    &:hover:not(:disabled) { background-color: #27ae60 !important; }
+  }
+  .btn-cancel {
+    background-color: transparent !important; border: 1px solid #4a627a !important; color: #bdc3c7 !important;
   }
 }
