@@ -120,9 +120,45 @@ filtrarClientes(): void {
     }
   }
 
-  getPagesArray(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  getPagesArray(): (number | string)[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+  const pages: (number | string)[] = [];
+
+  // Si hay 7 páginas o menos, se muestran todas normalmente
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    // Siempre mostramos la página 1
+    pages.push(1);
+
+    // Lógica de elipsis inicial
+    if (current > 3) {
+      pages.push('...');
+    }
+
+    // Rango central dinámico (alrededor de la actual)
+    let start = Math.max(2, current - 1);
+    let end = Math.min(total - 1, current + 1);
+
+    // Ajustes para mantener siempre 3 números en el centro si es posible
+    if (current <= 3) end = 4;
+    if (current >= total - 2) start = total - 3;
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    // Lógica de elipsis final
+    if (current < total - 2) {
+      pages.push('...');
+    }
+
+    // Siempre mostramos la última página
+    pages.push(total);
   }
+  return pages;
+}
 
   eliminarCliente(id: number): void {
     Swal.fire({

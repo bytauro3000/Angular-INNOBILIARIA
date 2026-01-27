@@ -168,6 +168,7 @@
   }
 
   /* PAGINACIÓN */
+  /* PAGINACIÓN ACTUALIZADA */
   .paginacion-controles {
     display: flex;
     justify-content: center;
@@ -176,7 +177,8 @@
     margin-top: 1rem;
     flex-wrap: wrap;
 
-    .btn {
+    /* Estilo para todos los botones de la paginación */
+    .btn, .pagina-btn, .pagina-numero-btn {
       border-radius: 6px !important;
       cursor: pointer;
       font-size: 0.85rem;
@@ -185,21 +187,49 @@
       border: 1px solid #dcdcdc !important;
       color: #333 !important;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px; // Asegura altura consistente
     }
 
     .pagina-numero-btn {
-      min-width: 35px;
+      min-width: 38px;
       &.active {
         background-color: #3498db !important;
         border-color: #3498db !important;
         color: #fff !important;
         font-weight: bold;
+        box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
       }
     }
 
-    .btn:disabled {
+    .ellipsis-spacer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-weight: bold;
+      min-width: 35px;
+      height: 38px;
+      user-select: none;
+    }
+
+    .btn:disabled, .pagina-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      background-color: #eeeeee !important;
+    }
+
+    /* Ajuste para móviles */
+    @media (max-width: 480px) {
+      gap: 0.3rem;
+      .btn, .pagina-btn, .pagina-numero-btn {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem;
+        min-height: 32px;
+      }
+      .pagina-numero-btn { min-width: 32px; }
     }
   }
 }
