@@ -31,11 +31,17 @@ export class ContratoService {
     return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request, { headers: this.getHeaders() });
   }
 
+  actualizarContrato(id: number, request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
+    return this.http.put<ContratoResponseDTO>(`${this.apiUrl}/actualizar/${id}`, request, { 
+      headers: this.getHeaders() 
+    });
+  }
+
   eliminarContrato(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
   }
 
-  // 🟢 NUEVO: Método para descargar el PDF generado en el Backend
+  //Método para descargar el PDF generado en el Backend
   imprimirContratoPdf(id: number): Observable<Blob> {
     // Es vital usar { responseType: 'blob' } para que Angular entienda que recibe un archivo
     return this.http.get(`${this.apiUrl}/${id}/imprimir`, { 

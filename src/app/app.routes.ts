@@ -18,6 +18,7 @@ import { ClienteVer } from './components/cliente-ver/cliente-ver';
 // Contratos
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
+import { ContratoEditarComponent } from './components/contrato-editar/contrato-editar.component';
 
 // Separaciones
 import { SeparacionComponent } from './components/separacion-crud/separacion-crud.component';
@@ -65,6 +66,7 @@ export const routes: Routes = [
       // Contratos
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
+      { path: 'contratos/editar/:id', component: ContratoEditarComponent },
 
       // Otros
       { path: 'programas', component: ProgramaComponent },

@@ -1,0 +1,141 @@
+<div class="contratos-container">
+  <h2>Modificar Contrato ID: {{ contratoId }}</h2>
+
+  <div class="form-wrapper">
+    <form [formGroup]="contratoForm" (ngSubmit)="guardarCambios()">
+
+      <div class="form-row form-3-col">
+        <div class="form-group">
+          <label>Tipo de Contrato</label>
+          <select formControlName="tipoContrato">
+            <option *ngFor="let tipo of tipoContratoValues" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha del Contrato</label>
+          <input type="date" formControlName="fechaContrato" />
+        </div>
+      </div>
+
+      <div class="form-row form-2-col">
+        <div class="form-group">
+          <label>Vendedor</label>
+          <div class="input-with-button">
+            <div class="custom-select-container" #vendedorBusquedaContainer (click)="mostrarVendedores = !mostrarVendedores">
+              <input type="text" placeholder="Buscar vendedor..." class="custom-select-input"
+                [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()" [ngModelOptions]="{standalone: true}" autocomplete="off" />
+              <ul class="custom-select-list" *ngIf="mostrarVendedores">
+                <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
+                  {{ v.nombre }} {{ v.apellidos }} (DNI: {{ v.dni }})
+                </li>
+              </ul>
+            </div>
+            <button type="button" class="btn-add-mini" (click)="abrirModalVendedor()">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Programa</label>
+          <div class="input-with-button">
+            <div class="custom-select-container" #programaBusquedaContainer (click)="mostrarProgramas = !mostrarProgramas">
+              <input type="text" placeholder="Buscar programa..." class="custom-select-input"
+                [(ngModel)]="filtroPrograma" [ngModelOptions]="{standalone: true}" readonly />
+              </div>
+            <button type="button" class="btn-add-mini" (click)="abrirModalPrograma()">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row form-3-col">
+        <div class="form-group">
+          <label>Monto Total</label>
+          <input type="text" formControlName="montoTotal" (blur)="onCurrencyInput($event, 'montoTotal')" />
+        </div>
+        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
+          <label>Inicial</label>
+          <input type="text" formControlName="inicial" (blur)="onCurrencyInput($event, 'inicial')" />
+        </div>
+        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
+          <label>Saldo</label>
+          <input type="text" formControlName="saldo" />
+        </div>
+      </div>
+
+      <div class="form-row form-2-col">
+        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
+          <label>Cantidad de Letras</label>
+          <input type="number" formControlName="cantidadLetras" />
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <input type="text" formControlName="observaciones" />
+        </div>
+      </div>
+
+      <div class="form-row form-2-col">
+        <div class="form-group">
+          <label>Agregar/Quitar Clientes</label>
+          <div class="input-with-button">
+            <div class="custom-select-container" #clienteBusquedaContainer (click)="mostrarClientes = !mostrarClientes">
+              <input type="text" placeholder="Buscar cliente..." class="custom-select-input"
+                [(ngModel)]="filtroCliente" (input)="filtrarClientes()" [ngModelOptions]="{standalone: true}" />
+              <ul class="custom-select-list" *ngIf="mostrarClientes">
+                <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">{{ c.nombre }} {{ c.apellidos }}</li>
+              </ul>
+            </div>
+            <button type="button" class="btn-add-mini" (click)="abrirModalCliente()">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+          </div>
+          <ul class="selected-items-list">
+            <li *ngFor="let cli of clientesSeleccionados" class="item-pequeno">
+              {{ cli.nombre }} {{ cli.apellidos }}
+              <button type="button" (click)="eliminarCliente(cli.idCliente)">❌</button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="form-group">
+          <label>Agregar/Quitar Lotes</label>
+          <div class="input-with-button">
+            <div class="custom-select-container" #loteBusquedaContainer (click)="mostrarLotes = !mostrarLotes">
+              <input type="text" placeholder="Buscar lote..." class="custom-select-input"
+                [(ngModel)]="filtroLote" (input)="filtrarLotes()" [ngModelOptions]="{standalone: true}" />
+              <ul class="custom-select-list" *ngIf="mostrarLotes">
+                <li *ngFor="let l of lotesFiltrados" (click)="seleccionarLote(l)">Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}</li>
+              </ul>
+            </div>
+            <button type="button" class="btn-add-mini" (click)="abrirModalLote()">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+          </div>
+          <ul class="selected-items-list">
+            <li *ngFor="let lote of lotesSeleccionados" class="item-pequeno">
+              Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
+              <button type="button" (click)="eliminarLote(lote.idLote)">❌</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-actions">
+  <button type="submit" class="btn btn-primary" [disabled]="!contratoForm.valid">
+    <i class="bi bi-save"></i> Guardar Cambios
+  </button>
+  <button type="button" class="btn btn-secondary" (click)="router.navigate(['/secretaria-menu/contratos'])">
+    Cancelar
+  </button>
+</div>
+    </form>
+  </div>
+</div>
+
+<app-vendedor-insertar #vendedorModalContrato (vendedorGuardado)="cargarCombos()"></app-vendedor-insertar>
+<app-cliente-insertar #registroModal (clienteGuardado)="cargarCombos()"></app-cliente-insertar>
+<app-programa-inset-edit #registroModalPrograma (ProgramaGuardado)="cargarCombos()"></app-programa-inset-edit>
+<app-lotes-insertar-editar #loteModalContrato (loteGuardado)="cargarCombos()"></app-lotes-insertar-editar>
