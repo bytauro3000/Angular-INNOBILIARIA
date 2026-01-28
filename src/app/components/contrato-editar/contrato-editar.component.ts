@@ -71,6 +71,7 @@ export class ContratoEditarComponent implements OnInit {
   mostrarLotes: boolean = false;
 
   faPlus = faPlus;
+  modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
 
   constructor(
@@ -88,18 +89,14 @@ export class ContratoEditarComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.cargarCombos();
-    
-    // Capturar ID de la URL y cargar datos
     this.contratoId = Number(this.route.snapshot.paramMap.get('id'));
-    if (this.contratoId) {
-      this.cargarDatosContrato();
-    }
-    
+    this.cargarCombos();
     this.handleFormChanges();
   }
 
   private initForm() {
     this.contratoForm = this.fb.group({
+      modalidadContrato: ['DIRECTO', Validators.required],
       tipoContrato: ['FINANCIADO', Validators.required],
       fechaContrato: ['', Validators.required],
       vendedorId: [null, Validators.required],
@@ -114,54 +111,72 @@ export class ContratoEditarComponent implements OnInit {
     });
   }
 
-  private cargarDatosContrato() {
-  this.contratoService.obtenerContratoPorId(this.contratoId).subscribe({
-    next: (res: any) => {
-      // 1. Mapear valores básicos al formulario
-      this.contratoForm.patchValue({
-        tipoContrato: res.tipoContrato,
-        fechaContrato: res.fechaContrato ? new Date(res.fechaContrato).toISOString().split('T')[0] : '',
-        montoTotal: this.formatCurrency(res.montoTotal || 0),
-        inicial: this.formatCurrency(res.inicial || 0),
-        cantidadLetras: res.cantidadLetras,
-        observaciones: res.observaciones
-      });
-
-      // 2. Mapear Clientes (Solución al error de propiedades faltantes)
-      // Forzamos el mapeo para asegurar que cumplan con la interfaz Cliente
-      this.clientesSeleccionados = (res.clientes || []).map((c: any) => ({
-        ...c,
-        estadoCivil: c.estadoCivil || null,
-        tipoCliente: c.tipoCliente || 'NATURAL',
-        estado: c.estado || 'ACTIVO'
-      } as Cliente));
-      this.actualizarIdsClientes();
-
-      // 3. Mapear Lotes (Solución al error 'programaNombre')
-      this.lotesSeleccionados = (res.lotes || []).map((l: any) => ({
-        ...l,
-        // Convertimos la propiedad plana del DTO al objeto que espera el modelo
-        programa: l.programa || { nombrePrograma: l.programaNombre }
-      } as Lote));
-      this.actualizarIdsLotes();
+  public cargarCombos() {
+    // Usamos forkJoin o suscripciones anidadas para asegurar que la data esté lista
+    this.vendedorService.listarVendedores().subscribe(v => {
+      this.vendedores = v;
+      this.vendedoresFiltrados = [...v];
       
-      // 4. Cargar Programa en el selector visual
-      if (this.lotesSeleccionados.length > 0) {
-        const nombreProg = (res.lotes[0] as any).programaNombre;
-        this.programaService.listarProgramas().subscribe(progs => {
-           const progEncontrado = progs.find(p => p.nombrePrograma === nombreProg);
-           if (progEncontrado) {
-             this.seleccionarPrograma(progEncontrado);
-           }
-        });
-      }
+      this.programaService.listarProgramas().subscribe(p => {
+        this.programas = p;
+        this.programasFiltrados = [...p];
+        
+        // 🔹 Solo cuando ambas listas están cargadas, buscamos los datos del contrato
+        if (this.contratoId) {
+          this.cargarDatosContrato();
+        }
+      });
+    });
+  }
 
-      this.actualizarSaldo();
-    },
-    error: () => this.toastr.error('Error al cargar datos del contrato')
-  });
-}
-  // --- LÓGICA DE BÚSQUEDA Y SELECCIÓN (Igual a Insertar) ---
+  private cargarDatosContrato() {
+    this.contratoService.obtenerContratoPorId(this.contratoId).subscribe({
+      next: (res: any) => {
+        // 1. Llenar campos básicos
+        this.contratoForm.patchValue({
+          modalidadContrato: res.separacion ? 'SEPARACION' : 'DIRECTO',
+          tipoContrato: res.tipoContrato,
+          fechaContrato: res.fechaContrato ? new Date(res.fechaContrato).toISOString().split('T')[0] : '',
+          montoTotal: this.formatCurrency(res.montoTotal || 0),
+          inicial: this.formatCurrency(res.inicial || 0),
+          cantidadLetras: res.cantidadLetras,
+          observaciones: res.observaciones
+        });
+
+        // 2. 🟢 MAPEO DE VENDEDOR (Solución al video)
+        // Buscamos en la lista de vendedores el que coincida con el ID que viene del contrato
+        const idVend = res.vendedor?.idVendedor || res.idVendedor;
+        const vendedorEncontrado = this.vendedores.find(v => v.idVendedor === idVend);
+        if (vendedorEncontrado) {
+          this.seleccionarVendedor(vendedorEncontrado);
+        }
+
+        // 3. 🟢 MAPEO DE PROGRAMA (Solución al video)
+        // El DTO de contrato suele traer los lotes, y de ahí sacamos el programa
+        if (res.lotes && res.lotes.length > 0) {
+          const nombreProgContrato = res.lotes[0].programaNombre;
+          const programaEncontrado = this.programas.find(p => p.nombrePrograma === nombreProgContrato);
+          if (programaEncontrado) {
+            this.seleccionarPrograma(programaEncontrado);
+          }
+        }
+
+        // 4. Mapear Listas de Clientes y Lotes
+        this.clientesSeleccionados = (res.clientes || []).map((c: any) => ({ ...c } as Cliente));
+        this.actualizarIdsClientes();
+
+        this.lotesSeleccionados = (res.lotes || []).map((l: any) => ({
+          ...l,
+          programa: { nombrePrograma: l.programaNombre }
+        } as Lote));
+        this.actualizarIdsLotes();
+
+        this.actualizarSaldo();
+      },
+      error: () => this.toastr.error('Error al cargar datos del contrato')
+    });
+  }
+
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
@@ -171,9 +186,18 @@ export class ContratoEditarComponent implements OnInit {
     if (this.loteBusquedaContainer && !this.loteBusquedaContainer.nativeElement.contains(target)) this.mostrarLotes = false;
   }
 
-  cargarCombos() {
-    this.vendedorService.listarVendedores().subscribe(v => this.vendedores = v);
-    this.programaService.listarProgramas().subscribe(p => this.programas = p);
+  seleccionarVendedor(v: Vendedor) {
+    this.contratoForm.get('vendedorId')?.setValue(v.idVendedor);
+    this.filtroVendedor = `${v.nombre} ${v.apellidos}`; // 🔹 Esto llena el input vacío del video
+    this.mostrarVendedores = false;
+  }
+  seleccionarPrograma(p: Programa) {
+    if (p.idPrograma) {
+      this.contratoForm.get('idPrograma')?.setValue(p.idPrograma);
+      this.filtroPrograma = p.nombrePrograma; // 🔹 Esto llena el input vacío del video
+      this.mostrarProgramas = false;
+      this.loteService.listarLotesPorPrograma(p.idPrograma).subscribe(l => this.lotes = l || []);
+    }
   }
 
   filtrarVendedores() {
@@ -184,28 +208,11 @@ export class ContratoEditarComponent implements OnInit {
     this.mostrarVendedores = true;
   }
 
-  seleccionarVendedor(v: Vendedor) {
-    this.contratoForm.get('vendedorId')?.setValue(v.idVendedor);
-    this.filtroVendedor = `${v.nombre} ${v.apellidos}`;
-    this.mostrarVendedores = false;
+  filtrarProgramas() {
+    const f = this.filtroPrograma.toLowerCase();
+    this.programasFiltrados = this.programas.filter(p => p.nombrePrograma.toLowerCase().includes(f));
+    this.mostrarProgramas = true;
   }
-
- seleccionarPrograma(p: Programa) {
-  // 🔹 Verificamos que idPrograma exista para evitar el error de 'undefined'
-  if (p.idPrograma !== undefined && p.idPrograma !== null) {
-    this.contratoForm.get('idPrograma')?.setValue(p.idPrograma);
-    this.filtroPrograma = p.nombrePrograma;
-    this.mostrarProgramas = false;
-    
-    // Ahora TypeScript sabe que p.idPrograma es un number seguro
-    this.loteService.listarLotesPorPrograma(p.idPrograma).subscribe({
-      next: (l) => this.lotes = l || [],
-      error: (err) => console.error('Error al cargar lotes del programa', err)
-    });
-  } else {
-    this.toastr.warning('El programa seleccionado no tiene un ID válido.');
-  }
-}
 
   filtrarClientes() {
     const f = this.filtroCliente.trim();
@@ -249,6 +256,7 @@ export class ContratoEditarComponent implements OnInit {
   }
 
   eliminarLote(id?: number) {
+    if (id === undefined) return;
     this.lotesSeleccionados = this.lotesSeleccionados.filter(l => l.idLote !== id);
     this.actualizarIdsLotes();
   }
@@ -257,7 +265,6 @@ export class ContratoEditarComponent implements OnInit {
     this.contratoForm.get('idLotes')?.setValue(this.lotesSeleccionados.map(l => l.idLote));
   }
 
-  // --- UTILIDADES ---
   actualizarSaldo() {
     const t = this.extractNumericValue(this.contratoForm.get('montoTotal')?.value);
     const i = this.extractNumericValue(this.contratoForm.get('inicial')?.value);
@@ -278,10 +285,8 @@ export class ContratoEditarComponent implements OnInit {
     this.actualizarSaldo();
   }
 
-  // --- ACCIÓN FINAL ---
   guardarCambios() {
     if (this.contratoForm.invalid) return;
-
     const val = this.contratoForm.getRawValue();
     const request: ContratoRequestDTO = {
       fechaContrato: val.fechaContrato,
@@ -305,7 +310,6 @@ export class ContratoEditarComponent implements OnInit {
     });
   }
 
-  // Modales
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }
   abrirModalCliente() { this.registroModal.abrirModalCliente(); }
   abrirModalPrograma() { this.registroModalPrograma.abrirModal(); }
