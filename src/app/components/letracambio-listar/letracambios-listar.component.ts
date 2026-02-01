@@ -215,11 +215,19 @@ export class LetracambioListarComponent implements OnInit {
           return;
         }
 
+        reporte.sort((a, b) => {
+        const numA = parseInt(a.numeroLetra.split('/')[0]);
+        const numB = parseInt(b.numeroLetra.split('/')[0]);
+        return numA - numB;
+      });
+
         const doc = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
           format: 'a4',
         });
+
+        
 
         const margin = 15;
         const pageWidth = doc.internal.pageSize.getWidth();
