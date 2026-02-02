@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, AfterViewInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -19,11 +19,13 @@ import { ProgramaService } from '../../services/programa.service';
   templateUrl: './lotes-insertar-editar.html',
   styleUrls: ['./lotes-insertar-editar.scss']
 })
-export class LotesInsertarEditar implements OnInit, AfterViewInit {
+export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
+  @ViewChild('areaInput') areaInput!: ElementRef; 
   @Output() loteGuardado = new EventEmitter<void>();
 
   private modal?: bootstrap.Modal;
+  private areaTooltip?: bootstrap.Tooltip; 
   loteForm!: FormGroup;
   programas: Programa[] = [];
   isEditMode = false;
@@ -40,10 +42,22 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.inicializarFormulario();
     this.RecargarProgramas(); 
+    this.suscribirACalculoArea();
   }
 
   ngAfterViewInit(): void {
     this.modal = new bootstrap.Modal(this.modalElement.nativeElement);
+    
+    // 🟢 CAMBIO: Posicionamiento en 'bottom' (inferior)
+    this.areaTooltip = new bootstrap.Tooltip(this.areaInput.nativeElement, {
+      title: 'Verificar área con el plano',
+      trigger: 'manual',
+      placement: 'bottom' 
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.areaTooltip?.dispose();
   }
 
   RecargarProgramas(): void {
@@ -57,6 +71,46 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
         this.toastr.error('No se pudieron cargar los programas.');
       }
     });
+  }
+
+  private suscribirACalculoArea(): void {
+    const camposMedidas = ['largo1', 'largo2', 'ancho1', 'ancho2'];
+    camposMedidas.forEach(campo => {
+      this.loteForm.get(campo)?.valueChanges.subscribe(() => {
+        this.calcularAreaAutomaticamente();
+      });
+    });
+  }
+
+  calcularAreaAutomaticamente(): void {
+    const f = this.loteForm.getRawValue();
+    
+    // 🟢 CAMBIO: Si el usuario ya escribió algo en Área, no calculamos nada
+    if (f.area && f.area !== '' && f.area !== '0.00') {
+      return;
+    }
+
+    const l1 = Number(f.largo1) || 0;
+    const l2 = Number(f.largo2) || 0;
+    const a1 = Number(f.ancho1) || 0;
+    const a2 = Number(f.ancho2) || 0;
+
+    // 🟢 CAMBIO: Solo calcula cuando todos los campos básicos tienen datos (mínimo l1, a1, a2)
+    if (l1 > 0 && a1 > 0 && a2 > 0) {
+      const promAncho = (a1 + a2) / 2;
+      const resultadoArea = ((l1 + (l2 || l1)) / 2) * promAncho;
+
+      this.loteForm.patchValue({
+        area: parseFloat(resultadoArea.toFixed(2))
+      }, { emitEvent: false });
+
+      this.areaTooltip?.show();
+
+      // 🟢 CAMBIO: Duración extendida a 6 segundos para que no se borre rápido
+      setTimeout(() => {
+        this.areaTooltip?.hide();
+      }, 6000);
+    }
   }
 
   private inicializarFormulario(): void {
@@ -102,29 +156,21 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit {
     this.modal?.show();
   }
 
-  cerrarModal(): void { this.modal?.hide(); }
+  cerrarModal(): void { 
+    this.areaTooltip?.hide();
+    this.modal?.hide(); 
+  }
 
   formatearTexto(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;
     let valor = input.value;
-
     if (valor) {
-      // Capitalización original
       valor = valor.toLowerCase().split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
       this.loteForm.get(controlName)?.setValue(valor, { emitEvent: false });
-
-      // Lógica para mantener teclado abierto en móviles
-      const opcionesAutocompletado = [
-        "Con El Lote N° ",
-        "Con La Calle N° ",
-        "Con La Calle ",
-        "Con La Avenida "
-      ];
-
+      const opcionesAutocompletado = ["Con El Lote N° ", "Con La Calle N° ", "Con La Calle ", "Con La Avenida "];
       if (opcionesAutocompletado.includes(valor)) {
         setTimeout(() => {
           input.focus();
-          // Coloca el cursor al final para seguir escribiendo el dato variable
           input.setSelectionRange(valor.length, valor.length);
         }, 0);
       }

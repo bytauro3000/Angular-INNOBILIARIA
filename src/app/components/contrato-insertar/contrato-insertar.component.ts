@@ -190,11 +190,14 @@ export class ContratoInsertarComponent implements OnInit {
     });
   }
 
-  public getLoteCosto(lote: Lote): number {
-    const area = Number(lote.area) || 0;
-    const precio = Number(lote.precioM2) || 0;
-    return area * precio;
-  }
+ public getLoteCosto(lote: Lote): number {
+  const area = Number(lote.area) || 0;
+  const precio = Number(lote.precioM2) || 0;
+  const total = area * precio;
+
+  // 🟢 CAMBIO: Redondeamos al entero más cercano para coincidir con el Backend
+  return Math.round(total); 
+}
 
   private calcularMontoTotalLotes() {
     if (this.contratoForm.get('modalidadContrato')?.value !== 'DIRECTO') return;

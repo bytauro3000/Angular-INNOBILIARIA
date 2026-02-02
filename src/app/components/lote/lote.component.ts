@@ -56,6 +56,7 @@ export class LoteComponent implements OnInit {
     });
   }
 
+
   // 🔹 MÉTODO ACTUALIZADO PARA SOPORTAR BÚSQUEDA
   onProgramaChange(): void {
     if (this.idProgramaSeleccionado) {

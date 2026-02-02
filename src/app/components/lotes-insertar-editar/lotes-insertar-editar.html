@@ -11,17 +11,12 @@
 
         <div class="modal-body">
           <div class="form-wrapper">
-            
+
             <div class="form-row">
               <div class="form-group">
                 <label>Programa Inmobiliario</label>
-                <ng-select [items]="programas" 
-                           bindLabel="nombrePrograma" 
-                           formControlName="programa" 
-                           [searchable]="true" 
-                           appendTo="body" 
-                           [compareWith]="comparePrograma" 
-                           placeholder="Seleccione el proyecto">
+                <ng-select [items]="programas" bindLabel="nombrePrograma" formControlName="programa" [searchable]="true"
+                  appendTo="body" [compareWith]="comparePrograma" placeholder="Seleccione el proyecto">
                 </ng-select>
               </div>
             </div>
@@ -29,22 +24,29 @@
             <div class="form-row form-3-col">
               <div class="form-group">
                 <label>Manzana</label>
-                <input type="text" formControlName="manzana" placeholder="Ej. MZ 01" (input)="formatearTexto($event, 'manzana')" required />
+                <input type="text" formControlName="manzana" placeholder="Ej. MZ 01"
+                  (input)="formatearTexto($event, 'manzana')" required />
               </div>
               <div class="form-group">
                 <label>N° Lote</label>
                 <input type="text" formControlName="numeroLote" placeholder="Ej. 15" required />
               </div>
               <div class="form-group">
-                <label>Área (m²)</label>
-                <input type="text" formControlName="area" (input)="validarSoloNumeros($event, 'area')" placeholder="0.00" required />
-              </div>
+  <label>Área (m²)</label>
+  <input type="text" 
+         formControlName="area" 
+         #areaInput
+         placeholder="0.00" 
+         class="form-control" 
+         (input)="validarSoloNumeros($event, 'area')" />
+</div>
             </div>
 
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label>Precio por m²</label>
-                <input type="text" formControlName="precioM2" (input)="validarSoloNumeros($event, 'precioM2')" placeholder="0.00" required />
+                <input type="text" formControlName="precioM2" (input)="validarSoloNumeros($event, 'precioM2')"
+                  placeholder="0.00" required />
               </div>
               <div class="form-group">
                 <label>Estado</label>
@@ -59,49 +61,53 @@
             <div class="form-row form-4-col">
               <div class="form-group">
                 <label>Largo 1 (Derecho)</label>
-                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')" placeholder="0.00" />
+                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')"
+                  placeholder="0.00" />
               </div>
               <div class="form-group">
                 <label>Largo 2 (Izquierdo)</label>
-                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')" placeholder="0.00" />
+                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')"
+                  placeholder="0.00" />
               </div>
               <div class="form-group">
                 <label>Ancho 1 (Frente)</label>
-                <input type="text" formControlName="ancho1" (input)="validarSoloNumeros($event, 'ancho1')" placeholder="0.00" />
+                <input type="text" formControlName="ancho1" (input)="validarSoloNumeros($event, 'ancho1')"
+                  placeholder="0.00" />
               </div>
               <div class="form-group">
                 <label>Ancho 2 (Fondo)</label>
-                <input type="text" formControlName="ancho2" (input)="validarSoloNumeros($event, 'ancho2')" placeholder="0.00" />
+                <input type="text" formControlName="ancho2" (input)="validarSoloNumeros($event, 'ancho2')"
+                  placeholder="0.00" />
               </div>
             </div>
 
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label>Colindante Norte (Frente)</label>
-                <input type="text" formControlName="colindanteNorte" list="opcionesColindantes" 
-                       (input)="formatearTexto($event, 'colindanteNorte')" 
-                       (change)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
+                <input type="text" formControlName="colindanteNorte" list="opcionesColindantes"
+                  (input)="formatearTexto($event, 'colindanteNorte')"
+                  (change)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
               </div>
               <div class="form-group">
                 <label>Colindante Sur (Fondo)</label>
-                <input type="text" formControlName="colindanteSur" list="opcionesColindantes" 
-                       (input)="formatearTexto($event, 'colindanteSur')" 
-                       (change)="formatearTexto($event, 'colindanteSur')" placeholder="Límite Sur" />
+                <input type="text" formControlName="colindanteSur" list="opcionesColindantes"
+                  (input)="formatearTexto($event, 'colindanteSur')" (change)="formatearTexto($event, 'colindanteSur')"
+                  placeholder="Límite Sur" />
               </div>
             </div>
 
             <div class="form-row form-2-col">
               <div class="form-group">
                 <label>Colindante Este (Derecha)</label>
-                <input type="text" formControlName="colindanteEste" list="opcionesColindantes" 
-                       (input)="formatearTexto($event, 'colindanteEste')" 
-                       (change)="formatearTexto($event, 'colindanteEste')" placeholder="Límite Este" />
+                <input type="text" formControlName="colindanteEste" list="opcionesColindantes"
+                  (input)="formatearTexto($event, 'colindanteEste')" (change)="formatearTexto($event, 'colindanteEste')"
+                  placeholder="Límite Este" />
               </div>
               <div class="form-group">
                 <label>Colindante Oeste (Izquierda)</label>
-                <input type="text" formControlName="colindanteOeste" list="opcionesColindantes" 
-                       (input)="formatearTexto($event, 'colindanteOeste')" 
-                       (change)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
+                <input type="text" formControlName="colindanteOeste" list="opcionesColindantes"
+                  (input)="formatearTexto($event, 'colindanteOeste')"
+                  (change)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
               </div>
             </div>
 
