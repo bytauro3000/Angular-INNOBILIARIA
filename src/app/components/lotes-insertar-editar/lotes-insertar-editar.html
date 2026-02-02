@@ -60,16 +60,6 @@
 
             <div class="form-row form-4-col">
               <div class="form-group">
-                <label>Largo 1 (Derecho)</label>
-                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')"
-                  placeholder="0.00" />
-              </div>
-              <div class="form-group">
-                <label>Largo 2 (Izquierdo)</label>
-                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')"
-                  placeholder="0.00" />
-              </div>
-              <div class="form-group">
                 <label>Ancho 1 (Frente)</label>
                 <input type="text" formControlName="ancho1" (input)="validarSoloNumeros($event, 'ancho1')"
                   placeholder="0.00" />
@@ -79,6 +69,16 @@
                 <input type="text" formControlName="ancho2" (input)="validarSoloNumeros($event, 'ancho2')"
                   placeholder="0.00" />
               </div>
+              <div class="form-group">
+                <label>Largo 2 (Izquierdo)</label>
+                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')"
+                  placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Largo 1 (Derecho)</label>
+                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')"
+                  placeholder="0.00" />
+              </div>  
             </div>
 
             <div class="form-row form-2-col">
@@ -98,17 +98,17 @@
 
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label>Colindante Este (Derecha)</label>
-                <input type="text" formControlName="colindanteEste" list="opcionesColindantes"
-                  (input)="formatearTexto($event, 'colindanteEste')" (change)="formatearTexto($event, 'colindanteEste')"
-                  placeholder="Límite Este" />
-              </div>
-              <div class="form-group">
                 <label>Colindante Oeste (Izquierda)</label>
                 <input type="text" formControlName="colindanteOeste" list="opcionesColindantes"
                   (input)="formatearTexto($event, 'colindanteOeste')"
                   (change)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
               </div>
+              <div class="form-group">
+                <label>Colindante Este (Derecha)</label>
+                <input type="text" formControlName="colindanteEste" list="opcionesColindantes"
+                  (input)="formatearTexto($event, 'colindanteEste')" (change)="formatearTexto($event, 'colindanteEste')"
+                  placeholder="Límite Este" />
+              </div> 
             </div>
 
             <datalist id="opcionesColindantes">
