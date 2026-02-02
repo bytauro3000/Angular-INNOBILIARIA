@@ -43,8 +43,8 @@ export class ContratoService {
 
   //Método para descargar el PDF generado en el Backend
   imprimirContratoPdf(id: number): Observable<Blob> {
-    // Es vital usar { responseType: 'blob' } para que Angular entienda que recibe un archivo
-    return this.http.get(`${this.apiUrl}/${id}/imprimir`, { 
+    const timestamp = new Date().getTime();
+    return this.http.get(`${this.apiUrl}/${id}/imprimir?t=${timestamp}`, { 
       responseType: 'blob' 
     });
   }
