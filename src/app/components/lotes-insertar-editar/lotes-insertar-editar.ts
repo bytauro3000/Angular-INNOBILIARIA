@@ -21,11 +21,11 @@ import { ProgramaService } from '../../services/programa.service';
 })
 export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
-  @ViewChild('areaInput') areaInput!: ElementRef; 
+  @ViewChild('areaInput') areaInput!: ElementRef;
   @Output() loteGuardado = new EventEmitter<void>();
 
   private modal?: bootstrap.Modal;
-  private areaTooltip?: bootstrap.Tooltip; 
+  private areaTooltip?: bootstrap.Tooltip;
   loteForm!: FormGroup;
   programas: Programa[] = [];
   isEditMode = false;
@@ -37,22 +37,23 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
     private programaService: ProgramaService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.inicializarFormulario();
-    this.RecargarProgramas(); 
+    this.RecargarProgramas();
     this.suscribirACalculoArea();
+    this.suscribirAValidacionDuplicados();
   }
 
   ngAfterViewInit(): void {
     this.modal = new bootstrap.Modal(this.modalElement.nativeElement);
-    
+
     // 🟢 CAMBIO: Posicionamiento en 'bottom' (inferior)
     this.areaTooltip = new bootstrap.Tooltip(this.areaInput.nativeElement, {
       title: 'Verificar área con el plano',
       trigger: 'manual',
-      placement: 'bottom' 
+      placement: 'bottom'
     });
   }
 
@@ -84,7 +85,7 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
 
   calcularAreaAutomaticamente(): void {
     const f = this.loteForm.getRawValue();
-    
+
     // 🟢 CAMBIO: Si el usuario ya escribió algo en Área, no calculamos nada
     if (f.area && f.area !== '' && f.area !== '0.00') {
       return;
@@ -118,14 +119,14 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
       manzana: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s-]+$/)]],
       numeroLote: ['', [Validators.required]],
       area: ['', [Validators.required]],
-      largo1: [''], 
-      largo2: [''], 
-      ancho1: [''], 
+      largo1: [''],
+      largo2: [''],
+      ancho1: [''],
       ancho2: [''],
       precioM2: ['', [Validators.required]],
-      colindanteNorte: [''], 
-      colindanteSur: [''], 
-      colindanteEste: [''], 
+      colindanteNorte: [''],
+      colindanteSur: [''],
+      colindanteEste: [''],
       colindanteOeste: [''],
       estado: [EstadoLote.Disponible, Validators.required],
       programa: [null, Validators.required]
@@ -142,8 +143,45 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
     this.loteForm.get(controlName)?.setValue(valor, { emitEvent: false });
   }
 
+  private suscribirAValidacionDuplicados(): void {
+  // Vigilamos los 3 campos clave para disparar la validación
+  const camposClave = ['programa', 'manzana', 'numeroLote'];
+  
+  camposClave.forEach(campo => {
+    this.loteForm.get(campo)?.valueChanges.subscribe(() => {
+      this.verificarSiLoteExiste();
+    });
+  });
+}
+
+private verificarSiLoteExiste(): void {
+  const values = this.loteForm.getRawValue();
+  const idProg = values.programa?.idPrograma;
+  const mz = values.manzana;
+  const num = values.numeroLote;
+
+  // Solo validamos si los 3 campos tienen datos y NO estamos en modo edición
+  if (idProg && mz && num && !this.isEditMode) {
+    this.loteService.validarLoteExistente(idProg, mz, num).subscribe(existe => {
+      if (existe) {
+        this.toastr.warning(
+          `El lote ${num} de la manzana ${mz} ya se encuentra registrado en este programa.`,
+          'Atención: Lote Duplicado',
+          { 
+            timeOut: 5000, 
+            progressBar: true,
+            positionClass: 'toast-top-right' // Puedes cambiar la posición aquí
+          }
+        );
+        // Opcional: Limpiar el número de lote para obligar al usuario a corregirlo
+        this.loteForm.get('numeroLote')?.setValue('', { emitEvent: false });
+      }
+    });
+  }
+}
+
   abrirModal(lote?: Lote): void {
-    this.RecargarProgramas(); 
+    this.RecargarProgramas();
     this.loteForm.reset({ estado: EstadoLote.Disponible, area: '', precioM2: '' });
     if (lote && lote.idLote) {
       this.isEditMode = true;
@@ -156,9 +194,9 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
     this.modal?.show();
   }
 
-  cerrarModal(): void { 
+  cerrarModal(): void {
     this.areaTooltip?.hide();
-    this.modal?.hide(); 
+    this.modal?.hide();
   }
 
   formatearTexto(event: any, controlName: string): void {
@@ -186,21 +224,33 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
       this.loteForm.markAllAsTouched();
       return;
     }
+
     const data = this.loteForm.value;
+    // Mantenemos el SweetAlert solo para el estado de carga (loading)
     Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
-    const request = this.isEditMode 
+
+    const request = this.isEditMode
       ? this.loteService.actualizarLote(this.idLoteEditar!, data)
       : this.loteService.crearLote(data);
+
     request.subscribe({
       next: () => {
         Swal.close();
-        Swal.fire('Éxito', `Lote ${this.isEditMode ? 'actualizado' : 'creado'} correctamente`, 'success');
+        this.toastr.success(`Lote ${this.isEditMode ? 'actualizado' : 'creado'} correctamente`, '¡Éxito!');
         this.loteGuardado.emit();
         this.cerrarModal();
       },
-      error: () => {
-        Swal.close();
-        Swal.fire('Error', 'No se pudo completar la operación', 'error');
+      error: (err) => {
+        Swal.close(); // Cerramos el "Procesando..."
+
+        // Capturamos el mensaje: "El lote X de la manzana Y ya existe..." enviado por el Backend
+        const errorMsg = err.error || 'No se pudo completar la operación';
+
+        this.toastr.warning(errorMsg, 'Registro Duplicado', {
+          timeOut: 4000,       // Dura 4 segundos
+          progressBar: true,   // Muestra la barrita de tiempo
+          closeButton: true    // Permite cerrarlo manualmente si se desea
+        });
       }
     });
   }

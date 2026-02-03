@@ -10,10 +10,10 @@ import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
   providedIn: 'root'
 })
 export class LoteService {
-  
+
   private apiUrl = 'https://inmobiliariaivan.onrender.com/api/lotes';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
 
 
@@ -112,5 +112,14 @@ export class LoteService {
         }))
       )
     );
+  }
+
+  // Agrega este método dentro de tu clase LoteService
+  validarLoteExistente(idPrograma: number, manzana: string, numeroLote: string): Observable<boolean> {
+    const params = new HttpParams()
+      .set('idPrograma', idPrograma.toString())
+      .set('manzana', manzana)
+      .set('numeroLote', numeroLote);
+    return this.http.get<boolean>(`${this.apiUrl}/validar-duplicado`, { params });
   }
 }
