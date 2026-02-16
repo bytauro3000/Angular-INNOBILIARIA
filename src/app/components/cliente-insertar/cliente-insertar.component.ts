@@ -145,7 +145,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     const tipo = this.clienteForm.get('tipoCliente')?.value;
 
     // Solo busca si es NATURAL y tiene 8 dígitos
-    if (tipo === TipoCliente.NATURAL && dni && dni.length === 8) {
+    if (tipo === TipoCliente.NATURAL && dni && dni.length === 9) {
       this.cargandoDni = true;
 
       this.clienteService.consultarDniExterno(dni).subscribe({
