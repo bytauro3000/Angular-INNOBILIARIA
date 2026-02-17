@@ -123,7 +123,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   private updateNumDocValidators(tipo: TipoCliente): void {
     const control = this.clienteForm.get('numDoc');
     if (!control) return;
-    const length = tipo === TipoCliente.NATURAL ? 9 : 11;
+    const length = tipo === TipoCliente.NATURAL ? 8 : 11;
     control.setValidators([Validators.required, Validators.minLength(length), Validators.maxLength(length)]);
     control.updateValueAndValidity();
   }
@@ -134,7 +134,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     if (control.errors['required']) return 'Obligatorio.';
     if (controlName === 'email' && control.errors['pattern']) return 'Email inválido.';
     if (controlName === 'numDoc' && (control.errors['minlength'] || control.errors['maxlength'])) {
-      return `Debe tener ${this.clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 9 : 11} dígitos.`;
+      return `Debe tener ${this.clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11} dígitos.`;
     }
     return 'Error.';
   }
@@ -145,7 +145,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     const tipo = this.clienteForm.get('tipoCliente')?.value;
 
     // Solo busca si es NATURAL y tiene 8 dígitos
-    if (tipo === TipoCliente.NATURAL && dni && dni.length === 9) {
+    if (tipo === TipoCliente.NATURAL && dni && dni.length === 8) {
       this.cargandoDni = true;
 
       this.clienteService.consultarDniExterno(dni).subscribe({
