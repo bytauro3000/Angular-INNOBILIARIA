@@ -1,0 +1,41 @@
+<div class="modal-overlay" *ngIf="estaAbierto" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h5><i class="bi bi-lightning-charge-fill me-2"></i>Inscripción de Servicio</h5>
+      <button class="btn-close-custom" (click)="cerrarModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert alert-info py-2" style="background-color: #e7f1ff; border: 1px solid #b6d4fe; border-radius: 8px;">
+        Contrato: <strong>#{{ idContrato }}</strong>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label d-block fw-bold mb-2">Tipo de Servicio</label>
+        <select class="form-select w-100" [(ngModel)]="tipoServicio" style="padding: 10px; border-radius: 8px;">
+          <option [value]="TipoServicios.LUZ">⚡ LUZ ELÉCTRICA</option>
+          <option [value]="TipoServicios.AGUA">💧 AGUA Y DESAGÜE</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label d-block fw-bold mb-2">Monto del Derecho (USD)</label>
+        <div class="input-group">
+          <input type="text" class="form-control" [value]="monto | currency:'USD'" readonly 
+                 style="background-color: #f1f3f5; font-weight: bold; color: #0d6efd;">
+        </div>
+        <p class="text-muted mt-2" style="font-size: 0.85rem;">* Pago único por instalación y conexión.</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn btn-primary px-4" [disabled]="loading" (click)="confirmarInscripcion()">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ loading ? 'Registrando...' : 'Confirmar' }}
+      </button>
+    </div>
+
+  </div>
+</div>

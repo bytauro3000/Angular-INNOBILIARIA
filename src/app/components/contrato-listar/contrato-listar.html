@@ -77,6 +77,10 @@
               <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete" title="Eliminar">
                 <i class="bi bi-trash"></i>
               </button>
+
+            <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action btn-info" title="Inscribir Servicio">
+  <i class="bi bi-lightning-charge"></i>
+</button>
               <a *ngIf="contrato.tipoContrato === 'FINANCIADO'" [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-info" title="Letras">
                 <i class="bi bi-file-earmark-plus"></i>
               </a>
@@ -107,3 +111,7 @@
     </button>
   </div>
 </div>
+<app-inscripcion-servicios-insertar 
+  #modalInscripcion 
+  (inscripcionExitosa)="onInscripcionExitosa()">
+</app-inscripcion-servicios-insertar>
