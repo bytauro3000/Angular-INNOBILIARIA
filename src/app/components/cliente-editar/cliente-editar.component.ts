@@ -61,6 +61,8 @@ export class ClienteEditarComponent implements OnInit {
   }
 
   private inicializarFormulario(): void {
+    // Definimos la misma Regex
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     this.clienteForm = this.fb.group({
       idCliente: [null],
       nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
@@ -70,7 +72,7 @@ export class ClienteEditarComponent implements OnInit {
       genero: ['', Validators.required],
       estadoCivil: [null, Validators.required],
       celular: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.pattern(EMAIL_REGEX)]],
       direccion: ['', Validators.required],
       distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
       estado: [null, Validators.required],

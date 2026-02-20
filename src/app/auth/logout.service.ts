@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class LogoutService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/auth/logout';
+  private apiUrl = '${environment.apiUrl}/api/auth/logout';
 
   constructor(
     private http: HttpClient,

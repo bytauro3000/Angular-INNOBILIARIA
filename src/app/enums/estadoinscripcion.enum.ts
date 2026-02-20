@@ -1,0 +1,6 @@
+export enum EstadoInscripcion {
+    PENDIENTE_CONEXION = 'PENDIENTE_CONEXION',
+    ACTIVO = 'ACTIVO',
+    SUSPENDIDO = 'SUSPENDIDO',
+    RETIRADO = 'RETIRADO'
+}
