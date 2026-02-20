@@ -12,7 +12,7 @@ import { ReporteCronogramaPagosClientesDTO } from '../dto/reportecronogramapagoc
   providedIn: 'root'
 })
 export class LetrasCambioService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/letras';
+  private apiUrl = '${environment.apiUrl}/api/letras';
 
   constructor(private http: HttpClient) {}
 

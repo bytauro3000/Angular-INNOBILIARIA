@@ -7,7 +7,7 @@ import { DashboardData } from '../models/dashboard.model'; // 👈 Importamos la
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/dashboard/totales';
+  private apiUrl = '${environment.apiUrl}/api/dashboard/totales';
 
   constructor(private http: HttpClient) {}
 

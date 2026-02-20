@@ -4,13 +4,14 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Cliente } from '../models/cliente.model';
 import { ConsultaDniDTO } from '../dto/consultadni.dto'; 
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/clientes';
+  private readonly apiUrl = `${environment.apiUrl}/api/clientes`;
 
   constructor(private http: HttpClient) { }
 
