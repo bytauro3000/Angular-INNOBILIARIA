@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Vendedor } from '../models/vendedor.model';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class VendedorService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/vendedores';
+  private readonly apiUrl = `${environment.apiUrl}/api/vendedores`;
 
   constructor(private http: HttpClient) {}
 

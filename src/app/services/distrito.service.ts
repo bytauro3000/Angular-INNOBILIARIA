@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Distrito } from '../models/distrito.model';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class DistritoService {
   // ✅ URL base actualizada
-  private apiUrl = '${environment.apiUrl}/api/distritos';
+  private readonly apiUrl = `${environment.apiUrl}/api/distritos`;
 
   constructor(private http: HttpClient) {}
 

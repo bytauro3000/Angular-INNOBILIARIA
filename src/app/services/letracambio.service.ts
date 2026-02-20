@@ -6,13 +6,14 @@ import { GenerarLetrasRequest } from '../dto/generarletra.dto';
 import { LetraCambio } from '../models/letra-cambio.model';
 import { ReporteLetraCambioDTO } from '../dto/reporteletracambio.dto';
 import { ReporteCronogramaPagosClientesDTO } from '../dto/reportecronogramapagocli.dto';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class LetrasCambioService {
-  private apiUrl = '${environment.apiUrl}/api/letras';
+  private readonly apiUrl = `${environment.apiUrl}/api/letras`;
 
   constructor(private http: HttpClient) {}
 

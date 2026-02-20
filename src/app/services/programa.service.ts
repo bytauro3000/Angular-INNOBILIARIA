@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Programa } from '../models/programa.model';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProgramaService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/programas';
+  private readonly apiUrl = `${environment.apiUrl}/api/programas`;
 
   constructor(private http: HttpClient) {}
 
