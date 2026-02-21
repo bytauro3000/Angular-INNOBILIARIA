@@ -4,13 +4,8 @@
   <div class="filtros-header">
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input
-        type="text"
-        [(ngModel)]="terminoBusqueda"
-        (input)="filtrarContratos()"
-        placeholder="Buscar por ID Contrato"
-        class="form-control"
-      />
+      <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarContratos()" placeholder="Buscar por ID Contrato"
+        class="form-control" />
     </div>
 
     <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-nuevo">
@@ -25,7 +20,8 @@
           <th style="width: 50px;">ID</th>
           <th>Nombre(s) del Cliente</th>
           <th>Documento</th>
-          <th>Lote</th> <th>Fecha</th>
+          <th>Lote</th>
+          <th>Fecha</th>
           <th>Tipo</th>
           <th>Total</th>
           <th>Inicial</th>
@@ -36,30 +32,40 @@
       </thead>
       <tbody>
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
-          <td data-label="ID" class="text-center">{{ contrato.idContrato }}</td>
+          <td data-label="ID" class="text-center">
+            <div class="id-service-wrapper">
+              <span class="id-number">{{ contrato.idContrato }}</span>
+              <div class="service-indicators" *ngIf="contrato.tieneLuz || contrato.tieneAgua">
+                <i *ngIf="contrato.tieneLuz" class="bi bi-lightning-charge-fill text-warning"
+                  title="Servicio de Luz Activo"></i>
+                <i *ngIf="contrato.tieneAgua" class="bi bi-droplet-fill text-primary"
+                  title="Servicio de Agua Activo"></i>
+              </div>
+            </div>
+          </td>
           <td data-label="Cliente">
-  <div class="multi-item-container">
-    <div *ngFor="let cliente of contrato.clientes">
-      {{ cliente.nombre }} {{ cliente.apellidos }}
-    </div>
-  </div>
-</td>
+            <div class="multi-item-container">
+              <div *ngFor="let cliente of contrato.clientes">
+                {{ cliente.nombre }} {{ cliente.apellidos }}
+              </div>
+            </div>
+          </td>
 
-<td data-label="DNI" class="text-center">
-  <div class="multi-item-container">
-    <div *ngFor="let cliente of contrato.clientes">
-      {{ cliente.numDoc }}
-    </div>
-  </div>
-</td>
+          <td data-label="DNI" class="text-center">
+            <div class="multi-item-container">
+              <div *ngFor="let cliente of contrato.clientes">
+                {{ cliente.numDoc }}
+              </div>
+            </div>
+          </td>
 
-<td data-label="Lote" class="text-center">
-  <div class="multi-item-container">
-    <div *ngFor="let lote of contrato.lotes">
-      Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
-    </div>
-  </div>
-</td>
+          <td data-label="Lote" class="text-center">
+            <div class="multi-item-container">
+              <div *ngFor="let lote of contrato.lotes">
+                Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
+              </div>
+            </div>
+          </td>
           <td data-label="Fecha" class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
           <td data-label="Tipo" class="text-center">{{ contrato.tipoContrato }}</td>
           <td data-label="Total" class="text-end fw-bold">{{ contrato.montoTotal | currency: 'USD' }}</td>
@@ -71,17 +77,29 @@
               <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir">
                 <i class="bi bi-printer"></i>
               </button>
-              <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]" class="btn-action btn-edit" title="Editar">
+              <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
+                class="btn-action btn-edit" title="Editar">
                 <i class="bi bi-pencil"></i>
               </button>
               <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete" title="Eliminar">
                 <i class="bi bi-trash"></i>
               </button>
 
-            <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action btn-info" title="Inscribir Servicio">
-  <i class="bi bi-lightning-charge"></i>
-</button>
-              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'" [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-info" title="Letras">
+              <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action" [ngClass]="{
+            'btn-info': !contrato.tieneLuz || !contrato.tieneAgua,
+            'btn-success-active': contrato.tieneLuz && contrato.tieneAgua
+        }" [disabled]="contrato.tieneLuz && contrato.tieneAgua"
+                [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir Servicio'">
+
+                <i class="bi" [ngClass]="{
+        'bi-lightning-charge': !contrato.tieneLuz,
+        'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
+        'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
+    }"></i>
+              </button>
+              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
+                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-info"
+                title="Letras">
                 <i class="bi bi-file-earmark-plus"></i>
               </a>
             </div>
@@ -99,10 +117,8 @@
       Anterior
     </button>
 
-    <button *ngFor="let page of getPagesArray()" 
-            (click)="goToPage(page)" 
-            [class.active]="currentPage === page"
-            class="btn pagina-numero-btn">
+    <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" [class.active]="currentPage === page"
+      class="btn pagina-numero-btn">
       {{ page }}
     </button>
 
@@ -111,7 +127,5 @@
     </button>
   </div>
 </div>
-<app-inscripcion-servicios-insertar 
-  #modalInscripcion 
-  (inscripcionExitosa)="onInscripcionExitosa()">
+<app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">
 </app-inscripcion-servicios-insertar>

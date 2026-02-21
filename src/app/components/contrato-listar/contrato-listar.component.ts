@@ -52,20 +52,23 @@ export class ContratoListarComponent implements OnInit {
   }
 
   cargarContratos(): void {
-    this.contratoService.listarContrato().subscribe({
-      next: (data) => {
-        this.contratos = data;
-        this.filtrarContratos();
-        this.cdr.detectChanges(); 
-      },
-      error: (error) => {
-        console.error('Error al cargar contratos:', error);
-        this.toastr.error('Error al cargar los contratos.', 'Error');
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
+  this.contratoService.listarContrato().subscribe({
+    next: (data) => {
+      //Forzamos una nueva referencia del array para que Angular detecte el cambio
+      this.contratos = [...data]; 
+      this.filtrarContratos();
+      
+      //Obligamos a Angular a pintar los cambios en la tabla
+      this.cdr.markForCheck(); 
+      this.cdr.detectChanges(); 
+    },
+    error: (error) => {
+      console.error('Error al cargar contratos:', error);
+      this.toastr.error('Error al cargar los contratos.', 'Error');
+      this.cdr.detectChanges();
+    }
+  });
+}
   imprimirContrato(contrato: ContratoResponseDTO): void {
   if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
     this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');

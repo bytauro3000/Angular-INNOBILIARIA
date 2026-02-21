@@ -11,4 +11,6 @@ export interface ContratoRequestDTO {
   idSeparacion?: number;
   idClientes: number[];
   idLotes: number[];
+
+  
 }

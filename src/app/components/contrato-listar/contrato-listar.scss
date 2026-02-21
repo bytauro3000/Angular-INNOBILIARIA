@@ -214,4 +214,69 @@
       box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
     }
   }
+
+}
+/* Contenedor para el ID y sus servicios */
+.id-service-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  .id-number {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .service-indicators {
+    display: flex;
+    gap: 4px;
+    font-size: 0.8rem; // Más pequeño que el texto normal
+    
+    i {
+      /* Sombra suave para que resalten */
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+    }
+  }
+}
+
+/* Estilo para botón deshabilitado */
+.btn-action {
+  &:disabled {
+    background-color: #f8f9fa !important;
+    border-color: #e9ecef !important;
+    color: #ced4da !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+    
+    &:hover {
+      background-color: #f8f9fa !important;
+    }
+  }
+}
+
+/* Colores de iconos (Asegurar si no usas Bootstrap global) */
+.text-warning { color: #ffc107 !important; }
+.text-primary { color: #0d6efd !important; }
+/* Estilo para cuando el botón está completado y bloqueado */
+.btn-success-active {
+    color: #198754 !important;
+    border-color: #198754 !important;
+    background-color: #e8f5e9 !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Mejora visual para los indicadores junto al ID */
+.service-indicators {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    justify-content: center;
+
+    i {
+        font-size: 0.85rem;
+        &.bi-lightning-charge-fill { color: #ffc107; }
+        &.bi-droplet-fill { color: #0d6efd; }
+    }
 }
