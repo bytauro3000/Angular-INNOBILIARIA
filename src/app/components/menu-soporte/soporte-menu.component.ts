@@ -43,15 +43,10 @@ export class SoporteMenuComponent implements OnInit {
   }
 
   onLogout(): void {
-    this.logoutService.logout().subscribe({
-      next: () => {
-        this.logoutService.clearSessionAndRedirect();
-        console.log('Sesión cerrada correctamente en el backend.');
-      },
-      error: (err) => {
-        console.error('Error al cerrar sesión en el backend:', err);
-        this.logoutService.clearSessionAndRedirect();
-      }
-    });
-  }
+        // 1. Llamamos al servicio (ahora es void, no es observable)
+        this.logoutService.logout();
+        
+        // 2. Registro en consola para verificar
+        console.log('Sesión de soporte cerrada localmente.');
+    }
 }
