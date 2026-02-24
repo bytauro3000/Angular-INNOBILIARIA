@@ -1,0 +1,75 @@
+<div class="messaging-container">
+  <aside class="chat-sidebar">
+    <div class="sidebar-header">
+        <h1>PRUEBA: EL COMPONENTE CARGA</h1>
+      <h2>Mensajes</h2>
+      <div class="search-box">
+        <input type="text" placeholder="Buscar cliente o vendedor...">
+      </div>
+    </div>
+    
+    <div class="chat-list">
+      <div *ngFor="let t of trabajadores" 
+           class="chat-item" 
+           [class.active]="chatSeleccionado?.id === t.id"
+           (click)="seleccionarChat(t)">
+        <div class="avatar">{{ t.iniciales }}</div>
+        <div class="chat-info">
+          <div class="info-header">
+            <h4>{{ t.nombre }}</h4>
+            <span class="chat-time">10:45 AM</span>
+          </div>
+          <p>{{ t.ultimoMsj || 'Sin mensajes recientes' }}</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="chat-window">
+    <ng-container *ngIf="chatSeleccionado; else noChat">
+      <header class="chat-window-header">
+        <div class="active-user-info">
+          <div class="avatar-sm">{{ chatSeleccionado.iniciales }}</div>
+          <div>
+            <h3>{{ chatSeleccionado.nombre }}</h3>
+            <span class="status online">En línea</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="action-btn">📞</button>
+          <button class="action-btn">📄</button>
+        </div>
+      </header>
+
+      <div class="message-history">
+        <div *ngFor="let m of mensajes" 
+             [ngClass]="{'sent': m.emisorId === usuarioLogueado.id, 'received': m.emisorId !== usuarioLogueado.id}"
+             class="message">
+          <div class="message-bubble">
+            <p>{{ m.texto }}</p>
+            <div class="message-footer">
+              <span class="time">{{ m.hora }}</span>
+              <span class="check" *ngIf="m.emisorId === usuarioLogueado.id">✓✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="chat-footer">
+        <button class="attach-btn">+</button>
+        <div class="input-wrapper">
+          <input type="text" [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarMensaje()" placeholder="Escribe un mensaje aquí...">
+        </div>
+        <button class="send-btn" (click)="enviarMensaje()">➤</button>
+      </footer>
+    </ng-container>
+
+    <ng-template #noChat>
+      <div class="empty-state">
+        <div class="logo-inm">🏢</div>
+        <h2>Inmobiliaria IVAN</h2>
+        <p>Selecciona un contacto para iniciar la gestión.</p>
+      </div>
+    </ng-template>
+  </main>
+</div>

@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 
+// Importacion de Mensajeria
+import { MensajeriaComponent } from './components/mensajeria/mensajeria.component';
+
 // Importa los componentes de menú
 import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria-menu.component';
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
@@ -72,7 +75,10 @@ export const routes: Routes = [
       { path: 'programas', component: ProgramaComponent },
       { path: 'vendedores', component: VendedorComponent },
       { path: 'lotes', component: LoteComponent },
-      { path: 'parceleros', component: ParceleroComponent }
+      { path: 'parceleros', component: ParceleroComponent },
+
+      // 🟢 RUTA DE MENSAJERÍA AÑADIDA
+      { path: 'mensajeria', component: MensajeriaComponent }
     ]
   },
 
