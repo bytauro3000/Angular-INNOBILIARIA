@@ -12,6 +12,10 @@ export interface ContratoResponseDTO {
     cantidadLetras: number;
     observaciones: string;
     clientes: ClienteResponseDTO[];
-    lotes: LoteResponseDTO[];    // 🟢 Agregado
-    letras: LetraResponseDTO[];  // 🟢 Agregado
+    lotes: LoteResponseDTO[];
+    letras: LetraResponseDTO[]; 
+
+    //NUEVOS CAMPOS PARA LOS INDICADORES VISUALES
+    tieneLuz: boolean;
+    tieneAgua: boolean;
 }

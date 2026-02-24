@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component,ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import { ContratoService } from '../../services/contrato.service';
 import { ContratoResponseDTO } from '../../dto/contratoreponse.dto';
 import { TipoContrato } from '../../enums/tipocontrato.enum';
 import { ToastrService } from 'ngx-toastr';
+import { InscripcionServiciosInsertarComponent } from '../inscripcion-servicios-insertar/inscripcion-servicios-insertar.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -17,13 +18,16 @@ import Swal from 'sweetalert2';
     FormsModule,
     RouterModule,
     CurrencyPipe,
-    DatePipe
+    DatePipe,
+    InscripcionServiciosInsertarComponent
   ],
   templateUrl: './contrato-listar.html',
   styleUrls: ['./contrato-listar.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContratoListarComponent implements OnInit {
+
+  @ViewChild('modalInscripcion') modalInscripcion!: InscripcionServiciosInsertarComponent;
 
   contratos: ContratoResponseDTO[] = [];
   contratosFiltrados: ContratoResponseDTO[] = [];
@@ -48,20 +52,23 @@ export class ContratoListarComponent implements OnInit {
   }
 
   cargarContratos(): void {
-    this.contratoService.listarContrato().subscribe({
-      next: (data) => {
-        this.contratos = data;
-        this.filtrarContratos();
-        this.cdr.detectChanges(); 
-      },
-      error: (error) => {
-        console.error('Error al cargar contratos:', error);
-        this.toastr.error('Error al cargar los contratos.', 'Error');
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
+  this.contratoService.listarContrato().subscribe({
+    next: (data) => {
+      //Forzamos una nueva referencia del array para que Angular detecte el cambio
+      this.contratos = [...data]; 
+      this.filtrarContratos();
+      
+      //Obligamos a Angular a pintar los cambios en la tabla
+      this.cdr.markForCheck(); 
+      this.cdr.detectChanges(); 
+    },
+    error: (error) => {
+      console.error('Error al cargar contratos:', error);
+      this.toastr.error('Error al cargar los contratos.', 'Error');
+      this.cdr.detectChanges();
+    }
+  });
+}
   imprimirContrato(contrato: ContratoResponseDTO): void {
   if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
     this.toastr.warning('Primero debe generar las letras de cambio para este contrato.', 'Atención');
@@ -150,6 +157,16 @@ export class ContratoListarComponent implements OnInit {
 
   getPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  // 4. Método para abrir el modal
+  abrirModalInscripcion(id: number): void {
+    this.modalInscripcion.abrirModal(id);
+  }
+
+  // 5. Método para refrescar la lista (opcional)
+  onInscripcionExitosa(): void {
+    this.cargarContratos(); // Recarga la tabla para ver cambios si es necesario
   }
 
   eliminarContrato(id: number): void {

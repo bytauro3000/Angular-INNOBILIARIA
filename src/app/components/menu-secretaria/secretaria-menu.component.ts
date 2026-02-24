@@ -82,10 +82,13 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
         this.isContratoSubmenuOpen = false;
     }
 
-    onLogout(): void {
-        this.logoutService.logout().subscribe({
-            next: () => this.logoutService.clearSessionAndRedirect(),
-            error: () => this.logoutService.clearSessionAndRedirect()
-        });
+   onLogout(): void {
+        // 1. Llamamos al servicio (ahora es void, no es observable)
+        this.logoutService.logout();
+        
+        // 2. Opcional: Mostrar mensaje de éxito con Toastr si lo tienes inyectado
+        // this.toastr.info('Has cerrado sesión correctamente', 'Sesión Finalizada');
+        
+        console.log('Sesión cerrada localmente.');
     }
 }
