@@ -25,6 +25,9 @@ import { SeparacionComponent } from './components/separacion-crud/separacion-cru
 // 🟢 IMPORTANTE: Asegúrate de que la ruta de importación sea la correcta según tu estructura
 import { SeparacionInsertEdit } from './components/separacion-insert-edit/separacion-insert-edit'; 
 
+// Servicios Basicos
+import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
+
 // Otros componentes
 import { ParceleroComponent } from './components/parcelero/parcelero';
 import { VendedorComponent } from './components/vendedor/vendedor';
@@ -72,7 +75,10 @@ export const routes: Routes = [
       { path: 'programas', component: ProgramaComponent },
       { path: 'vendedores', component: VendedorComponent },
       { path: 'lotes', component: LoteComponent },
-      { path: 'parceleros', component: ParceleroComponent }
+      { path: 'parceleros', component: ParceleroComponent },
+
+      //Servicios Basicos
+      { path: 'servicios-basicos', component: LecturaPlanillaComponent },
     ]
   },
 

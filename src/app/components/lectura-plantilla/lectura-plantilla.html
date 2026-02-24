@@ -1,0 +1,75 @@
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="fas fa-file-invoice"></i> Planilla Masiva de Lecturas</h4>
+    </div>
+    <div class="card-body">
+      
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <label class="form-label font-weight-bold">Tipo de Servicio:</label>
+          <select class="form-select form-select-lg" [(ngModel)]="tipoSeleccionado" (change)="cargarPlanilla()">
+            <option value="LUZ">💡 SERVICIO DE LUZ</option>
+            <option value="AGUA">💧 SERVICIO DE AGUA</option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button class="btn btn-outline-primary" (click)="cargarPlanilla()" [disabled]="cargando">
+            <i class="fas fa-sync-alt" [class.fa-spin]="cargando"></i> Cargar Contratos
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="planilla.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Cliente / Contrato</th>
+              <th>Ubicación (Mz-Lt)</th>
+              <th class="text-center">Lect. Anterior</th>
+              <th class="text-center" style="width: 200px;">Lect. Actual</th>
+              <th class="text-center">Consumo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fila of planilla" [class.table-danger]="fila.error">
+              <td>
+                <strong>{{ fila.clienteNombre }}</strong><br>
+                <small class="text-muted">ID: {{ fila.idContrato }}</small>
+              </td>
+              <td><span class="badge bg-secondary">{{ fila.manzana }} - {{ fila.lote }}</span></td>
+              <td class="text-center text-primary font-weight-bold">{{ fila.lecturaAnterior }}</td>
+              <td>
+                <input type="number" 
+                       class="form-control form-control-sm text-center" 
+                       [class.is-invalid]="fila.error"
+                       [(ngModel)]="fila.lecturaActual" 
+                       (input)="calcular(fila)">
+                <div class="invalid-feedback" *ngIf="fila.error">
+                  No puede ser menor a {{ fila.lecturaAnterior }}
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="h5" [class.text-success]="!fila.error">{{ fila.consumo }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-info text-center" *ngIf="planilla.length === 0 && !cargando">
+        Seleccione un servicio para cargar los clientes inscritos.
+      </div>
+
+      <div class="card-footer d-flex justify-content-between align-items-center" *ngIf="planilla.length > 0">
+        <span class="text-muted">Total de registros: {{ planilla.length }}</span>
+        <button class="btn btn-success btn-lg" 
+                [disabled]="!esPlanillaValida()" 
+                (click)="guardarTodo()">
+          <i class="fas fa-check-circle"></i> REGISTRAR RECIBOS DEL MES
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
