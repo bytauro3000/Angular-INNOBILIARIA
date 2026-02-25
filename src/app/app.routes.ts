@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 
+// Importacion de Mensajeria
+import { MensajeriaComponent } from './components/mensajeria/mensajeria.component';
+
 // Importa los componentes de menú
 import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria-menu.component';
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
@@ -27,6 +30,7 @@ import { SeparacionInsertEdit } from './components/separacion-insert-edit/separa
 
 // Servicios Basicos
 import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
+
 
 // Otros componentes
 import { ParceleroComponent } from './components/parcelero/parcelero';
@@ -79,6 +83,9 @@ export const routes: Routes = [
 
       //Servicios Basicos
       { path: 'servicios-basicos', component: LecturaPlanillaComponent },
+      // 🟢 RUTA DE MENSAJERÍA AÑADIDA
+      { path: 'mensajeria', component: MensajeriaComponent }
+
     ]
   },
 
