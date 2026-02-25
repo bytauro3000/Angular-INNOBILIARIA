@@ -15,7 +15,9 @@ import { LogoutService } from '../../auth/logout.service';
 export class SecretariaMenuComponent implements OnInit, AfterViewInit {
 
     usuarioLogueado: any;
-    isMenuOpen: boolean = false;
+    
+    // Variables de control de UI
+    isMenuOpen: boolean = false; // ✅ Controla el menú hamburguesa
     isClientesSubmenuOpen: boolean = false;
     isContratoSubmenuOpen: boolean = false;
 
@@ -27,18 +29,17 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         const token = this.tokenService.getToken();
+
         if (token) {
             try {
                 const decodedToken: any = jwtDecode(token);
-                // 🟢 CORRECCIÓN: Guardamos el email (sub) para filtrar el chat
                 this.usuarioLogueado = {
-                    id: decodedToken.id,
                     nombre: decodedToken.nombre,
-                    apellidos: decodedToken.apellidos,
-                    email: decodedToken.sub 
+                    apellidos: decodedToken.apellidos
                 };
             } catch (error) {
                 console.error('Error decodificando el token:', error);
+                this.usuarioLogueado = null;
             }
         }
     }
@@ -53,29 +54,45 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
                 integrationID: "5a403860-67f9-4209-9e46-0f398360d94f", 
                 region: "au-syd", 
                 serviceInstanceID: "2e434f7d-6653-4ff7-a72e-02261f84c63d",
-                onLoad: async (instance: any) => { await instance.render(); }
+                onLoad: async (instance: any) => { 
+                    await instance.render(); 
+                }
             };
-            setTimeout(() => {
-                const t = document.createElement('script');
-                t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + ((window as any).watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
-                document.head.appendChild(t);
-            });
         }
+
+        setTimeout(function(){
+            const t=document.createElement('script');
+            t.src="https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + ((window as any).watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+            document.head.appendChild(t);
+        });
     }
 
-    toggleMobileMenu() { this.isMenuOpen = !this.isMenuOpen; }
-    toggleClientesSubmenu() { this.isContratoSubmenuOpen = false; this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen; }
-    toggleContratoSubmenu() { this.isClientesSubmenuOpen = false; this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen; }
+    // ✅ Alternar menú principal en móviles
+    toggleMobileMenu() {
+        this.isMenuOpen = !this.isMenuOpen;
+    }
+
+    toggleClientesSubmenu() {
+        this.isContratoSubmenuOpen = false;
+        this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen;
+    }
+
+    toggleContratoSubmenu() {
+        this.isClientesSubmenuOpen = false;
+        this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen;
+    }
 
     @HostListener('document:click', ['$event'])
     onClick(event: Event) {
         const target = event.target as HTMLElement;
+        // Si se hace clic fuera del menú o en un enlace, cerramos los submenús
         if (!target.closest('.has-submenu') && !target.closest('.menu-toggle')) {
             this.isClientesSubmenuOpen = false;
             this.isContratoSubmenuOpen = false;
         }
     }
 
+    // ✅ Función para cerrar el menú móvil al hacer clic en un link
     closeMenu() {
         this.isMenuOpen = false;
         this.isClientesSubmenuOpen = false;

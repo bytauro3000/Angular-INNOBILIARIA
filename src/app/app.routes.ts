@@ -12,25 +12,23 @@ import { AdminMenuComponent } from './components/menu-admin/admin-menu.component
 //Importa los dashboards para los menús
 import { SecretariaDashboard } from './components/secretaria-dashboard/secretaria-dashboard';
 
-// Clientes
+//Clientes
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';
 import { ClienteVer } from './components/cliente-ver/cliente-ver';
 
-// Contratos
+//Contratos
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
 import { ContratoEditarComponent } from './components/contrato-editar/contrato-editar.component';
 
 // Separaciones
 import { SeparacionComponent } from './components/separacion-crud/separacion-crud.component';
-// 🟢 IMPORTANTE: Asegúrate de que la ruta de importación sea la correcta según tu estructura
 import { SeparacionInsertEdit } from './components/separacion-insert-edit/separacion-insert-edit'; 
 
 // Servicios Basicos
 import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
-
 
 // Otros componentes
 import { ParceleroComponent } from './components/parcelero/parcelero';
@@ -83,9 +81,9 @@ export const routes: Routes = [
 
       //Servicios Basicos
       { path: 'servicios-basicos', component: LecturaPlanillaComponent },
-      // 🟢 RUTA DE MENSAJERÍA AÑADIDA
-      { path: 'mensajeria', component: MensajeriaComponent }
 
+      //ruta para mensajeria
+      { path: 'mensajeria', component: MensajeriaComponent }
     ]
   },
 
