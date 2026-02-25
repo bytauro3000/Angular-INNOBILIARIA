@@ -1,0 +1,96 @@
+$navy: #1a252f;
+$blue: #2980b9;
+$green: #27ae60;
+$yellow: #f1c40f;
+$gray: #ecf0f1;
+
+.planilla-container {
+  padding: 0; background-color: #ffffff !important;
+  height: 100vh; display: flex; flex-direction: column;
+
+  .card-header {
+    background: $navy; color: #fff; padding: 12px 25px;
+    display: flex; justify-content: space-between; align-items: center;
+    h2 { color: #fff !important; margin: 0; font-size: 1.1rem; }
+    
+    // 🟢 Separación de precios
+    .prices-box {
+      display: flex; gap: 10px; // Espacio entre LUZ y AGUA
+      .badge-price {
+        padding: 4px 12px; border-radius: 4px; font-size: 0.8rem;
+        border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.1);
+      }
+    }
+  }
+
+  .filter-section {
+    display: flex; flex-wrap: wrap; gap: 15px; padding: 15px 25px;
+    background: #ecf0f1; border-bottom: 1px solid #bdc3c7;
+    .form-group {
+      flex: 1; min-width: 140px;
+      label { display: block; font-weight: 800; color: #2c3e50; margin-bottom: 4px; font-size: 0.75rem; }
+      input, select { width: 100%; padding: 6px; border: 1px solid #bdc3c7; border-radius: 4px; color: #000 !important; }
+    }
+  }
+
+  // 🟢 ÁREA DE SCROLL CON HEADER FIJO
+  .table-scroll-area {
+    flex: 1; overflow-y: auto; overflow-x: auto;
+    background: #fff;
+
+    .unified-table {
+      width: 100%; border-collapse: collapse;
+
+      // Clase para fijar encabezados
+      .sticky-th {
+        position: sticky; top: 0; z-index: 10;
+        box-shadow: inset 0 -1px 0 #ddd; // Borde inferior simulado
+      }
+
+      .sticky-sub {
+        position: sticky; top: 38px; z-index: 9; // Se posiciona debajo de la principal
+        background: #f8f9fa !important;
+        box-shadow: inset 0 -1px 0 #ddd;
+      }
+
+      th { padding: 8px; border: 1px solid #ddd; font-size: 0.7rem; text-align: center; }
+      .main-head th { background: #34495e; color: #fff; font-size: 0.85rem; }
+      .sub-head th { color: #333; font-weight: 800; }
+      
+      // Anchos de columna
+      .col-titular { width: 220px; } 
+      .col-mz { width: 70px; }      
+      .col-lect { width: 140px; }    
+      .col-cons { width: 60px; }
+      .col-imp { width: 90px; }
+
+      td { padding: 6px 8px; border: 1px solid #eee; color: #000 !important; font-size: 0.8rem; }
+      .badge-mz { background: #34495e; color: #fff !important; padding: 4px 6px; border-radius: 4px; font-weight: bold; }
+
+      .state-disabled { background-color: $gray !important; }
+      .state-pending { background-color: rgba($yellow, 0.25) !important; border: 1.5px solid $yellow !important; }
+      .state-ready { background-color: rgba($green, 0.25) !important; border: 1.5px solid $green !important; }
+
+      .input-cell {
+        width: 100%; border: none; background: transparent; text-align: center;
+        font-weight: 900; color: #000 !important; font-size: 1rem;
+        &:focus { outline: none; }
+      }
+    }
+  }
+
+  .footer-actions {
+    background: $navy; color: #fff; padding: 15px 25px;
+    display: flex; justify-content: space-between; align-items: center;
+    .btn-save {
+      background: $green; color: #fff; border: none; padding: 10px 35px; border-radius: 4px; font-weight: 900;
+      &:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
+    }
+  }
+
+  .empty-state-box {
+    padding: 100px; text-align: center; color: $blue;
+    i { font-size: 2.5rem; margin-bottom: 15px; }
+    p { font-weight: bold; font-size: 1.1rem; }
+  }
+}
