@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from '../token.service';
-import { ToastrService } from 'ngx-toastr'; // ✅ Importar Toastr
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -20,12 +20,13 @@ export class LoginComponent implements OnInit {
     contrasena: ''
   };
   recordar: boolean = false;
+  verContrasena: boolean = false;
 
   constructor(
     private loginService: LoginService,
     private router: Router,
     private tokenService: TokenService,
-    private toastr: ToastrService // ✅ Inyectar el servicio
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -34,6 +35,10 @@ export class LoginComponent implements OnInit {
       this.loginRequest.correo = correoGuardado;
       this.recordar = true;
     }
+  }
+
+  togglePassword(): void {
+    this.verContrasena = !this.verContrasena;
   }
 
   onLogin(): void {
@@ -53,7 +58,7 @@ export class LoginComponent implements OnInit {
         const decodedToken: any = jwtDecode(token);
         const userRole = decodedToken.rol;
 
-        this.toastr.success('¡Bienvenido!', 'Éxito'); // ✅ Mensaje de éxito opcional
+        this.toastr.success('¡Bienvenido al SGI!', 'Acceso Exitoso');
 
         switch (userRole) {
           case 'ROLE_SECRETARIA':
@@ -71,11 +76,9 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         console.error('Login fallido:', err);
-        // ✅ USAMOS TOASTR EN LUGAR DE VARIABLE LOCAL
         this.toastr.error('Correo o contraseña incorrectos', 'Error de Acceso', {
           timeOut: 3000,
           progressBar: true,
-          progressAnimation: 'increasing',
           positionClass: 'toast-top-right'
         });
       }

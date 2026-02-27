@@ -26,8 +26,6 @@ export class LecturaPlanillaComponent implements OnInit {
   confLuz: any = null;
   confAgua: any = null;
   cargando: boolean = false;
-  
-  // 🟢 Mensaje dinámico inicial
   mensajeEstado: string = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.'; 
 
   constructor(
@@ -59,14 +57,14 @@ export class LecturaPlanillaComponent implements OnInit {
     }
 
     this.cargando = true;
-    this.mensajeEstado = '⌛ Cargando planilla unificada, por favor espere...'; //
+    this.mensajeEstado = '⌛ Cargando planilla unificada, por favor espere...'; 
 
     this.lecturaService.prepararPlanillaUnificada(this.programaId).subscribe({
       next: (data) => {
         this.planillaCompleta = data.map(f => ({
           ...f,
-          lecturaActLuz: f.lecturaAntLuz, 
-          lecturaActAgua: f.lecturaAntAgua,
+          lecturaActLuz: null,          // Inicia vacío
+          lecturaActAgua: null,          // Inicia vacío
           consumoLuz: 0,
           importeLuz: 0,
           consumoAgua: 0,
@@ -95,15 +93,54 @@ export class LecturaPlanillaComponent implements OnInit {
     }
   }
 
+  // Maneja la entrada del usuario: convierte string a número o null
+  onInputLectura(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA', value: string) {
+    const valor = value === '' ? null : parseFloat(value);
+    if (tipo === 'LUZ') {
+      fila.lecturaActLuz = valor;
+    } else {
+      fila.lecturaActAgua = valor;
+    }
+    this.calcular(fila, tipo);
+  }
+
   calcular(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA') {
     if (tipo === 'LUZ') {
-      fila.consumoLuz = Number(((fila.lecturaActLuz || 0) - fila.lecturaAntLuz).toFixed(2));
-      fila.importeLuz = fila.consumoLuz * (this.confLuz?.precioUnitario || 0.80);
-      fila.errorLuz = fila.lecturaActLuz !== null && fila.lecturaActLuz < fila.lecturaAntLuz;
+      // Si no hay lectura actual, consumo e importe en cero
+      if (fila.lecturaActLuz === null) {
+        fila.consumoLuz = 0;
+        fila.importeLuz = 0;
+        fila.errorLuz = false;
+      } else {
+        fila.consumoLuz = Number(((fila.lecturaActLuz || 0) - fila.lecturaAntLuz).toFixed(2));
+        fila.importeLuz = fila.consumoLuz * (this.confLuz?.precioUnitario || 0.80);
+        fila.errorLuz = fila.lecturaActLuz < fila.lecturaAntLuz;
+      }
     } else {
-      fila.consumoAgua = Number(((fila.lecturaActAgua || 0) - fila.lecturaAntAgua).toFixed(2));
-      fila.importeAgua = fila.consumoAgua * (this.confAgua?.precioUnitario || 15.00);
-      fila.errorAgua = fila.lecturaActAgua !== null && fila.lecturaActAgua < fila.lecturaAntAgua;
+      if (fila.lecturaActAgua === null) {
+        fila.consumoAgua = 0;
+        fila.importeAgua = 0;
+        fila.errorAgua = false;
+      } else {
+        fila.consumoAgua = Number(((fila.lecturaActAgua || 0) - fila.lecturaAntAgua).toFixed(2));
+        fila.importeAgua = fila.consumoAgua * (this.confAgua?.precioUnitario || 15.00);
+        fila.errorAgua = fila.lecturaActAgua < fila.lecturaAntAgua;
+      }
+    }
+  }
+
+  // Valida al perder el foco: si el valor es menor que la lectura anterior, muestra alerta
+  validarLectura(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA') {
+    const lecturaAct = tipo === 'LUZ' ? fila.lecturaActLuz : fila.lecturaActAgua;
+    const lecturaAnt = tipo === 'LUZ' ? fila.lecturaAntLuz : fila.lecturaAntAgua;
+    if (lecturaAct !== null && lecturaAct < lecturaAnt) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Valor incorrecto',
+        text: `La lectura actual no puede ser menor que la anterior (${lecturaAnt}).`,
+        timer: 3000,
+        showConfirmButton: false
+      });
     }
   }
 
@@ -118,7 +155,14 @@ export class LecturaPlanillaComponent implements OnInit {
   guardarTodo() {
     this.lecturaService.guardarPlanillaUnificada(this.planillaCompleta, this.fechaGiroManual).subscribe({
       next: () => {
-        Swal.fire('¡Éxito!', 'Registros procesados correctamente', 'success');
+        // Swal con timer y sin botón de confirmación
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Registros procesados correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
         this.planillaCompleta = [];
         this.planillaFiltrada = [];
         this.programaId = null;
