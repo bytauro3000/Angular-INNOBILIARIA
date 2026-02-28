@@ -19,7 +19,9 @@ export class LecturaPlanillaComponent implements OnInit {
   filtroManzana: string = '';
   filtroLote: string = '';
   fechaGiroManual: string = new Date().toISOString().split('T')[0];
+  fechaLecturaManual: string = new Date().toISOString().split('T')[0]; // 👈 NUEVA
 
+  guardando: boolean = false;
   planillaCompleta: LecturaUnificadaDTO[] = [];
   planillaFiltrada: LecturaUnificadaDTO[] = [];
   programas: Programa[] = [];
@@ -63,8 +65,8 @@ export class LecturaPlanillaComponent implements OnInit {
       next: (data) => {
         this.planillaCompleta = data.map(f => ({
           ...f,
-          lecturaActLuz: null,          // Inicia vacío
-          lecturaActAgua: null,          // Inicia vacío
+          lecturaActLuz: null,
+          lecturaActAgua: null,
           consumoLuz: 0,
           importeLuz: 0,
           consumoAgua: 0,
@@ -93,7 +95,6 @@ export class LecturaPlanillaComponent implements OnInit {
     }
   }
 
-  // Maneja la entrada del usuario: convierte string a número o null
   onInputLectura(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA', value: string) {
     const valor = value === '' ? null : parseFloat(value);
     if (tipo === 'LUZ') {
@@ -106,7 +107,6 @@ export class LecturaPlanillaComponent implements OnInit {
 
   calcular(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA') {
     if (tipo === 'LUZ') {
-      // Si no hay lectura actual, consumo e importe en cero
       if (fila.lecturaActLuz === null) {
         fila.consumoLuz = 0;
         fila.importeLuz = 0;
@@ -129,7 +129,6 @@ export class LecturaPlanillaComponent implements OnInit {
     }
   }
 
-  // Valida al perder el foco: si el valor es menor que la lectura anterior, muestra alerta
   validarLectura(fila: LecturaUnificadaDTO, tipo: 'LUZ' | 'AGUA') {
     const lecturaAct = tipo === 'LUZ' ? fila.lecturaActLuz : fila.lecturaActAgua;
     const lecturaAnt = tipo === 'LUZ' ? fila.lecturaAntLuz : fila.lecturaAntAgua;
@@ -153,9 +152,17 @@ export class LecturaPlanillaComponent implements OnInit {
   }
 
   guardarTodo() {
-    this.lecturaService.guardarPlanillaUnificada(this.planillaCompleta, this.fechaGiroManual).subscribe({
+    if (!this.esPlanillaValida()) return;
+
+    this.guardando = true;
+    // 👇 ENVIAR AMBAS FECHAS
+    this.lecturaService.guardarPlanillaUnificada(
+      this.planillaCompleta, 
+      this.fechaGiroManual,
+      this.fechaLecturaManual
+    ).subscribe({
       next: () => {
-        // Swal con timer y sin botón de confirmación
+        this.guardando = false;
         Swal.fire({
           icon: 'success',
           title: '¡Éxito!',
@@ -167,6 +174,10 @@ export class LecturaPlanillaComponent implements OnInit {
         this.planillaFiltrada = [];
         this.programaId = null;
         this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
+      },
+      error: () => {
+        this.guardando = false;
+        Swal.fire('Error', 'No se pudo guardar la planilla', 'error');
       }
     });
   }

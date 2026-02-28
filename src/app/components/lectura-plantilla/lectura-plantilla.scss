@@ -23,7 +23,7 @@ $gray: #ecf0f1;
   .card-header {
     background: $navy;
     color: #000000;
-    padding: 25px 0px 5px 27px;
+    padding: 25px 27px 5px 27px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -100,7 +100,17 @@ $gray: #ecf0f1;
       padding: 10px;
       flex: 1;
       overflow-y: auto;
-    }
+
+    .vivienda-card .card-top .badge-mz {
+    background-color: #ffc107;   
+    color: #000000;     
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 1px solid rgba(0,0,0,0.1); /* Sutil borde */
+  }
+  }
 
     .desktop-only {
       display: none;
@@ -222,15 +232,16 @@ $gray: #ecf0f1;
 
       .sub-head th {
         color: #333;
-        font-weight: 800;
+        font-weight: 650;
+        font-size: 0.8rem;
       }
 
       .col-titular {
-        width: 260px;
+        width: 360px;
       }
 
       .col-mz {
-        width: 70px;
+        width: 85px;
       }
 
       .col-lect {
@@ -310,5 +321,15 @@ $gray: #ecf0f1;
       font-size: 2.5rem;
       margin-bottom: 10px;
     }
+  }
+}
+
+.name-box strong {
+  text-transform: uppercase;
+}
+
+@media (min-width: 993px) {
+  .name-box strong {
+    font-weight: 600; 
   }
 }
