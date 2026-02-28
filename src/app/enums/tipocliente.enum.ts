@@ -1,4 +1,5 @@
 export enum TipoCliente {
   NATURAL = 'NATURAL',
-  JURIDICO = 'JURIDICO'
+  JURIDICO = 'JURIDICO',
+  CE = 'CARNET DE EXTRANJERIA'
 }

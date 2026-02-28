@@ -5,13 +5,14 @@ import { LoteResumen } from '../dto/loteresumen.dto';
 import { EstadoLote } from '../enums/estadolote.enum';
 import { Lote } from '../models/lote.model';
 import { LoteProgramaDTO } from '../dto/lote-programa-response.dto';
+import { environment } from '../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoteService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/lotes';
+  private readonly apiUrl = `${environment.apiUrl}/api/lotes`;
 
   constructor(private http: HttpClient) { }
 

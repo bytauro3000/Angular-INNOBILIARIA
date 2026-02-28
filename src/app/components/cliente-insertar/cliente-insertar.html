@@ -41,7 +41,7 @@
                 <label for="numDoc">DNI / RUC</label>
                 <div class="input-container-relative">
                   <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
-                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
+                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 9 : 11"
                     (input)="limpiarNoNumericos('numDoc'); onDniInput()" 
                     [attr.title]="getErrorMessage('numDoc')"
                     [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"

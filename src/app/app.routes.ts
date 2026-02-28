@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 
+// Importacion de Mensajeria
+import { MensajeriaComponent } from './components/mensajeria/mensajeria.component';
+
 // Importa los componentes de menú
 import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria-menu.component';
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
@@ -9,21 +12,23 @@ import { AdminMenuComponent } from './components/menu-admin/admin-menu.component
 //Importa los dashboards para los menús
 import { SecretariaDashboard } from './components/secretaria-dashboard/secretaria-dashboard';
 
-// Clientes
+//Clientes
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
 import { ClienteInsertarComponent } from './components/cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from './components/cliente-editar/cliente-editar.component';
 import { ClienteVer } from './components/cliente-ver/cliente-ver';
 
-// Contratos
+//Contratos
 import { ContratoListarComponent } from './components/contrato-listar/contrato-listar.component';
 import { ContratoInsertarComponent } from './components/contrato-insertar/contrato-insertar.component';
 import { ContratoEditarComponent } from './components/contrato-editar/contrato-editar.component';
 
 // Separaciones
 import { SeparacionComponent } from './components/separacion-crud/separacion-crud.component';
-// 🟢 IMPORTANTE: Asegúrate de que la ruta de importación sea la correcta según tu estructura
 import { SeparacionInsertEdit } from './components/separacion-insert-edit/separacion-insert-edit'; 
+
+// Servicios Basicos
+import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
 
 // Otros componentes
 import { ParceleroComponent } from './components/parcelero/parcelero';
@@ -72,7 +77,13 @@ export const routes: Routes = [
       { path: 'programas', component: ProgramaComponent },
       { path: 'vendedores', component: VendedorComponent },
       { path: 'lotes', component: LoteComponent },
-      { path: 'parceleros', component: ParceleroComponent }
+      { path: 'parceleros', component: ParceleroComponent },
+
+      //Servicios Basicos
+      { path: 'servicios-basicos', component: LecturaPlanillaComponent },
+
+      //ruta para mensajeria
+      { path: 'mensajeria', component: MensajeriaComponent }
     ]
   },
 

@@ -1,30 +1,30 @@
 // src/app/app.config.ts
 
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core'; // 🟢 Agregamos importProvidersFrom
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './auth/auth-interceptor';
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts'; // 👈 Importación necesaria
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { FormsModule } from '@angular/forms';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([AuthInterceptor])),
-
-    // 🟢 Configuración de Gráficos (Chart.js)
+    importProvidersFrom(FormsModule), 
     provideCharts(withDefaultRegisterables()),
 
-    // Mensajes con Toastr - libreria de notificaciones
+    // Mensajes con Toastr
     provideToastr({
-      timeOut: 5000, // El mensaje desaparecerá después de 5 segundos
-      positionClass: 'toast-bottom-right', // Opcional: Define la posición esquina derecha inferior
-      preventDuplicates: true, // Opcional: Evita mensajes duplicados
+      timeOut: 5000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
     }),
     
-    provideAnimations()
+    provideAnimations(),
   ]
 };

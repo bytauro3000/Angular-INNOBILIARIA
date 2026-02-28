@@ -3,13 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ContratoResponseDTO } from '../dto/contratoreponse.dto'; 
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContratoService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/contratos'; 
+  private readonly apiUrl = `${environment.apiUrl}/api/contratos`;
 
   constructor(private http: HttpClient) { }
 
@@ -45,7 +46,7 @@ export class ContratoService {
   imprimirContratoPdf(id: number): Observable<Blob> {
     const timestamp = new Date().getTime();
     return this.http.get(`${this.apiUrl}/${id}/imprimir?t=${timestamp}`, { 
-      responseType: 'blob' 
+      responseType: 'blob'
     });
   }
 }

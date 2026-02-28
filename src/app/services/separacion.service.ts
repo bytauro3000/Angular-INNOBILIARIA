@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { SeparacionDTO } from '../dto/separacion.dto'; 
 import { Separacion } from '../models/separacion.model';
 import { SeparacionResumen } from '../dto/separacionresumen.dto';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class SeparacionService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/separaciones'; 
+  private readonly apiUrl = `${environment.apiUrl}/api/separaciones`; 
 
   constructor(private http: HttpClient) { }
 

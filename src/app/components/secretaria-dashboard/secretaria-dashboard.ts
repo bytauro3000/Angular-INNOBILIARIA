@@ -89,35 +89,53 @@ export class SecretariaDashboard implements OnInit {
   }
 
   cargarDatos(): void {
-    this.dashboardService.getTotales().subscribe({
-      next: (data: DashboardData) => {
-        this.totalLotes = data.lotes;
-        this.totalParceleros = data.parceleros;
-        this.totalVendedores = data.vendedores;
-        this.totalProgramas = data.programas;
-        this.totalClientes = data.clientes;
+  this.dashboardService.getTotales().subscribe({
+    next: (data: DashboardData) => {
+      // 1. Asignación de totales para las tarjetas
+      this.totalLotes = data.lotes;
+      this.totalParceleros = data.parceleros;
+      this.totalVendedores = data.vendedores;
+      this.totalProgramas = data.programas;
+      this.totalClientes = data.clientes;
 
-        const nombresOriginales = Object.keys(data.graficoLotes);
-        const nombresLimpios = nombresOriginales.map(n => this.limpiarNombrePrograma(n));
+      // 2. Procesamiento de Lotes (Gráfico de Barras)
+      const nombresOriginales = Object.keys(data.graficoLotes);
+      const nombresLimpios = nombresOriginales.map(n => this.limpiarNombrePrograma(n));
 
-        this.barChartData = {
-          labels: nombresLimpios,
-          datasets: [
-            { data: nombresOriginales.map(p => data.graficoLotes[p].Disponible || 0), label: 'Disponible', backgroundColor: '#2ecc71' },
-            { data: nombresOriginales.map(p => data.graficoLotes[p].Separado || 0), label: 'Separado', backgroundColor: '#f1c40f' },
-            { data: nombresOriginales.map(p => data.graficoLotes[p].Vendido || 0), label: 'Vendido', backgroundColor: '#e74c3c' }
-          ]
-        };
+      // 🟢 CLAVE: Creamos un NUEVO objeto para barChartData
+      this.barChartData = {
+        labels: nombresLimpios,
+        datasets: [
+          { 
+            data: nombresOriginales.map(p => data.graficoLotes[p].Disponible || 0), 
+            label: 'Disponible', backgroundColor: '#2ecc71' 
+          },
+          { 
+            data: nombresOriginales.map(p => data.graficoLotes[p].Separado || 0), 
+            label: 'Separado', backgroundColor: '#f1c40f' 
+          },
+          { 
+            data: nombresOriginales.map(p => data.graficoLotes[p].Vendido || 0), 
+            label: 'Vendido', backgroundColor: '#e74c3c' 
+          }
+        ]
+      };
 
-        const totalContado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.CONTADO || 0), 0);
-        const totalFinanciado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.FINANCIADO || 0), 0);
+      // 3. Procesamiento de Contratos (Doughnut)
+      const totalContado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.CONTADO || 0), 0);
+      const totalFinanciado = Object.values(data.graficoContratos).reduce((acc, curr) => acc + (curr.FINANCIADO || 0), 0);
 
-        this.contractChartData = {
-          labels: ['Contado', 'Financiado'],
-          datasets: [{ data: [totalContado, totalFinanciado], backgroundColor: ['#3498db', '#9b59b6'] }]
-        };
-      },
-      error: (err) => console.error('Error al cargar dashboard:', err)
-    });
-  }
+      // 🟢 CLAVE: Creamos un NUEVO objeto para contractChartData
+      this.contractChartData = {
+        labels: ['Contado', 'Financiado'],
+        datasets: [{ 
+          data: [totalContado, totalFinanciado], 
+          backgroundColor: ['#3498db', '#9b59b6'],
+          hoverOffset: 15 
+        }]
+      };
+    },
+    error: (err) => console.error('Error al cargar dashboard:', err)
+  });
+}
 }

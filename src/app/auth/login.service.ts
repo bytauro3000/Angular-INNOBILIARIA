@@ -5,13 +5,13 @@ import { Observable } from 'rxjs';
 // ✅ Interfaces
 import { LoginRequest } from './interfaces/login-request';
 import { LoginResponse } from './interfaces/login-response';
+import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/auth/login';
-
+  private readonly URL_AUTH = `${environment.apiUrl}/api/auth/login`;
   constructor(private http: HttpClient) { }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -20,7 +20,7 @@ export class LoginService {
       'Content-Type': 'application/json'
     });1
 
-    return this.http.post<LoginResponse>(this.apiUrl, credentials, { headers });
+    return this.http.post<LoginResponse>(this.URL_AUTH, credentials, { headers });
   }
 }
 

@@ -1,0 +1,145 @@
+<div class="planilla-container">
+  <div class="main-card">
+    <div class="card-header">
+      <h2>REGISTRO UNIFICADO: LUZ & AGUA</h2>
+      <div class="prices-box" *ngIf="confLuz && confAgua">
+        <div class="badge-price luz">Luz: S/ {{confLuz.precioUnitario}} kWh</div>
+        <div class="badge-price agua">Agua: S/ {{confAgua.precioUnitario}} m³</div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="form-group">
+        <label>Programa (Asociación)</label>
+        <select [(ngModel)]="programaId" (change)="onCambioPrograma()">
+          <option [ngValue]="null">-- Seleccionar Programa --</option>
+          <option *ngFor="let p of programas" [value]="p.idPrograma">{{ p.nombrePrograma }}</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Mz.</label><input [(ngModel)]="filtroManzana" (input)="aplicarFiltrosLocal()"
+          placeholder="Mz..."></div>
+      <div class="form-group"><label>Lt.</label><input [(ngModel)]="filtroLote" (input)="aplicarFiltrosLocal()"
+          placeholder="Lt..."></div>
+      <div class="form-group"><label>Fecha Emisión</label><input type="date" [(ngModel)]="fechaGiroManual"></div>
+      <div class="form-group"><label>Fecha Lectura</label><input type="date" [(ngModel)]="fechaLecturaManual"></div>
+    </div>
+
+    <div class="empty-state-box" *ngIf="planillaFiltrada.length === 0">
+      <i class="fas" [class.fa-spinner]="cargando" [class.fa-spin]="cargando" [class.fa-info-circle]="!cargando"></i>
+      <p>{{ mensajeEstado }}</p>
+    </div>
+
+    <div class="mobile-cards-container" *ngIf="planillaFiltrada.length > 0 && !cargando">
+      <div class="vivienda-card" *ngFor="let f of planillaFiltrada">
+        <div class="card-top">
+          <div class="name-box">
+            <strong>{{f.clienteNombre}}</strong>
+          </div>
+          <span class="badge-mz">{{f.manzana}}-{{f.lote}}</span>
+        </div>
+
+        <div class="card-body">
+          <div class="service-block" [class.state-disabled]="!f.inscritoLuz">
+            <div class="block-label">⚡ SERVICIO DE LUZ</div>
+            <div class="data-row">
+              <div class="data-col"><label>Anterior</label><span>{{f.lecturaAntLuz}}</span></div>
+              <div class="data-col">
+                <label>Lectura Actual</label>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="input-card" [value]="f.lecturaActLuz"
+                  [disabled]="!f.inscritoLuz" (input)="onInputLectura(f, 'LUZ', $event.target.value)"
+                  (blur)="validarLectura(f, 'LUZ')"
+                  [class.state-pending]="f.inscritoLuz && f.lecturaActLuz !== null && f.lecturaActLuz <= f.lecturaAntLuz"
+                  [class.state-ready]="f.inscritoLuz && f.lecturaActLuz !== null && f.lecturaActLuz > f.lecturaAntLuz">
+              </div>
+              <div class="data-col"><label>Consumo</label><strong>{{f.consumoLuz}}</strong></div>
+              <div class="data-col"><label>Importe</label><strong>S/ {{f.importeLuz | number:'1.2-2'}}</strong></div>
+            </div>
+          </div>
+
+          <div class="service-block" [class.state-disabled]="!f.inscritoAgua">
+            <div class="block-label">💧 SERVICIO DE AGUA</div>
+            <div class="data-row">
+              <div class="data-col"><label>Anterior</label><span>{{f.lecturaAntAgua}}</span></div>
+              <div class="data-col">
+                <label>Lectura Actual</label>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="input-card" [value]="f.lecturaActAgua"
+                  [disabled]="!f.inscritoAgua" (input)="onInputLectura(f, 'AGUA', $event.target.value)"
+                  (blur)="validarLectura(f, 'AGUA')"
+                  [class.state-pending]="f.inscritoAgua && f.lecturaActAgua !== null && f.lecturaActAgua <= f.lecturaAntAgua"
+                  [class.state-ready]="f.inscritoAgua && f.lecturaActAgua !== null && f.lecturaActAgua > f.lecturaAntAgua">
+              </div>
+              <div class="data-col"><label>Consumo</label><strong>{{f.consumoAgua}}</strong></div>
+              <div class="data-col"><label>Importe</label><strong>S/ {{f.importeAgua | number:'1.2-2'}}</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-scroll-area desktop-only" *ngIf="planillaFiltrada.length > 0 && !cargando">
+      <table class="unified-table">
+        <thead>
+          <tr class="main-head">
+            <th colspan="2" class="sticky-th">DATOS CLIENTE</th>
+            <th colspan="4" class="luz-head sticky-th">⚡ SERVICIO DE LUZ</th>
+            <th colspan="4" class="agua-head sticky-th">💧 SERVICIO DE AGUA</th>
+          </tr>
+          <tr class="sub-head">
+            <th class="col-titular sticky-sub">Nombre y Apellidos</th>
+            <th class="col-mz sticky-sub">Mz-Lt</th>
+            <th class="col-lect sticky-sub">Lectura Anterior</th>
+            <th class="col-lect sticky-sub">Lectura Actual</th>
+            <th class="col-cons sticky-sub">Cons</th>
+            <th class="col-imp sticky-sub">Importe</th>
+            <th class="col-lect sticky-sub">Lectura Anterior</th>
+            <th class="col-lect sticky-sub">Lectura Actual</th>
+            <th class="col-cons sticky-sub">Consumo</th>
+            <th class="col-imp sticky-sub">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of planillaFiltrada">
+            <td>
+  <div class="name-box">
+    <strong>{{f.clienteNombre}}</strong>
+  </div>
+</td>
+            <td class="text-center"><span class="badge-mz">{{f.manzana}}-{{f.lote}}</span></td>
+
+            <td class="text-center bg-light">{{f.lecturaAntLuz}}</td>
+            <td [class.state-disabled]="!f.inscritoLuz"
+              [class.state-pending]="f.inscritoLuz && f.lecturaActLuz !== null && f.lecturaActLuz <= f.lecturaAntLuz"
+              [class.state-ready]="f.inscritoLuz && f.lecturaActLuz !== null && f.lecturaActLuz > f.lecturaAntLuz">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" class="input-cell" [value]="f.lecturaActLuz"
+                [disabled]="!f.inscritoLuz" (input)="onInputLectura(f, 'LUZ', $event.target.value)"
+                (blur)="validarLectura(f, 'LUZ')">
+            </td>
+            <td class="text-center">{{f.consumoLuz}}</td>
+            <td class="text-center">S/ {{f.importeLuz | number:'1.2-2'}}</td>
+
+            <td class="text-center bg-light">{{f.lecturaAntAgua}}</td>
+            <td [class.state-disabled]="!f.inscritoAgua"
+              [class.state-pending]="f.inscritoAgua && f.lecturaActAgua !== null && f.lecturaActAgua <= f.lecturaAntAgua"
+              [class.state-ready]="f.inscritoAgua && f.lecturaActAgua !== null && f.lecturaActAgua > f.lecturaAntAgua">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" class="input-cell" [value]="f.lecturaActAgua"
+                [disabled]="!f.inscritoAgua" (input)="onInputLectura(f, 'AGUA', $event.target.value)"
+                (blur)="validarLectura(f, 'AGUA')">
+            </td>
+            <td class="text-center">{{f.consumoAgua}}</td>
+            <td class="text-center">S/ {{f.importeAgua | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer-actions" *ngIf="planillaCompleta.length > 0 && !cargando">
+      <div class="db-info"><i class="fas fa-database"></i> Registros: {{planillaCompleta.length}}</div>
+
+      <button class="btn-save" [disabled]="!esPlanillaValida() || guardando" (click)="guardarTodo()">
+        <i class="fas fa-circle-notch fa-spin" *ngIf="guardando" style="margin-right: 8px;"></i>
+
+        {{ guardando ? 'REGISTRANDO...' : 'REGISTRAR TODOS LOS RECIBOS' }}
+      </button>
+    </div>
+  </div>
+</div>

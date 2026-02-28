@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Parcelero } from '../models/parcelero.model';
+import { environment } from '../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParceleroService {
 
-  private apiUrl = 'https://inmobiliariaivan.onrender.com/api/parceleros';
+  private readonly apiUrl = `${environment.apiUrl}/api/parceleros`;
 
   constructor(private http: HttpClient) {}
 
