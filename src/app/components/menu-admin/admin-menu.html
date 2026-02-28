@@ -1,4 +1,150 @@
-<div class="menu-container">
-  <h2>Menú de Administrado</h2>
-  <p>¡Bienvenida, Administrador! Accede a las funciones del sistema para gestionar la información de los clientes y propiedades.</p>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h3>Panel Admin</h3>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item active">
+        <a href="javascript:void(0)"><i class="fas fa-users"></i><span>Gestión de Usuarios</span></a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="cerrarSesion()">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <div class="toast-notification" *ngIf="toast.mostrar" [ngClass]="toast.tipo">
+      <i class="fas" [ngClass]="toast.tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
+      <span>{{ toast.mensaje }}</span>
+    </div>
+
+    <div class="content-header">
+      <h2>Gestión de Usuarios</h2>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <select class="form-select" #filtroBusqueda>
+          <option value="Nombres y Apellidos">Nombres y Apellidos</option>
+          <option value="Correo">Correo Electrónico</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Ingresa el término de búsqueda..." 
+               (input)="filtrarUsuarios(filtroBusqueda.value, $event)">
+      </div>
+      <button class="btn-agregar" (click)="abrirModalRegistro()">+ Agregar</button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table custom-table">
+        <tbody *ngIf="cargando">
+          <tr>
+            <td colspan="7" class="text-center loading-container">
+              <div class="spinner"></div>
+              <p>Cargando información desde la nube...</p>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody *ngIf="!cargando">
+          <tr *ngFor="let usuario of usuariosFiltrados">
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombres }}</td>
+            <td>{{ usuario.apellidos }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.rol | uppercase }}</td>
+            <td>
+              <span class="badge-estado" [ngClass]="usuario.estado.toLowerCase()">
+                {{ usuario.estado | uppercase }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button class="btn-icon btn-view" title="Ver" (click)="abrirModalVer(usuario)"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon btn-edit" title="Editar" (click)="abrirModalEditar(usuario)"><i class="fas fa-pencil-alt"></i></button>
+              <button class="btn-icon btn-delete" title="Cambiar Estado" (click)="cambiarEstado(usuario)"><i class="fas fa-sync-alt"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="custom-modal">
+    <div class="modal-header">
+      <h4><i class="fas" [ngClass]="modoAccion === 'ver' ? 'fa-eye' : (modoAccion === 'editar' ? 'fa-edit' : 'fa-user-plus')"></i> {{ tituloModal }}</h4>
+      <button class="close-btn" (click)="cerrarModal()"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()">
+      <div class="modal-body">
+        
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label>NOMBRES</label>
+            <input type="text" class="form-control dark-input" formControlName="nombres">
+          </div>
+          <div class="col-md-6 form-group">
+            <label>APELLIDOS</label>
+            <input type="text" class="form-control dark-input" formControlName="apellidos">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label>CORREO ELECTRÓNICO</label>
+            <input type="email" class="form-control dark-input" formControlName="correo">
+          </div>
+          <div class="col-md-6 form-group">
+            <label>CONTRASEÑA <span *ngIf="modoAccion === 'editar'">(Dejar en blanco para no cambiar)</span></label>
+            <input type="password" class="form-control dark-input" formControlName="contrasena">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4 form-group">
+            <label>DNI</label>
+            <input type="text" class="form-control dark-input" formControlName="dni">
+          </div>
+          <div class="col-md-4 form-group">
+            <label>TELÉFONO</label>
+            <input type="text" class="form-control dark-input" formControlName="telefono">
+          </div>
+          <div class="col-md-4 form-group">
+            <label>DIRECCIÓN</label>
+            <input type="text" class="form-control dark-input" formControlName="direccion">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 form-group">
+            <label>ROL DEL USUARIO</label>
+            <select class="form-control dark-input" formControlName="idRol">
+              <option [ngValue]="1">Secretaria</option>
+              <option [ngValue]="2">Soporte</option>
+              <option [ngValue]="3">Administrador</option>
+            </select>
+          </div>
+          <div class="col-md-6 form-group">
+            <label>ESTADO DEL USUARIO</label>
+            <select class="form-control dark-input" formControlName="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" *ngIf="modoAccion !== 'ver'">
+        <button type="submit" class="btn-actualizar" [disabled]="usuarioForm.invalid">
+          <i class="fas fa-check-circle"></i> {{ modoAccion === 'registrar' ? 'Guardar' : 'Actualizar' }}
+        </button>
+        <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </form>
   </div>
+</div>
