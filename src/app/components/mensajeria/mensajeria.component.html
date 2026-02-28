@@ -1,22 +1,20 @@
 <div class="messaging-container">
   <aside class="chat-sidebar">
     <div class="sidebar-header">
-        <h1>PRUEBA: EL COMPONENTE CARGA</h1>
+      <h1>PRUEBA: EL COMPONENTE CARGA</h1>
       <h2>Mensajes</h2>
       <div class="search-box">
         <input type="text" placeholder="Buscar cliente o vendedor...">
       </div>
     </div>
-    
+
     <div class="chat-list">
-      <div *ngFor="let t of trabajadores" 
-           class="chat-item" 
-           [class.active]="chatSeleccionado?.id === t.id"
-           (click)="seleccionarChat(t)">
+      <div *ngFor="let t of trabajadores" class="chat-item" [class.active]="chatSeleccionado?.id === t.id"
+        (click)="seleccionarChat(t)">
         <div class="avatar">{{ t.iniciales }}</div>
         <div class="chat-info">
           <div class="info-header">
-            <h4>{{ t.nombre }}</h4>
+            <h4>{{ t.nombres }} {{ t.apellidos }}</h4> <!-- 👈 así -->
             <span class="chat-time">10:45 AM</span>
           </div>
           <p>{{ t.ultimoMsj || 'Sin mensajes recientes' }}</p>
@@ -42,9 +40,9 @@
       </header>
 
       <div class="message-history">
-        <div *ngFor="let m of mensajes" 
-             [ngClass]="{'sent': m.emisorId === usuarioLogueado.id, 'received': m.emisorId !== usuarioLogueado.id}"
-             class="message">
+        <div *ngFor="let m of mensajes"
+          [ngClass]="{'sent': m.emisorId === usuarioLogueado.id, 'received': m.emisorId !== usuarioLogueado.id}"
+          class="message">
           <div class="message-bubble">
             <p>{{ m.texto }}</p>
             <div class="message-footer">
@@ -58,7 +56,8 @@
       <footer class="chat-footer">
         <button class="attach-btn">+</button>
         <div class="input-wrapper">
-          <input type="text" [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarMensaje()" placeholder="Escribe un mensaje aquí...">
+          <input type="text" [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarMensaje()"
+            placeholder="Escribe un mensaje aquí...">
         </div>
         <button class="send-btn" (click)="enviarMensaje()">➤</button>
       </footer>
