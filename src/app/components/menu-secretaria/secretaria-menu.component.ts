@@ -18,6 +18,7 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
     isMenuOpen: boolean = false;
     isClientesSubmenuOpen: boolean = false;
     isContratoSubmenuOpen: boolean = false;
+    isServiciosBasicosSubmenuOpen: boolean = false; // <-- NUEVA VARIABLE
     isUserDropdownOpen: boolean = false;
 
     constructor(
@@ -101,19 +102,29 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
     toggleClientesSubmenu() {
         this.isUserDropdownOpen = false;
         this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false; // <-- Cerrar servicios básicos
         this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen;
     }
 
     toggleContratoSubmenu() {
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false; // <-- Cerrar servicios básicos
         this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen;
+    }
+
+    toggleServiciosBasicosSubmenu() { // <-- NUEVO MÉTODO
+        this.isUserDropdownOpen = false;
+        this.isClientesSubmenuOpen = false;
+        this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = !this.isServiciosBasicosSubmenuOpen;
     }
 
     toggleUserDropdown(event: Event) {
         event.stopPropagation();
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false; // <-- Cerrar servicios básicos
         this.isUserDropdownOpen = !this.isUserDropdownOpen;
     }
 
@@ -123,6 +134,7 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
         if (!target.closest('.has-submenu') && !target.closest('.menu-toggle') && !target.closest('.user-avatar-initial')) {
             this.isClientesSubmenuOpen = false;
             this.isContratoSubmenuOpen = false;
+            this.isServiciosBasicosSubmenuOpen = false; // <-- Cerrar servicios básicos
             this.isUserDropdownOpen = false;
         }
     }
@@ -131,6 +143,7 @@ export class SecretariaMenuComponent implements OnInit, AfterViewInit {
         this.isMenuOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false; // <-- Cerrar servicios básicos
         this.isUserDropdownOpen = false;
     }
 

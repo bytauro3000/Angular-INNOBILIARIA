@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { LecturaUnificadaDTO } from '../dto/Lecturaunificada.dto';
+import { ReciboConClienteDTO } from '../dto/reciboconcliente.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { LecturaUnificadaDTO } from '../dto/Lecturaunificada.dto';
 export class LecturaService {
   private apiUrl = `${environment.apiUrl}/api/gateway/recibos`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   prepararPlanillaUnificada(idPrograma: number): Observable<LecturaUnificadaDTO[]> {
     const params = new HttpParams().set('idPrograma', idPrograma.toString());
@@ -30,10 +31,23 @@ export class LecturaService {
   }
 
   obtenerRecibos(): Observable<any[]> {
-  return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(this.apiUrl);
   }
 
-  listarRecibos(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  filtrarRecibos(mes: number, anio: number, tipoServicio: string): Observable<ReciboConClienteDTO[]> {
+    const params = new HttpParams()
+      .set('mes', mes.toString())
+      .set('anio', anio.toString())
+      .set('tipoServicio', tipoServicio);
+    const url = `${this.apiUrl}/listar-con-filtros`;
+    console.log('URL generada:', url);
+    return this.http.get<ReciboConClienteDTO[]>(url, { params });
+  }
+
+  generarPdfRecibo(idRecibo: number): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.apiUrl}/generar-pdf/${idRecibo}`, {
+      responseType: 'blob',
+      observe: 'response'  // 👈 esto permite acceder a los headers
+    });
   }
 }

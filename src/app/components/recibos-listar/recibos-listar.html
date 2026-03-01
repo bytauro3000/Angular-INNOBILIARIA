@@ -1,1 +1,76 @@
-<p>recibos-listar works!</p>
+<div class="container">
+    <h2>Consulta de Recibos</h2>
+
+    <div class="filtros">
+        <div class="form-group">
+            <label>Mes</label>
+            <select [(ngModel)]="mesSeleccionado">
+                <option *ngFor="let m of meses" [value]="m.value">{{ m.nombre }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Año</label>
+            <input type="number" [(ngModel)]="anio" min="2020" max="2030">
+        </div>
+        <div class="form-group">
+            <label>Tipo de Servicio</label>
+            <select [(ngModel)]="tipoServicio">
+                <option value="LUZ">Luz</option>
+                <option value="AGUA">Agua</option>
+            </select>
+        </div>
+        <button (click)="buscar()" [disabled]="cargando">Buscar</button>
+    </div>
+
+    <div *ngIf="cargando" class="cargando">Cargando...</div>
+
+    <div *ngIf="!cargando && recibos.length === 0" class="sin-resultados">
+        No se encontraron recibos para los filtros seleccionados.
+    </div>
+
+    <table *ngIf="!cargando && recibos.length > 0" class="tabla-recibos">
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th class="col-cliente">Cliente</th>
+                <th>Mz-Lt</th>
+                <th class="col-lectura">Lect. Anterior</th>
+                <th class="col-lectura">Lect. Actual</th>
+                <th class="col-consumo">Consumo</th>
+                <th class="col-importe">Importe</th>
+                <th class="col-fecha">Fecha Giro</th>
+                <th class="col-fecha">Fecha Venc.</th>
+                <th class="col-estado">Estado</th>
+                <th>Acciones</th>   <!-- NUEVA COLUMNA -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let r of recibos; let i = index">
+                <td class="text-center">{{ i + 1 }}</td>
+                <td class="cliente-nombre">{{ r.nombreCliente | uppercase }}</td>
+                <td class="text-center">{{ r.manzana }}-{{ r.lote }}</td>
+                <td class="text-center">{{ r.lecturaAnterior }}</td>
+                <td class="text-center">{{ r.lecturaActual }}</td>
+                <td class="text-center">{{ r.consumoMes }}</td>
+                <td class="text-center">S/ {{ r.importeTotal | number:'1.2-2' }}</td>
+                <td class="text-center">{{ r.fechaGiro | date:'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ r.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                <td class="estado-cell">
+                    <span [ngClass]="{
+                        'estado-pendiente': r.estado === 'PENDIENTE',
+                        'estado-pagado': r.estado === 'PAGADO',
+                        'estado-vencido': r.estado === 'VENCIDO'
+                    }">
+                        {{ r.estado }}
+                    </span>
+                </td>
+                <!-- NUEVA CELDA CON BOTÓN PDF -->
+                <td class="text-center">
+                    <button class="btn-pdf" (click)="descargarPdf(r.idRecibo)" title="Descargar recibo">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
