@@ -152,33 +152,62 @@ export class LecturaPlanillaComponent implements OnInit {
   }
 
   guardarTodo() {
-    if (!this.esPlanillaValida()) return;
+  if (!this.esPlanillaValida()) return;
 
-    this.guardando = true;
-    // 👇 ENVIAR AMBAS FECHAS
-    this.lecturaService.guardarPlanillaUnificada(
-      this.planillaCompleta, 
-      this.fechaGiroManual,
-      this.fechaLecturaManual
-    ).subscribe({
-      next: () => {
-        this.guardando = false;
-        Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Registros procesados correctamente',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        this.planillaCompleta = [];
-        this.planillaFiltrada = [];
-        this.programaId = null;
-        this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
-      },
-      error: () => {
-        this.guardando = false;
-        Swal.fire('Error', 'No se pudo guardar la planilla', 'error');
-      }
+  // Validar fechas comparando directamente las cadenas (formato YYYY-MM-DD)
+  if (this.fechaLecturaManual > this.fechaGiroManual) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Fechas incorrectas',
+      text: 'La fecha de lectura no puede ser posterior a la fecha de emisión',
+      timer: 3000,
+      showConfirmButton: false
     });
+    return;
   }
+
+  this.guardando = true;
+  this.lecturaService.guardarPlanillaUnificada(
+    this.planillaCompleta, 
+    this.fechaGiroManual,
+    this.fechaLecturaManual
+  ).subscribe({
+    next: () => {
+      this.guardando = false;
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Registros procesados correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      this.limpiarPlanilla();
+    },
+    error: (err) => {
+      this.guardando = false;
+      let mensaje = 'No se pudo guardar la planilla';
+      
+      // Extraer mensaje del error según la nueva estructura del gateway
+      if (err.error?.error) {
+        mensaje = err.error.error;               // Mensaje limpio desde el backend
+      } else if (err.error?.detalle) {
+        mensaje = err.error.detalle;              // Por si aún existe
+      } else if (err.error && typeof err.error === 'string') {
+        mensaje = err.error;
+      } else if (err.message) {
+        mensaje = err.message;
+      }
+      
+      Swal.fire('Error', mensaje, 'error');
+    }
+  });
+}
+
+// Método auxiliar para limpiar (opcional)
+private limpiarPlanilla() {
+  this.planillaCompleta = [];
+  this.planillaFiltrada = [];
+  this.programaId = null;
+  this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
+}
 }
