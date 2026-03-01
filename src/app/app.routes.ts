@@ -29,6 +29,7 @@ import { SeparacionInsertEdit } from './components/separacion-insert-edit/separa
 
 // Servicios Basicos
 import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
+import { RecibosListadoComponent } from './components/recibos-listar/recibos-listado-component';
 
 // Otros componentes
 import { ParceleroComponent } from './components/parcelero/parcelero';
@@ -81,6 +82,7 @@ export const routes: Routes = [
 
       //Servicios Basicos
       { path: 'servicios-basicos', component: LecturaPlanillaComponent },
+      { path: 'servicios-basicos/listar', component: RecibosListadoComponent },
 
       //ruta para mensajeria
       { path: 'mensajeria', component: MensajeriaComponent }

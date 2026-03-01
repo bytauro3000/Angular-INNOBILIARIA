@@ -28,4 +28,12 @@ export class LecturaService {
   obtenerConfiguracion(tipo: 'LUZ' | 'AGUA'): Observable<any> {
     return this.http.get(`${environment.apiUrl}/api/configuraciones/${tipo}`);
   }
+
+  obtenerRecibos(): Observable<any[]> {
+  return this.http.get<any[]>(this.apiUrl);
+  }
+
+  listarRecibos(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
+  }
 }
