@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LecturaService } from '../../services/lectura.service';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+
 
 @Component({
   selector: 'app-recibo-listado',

@@ -5,6 +5,7 @@ $blue: #2980b9;
 $green: #27ae60;
 $yellow: #f1c40f;
 $gray: #ecf0f1;
+@use "sass:color";
 
 .clientes-container {
   padding: 2rem;
@@ -64,8 +65,7 @@ $gray: #ecf0f1;
  
 
   &:hover {
-    background-color: darken($cyan, 10%) !important;
-    
+    background-color: color.adjust($cyan, $lightness: -10%) !important;
     transform: translateY(-1px);
   }
 
