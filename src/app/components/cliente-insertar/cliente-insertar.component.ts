@@ -8,7 +8,7 @@ import { Cliente } from '../../models/cliente.model';
 import { EstadoCliente } from '../../enums/estadocliente.enum';
 import { TipoCliente } from '../../enums/tipocliente.enum';
 import { Genero } from '../../enums/Genero.enum';
-import { EstadoCivil } from '../../enums/estadocivil.enum'; // 👈 Importación añadida
+import { EstadoCivil } from '../../enums/estadocivil.enum';
 import { Distrito } from '../../models/distrito.model';
 import { ClienteService } from '../../services/cliente.service';
 import { DistritoService } from '../../services/distrito.service';
@@ -36,7 +36,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   clienteForm!: FormGroup;
   distritos: Distrito[] = [];
   Generos = Object.values(Genero);
-  EstadosCiviles = Object.values(EstadoCivil); // 👈 Para iterar en el HTML
+  EstadosCiviles = Object.values(EstadoCivil);
   cargandoDni: boolean = false;
   SearchCountryField = SearchCountryField;
   CountryISO = CountryISO;
@@ -98,7 +98,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       apellidos: ['', [Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
       tipoCliente: [TipoCliente.NATURAL, Validators.required],
       numDoc: ['', Validators.required],
-      estadoCivil: [EstadoCivil.SOLTERO, Validators.required], // 👈 Inicializado en Soltero
+      estadoCivil: [EstadoCivil.SOLTERO, Validators.required],
       celular: ['', Validators.required], 
       telefono: [''],
       direccion: ['', Validators.required],
@@ -139,22 +139,18 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     return 'Error.';
   }
 
-  // 🔹 NUEVA FUNCIÓN: Autocompletado por DNI
   public onDniInput(): void {
     const dni = this.clienteForm.get('numDoc')?.value;
     const tipo = this.clienteForm.get('tipoCliente')?.value;
 
-    // Solo busca si es NATURAL y tiene 8 dígitos
     if (tipo === TipoCliente.NATURAL && dni && dni.length === 8) {
       this.cargandoDni = true;
 
       this.clienteService.consultarDniExterno(dni).subscribe({
         next: (res) => {
           if (res && res.success) {
-            // Actualizamos los campos del formulario reactivo
             this.clienteForm.patchValue({
               nombre: res.first_name,
-              // Concatenamos Apellido Paterno + Materno
               apellidos: `${res.first_last_name} ${res.second_last_name}`.trim()
             });
             this.toastr.success('Datos recuperados de RENIEC');
@@ -168,12 +164,13 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       });
     }
   }
+
   public abrirModalCliente(cliente?: Cliente): void {
     this.clienteForm.reset();
     if (cliente) {
       this.clienteForm.patchValue({ 
         ...cliente, 
-        estadoCivil: cliente.estadoCivil, // 👈 Se carga en edición
+        estadoCivil: cliente.estadoCivil,
         genero: cliente.genero,
         distrito: { idDistrito: cliente.distrito?.idDistrito } 
       });

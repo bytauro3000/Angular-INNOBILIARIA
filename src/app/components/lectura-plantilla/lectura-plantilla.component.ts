@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core'; // 👈 Importar HostListener
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -19,7 +19,7 @@ export class LecturaPlanillaComponent implements OnInit {
   filtroManzana: string = '';
   filtroLote: string = '';
   fechaGiroManual: string = new Date().toISOString().split('T')[0];
-  fechaLecturaManual: string = new Date().toISOString().split('T')[0]; // 👈 NUEVA
+  fechaLecturaManual: string = new Date().toISOString().split('T')[0];
 
   guardando: boolean = false;
   planillaCompleta: LecturaUnificadaDTO[] = [];
@@ -28,7 +28,10 @@ export class LecturaPlanillaComponent implements OnInit {
   confLuz: any = null;
   confAgua: any = null;
   cargando: boolean = false;
-  mensajeEstado: string = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.'; 
+  mensajeEstado: string = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
+
+  // 👇 NUEVA VARIABLE para controlar el panel de búsqueda en móvil
+  mostrarFiltrosMovil: boolean = false;
 
   constructor(
     private lecturaService: LecturaService,
@@ -70,7 +73,7 @@ export class LecturaPlanillaComponent implements OnInit {
           consumoLuz: 0,
           importeLuz: 0,
           consumoAgua: 0,
-          importeAgua: 0
+          importeAgua: 0,
         }));
         this.aplicarFiltrosLocal();
         this.cargando = false;
@@ -152,62 +155,71 @@ export class LecturaPlanillaComponent implements OnInit {
   }
 
   guardarTodo() {
-  if (!this.esPlanillaValida()) return;
+    if (!this.esPlanillaValida()) return;
 
-  // Validar fechas comparando directamente las cadenas (formato YYYY-MM-DD)
-  if (this.fechaLecturaManual > this.fechaGiroManual) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Fechas incorrectas',
-      text: 'La fecha de lectura no puede ser posterior a la fecha de emisión',
-      timer: 3000,
-      showConfirmButton: false
-    });
-    return;
-  }
-
-  this.guardando = true;
-  this.lecturaService.guardarPlanillaUnificada(
-    this.planillaCompleta, 
-    this.fechaGiroManual,
-    this.fechaLecturaManual
-  ).subscribe({
-    next: () => {
-      this.guardando = false;
+    if (this.fechaLecturaManual > this.fechaGiroManual) {
       Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: 'Registros procesados correctamente',
-        timer: 2000,
+        icon: 'warning',
+        title: 'Fechas incorrectas',
+        text: 'La fecha de lectura no puede ser posterior a la fecha de emisión',
+        timer: 3000,
         showConfirmButton: false
       });
-      this.limpiarPlanilla();
-    },
-    error: (err) => {
-      this.guardando = false;
-      let mensaje = 'No se pudo guardar la planilla';
-      
-      // Extraer mensaje del error según la nueva estructura del gateway
-      if (err.error?.error) {
-        mensaje = err.error.error;               // Mensaje limpio desde el backend
-      } else if (err.error?.detalle) {
-        mensaje = err.error.detalle;              // Por si aún existe
-      } else if (err.error && typeof err.error === 'string') {
-        mensaje = err.error;
-      } else if (err.message) {
-        mensaje = err.message;
-      }
-      
-      Swal.fire('Error', mensaje, 'error');
+      return;
     }
-  });
-}
 
-// Método auxiliar para limpiar (opcional)
-private limpiarPlanilla() {
-  this.planillaCompleta = [];
-  this.planillaFiltrada = [];
-  this.programaId = null;
-  this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
-}
+    this.guardando = true;
+    this.lecturaService.guardarPlanillaUnificada(
+      this.planillaCompleta, 
+      this.fechaGiroManual,
+      this.fechaLecturaManual
+    ).subscribe({
+      next: () => {
+        this.guardando = false;
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Registros procesados correctamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        this.limpiarPlanilla();
+      },
+      error: (err) => {
+        this.guardando = false;
+        let mensaje = 'No se pudo guardar la planilla';
+        if (err.error?.error) {
+          mensaje = err.error.error;
+        } else if (err.error?.detalle) {
+          mensaje = err.error.detalle;
+        } else if (err.error && typeof err.error === 'string') {
+          mensaje = err.error;
+        } else if (err.message) {
+          mensaje = err.message;
+        }
+        Swal.fire('Error', mensaje, 'error');
+      }
+    });
+  }
+
+  private limpiarPlanilla() {
+    this.planillaCompleta = [];
+    this.planillaFiltrada = [];
+    this.programaId = null;
+    this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
+  }
+
+  // 👇 NUEVOS MÉTODOS PARA EL BUSCADOR MÓVIL
+  toggleFiltrosMovil() {
+    this.mostrarFiltrosMovil = !this.mostrarFiltrosMovil;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.mostrarFiltrosMovil) return;
+    const target = event.target as HTMLElement;
+    if (!target.closest('.mobile-search-panel') && !target.closest('.floating-search-btn')) {
+      this.mostrarFiltrosMovil = false;
+    }
+  }
 }

@@ -6,87 +6,102 @@
         <h5 class="modal-title">
           <i class="bi bi-pencil-square"></i> Editar Información del Cliente
         </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+        <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
       </div>
 
       <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
         <div class="modal-body compact-body">
           <div class="form-wrapper-modal">
             
+            <!-- Nombre y Apellidos -->
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" formControlName="nombre" (input)="formatearTexto($event, 'nombre')">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" formControlName="nombre" 
+                       (input)="formatearTexto($event, 'nombre')" 
+                       placeholder="Nombres del cliente">
               </div>
               <div class="form-group">
-                <label>Apellidos</label>
-                <input type="text" formControlName="apellidos" (input)="formatearTexto($event, 'apellidos')">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" formControlName="apellidos" 
+                       (input)="formatearTexto($event, 'apellidos')" 
+                       placeholder="Apellidos del cliente">
               </div>
             </div>
 
+            <!-- Tipo, Documento, Género -->
             <div class="form-row form-3-col">
               <div class="form-group">
-                <label>Tipo Cliente</label>
-                <select formControlName="tipoCliente">
+                <label for="tipoCliente">Tipo Cliente</label>
+                <select id="tipoCliente" formControlName="tipoCliente">
                   <option *ngFor="let t of tiposCliente" [value]="t">{{ t | titlecase }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>DNI / RUC</label>
-                <input type="text" formControlName="numDoc">
+                <label for="numDoc">DNI / RUC</label>
+                <input type="text" id="numDoc" formControlName="numDoc" 
+                       placeholder="Documento">
               </div>
               <div class="form-group">
-                <label>Género</label>
-                <select formControlName="genero">
+                <label for="genero">Género</label>
+                <select id="genero" formControlName="genero">
                   <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
                 </select>
               </div>
             </div>
 
+            <!-- Estado Civil, Celular, Email -->
             <div class="form-row form-3-col">
               <div class="form-group">
-                <label>Estado Civil</label>
-                <select formControlName="estadoCivil">
+                <label for="estadoCivil">Estado Civil</label>
+                <select id="estadoCivil" formControlName="estadoCivil">
                   <option *ngFor="let ec of estadosCiviles" [value]="ec">{{ ec }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Celular</label>
-                <input type="tel" formControlName="celular">
+                <label for="celular">Celular</label>
+                <input type="tel" id="celular" formControlName="celular" 
+                       placeholder="+51 999 999 999">
               </div>
               <div class="form-group">
-                <label>Email</label>
-                <input type="email" formControlName="email">
+                <label for="email">Email (Opcional)</label>
+                <input type="email" id="email" formControlName="email" 
+                       placeholder="correo@ejemplo.com">
               </div>
             </div>
 
+            <!-- Dirección y Distrito -->
             <div class="form-row form-2-col-direccion">
               <div class="form-group">
-                <label>Dirección Completa</label>
-                <input type="text" formControlName="direccion">
+                <label for="direccion">Dirección Completa</label>
+                <input type="text" id="direccion" formControlName="direccion" 
+                       placeholder="Calle, Av., Mz y Lote...">
               </div>
               <div class="form-group" formGroupName="distrito">
-                <label>Distrito</label>
-                <select formControlName="idDistrito">
+                <label for="idDistrito">Distrito</label>
+                <select id="idDistrito" formControlName="idDistrito">
                   <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
                 </select>
               </div>
             </div>
 
+            <!-- Estado, Teléfono Fijo, Fecha Registro -->
             <div class="form-row form-3-col">
               <div class="form-group">
-                <label>Estado del Cliente</label>
-                <select formControlName="estado">
+                <label for="estado">Estado del Cliente</label>
+                <select id="estado" formControlName="estado">
                   <option *ngFor="let e of estadosCliente" [value]="e">{{ e | titlecase }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Teléfono Fijo</label>
-                <input type="tel" formControlName="telefono" placeholder="Opcional">
+                <label for="telefono">Teléfono Fijo (Opcional)</label>
+                <input type="tel" id="telefono" formControlName="telefono" 
+                       placeholder="Número fijo">
               </div>
               <div class="form-group">
-                <label>F. Registro</label>
-                <input type="date" formControlName="fechaRegistro">
+                <label for="fechaRegistro">F. Registro</label>
+                <!-- El control ya está deshabilitado en el form group -->
+                <input type="date" id="fechaRegistro" formControlName="fechaRegistro">
               </div>
             </div>
 

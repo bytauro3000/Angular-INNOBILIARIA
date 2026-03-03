@@ -1,92 +1,97 @@
 <div class="clientes-container">
-  <h2>Gestión de Clientes</h2>
+  <h2>GESTIÓN DE CLIENTES</h2>
 
-  <div class="filtros">
-    <select [(ngModel)]="tipoFiltro" (change)="filtrarClientes()" class="filtro-select">
-      <option value="nombres">Nombres y Apellidos</option>
-      <option value="documento">Documento (DNI/RUC)</option>
-    </select>
+  <!-- FILTROS MODIFICADOS -->
+  <div class="filtros-header">
+    <!-- Select de filtro -->
+    <div class="filtro-select-wrapper">
+      <select [(ngModel)]="tipoFiltro" (change)="filtrarClientes()" class="filtro-select">
+        <option value="nombres">Nombres y Apellidos</option>
+        <option value="documento">Documento (DNI/RUC)</option>
+      </select>
+    </div>
 
-    <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarClientes()"
-      placeholder="Ingresa el término de búsqueda..." class="filtro-input">
+    <!-- Input de búsqueda (sin lupa) -->
+    <div class="search-box">
+      <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarClientes()"
+        placeholder="Ingresa el término de búsqueda..." class="form-control" />
+    </div>
 
-    <button (click)="abrirModal()" class="btn btn-agregar">
-  <i class="bi bi-plus-lg"></i> <span>Agregar</span>
-</button>
+    <!-- Botón Agregar -->
+    <button (click)="abrirModal()" class="btn-nuevo">
+      <img src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772509954/botonagregar_zkxrvd.png"
+        alt="Agregar" class="icono-agregar">
+      <span>Agregar</span>
+    </button>
   </div>
-
-  <div class="tabla-clientes">
-    <table>
+  
+  <div class="tabla-wrapper">
+    <table class="table-custom">
       <thead>
         <tr>
-          <th>Id</th>
-          <th>Nombre</th>
-          <th>Apellidos</th>
-          <th>Tipo</th>
-          <th>Documento</th>
-          <th>Celular</th>
-          <th>Estado</th>
-          <th>Acciones</th>
+          <th class="text-center" style="width: 60px;">ID</th>
+          <th>NOMBRE</th>
+          <th>APELLIDOS</th>
+          <th class="text-center">TIPO</th>
+          <th class="text-center">DOCUMENTO</th>
+          <th class="text-center">CELULAR</th>
+          <th class="text-center">ESTADO</th>
+          <th class="text-center" style="width: 140px;">ACCIONES</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cliente of paginatedClientes">
-          <td data-label="Id">{{ cliente.idCliente }}</td>
+          <td class="text-center" data-label="ID">{{ cliente.idCliente }}</td>
           <td data-label="Nombre">{{ cliente.nombre }}</td>
           <td data-label="Apellidos">{{ cliente.apellidos || '-' }}</td>
-          <td data-label="Tipo">{{ cliente.tipoCliente }}</td>
-          <td data-label="Documento">{{ cliente.numDoc || '-' }}</td>
-          <td data-label="Celular">{{ cliente.celular }}</td>
-          <td data-label="Estado">{{ cliente.estado }}</td>
-          <td data-label="Acciones" class="acciones-cell">
-            <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]"
-              class="btn btn-outline-info btn-sm me-1" title="Ver cliente">
-              <i class="bi bi-eye"></i>
-            </button>
-            
-            <button (click)="editarModal.abrirModal(cliente.idCliente)"
-              class="btn btn-outline-primary btn-sm me-1" title="Editar cliente">
-              <i class="bi bi-pencil"></i>
-            </button>
-
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminarCliente(cliente.idCliente)"
-              title="Eliminar cliente">
-              <i class="bi bi-trash"></i>
-            </button>
+          <td class="text-center" data-label="Tipo">{{ cliente.tipoCliente }}</td>
+          <td class="text-center" data-label="Documento">{{ cliente.numDoc || '-' }}</td>
+          <td class="text-center" data-label="Celular">{{ cliente.celular }}</td>
+          <td class="text-center" data-label="Estado">{{ cliente.estado }}</td>
+          <td class="acciones-cell" data-label="Acciones">
+            <div class="acciones-container">
+              <!-- Ver cliente -->
+              <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]"
+                class="btn-action btn-view" title="Ver cliente">
+                <i class="bi bi-eye"></i>
+              </button>
+              <!-- Editar cliente -->
+              <button (click)="editarModal.abrirModal(cliente.idCliente)"
+                class="btn-action btn-edit" title="Editar cliente">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <!-- Eliminar cliente -->
+              <button class="btn-action btn-delete" (click)="eliminarCliente(cliente.idCliente)"
+                title="Eliminar cliente">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
+        </tr>
+        <tr *ngIf="paginatedClientes.length === 0">
+          <td colspan="8" class="no-data">No se encontraron clientes que coincidan con la búsqueda.</td>
         </tr>
       </tbody>
     </table>
-    <div *ngIf="paginatedClientes.length === 0" class="no-results">
-      No se encontraron clientes que coincidan con la búsqueda.
-    </div>
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
-  <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagina-btn">
-    Anterior
-  </button>
-
-  <ng-container *ngFor="let page of getPagesArray()">
-    <button *ngIf="page !== '...'" 
-            (click)="goToPage($any(page))" 
-            [class.active]="page === currentPage" 
-            class="pagina-numero-btn">
-      {{ page }}
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
+      Anterior
     </button>
-
-    <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
-  </ng-container>
-
-  <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="pagina-btn">
-    Siguiente
-  </button>
+    <ng-container *ngFor="let page of getPagesArray()">
+      <button *ngIf="page !== '...'" (click)="goToPage($any(page))" class="btn-paginacion"
+        [class.active]="page === currentPage">
+        {{ page }}
+      </button>
+      <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+    </ng-container>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
+      Siguiente
+    </button>
+  </div>
 </div>
 
-  <app-cliente-insertar #registroModal (clienteGuardado)="cargarClientes()">
-  </app-cliente-insertar>
-
-  <app-cliente-editar #editarModal (clienteActualizado)="cargarClientes()">
-  </app-cliente-editar>
-
-</div>
+<!-- Modales -->
+<app-cliente-insertar #registroModal (clienteGuardado)="cargarClientes()"></app-cliente-insertar>
+<app-cliente-editar #editarModal (clienteActualizado)="cargarClientes()"></app-cliente-editar>

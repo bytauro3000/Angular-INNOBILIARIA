@@ -50,7 +50,6 @@ export class ClienteEditarComponent implements OnInit {
     });
   }
 
-  // Método para que el Listado de Clientes abra este modal
   public abrirModal(id: number): void {
     this.clienteId = id;
     if (!this.modal) {
@@ -61,7 +60,6 @@ export class ClienteEditarComponent implements OnInit {
   }
 
   private inicializarFormulario(): void {
-    // Definimos la misma Regex
     const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     this.clienteForm = this.fb.group({
       idCliente: [null],

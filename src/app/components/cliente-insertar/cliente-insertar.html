@@ -13,21 +13,7 @@
         <div class="modal-body compact-body">
           <div class="form-wrapper-modal">
 
-            <div class="form-row form-2-col">
-              <div class="form-group">
-                <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required
-                  (input)="formatearTexto($event, 'nombre')" />
-              </div>
-
-              <div class="form-group">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente"
-                  (input)="formatearTexto($event, 'apellidos')" />
-              </div>
-            </div>
-
-            <div class="form-row form-3-col">
+             <div class="form-row form-3-col">
               <div class="form-group">
                 <label for="tipoCliente">Tipo de Cliente</label>
                 <select id="tipoCliente" formControlName="tipoCliente" required>
@@ -41,7 +27,7 @@
                 <label for="numDoc">DNI / RUC</label>
                 <div class="input-container-relative">
                   <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
-                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 9 : 11"
+                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
                     (input)="limpiarNoNumericos('numDoc'); onDniInput()" 
                     [attr.title]="getErrorMessage('numDoc')"
                     [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
@@ -61,6 +47,22 @@
                 </select>
               </div>
             </div>
+
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required
+                  (input)="formatearTexto($event, 'nombre')" />
+              </div>
+
+              <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente"
+                  (input)="formatearTexto($event, 'apellidos')" />
+              </div>
+            </div>
+
+           
 
             <div class="form-row form-3-col">
               <div class="form-group">

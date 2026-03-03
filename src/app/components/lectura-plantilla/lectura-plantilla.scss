@@ -1,90 +1,165 @@
 // ============================================
 // VARIABLES GLOBALES
 // ============================================
-$navy: hsl(0, 0%, 100%);
+$navy: #023e8a;
 $blue: #2980b9;
 $green: #27ae60;
 $yellow: #f1c40f;
+$orange: #f39c12;
+$light-blue: #3498db;
 $gray: #ecf0f1;
+$light-bg: #f5f7fa;
+$text-dark: #1e293b;
+$text-light: #334155;
+$border-color: #e9ecef;
 
 // ============================================
 // CONTENEDOR PRINCIPAL
 // ============================================
-.planilla-container {
-  padding: 0 0px 0 0px;
-  background-color: #ffffff !important;
+:host {
+  display: block;
   height: 100vh;
+  background-color: $light-bg;
+  overflow-y: auto;
+}
+
+.planilla-container {
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 
+  .main-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
   // ==========================================
-  // ENCABEZADO (CARD-HEADER)
+  // ENCABEZADO
   // ==========================================
   .card-header {
-    background: $navy;
-    color: #000000;
-    padding: 25px 27px 5px 27px;
+    background: white;
+    color: $text-dark;
+    padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #bdc3c7;
+    border-bottom: 1px solid $border-color;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 
     h2 {
-      color: #000000 !important;
+      color: $text-dark;
+      font-family: Georgia, 'Times New Roman', Times, serif;
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
+      font-weight: 600;
     }
 
     .prices-box {
       display: flex;
-      gap: 10px;
+      gap: 12px;
 
       .badge-price {
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        background: #caf0f8;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &.luz {
+          background: rgba($orange, 0.15);
+          color: darken($orange, 20%);
+          border: 1px solid rgba($orange, 0.3);
+        }
+
+        &.agua {
+          background: rgba($light-blue, 0.15);
+          color: darken($light-blue, 20%);
+          border: 1px solid rgba($light-blue, 0.3);
+        }
       }
     }
   }
 
   // ==========================================
-  // SECCIÓN DE FILTROS
+  // FILTROS (siempre visibles, se desplazan con el contenido)
   // ==========================================
   .filter-section {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
-    padding: 15px 25px;
+    gap: 16px;
+    padding: 20px 24px;
     background: white;
-    
+    border-bottom: 1px solid $border-color;
 
     .form-group {
-      flex: 1;
+      flex: 1 1 160px;
       min-width: 140px;
 
       label {
         display: block;
-        font-weight: 800;
-        color: #023e8a;
-        margin-bottom: 4px;
-        font-size: 0.75rem;
+        font-weight: 600;
+        color: $text-light;
+        margin-bottom: 6px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
 
       input,
       select {
         width: 100%;
-        padding: 6px;
-        border: 1px solid #bdc3c7;
-        border-radius: 4px;
-        color: #000 !important;
+        padding: 10px 12px;
+        border: 1px solid $border-color;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        background-color: #f9fafc;
+        color: $text-dark;
+        transition: all 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: $navy;
+          box-shadow: 0 0 0 3px rgba($navy, 0.15);
+          background-color: white;
+        }
       }
     }
   }
 
   // ==========================================
-  // ESTILOS PARA VERSIÓN MÓVIL (TARJETAS)
+  // ESTADO VACÍO
+  // ==========================================
+  .empty-state-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 20px;
+    margin: 20px 24px;
+    color: $text-light;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+    i {
+      font-size: 3rem;
+      color: $navy;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: $text-light;
+    }
+  }
+
+  // ==========================================
+  // VERSIÓN MÓVIL (TARJETAS) - visible solo en móvil
   // ==========================================
   .mobile-cards-container {
     display: none;
@@ -94,97 +169,275 @@ $gray: #ecf0f1;
     display: block;
   }
 
-  @media (max-width: 992px) {
-    .mobile-cards-container {
-      display: block;
-      padding: 10px;
-      flex: 1;
-      overflow-y: auto;
-
-    .vivienda-card .card-top .badge-mz {
-    background-color: #ffc107;   
-    color: #000000;     
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    border: 1px solid rgba(0,0,0,0.1); /* Sutil borde */
-  }
-  }
-
-    .desktop-only {
-      display: none;
-    }
-
-    .filter-section {
-      .form-group {
-        min-width: 100% !important;
-      }
-    }
-  }
-
   // ==========================================
-  // TARJETAS DE VIVIENDA (MÓVIL)
+  // TABLA ESCRITORIO (scroll horizontal)
   // ==========================================
-  .vivienda-card {
-    background: #fff;
-    border: 0.1px solid #023e8a;
-    border-radius: 8px;
-    margin-bottom: 12px;
+  .table-scroll-area {
+    padding: 0 24px 24px 24px;
+    background: $light-bg;
+    overflow-x: auto;
 
-    .card-top {
-      background: #023e8a;
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 8px 8px 0 0;
+    .unified-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      margin-top: 16px;
 
-      strong {
-        color: #f4f5f7;
+      .sticky-th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, $navy, #0353a4);
+        color: white;
+        font-weight: 600;
         font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 14px 12px;
+        text-align: center;
+      }
+
+      .sticky-sub {
+        position: sticky;
+        top: 48px;
+        z-index: 9;
+        background: #f8f9fa !important;
+        box-shadow: inset 0 -1px 0 #ddd;
+        color: $text-dark;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 12px 10px;
+        text-align: center;
+      }
+
+      th {
+        padding: 12px 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+        text-align: center;
+
+        &.luz-head {
+          background: rgba($orange, 0.1);
+          color: darken($orange, 20%);
+          border-bottom: 2px solid $orange;
+        }
+
+        &.agua-head {
+          background: rgba($light-blue, 0.1);
+          color: darken($light-blue, 20%);
+          border-bottom: 2px solid $light-blue;
+        }
+      }
+
+      td {
+        padding: 12px 10px;
+        border: 1px solid #edf2f7;
+        color: $text-dark;
+        font-size: 0.9rem;
+        vertical-align: middle;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .bg-light {
+        background-color: #f9fafc;
+      }
+
+      .name-box strong {
+        text-transform: uppercase;
+        font-weight: 600;
+        @media (min-width: 993px) {
+          font-weight: 500;
+        }
+      }
+
+      .badge-mz {
+        background: $navy;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .input-cell {
+        width: 100%;
+        border: none;
+        background: transparent;
+        text-align: center;
+        font-weight: 600;
+        padding: 4px 0;
+        color: inherit;
+
+        &:focus {
+          outline: none;
+          background-color: rgba($navy, 0.05);
+          border-radius: 4px;
+        }
+      }
+
+      // Estados de lectura
+      .state-disabled {
+        background-color: $gray !important;
+        opacity: 0.6;
+
+        input {
+          opacity: 0.6;
+        }
+      }
+
+      .state-pending {
+        background-color: rgba($yellow, 0.15) !important;
+        border-left: 4px solid $yellow;
+      }
+
+      .state-ready {
+        background-color: rgba($green, 0.15) !important;
+        border-left: 4px solid $green;
+      }
+
+      // Anchos de columnas
+      .col-titular { min-width: 280px; }
+      .col-mz { min-width: 80px; }
+      .col-lect { min-width: 110px; }
+      .col-cons { min-width: 70px; }
+      .col-imp { min-width: 90px; }
+    }
+  }
+
+  // ==========================================
+  // PIE DE ACCIONES
+  // ==========================================
+  .footer-actions {
+    background: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid $border-color;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.02);
+
+    .db-info {
+      color: $text-light;
+      font-size: 0.95rem;
+      i {
+        margin-right: 6px;
+        color: $navy;
       }
     }
 
-    .service-block {
-      padding: 10px;
-      border-bottom: 1px solid #f1f1f1;
+    .btn-save {
+      background: $green;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 8px rgba($green, 0.2);
+      min-width: 240px;
 
-      .block-label {
-        font-size: 0.7rem;
-        font-weight: 800;
-        color: $blue;
-        margin-bottom: 5px;
+      &:hover:not(:disabled) {
+        background: darken($green, 5%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba($green, 0.25);
       }
 
-      .data-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+      &:disabled {
+        background: #94a3b8;
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
 
-        .data-col {
-          display: flex;
-          flex-direction: column;
+      i {
+        margin-right: 8px;
+      }
+    }
+  }
 
-          label {
-            font-size: 0.6rem;
-            color: #777;
-            font-weight: bold;
-          }
+  // ==========================================
+  // BOTÓN FLOTANTE DE BÚSQUEDA (visible en todos los tamaños)
+  // ==========================================
+  .floating-search-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: $navy;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
 
-          span,
-          strong {
-            font-size: 0.85rem;
-            color: #000;
-          }
+    &:hover {
+      background: darken($navy, 10%);
+    }
+  }
 
-          .input-card {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: 900;
+  // ==========================================
+  // PANEL DE BÚSQUEDA MÓVIL
+  // ==========================================
+  .mobile-search-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 16px;
+    z-index: 101;
+    width: 260px;
+
+    .search-panel-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          font-weight: 600;
+          font-size: 0.8rem;
+          color: $text-light;
+          margin-bottom: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+
+        input {
+          padding: 10px 12px;
+          border: 1px solid $border-color;
+          border-radius: 10px;
+          font-size: 0.95rem;
+          background-color: #f9fafc;
+          transition: all 0.2s;
+
+          &:focus {
+            outline: none;
+            border-color: $navy;
+            box-shadow: 0 0 0 3px rgba($navy, 0.15);
+            background-color: white;
           }
         }
       }
@@ -192,144 +445,117 @@ $gray: #ecf0f1;
   }
 
   // ==========================================
-  // ÁREA DE TABLA (ESCRITORIO)
+  // MEDIA QUERY PARA MÓVIL (≤ 992px)
   // ==========================================
-  .table-scroll-area {
-    flex: 1;
-    overflow: auto;
-    background: #fff;
-    padding: 0 26px;
-    
+  @media (max-width: 992px) {
+    // Ocultar solo mz y lt (el programa se mantiene visible)
+    .filter-mz,
+    .filter-lt {
+      display: none !important;
+    }
 
-    .unified-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1100px;
-      
+    // Las fechas y el programa ocupan todo el ancho
+    .filter-section .form-group {
+      min-width: 100% !important;
+    }
 
-      .sticky-th {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #023e8a;
-        color: #fff;
-      }
+    // Mostrar tarjetas móviles y ocultar tabla
+    .mobile-cards-container {
+      display: block;
+      padding: 16px;
+      flex: 1;
 
-      .sticky-sub {
-        position: sticky;
-        top: 38px;
-        z-index: 9;
-        background: #f8f9fa !important;
-        box-shadow: inset 0 -1px 0 #ddd;
-      }
+      .vivienda-card {
+        background: white;
+        border: 1px solid $border-color;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 
-      th {
-        padding: 8px;
-        border: 1px solid #ddd;
-        font-size: 0.7rem;
-        text-align: center;
-      }
+        .card-top {
+          background: $navy;
+          padding: 12px 16px;
+          border-radius: 16px 16px 0 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
 
-      .sub-head th {
-        color: #333;
-        font-weight: 650;
-        font-size: 0.8rem;
-      }
+          strong {
+            color: white;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+          }
 
-      .col-titular {
-        width: 360px;
-      }
+          .badge-mz {
+            background: white;
+            color: $navy;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+          }
+        }
 
-      .col-mz {
-        width: 85px;
-      }
+        .service-block {
+          padding: 16px;
+          border-bottom: 1px solid #f1f1f1;
 
-      .col-lect {
-        width: 120px;
-      }
+          .block-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: $blue;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
 
-      td {
-        padding: 6px 8px;
-        border: 1px solid #eee;
-        color: #000 !important;
-        font-size: 0.8rem;
+          .data-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+
+            .data-col {
+              display: flex;
+              flex-direction: column;
+
+              label {
+                font-size: 0.7rem;
+                color: #777;
+                font-weight: bold;
+              }
+
+              span, strong {
+                font-size: 0.9rem;
+                color: $text-dark;
+              }
+
+              .input-card {
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 600;
+              }
+            }
+          }
+        }
       }
     }
-  }
 
-  // ==========================================
-  // ESTADOS DE LAS LECTURAS
-  // ==========================================
-  .state-disabled {
-    background-color: $gray !important;
-    opacity: 0.5;
-  }
+    .desktop-only {
+      display: none;
+    }
 
-  .state-pending {
-    background-color: rgba($yellow, 0.25) !important;
-    border: 1.5px solid $yellow !important;
-  }
+    .footer-actions {
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
 
-  .state-ready {
-    background-color: rgba($green, 0.25) !important;
-    border: 1.5px solid $green !important;
-  }
-
-  .input-cell {
-    width: 100%;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-weight: 900;
-  }
-
-  // ==========================================
-  // PIE DE ACCIONES
-  // ==========================================
-  .footer-actions {
-    background: $navy;
-    color: #fff;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .btn-save {
-      background: $green;
-      color: #fff;
-      border: none;
-      padding: 10px 35px;
-      border-radius: 4px;
-      font-weight: 900;
-
-      &:disabled {
-        background: #7f8c8d;
-        opacity: 0.5;
+      .btn-save {
+        width: 100%;
+        min-width: auto;
       }
     }
-  }
-
-  // ==========================================
-  // MENSAJE DE ESTADO VACÍO
-  // ==========================================
-  .empty-state-box {
-    padding: 80px;
-    text-align: center;
-    color: $blue;
-
-    i {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-  }
-}
-
-.name-box strong {
-  text-transform: uppercase;
-}
-
-@media (min-width: 993px) {
-  .name-box strong {
-    font-weight: 600; 
   }
 }

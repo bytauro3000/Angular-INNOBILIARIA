@@ -1,5 +1,5 @@
 <div class="contratos-container">
-  <h2 class="text-center">Lista de Contratos</h2>
+  <h2>CONTRATOS</h2>
 
   <div class="filtros-header">
     <div class="search-box">
@@ -8,42 +8,51 @@
         class="form-control" />
     </div>
 
-    <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn btn-nuevo">
-      + <span class="btn-text">Nuevo Contrato</span>
-    </button>
+    <button 
+  [routerLink]="['/secretaria-menu/contratos/registrar']" 
+  class="btn-nuevo">
+
+  <img 
+    src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772509954/botonagregar_zkxrvd.png"
+    alt="Agregar"
+    class="icono-agregar">
+
+  <span>Nuevo</span>
+
+</button>
   </div>
 
   <div class="tabla-wrapper">
     <table class="table-custom">
       <thead>
         <tr>
-          <th style="width: 50px;">ID</th>
-          <th>Nombre(s) del Cliente</th>
-          <th>Documento</th>
-          <th>Lote</th>
-          <th>Fecha</th>
-          <th>Tipo</th>
-          <th>Total</th>
-          <th>Inicial</th>
-          <th>Saldo</th>
-          <th style="width: 80px;">Letras</th>
-          <th style="width: 150px;">Acciones</th>
+          <th class="text-center" style="width: 60px;">ID</th>
+          <th>CLIENTE(S)</th>
+          <th class="text-center">DOCUMENTO</th>
+          <th class="text-center">MZ Y LT</th>
+          <th class="text-center">FECHA C.</th>
+          <th class="text-center">TIPO C.</th>
+          <th class="text-end">TOTAL</th>
+          <th class="text-end">INICIAL</th>
+          <th class="text-end">SALDO</th>
+          <th class="text-center" style="width: 70px;">LETRAS</th>
+          <th class="text-center" style="width: 160px;">ACCIONES</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
-          <td data-label="ID" class="text-center">
+
+          <td class="text-center" data-label="ID">
             <div class="id-service-wrapper">
               <span class="id-number">{{ contrato.idContrato }}</span>
               <div class="service-indicators" *ngIf="contrato.tieneLuz || contrato.tieneAgua">
-                <i *ngIf="contrato.tieneLuz" class="bi bi-lightning-charge-fill text-warning"
-                  title="Servicio de Luz Activo"></i>
-                <i *ngIf="contrato.tieneAgua" class="bi bi-droplet-fill text-primary"
-                  title="Servicio de Agua Activo"></i>
+                <i *ngIf="contrato.tieneLuz" class="bi bi-lightning-charge-fill"></i>
+                <i *ngIf="contrato.tieneAgua" class="bi bi-droplet-fill"></i>
               </div>
             </div>
           </td>
-          <td data-label="Cliente">
+
+          <td data-label="Cliente(s)">
             <div class="multi-item-container">
               <div *ngFor="let cliente of contrato.clientes">
                 {{ cliente.nombre }} {{ cliente.apellidos }}
@@ -51,7 +60,7 @@
             </div>
           </td>
 
-          <td data-label="DNI" class="text-center">
+          <td class="text-center" data-label="Documento">
             <div class="multi-item-container">
               <div *ngFor="let cliente of contrato.clientes">
                 {{ cliente.numDoc }}
@@ -59,70 +68,90 @@
             </div>
           </td>
 
-          <td data-label="Lote" class="text-center">
+          <td class="text-center" data-label="Mz y Lt">
             <div class="multi-item-container">
               <div *ngFor="let lote of contrato.lotes">
                 Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
               </div>
             </div>
           </td>
-          <td data-label="Fecha" class="text-center">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
-          <td data-label="Tipo" class="text-center">{{ contrato.tipoContrato }}</td>
-          <td data-label="Total" class="text-end fw-bold">{{ contrato.montoTotal | currency: 'USD' }}</td>
-          <td data-label="Inicial" class="text-end">{{ contrato.inicial | currency: 'USD' }}</td>
-          <td data-label="Saldo" class="text-end">{{ contrato.saldo | currency: 'USD' }}</td>
-          <td data-label="N° Letras" class="text-center">{{ contrato.cantidadLetras }}</td>
-          <td data-label="Acciones" class="acciones-cell">
+
+          <td class="text-center" data-label="Fecha C.">
+            {{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}
+          </td>
+
+          <td class="text-center" data-label="Tipo C.">
+            {{ contrato.tipoContrato }}
+          </td>
+
+          <td class="text-end fw-bold" data-label="Total">
+            {{ contrato.montoTotal | currency: 'USD' }}
+          </td>
+
+          <td class="text-end" data-label="Inicial">
+            {{ contrato.inicial | currency: 'USD' }}
+          </td>
+
+          <td class="text-end" data-label="Saldo">
+            {{ contrato.saldo | currency: 'USD' }}
+          </td>
+
+          <td class="text-center" data-label="Letras">
+            {{ contrato.cantidadLetras }}
+          </td>
+
+          <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
-              <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir">
-                <i class="bi bi-printer"></i>
-              </button>
+
               <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"
-                class="btn-action btn-edit" title="Editar">
+                class="btn-action btn-edit" title="Editar contrato">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete" title="Eliminar">
+
+              <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete"
+                title="Eliminar contrato">
                 <i class="bi bi-trash"></i>
               </button>
 
-              <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action" [ngClass]="{
-            'btn-info': !contrato.tieneLuz || !contrato.tieneAgua,
-            'btn-success-active': contrato.tieneLuz && contrato.tieneAgua
-        }" [disabled]="contrato.tieneLuz && contrato.tieneAgua"
-                [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir Servicio'">
-
+              <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action btn-inscripcion"
+                [ngClass]="{'btn-success-active': contrato.tieneLuz && contrato.tieneAgua}"
+                [disabled]="contrato.tieneLuz && contrato.tieneAgua" [title]="(contrato.tieneLuz && contrato.tieneAgua) 
+        ? 'Servicios completos' 
+        : 'Inscribir servicio'">
                 <i class="bi" [ngClass]="{
-        'bi-lightning-charge': !contrato.tieneLuz,
-        'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
-        'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
-    }"></i>
+          'bi-lightning-charge': !contrato.tieneLuz,
+          'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
+          'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
+        }"></i>
               </button>
+
+              <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir contrato">
+                <i class="bi bi-printer"></i>
+              </button>
+
               <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
-                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-info"
-                title="Letras">
+                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-letras"
+                title="Generar letras">
                 <i class="bi bi-file-earmark-plus"></i>
               </a>
+
             </div>
           </td>
-        </tr>
-        <tr *ngIf="paginatedContratos.length === 0">
-          <td colspan="11" class="no-data">No hay contratos para mostrar.</td>
+
         </tr>
       </tbody>
     </table>
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
       Anterior
     </button>
-
-    <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" [class.active]="currentPage === page"
-      class="btn pagina-numero-btn">
+    <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" class="btn-paginacion"
+      [class.active]="currentPage === page">
       {{ page }}
     </button>
-
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
       Siguiente
     </button>
   </div>

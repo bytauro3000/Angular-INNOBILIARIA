@@ -1,11 +1,22 @@
-/* ============================================================
-   DISEÑO "MIDNIGHT GLASS" COMPACTO - 100% RESPONSIVO Y ALINEADO
-   ============================================================ */
+// ============================================
+// VARIABLES (tomadas de contratos/clientes)
+// ============================================
+$navy: #023e8a;
+$green: #27ae60;
+$light-blue: #3498db;
+$text-dark: #1e293b;
+$text-light: #334155;
+$border-color: #e9ecef;
+$input-bg: #f9fafc;
 
+// ============================================
+// MODAL PRINCIPAL
+// ============================================
 .modal-content {
-  background-color: #2c3e50 !important;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: white !important;
+  border-radius: 16px;
+  border: 1px solid $border-color !important;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
 }
 
 .custom-modal-width {
@@ -15,56 +26,95 @@
 }
 
 .modal-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+
   .modal-title {
-    font-weight: 700; font-size: 1.1rem; color: #ffffff;
-    display: flex; align-items: center; gap: 10px;
-    i { color: #2ecc71; }
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: $text-dark;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      color: $green;
+      font-size: 1.4rem;
+    }
+  }
+
+  .btn-close {
+    filter: none;
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
-.compact-body { padding: 1rem 1.5rem; }
+.modal-body {
+  padding: 1.5rem;
+}
 
+// ============================================
+// FORMULARIOS
+// ============================================
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 100%; // Garantiza que el grupo ocupe su columna
+  width: 100%;
 
   label {
-    color: #94a3b8; font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px;
+    color: $text-light;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
 }
 
-.width-100 { grid-column: 1 / -1; } // Fuerza a ocupar todo el ancho del grid
+.width-100 {
+  grid-column: 1 / -1;
+}
 
-/* --- INPUTS Y SELECTS NORMALIZADOS --- */
-input, select {
-  background-color: #34495e !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  border-radius: 6px !important;
-  padding: 6px 12px !important;
-  font-size: 0.85rem !important;
-  height: 38px !important; // Altura fija para alineación perfecta
-  width: 100% !important;   // Ancho total
+/* --- INPUTS Y SELECTS --- */
+input, select, textarea {
+  background-color: $input-bg !important;
+  border: 1px solid $border-color !important;
+  color: $text-dark !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  font-size: 0.95rem !important;
+  height: 42px !important;
+  width: 100% !important;
   transition: all 0.2s ease;
 
   &:focus {
-    background-color: #3d566e !important;
-    border-color: #2ecc71 !important;
-    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15) !important;
+    background-color: white !important;
+    border-color: $navy !important;
+    box-shadow: 0 0 0 3px rgba($navy, 0.15) !important;
     outline: none !important;
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+    font-size: 0.9rem;
   }
 }
 
-/* --- GRID ESTRUCTURAL --- */
+// Para textarea si se usara (no en este formulario)
+textarea {
+  height: auto !important;
+  min-height: 80px;
+}
+
+/* --- GRID --- */
 .form-row {
   display: grid;
   gap: 1rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1.2rem;
   width: 100%;
 }
 
@@ -72,15 +122,14 @@ input, select {
 .form-2-col { grid-template-columns: repeat(2, 1fr); }
 .form-3-col { grid-template-columns: repeat(3, 1fr); }
 
-/* --- CONTENEDOR DNI (CORRECCIÓN DE TAMAÑO) --- */
+/* --- CONTENEDOR DNI CON SPINNER --- */
 .input-container-relative {
   position: relative;
-  width: 100%; // Ocupa el 100% de la columna del grid
-  display: block;
+  width: 100%;
 
   input {
-    width: 100% !important;
-    padding-right: 35px !important; // Espacio para el spinner
+    width: 100%;
+    padding-right: 40px !important;
   }
 
   .spinner-dni {
@@ -90,53 +139,124 @@ input, select {
     transform: translateY(-50%);
     pointer-events: none;
     z-index: 5;
-    .spinner-border { width: 16px; height: 16px; border-width: 2px; }
+
+    .spinner-border {
+      width: 18px;
+      height: 18px;
+      border-width: 2px;
+      color: $green !important;
+    }
   }
 }
 
-/* --- AJUSTE CELULAR INTERNACIONAL --- */
+/* --- COMPONENTE DE TELÉFONO INTERNACIONAL --- */
 :host ::ng-deep .celular-wrapper {
   width: 100%;
-  .iti { width: 100%; }
-  ngx-intl-tel-input input.form-control.custom-intl-input {
-    background-color: #34495e !important;
-    height: 38px !important;
+
+  .iti {
+    width: 100%;
+  }
+
+  .iti__flag-container {
+    // Ajustes visuales
+  }
+
+  input.form-control.custom-intl-input {
+    background-color: $input-bg !important;
+    height: 42px !important;
     width: 100% !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
-    border-radius: 6px !important;
-    &:focus { border-color: #2ecc71 !important; }
+    border: 1px solid $border-color !important;
+    color: $text-dark !important;
+    border-radius: 10px !important;
+    padding-left: 52px !important; // espacio para la bandera
+
+    &:focus {
+      border-color: $navy !important;
+      box-shadow: 0 0 0 3px rgba($navy, 0.15) !important;
+      background-color: white !important;
+    }
+  }
+
+  .iti__selected-flag {
+    background-color: transparent !important;
+    border-radius: 10px 0 0 10px;
   }
 }
 
-/* --- RESPONSIVIDAD --- */
+/* --- BOTONES DEL MODAL --- */
+.modal-footer {
+  border-top: 1px solid $border-color;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+
+  .btn {
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, #27ae60, #219150);
+    color: white;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+      filter: brightness(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: $text-light;
+    border: 1px solid $border-color !important;
+
+    &:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1 !important;
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
 @media (max-width: 992px) {
-  .form-3-col { grid-template-columns: repeat(2, 1fr); }
+  .form-3-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 576px) {
-  .form-row { grid-template-columns: 1fr !important; }
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem;
+  }
+
   .modal-footer {
     flex-direction: column;
-    .btn { width: 100%; }
+    .btn {
+      width: 100%;
+    }
   }
-}
 
-/* --- BOTONES --- */
-.modal-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 1.5rem;
-  display: flex; gap: 10px; justify-content: flex-end;
-
-  .btn {
-    padding: 8px 20px; border-radius: 6px; font-weight: 600;
-    font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-save {
-    background-color: #2ecc71 !important; color: white !important; border: none !important;
-    &:hover:not(:disabled) { background-color: #27ae60 !important; }
-  }
-  .btn-cancel {
-    background-color: transparent !important; border: 1px solid #4a627a !important; color: #bdc3c7 !important;
+  :host ::ng-deep .celular-wrapper input.form-control.custom-intl-input {
+    padding-left: 46px !important;
   }
 }
