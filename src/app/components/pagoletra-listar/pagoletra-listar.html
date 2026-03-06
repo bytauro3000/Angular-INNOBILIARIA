@@ -1,0 +1,149 @@
+<div class="pagos-container">
+  <h2>REGISTRO DE PAGOS DE LETRAS</h2>
+
+  <div class="filtros">
+    <div class="form-group">
+      <label>Programa</label>
+      <select [(ngModel)]="programaSeleccionado">
+        <option [ngValue]="null" disabled selected>-- Seleccione --</option>
+        <option *ngFor="let prog of programas" [ngValue]="prog.idPrograma">
+          {{ prog.nombrePrograma }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Manzana</label>
+      <input type="text" [(ngModel)]="manzanaBusqueda" placeholder="Ej: A1" />
+    </div>
+
+    <div class="form-group">
+      <label>N° Lote</label>
+      <input type="text" [(ngModel)]="numeroLoteBusqueda" (input)="formatearNumeroLote()" placeholder="Ej: 10" />
+    </div>
+
+    <button class="btn-buscar" (click)="buscarContrato()" [disabled]="cargandoLetras">
+      <i class="bi bi-search"></i> Buscar
+    </button>
+
+    <button class="btn-limpiar" (click)="limpiarBusqueda()">
+      <i class="bi bi-x-circle"></i> Limpiar
+    </button>
+  </div>
+
+  <!-- Información del contrato encontrado -->
+  <div *ngIf="contratoEncontrado" class="contrato-info-card">
+    <h4>Contrato #{{ contratoEncontrado.idContrato }}</h4>
+    <div class="info-grid">
+      <div>
+        <strong>Cliente(s):</strong>
+        <span *ngFor="let c of contratoEncontrado.clientes; let last = last">
+          {{ c.nombre }} {{ c.apellidos }}{{ !last ? ', ' : '' }}
+        </span>
+      </div>
+      <div>
+        <strong>Lote(s):</strong>
+        <span *ngFor="let l of contratoEncontrado.lotes; let last = last">
+          Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}{{ !last ? ', ' : '' }}
+        </span>
+      </div>
+      <div><strong>Fecha contrato:</strong> {{ contratoEncontrado.fechaContrato | date:'dd/MM/yyyy' }}</div>
+      <div class="total-saldo-row">
+        <span class="total-label"><strong>Total:</strong> {{ contratoEncontrado.montoTotal | currency }}</span>
+        <span class="saldo-label"><strong>Saldo:</strong> {{ contratoEncontrado.saldo | currency }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de letras -->
+  <div *ngIf="contratoEncontrado" class="tabla-wrapper">
+    <div class="tabla-header">
+      <div class="header-left">
+        <div class="toggle-container">
+          <button 
+            class="toggle-btn" 
+            [class.active]="tipoLista === 'pendientes'"
+            (click)="cambiarTipoLista('pendientes')">
+            Pendientes
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="tipoLista === 'pagadas'"
+            (click)="cambiarTipoLista('pagadas')">
+            Pagadas
+          </button>
+        </div>
+      </div>
+      <div *ngIf="totalPages > 1" class="paginacion-superior">
+        <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
+          Anterior
+        </button>
+        <ng-container *ngFor="let page of getPagesArray()">
+          <button *ngIf="page !== '...'" 
+                  (click)="goToPage(+page)" 
+                  [class.active]="page === currentPage" 
+                  class="btn-paginacion">
+            {{ page }}
+          </button>
+          <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+        </ng-container>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="cargandoLetras" class="cargando">Cargando...</div>
+
+    <table *ngIf="!cargandoLetras && paginatedLetras.length > 0" class="tabla-custom">
+      <thead>
+        <tr>
+          <th>N° Letra</th>
+          <th>Fecha Vencimiento</th>
+          <th>Importe</th>
+          <th>Importe en texto</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let letra of paginatedLetras" [class.vencida]="tipoLista === 'pendientes' && isLetraVencida(letra.fechaVencimiento)">
+          <td data-label="N° Letra">{{ letra.numeroLetra }}</td>
+          <td data-label="Fecha Vencimiento">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Importe">{{ letra.importe | currency }}</td>
+          <td data-label="Importe en texto">{{ letra.importeLetras || '-' }}</td>
+          <td data-label="Estado">
+            <span class="estado-badge" [ngClass]="{
+              'estado-pendiente': letra.estadoLetra === 'PENDIENTE',
+              'estado-vencido': letra.estadoLetra === 'VENCIDO',
+              'estado-pagado': letra.estadoLetra === 'PAGADO'
+            }">
+              {{ letra.estadoLetra }}
+            </span>
+          </td>
+          <td class="acciones-cell" data-label="Acciones">
+            <div class="acciones-container">
+              <button *ngIf="tipoLista === 'pendientes'" 
+                      class="btn-pagar" 
+                      (click)="abrirModalPago(letra)" 
+                      title="Registrar pago">
+                <i class="bi bi-cash-stack"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!cargandoLetras && paginatedLetras.length === 0" class="sin-resultados">
+      No hay letras {{ tipoLista === 'pendientes' ? 'pendientes' : 'pagadas' }} para este contrato.
+    </div>
+  </div>
+</div>
+
+<app-pago-letra-form
+  *ngIf="mostrarModalPago"
+  [letra]="letraSeleccionada!"
+  (onClose)="cerrarModalPago()"
+  (onPagoExitoso)="onPagoRegistrado()">
+</app-pago-letra-form>

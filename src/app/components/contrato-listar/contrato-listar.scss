@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ============================================
 // VARIABLES
 // ============================================
@@ -14,11 +16,11 @@ $text-light: #334155;
 $border-color: #e9ecef;
 
 // ============================================
-// CONTENEDOR PRINCIPAL
+// CONTENEDOR PRINCIPAL (más ancho)
 // ============================================
 .contratos-container {
   padding: 24px;
-  max-width: 1400px;
+  max-width: 1800px;    // Aumentado de 1400px a 1800px
   margin: 0 auto;
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 
@@ -48,7 +50,7 @@ $border-color: #e9ecef;
 }
 
 // ============================================
-// FILTROS (buscador y botón nuevo)
+// FILTROS
 // ============================================
 .filtros-header {
   display: flex;
@@ -57,6 +59,44 @@ $border-color: #e9ecef;
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+
+  .selector-busqueda {
+    display: flex;
+    background: #e2e8f0;
+    padding: 4px;
+    border-radius: 10px;
+    gap: 4px;
+
+    .btn-toggle {
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: $text-light;
+      background: transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i { font-size: 1rem; }
+
+      &.active {
+        background: white;
+        color: $navy;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    }
+  }
+
+  .filtros-operativos {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+  }
 
   .search-box {
     display: flex;
@@ -90,6 +130,77 @@ $border-color: #e9ecef;
     }
   }
 
+  .busqueda-lote {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .select-programa {
+      width: 220px;
+      padding: 8px 10px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background-color: white;
+
+      &:focus {
+        outline: none;
+        border-color: $navy;
+        box-shadow: 0 0 0 2px rgba(2, 62, 138, 0.1);
+      }
+    }
+
+    .input-lote {
+      width: 100px;
+      padding: 8px 10px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 0.9rem;
+
+      &:focus {
+        outline: none;
+        border-color: $navy;
+        box-shadow: 0 0 0 2px rgba(2, 62, 138, 0.1);
+      }
+    }
+
+    .btn-buscar-lote, .btn-limpiar {
+      height: 38px;
+      border: none;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    .btn-buscar-lote {
+      background: $navy;
+      color: white;
+
+      &:hover {
+        background: color.adjust($navy, $lightness: -10%, $space: hsl);
+      }
+    }
+
+    .btn-limpiar {
+      background: #e74c3c;
+      color: white;
+
+      &:hover {
+        background: color.adjust(#e74c3c, $lightness: -10%, $space: hsl);
+      }
+    }
+  }
+
   .btn-nuevo {
     background: linear-gradient(135deg, #27ae60, #219150);
     color: white;
@@ -106,7 +217,8 @@ $border-color: #e9ecef;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
+    left: 4px !important;
     transition: all 0.3s ease;
 
     &:hover {
@@ -134,7 +246,7 @@ $border-color: #e9ecef;
 }
 
 // ============================================
-// TABLA
+// TABLA (con anchos mínimos para mejor distribución)
 // ============================================
 .tabla-wrapper {
   background: white;
@@ -162,12 +274,8 @@ $border-color: #e9ecef;
     padding: 16px 12px;
     white-space: nowrap;
 
-    &.text-center {
-      text-align: center;
-    }
-    &.text-end {
-      text-align: right;
-    }
+    &.text-center { text-align: center; }
+    &.text-end { text-align: right; }
   }
 
   td {
@@ -176,30 +284,32 @@ $border-color: #e9ecef;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
 
-    &.text-center {
-      text-align: center;
-    }
-    &.text-end {
-      text-align: right;
-    }
-    &.fw-bold {
-      font-weight: 600;
-    }
+    &.text-center { text-align: center; }
+    &.text-end { text-align: right; }
+    &.fw-bold { font-weight: 600; }
+  }
+
+  // Anchos mínimos para cada columna (opcional, mejora la distribución)
+  th, td {
+    &:nth-child(1) { min-width: 70px; }   // ID
+    &:nth-child(2) { min-width: 200px; }  // CLIENTE(S)
+    &:nth-child(3) { min-width: 120px; }  // DOCUMENTO
+    &:nth-child(4) { min-width: 100px; }  // MZ Y LT
+    &:nth-child(5) { min-width: 90px; }   // FECHA C.
+    &:nth-child(6) { min-width: 90px; }   // TIPO C.
+    &:nth-child(7) { min-width: 100px; }  // TOTAL
+    &:nth-child(8) { min-width: 90px; }   // INICIAL
+    &:nth-child(9) { min-width: 90px; }   // SALDO
+    &:nth-child(10) { min-width: 70px; }  // LETRAS
+    &:nth-child(11) { min-width: 160px; } // ACCIONES
   }
 
   tbody tr {
     transition: background 0.2s;
-
-    &:hover td {
-      background-color: #f1f5f9;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
+    &:hover td { background-color: #f1f5f9; }
+    &:last-child td { border-bottom: none; }
   }
 
-  // Contenedor para ID y servicios
   .id-service-wrapper {
     display: flex;
     flex-direction: column;
@@ -215,34 +325,21 @@ $border-color: #e9ecef;
       display: flex;
       gap: 6px;
       font-size: 0.9rem;
-
-      i {
-        &.bi-lightning-charge-fill {
-          color: $orange;
-        }
-        &.bi-droplet-fill {
-          color: $light-blue;
-        }
-      }
+      i.bi-lightning-charge-fill { color: $orange; }
+      i.bi-droplet-fill { color: $light-blue; }
     }
   }
 
-  // Contenedor para múltiples elementos (clientes, documentos, lotes)
   .multi-item-container {
     display: flex;
     flex-direction: column;
     gap: 4px;
-
     div {
       padding: 2px 0;
-
-      &:not(:last-child) {
-        border-bottom: 1px dashed #ddd;
-      }
+      &:not(:last-child) { border-bottom: 1px dashed #ddd; }
     }
   }
 
-  // Acciones (botones)
   .acciones-container {
     display: flex;
     justify-content: center;
@@ -266,73 +363,21 @@ $border-color: #e9ecef;
     font-size: 1rem;
     flex-shrink: 0;
 
-    i {
-      font-size: 1.1rem;
-    }
+    i { font-size: 1.1rem; }
 
-    &.btn-print {
-      color: #6f42c1;
-      border-color: #6f42c1;
-      &:hover {
-        background: #6f42c1;
-        color: white;
-      }
-    }
-    &.btn-edit {
-      color: $navy;
-      border-color: $navy;
-      &:hover {
-        background: $navy;
-        color: white;
-      }
-    }
-    &.btn-delete {
-      color: #dc3545;
-      border-color: #dc3545;
-      &:hover {
-        background: #dc3545;
-        color: white;
-      }
-    }
-    &.btn-inscripcion {
-      color: $light-blue;
-      border-color: $light-blue;
-      &:hover:not(:disabled) {
-        background: $light-blue;
-        color: white;
-      }
-    }
-    &.btn-letras {
-      color: $green;
-      border-color: $green;
-      &:hover {
-        background: $green;
-        color: white;
-      }
-    }
+    &.btn-print { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
+    &.btn-edit { color: $navy; border-color: $navy; &:hover { background: $navy; color: white; } }
+    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+    &.btn-inscripcion { color: $light-blue; border-color: $light-blue; &:hover:not(:disabled) { background: $light-blue; color: white; } }
+    &.btn-letras { color: $green; border-color: $green; &:hover { background: $green; color: white; } }
     &.btn-success-active {
       color: $green !important;
       border-color: $green !important;
       background: #e8f5e9 !important;
       opacity: 0.8;
       cursor: not-allowed;
-      &:hover {
-        background: #e8f5e9 !important;
-        color: $green !important;
-      }
     }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-
-  .no-data {
-    text-align: center;
-    padding: 40px;
-    color: $text-light;
-    font-size: 1.1rem;
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 }
 
@@ -360,60 +405,29 @@ $border-color: #e9ecef;
     min-width: 40px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-    &:hover:not(:disabled) {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &.active {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
+    &:hover:not(:disabled) { background: $navy; color: white; border-color: $navy; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &.active { background: $navy; color: white; border-color: $navy; }
   }
 }
 
 // ============================================
-// RESPONSIVE: TABLETS (768px - 992px)
+// RESPONSIVE: TABLETS
 // ============================================
 @media screen and (max-width: 992px) and (min-width: 768px) {
   .table-custom {
     font-size: 0.8rem;
-
-    th {
-      padding: 12px 8px;
-      font-size: 0.75rem;
-    }
-
-    td {
-      padding: 8px 8px;
-    }
-
-    .btn-action {
-      width: 28px;
-      height: 28px;
-      font-size: 0.9rem;
-
-      i {
-        font-size: 1rem;
-      }
-    }
+    th { padding: 12px 8px; font-size: 0.75rem; }
+    td { padding: 8px 8px; }
+    .btn-action { width: 28px; height: 28px; font-size: 0.9rem; i { font-size: 1rem; } }
   }
 }
 
 // ============================================
-// RESPONSIVE: MÓVILES (≤767px)
+// RESPONSIVE: MÓVILES
 // ============================================
 @media screen and (max-width: 767px) {
-  .table-custom thead {
-    display: none;
-  }
+  .table-custom thead { display: none; }
 
   .table-custom tbody tr {
     display: block;
@@ -421,7 +435,7 @@ $border-color: #e9ecef;
     border: 1px solid $border-color;
     border-radius: 12px;
     overflow: hidden;
-    background: white;
+    background: rgb(255, 255, 255);
   }
 
   .table-custom tbody td {
@@ -431,16 +445,14 @@ $border-color: #e9ecef;
     gap: 12px;
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
+    text-align: right;
 
     &::before {
       content: attr(data-label);
       font-weight: 600;
       color: #022654;
       text-align: left;
-    }
-
-    > *:not(::before) {
-      text-align: center;
+      justify-self: start;
     }
 
     &:first-child {
@@ -449,33 +461,39 @@ $border-color: #e9ecef;
       border-bottom: 2px solid $green;
       display: flex;
       justify-content: center;
-
-      &::before {
-        display: none;
-      }
+      text-align: center;
+      &::before { display: none; }
     }
 
     &.acciones-cell {
       display: flex;
-
-      &::before {
-        display: none;
-      }
-
-      .acciones-container {
-        justify-content: flex-start !important;
-        width: 100%;
-      }
+      text-align: initial;
+      &::before { display: none; }
+      .acciones-container { justify-content: flex-end !important; width: 100%; }
     }
   }
+
+  .table-custom tbody td > div { justify-self: end; text-align: right; width: 100%; }
+  .table-custom tbody td.text-center { text-align: right !important; }
+  .multi-item-container { width: 100%; }
+  .multi-item-container div { width: 100%; text-align: right; }
 
   .filtros-header {
     flex-direction: column;
     align-items: center;
     gap: 12px;
 
-    .search-box {
+    .selector-busqueda { width: 100%; justify-content: center; }
+    .filtros-operativos { width: 100%; flex-direction: column; }
+
+    .search-box { width: 100%; }
+
+    .busqueda-lote {
       width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      .select-programa, .input-lote, .btn-buscar-lote, .btn-limpiar { width: 100%; }
+      .btn-buscar-lote, .btn-limpiar { justify-content: center; }
     }
 
     .btn-nuevo {
@@ -499,17 +517,11 @@ $border-color: #e9ecef;
         pointer-events: none;
       }
 
-      span {
-        margin: 0;
-        padding: 0;
-      }
+      span, text { margin: 0; padding: 0; }
     }
   }
 
   .paginacion-controles {
-    .btn-paginacion {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-    }
+    .btn-paginacion { padding: 6px 12px; font-size: 0.8rem; }
   }
 }

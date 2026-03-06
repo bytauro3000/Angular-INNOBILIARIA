@@ -1,25 +1,49 @@
 <div class="contratos-container">
-  <h2>CONTRATOS</h2>
+  <h2>GESTIÓN DE CONTRATOS</h2>
 
   <div class="filtros-header">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarContratos()" placeholder="Buscar por ID Contrato"
-        class="form-control" />
+    
+    <div class="selector-busqueda">
+      <button class="btn-toggle" [class.active]="tipoBusqueda === 'ID'" (click)="cambiarModoBusqueda('ID')">
+        <i class="bi bi-hash"></i> Por ID
+      </button>
+      <button class="btn-toggle" [class.active]="tipoBusqueda === 'LOTE'" (click)="cambiarModoBusqueda('LOTE')">
+        <i class="bi bi-geo-alt"></i> Por Lote
+      </button>
     </div>
 
-    <button 
-  [routerLink]="['/secretaria-menu/contratos/registrar']" 
-  class="btn-nuevo">
+    <div class="filtros-operativos">
+      <div class="search-box" *ngIf="tipoBusqueda === 'ID'">
+        <span class="search-icon">🔍</span>
+        <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarContratos()" placeholder="Buscar por ID Contrato"
+          class="form-control" />
+      </div>
 
-  <img 
-    src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772509954/botonagregar_zkxrvd.png"
-    alt="Agregar"
-    class="icono-agregar">
+      <div class="busqueda-lote" *ngIf="tipoBusqueda === 'LOTE'">
+        <select [(ngModel)]="programaSeleccionado" class="form-control select-programa">
+          <option [ngValue]="null" disabled selected>-- Seleccione Programa --</option>
+          <option *ngFor="let prog of programas" [ngValue]="prog.idPrograma">
+            {{ prog.nombrePrograma }}
+          </option>
+        </select>
 
-  <span>Nuevo</span>
+        <input type="text" [(ngModel)]="manzanaBusqueda" placeholder="Manzana" class="form-control input-lote" />
+        <input type="text" [(ngModel)]="numeroLoteBusqueda" placeholder="N° Lote" class="form-control input-lote" />
+        
+        <button (click)="buscarPorLote()" class="btn-buscar-lote" title="Buscar por lote">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+        <button (click)="limpiarBusqueda()" class="btn-limpiar" title="Limpiar búsqueda">
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    </div>
 
-</button>
+    <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn-nuevo">
+      <img src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772509954/botonagregar_zkxrvd.png"
+        alt="Agregar" class="icono-agregar">
+      <span>Nuevo</span>
+    </button>
   </div>
 
   <div class="tabla-wrapper">
@@ -32,7 +56,7 @@
           <th class="text-center">MZ Y LT</th>
           <th class="text-center">FECHA C.</th>
           <th class="text-center">TIPO C.</th>
-          <th class="text-end">TOTAL</th>
+          <th class="text-center">TOTAL</th>
           <th class="text-end">INICIAL</th>
           <th class="text-end">SALDO</th>
           <th class="text-center" style="width: 70px;">LETRAS</th>
@@ -156,5 +180,6 @@
     </button>
   </div>
 </div>
+
 <app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">
 </app-inscripcion-servicios-insertar>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ContratoResponseDTO } from '../dto/contratoreponse.dto'; 
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
@@ -27,6 +28,15 @@ export class ContratoService {
   obtenerContratoPorId(id: number): Observable<ContratoResponseDTO> {
     return this.http.get<ContratoResponseDTO>(`${this.apiUrl}/${id}`);
   }
+
+  buscarPorProgramaManzanaLote(idPrograma: number, manzana: string, numeroLote: string): Observable<ContratoResponseDTO> {
+  const params = new HttpParams()
+    .set('idPrograma', idPrograma.toString())
+    .set('manzana', manzana)
+    .set('numeroLote', numeroLote);
+
+  return this.http.get<ContratoResponseDTO>(`${this.apiUrl}/buscar-por-lote`, { params });
+}
 
   guardarContrato(request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
     return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request, { headers: this.getHeaders() });

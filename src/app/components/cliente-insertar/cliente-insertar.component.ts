@@ -204,6 +204,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     }
   }
 
+  
+
   formatearTexto(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;
     let valor = input.value;
@@ -213,5 +215,28 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
         .join(' ');
       this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
     }
-  }    
+  }
+  
+  formatearCelular(event: any): void {
+  const input = event.target;
+  let valor = input.value.replace(/\D/g, ''); // elimina todo excepto dígitos
+
+  if (valor.length > 0) {
+    const partes = [];
+    for (let i = 0; i < valor.length; i += 3) {
+      partes.push(valor.substr(i, 3));
+    }
+    valor = partes.join('-');
+  }
+
+  // Actualiza el control sin emitir evento para evitar loops
+  this.clienteForm.get('celular')?.setValue(valor, { emitEvent: false });
+  // Restaura la posición del cursor al final (opcional)
+  input.value = valor;
+}
+
+// Opcional: maneja la tecla backspace para evitar comportamientos extraños
+manejarBackspace(event: KeyboardEvent): void {
+  // Permite que el backspace funcione normalmente; el formateo se encargará después.
+}
 }

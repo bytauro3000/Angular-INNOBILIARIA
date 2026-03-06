@@ -55,7 +55,7 @@ $border-color: #e9ecef;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  gap: 12px; // Reducido para acercar elementos
+  gap: 12px;
   flex-wrap: wrap;
 
   .filtro-select-wrapper {
@@ -87,28 +87,27 @@ $border-color: #e9ecef;
   }
 
   .search-box {
-  flex: 1 1 auto;
-  min-width: 300px;
-  background: white;
-  border: 1px solid $border-color;
-  border-radius: 10px;
-  // padding: 0 12px;  ← QUITA ESTO
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    flex: 1 1 auto;
+    min-width: 300px;
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 
-  input {
-    border: none;
-    padding: 10px 12px;  // AÑADE PADDING AQUÍ
-    width: 100%;
-    outline: none;
-    font-size: 0.95rem;
-    background: transparent;
-    color: $text-dark;
+    input {
+      border: none;
+      padding: 10px 12px;
+      width: 100%;
+      outline: none;
+      font-size: 0.95rem;
+      background: transparent;
+      color: $text-dark;
 
-    &::placeholder {
-      color: #94a3b8;
+      &::placeholder {
+        color: #94a3b8;
+      }
     }
   }
-}
 
   .btn-nuevo {
     background: linear-gradient(135deg, #27ae60, #219150);
@@ -117,7 +116,8 @@ $border-color: #e9ecef;
     height: 40px;
     width: auto;
     min-width: 110px;
-    padding: 0 18px 0 8px;
+    // AJUSTE PARA PC: Padding izquierdo aumentado para el icono absolute al filo
+    padding: 0 18px 0 42px; 
     flex-shrink: 0;
     border-radius: 50px;
     font-weight: 600;
@@ -126,7 +126,7 @@ $border-color: #e9ecef;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    position: relative; // INDISPENSABLE para anclar el icono
     transition: all 0.3s ease;
 
     &:hover {
@@ -140,15 +140,26 @@ $border-color: #e9ecef;
     }
 
     .icono-agregar {
+      // AJUSTE: ICONO AL FILO EN PC
+      position: absolute !important;
+      left: 5px !important; // Distancia pegada al borde
+      top: 50% !important;
+      margin-top: -16px; // Mitad de la altura (32px/2)
+      
       width: 32px;
       height: 32px;
       object-fit: contain;
       filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white) drop-shadow(-0.5px 0px 0px white);
       transition: transform 0.3s ease;
+      transform-origin: center center;
     }
 
     &:hover .icono-agregar {
       transform: rotate(90deg);
+    }
+    
+    span {
+      line-height: 1;
     }
   }
 }
@@ -182,12 +193,8 @@ $border-color: #e9ecef;
     padding: 16px 12px;
     white-space: nowrap;
 
-    &.text-center {
-      text-align: center;
-    }
-    &.text-end {
-      text-align: right;
-    }
+    &.text-center { text-align: center; }
+    &.text-end { text-align: right; }
   }
 
   td {
@@ -196,30 +203,17 @@ $border-color: #e9ecef;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
 
-    &.text-center {
-      text-align: center;
-    }
-    &.text-end {
-      text-align: right;
-    }
-    &.fw-bold {
-      font-weight: 600;
-    }
+    &.text-center { text-align: center; }
+    &.text-end { text-align: right; }
+    &.fw-bold { font-weight: 600; }
   }
 
   tbody tr {
     transition: background 0.2s;
-
-    &:hover td {
-      background-color: #f1f5f9;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
+    &:hover td { background-color: #f1f5f9; }
+    &:last-child td { border-bottom: none; }
   }
 
-  // Acciones (botones)
   .acciones-container {
     display: flex;
     justify-content: center;
@@ -243,39 +237,12 @@ $border-color: #e9ecef;
     font-size: 1rem;
     flex-shrink: 0;
 
-    i {
-      font-size: 1.1rem;
-    }
+    i { font-size: 1.1rem; }
 
-    &.btn-view {
-      color: #17a2b8;
-      border-color: #17a2b8;
-      &:hover {
-        background: #17a2b8;
-        color: white;
-      }
-    }
-    &.btn-edit {
-      color: $navy;
-      border-color: $navy;
-      &:hover {
-        background: $navy;
-        color: white;
-      }
-    }
-    &.btn-delete {
-      color: #dc3545;
-      border-color: #dc3545;
-      &:hover {
-        background: #dc3545;
-        color: white;
-      }
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    &.btn-view { color: #17a2b8; border-color: #17a2b8; &:hover { background: #17a2b8; color: white; } }
+    &.btn-edit { color: $navy; border-color: $navy; &:hover { background: $navy; color: white; } }
+    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 
   .no-data {
@@ -310,22 +277,9 @@ $border-color: #e9ecef;
     min-width: 40px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-    &:hover:not(:disabled) {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &.active {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
+    &:hover:not(:disabled) { background: $navy; color: white; border-color: $navy; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &.active { background: $navy; color: white; border-color: $navy; }
   }
 
   .ellipsis-spacer {
@@ -346,25 +300,9 @@ $border-color: #e9ecef;
 @media screen and (max-width: 992px) and (min-width: 768px) {
   .table-custom {
     font-size: 0.8rem;
-
-    th {
-      padding: 12px 8px;
-      font-size: 0.75rem;
-    }
-
-    td {
-      padding: 8px 8px;
-    }
-
-    .btn-action {
-      width: 28px;
-      height: 28px;
-      font-size: 0.9rem;
-
-      i {
-        font-size: 1rem;
-      }
-    }
+    th { padding: 12px 8px; font-size: 0.75rem; }
+    td { padding: 8px 8px; }
+    .btn-action { width: 28px; height: 28px; font-size: 0.9rem; i { font-size: 1rem; } }
   }
 }
 
@@ -372,10 +310,7 @@ $border-color: #e9ecef;
 // RESPONSIVE: MÓVILES (≤767px)
 // ============================================
 @media screen and (max-width: 767px) {
-  .table-custom thead {
-    display: none;
-  }
-
+  .table-custom thead { display: none; }
   .table-custom tbody tr {
     display: block;
     margin-bottom: 16px;
@@ -383,13 +318,13 @@ $border-color: #e9ecef;
     border-radius: 12px;
     overflow: hidden;
     background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   }
 
   .table-custom tbody td {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    align-items: center;
-    gap: 12px;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
 
@@ -397,36 +332,32 @@ $border-color: #e9ecef;
       content: attr(data-label);
       font-weight: 600;
       color: #022654;
-      text-align: left;
+      text-align: left !important;
+      min-width: 100px;
     }
 
-    > *:not(::before) {
-      text-align: center;
+    &:not(:first-child):not(.acciones-cell) {
+      text-align: right !important;
+      > *:not(::before) {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        text-align: right !important;
+      }
     }
 
     &:first-child {
       background: #f8f8fa;
-      font-weight: bold;
       border-bottom: 2px solid $green;
-      display: flex;
-      justify-content: center;
-
-      &::before {
-        display: none;
-      }
+      justify-content: center !important;
+      &::before { display: none !important; }
     }
 
     &.acciones-cell {
-      display: flex;
-
-      &::before {
-        display: none;
-      }
-
-      .acciones-container {
-        justify-content: flex-start !important;
-        width: 100%;
-      }
+      justify-content: flex-start !important;
+      &::before { display: none !important; }
+      .acciones-container { justify-content: flex-start !important; width: 100% !important; }
     }
   }
 
@@ -435,39 +366,41 @@ $border-color: #e9ecef;
     align-items: stretch;
     gap: 12px;
 
-    .filtro-select-wrapper,
-    .search-box {
-      width: 100%;
-    }
-
     .btn-nuevo {
       width: 100%;
+      height: 48px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      height: 45px;
+      padding: 0 20px;
+      border-radius: 50px;
+
+      &:active { transform: scale(0.98); }
 
       .icono-agregar {
-        position: absolute;
-        left: 5px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 35px;
-        height: 35px;
-        margin-left: 0;
-        filter: brightness(0) invert(1);
-        pointer-events: none;
+        position: absolute !important;
+        left: 8px !important; 
+        top: 50% !important;
+        margin-top: -16px;
+        
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white);
+        transition: transform 0.3s ease !important;
+        transform-origin: center center !important;
       }
 
-      span {
-        margin: 0;
-        padding: 0;
+      &:hover .icono-agregar, &:active .icono-agregar {
+        transform: rotate(90deg) !important;
       }
+
+      span { margin: 0; line-height: 1; }
     }
   }
 
+  // AQUÍ ESTÁN TUS ESTILOS DE PAGINACIÓN MÓVIL COMPLETOS
   .paginacion-controles {
     .btn-paginacion {
       padding: 6px 12px;

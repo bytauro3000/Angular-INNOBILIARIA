@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ============================================
 // VARIABLES GLOBALES
 // ============================================
@@ -70,13 +72,13 @@ $border-color: #e9ecef;
 
         &.luz {
           background: rgba($orange, 0.15);
-          color: darken($orange, 20%);
+          color: color.adjust($orange, $lightness: -20%, $space: hsl);
           border: 1px solid rgba($orange, 0.3);
         }
 
         &.agua {
           background: rgba($light-blue, 0.15);
-          color: darken($light-blue, 20%);
+          color: color.adjust($light-blue, $lightness: -20%, $space: hsl);
           border: 1px solid rgba($light-blue, 0.3);
         }
       }
@@ -222,13 +224,13 @@ $border-color: #e9ecef;
 
         &.luz-head {
           background: rgba($orange, 0.1);
-          color: darken($orange, 20%);
+          color: color.adjust($orange, $lightness: -20%, $space: hsl);
           border-bottom: 2px solid $orange;
         }
 
         &.agua-head {
           background: rgba($light-blue, 0.1);
-          color: darken($light-blue, 20%);
+          color: color.adjust($light-blue, $lightness: -20%, $space: hsl);
           border-bottom: 2px solid $light-blue;
         }
       }
@@ -348,7 +350,7 @@ $border-color: #e9ecef;
       min-width: 240px;
 
       &:hover:not(:disabled) {
-        background: darken($green, 5%);
+        background: color.adjust($green, $lightness: -5%, $space: hsl);
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba($green, 0.25);
       }
@@ -389,7 +391,7 @@ $border-color: #e9ecef;
     transition: background 0.2s;
 
     &:hover {
-      background: darken($navy, 10%);
+      background: color.adjust($navy, $lightness: -10%, $space: hsl);
     }
   }
 

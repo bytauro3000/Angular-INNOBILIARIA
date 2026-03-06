@@ -1,0 +1,74 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Registrar Pago - Letra {{ letra.numeroLetra }}</h3>
+      <button class="btn-close" (click)="cerrarModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="info-letra">
+        <p><strong>Importe de la letra:</strong> {{ letra.importe | currency }}</p>
+        <p><strong>Fecha vencimiento:</strong> {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <form #pagoForm="ngForm">
+        <div class="form-group">
+          <label>Importe Pagado *</label>
+          <input type="number" step="0.01" class="form-control" [(ngModel)]="pagoRequest.importePagado" name="importePagado" required>
+        </div>
+
+        <div class="form-group">
+          <label>Medio de Pago *</label>
+          <select class="form-control" [(ngModel)]="pagoRequest.medioPago" name="medioPago" required>
+            <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>N° Operación</label>
+            <input type="text" class="form-control" [(ngModel)]="pagoRequest.numeroOperacion" name="numeroOperacion">
+          </div>
+
+          <div class="form-group">
+            <label>Fecha Operación</label>
+            <input type="date" class="form-control" [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo Comprobante</label>
+            <select class="form-control" [(ngModel)]="pagoRequest.tipoComprobante" name="tipoComprobante">
+              <option [ngValue]="null">-- Seleccione --</option>
+              <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>N° Comprobante</label>
+            <input type="text" class="form-control" [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea class="form-control" [(ngModel)]="pagoRequest.observaciones" name="observaciones" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Voucher (imagen)</label>
+          <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModal()" [disabled]="enviando">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarPago()" [disabled]="enviando">
+        <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
+        {{ enviando ? 'Registrando...' : 'Registrar Pago' }}
+      </button>
+    </div>
+  </div>
+</div>
