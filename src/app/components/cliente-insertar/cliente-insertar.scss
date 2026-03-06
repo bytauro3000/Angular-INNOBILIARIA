@@ -260,3 +260,22 @@ textarea {
     padding-left: 46px !important;
   }
 }
+
+// Fuerza el centrado vertical del modal
+.modal.show .modal-dialog.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 1rem);
+}
+
+// Limita la altura del contenido y permite scroll interno
+.modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}

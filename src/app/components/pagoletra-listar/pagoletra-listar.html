@@ -31,7 +31,6 @@
     </button>
   </div>
 
-  <!-- Información del contrato encontrado -->
   <div *ngIf="contratoEncontrado" class="contrato-info-card">
     <h4>Contrato #{{ contratoEncontrado.idContrato }}</h4>
     <div class="info-grid">
@@ -55,7 +54,6 @@
     </div>
   </div>
 
-  <!-- Tabla de letras -->
   <div *ngIf="contratoEncontrado" class="tabla-wrapper">
     <div class="tabla-header">
       <div class="header-left">
@@ -142,8 +140,9 @@
 </div>
 
 <app-pago-letra-form
-  *ngIf="mostrarModalPago"
-  [letra]="letraSeleccionada!"
+  *ngIf="letraSeleccionada && letraSeleccionada.idLetra"
+  [letra]="letraSeleccionada"
+  [contrato]="contratoEncontrado"
   (onClose)="cerrarModalPago()"
   (onPagoExitoso)="onPagoRegistrado()">
 </app-pago-letra-form>

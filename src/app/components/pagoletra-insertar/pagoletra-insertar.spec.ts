@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PagoletraInsertar } from './pagoletra-insertar.component';
+import { PagoletraInsertarComponent } from './pagoletra-insertar.component';
 
 describe('PagoletraInsertar', () => {
-  let component: PagoletraInsertar;
-  let fixture: ComponentFixture<PagoletraInsertar>;
+  let component: PagoletraInsertarComponent;
+  let fixture: ComponentFixture<PagoletraInsertarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PagoletraInsertar]
+      imports: [PagoletraInsertarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PagoletraInsertar);
+    fixture = TestBed.createComponent(PagoletraInsertarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

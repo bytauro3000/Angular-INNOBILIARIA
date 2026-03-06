@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -25,7 +25,7 @@ import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-inse
   styleUrls: ['./pagoletra-listar.scss'],
 })
 export class PagoletraListarComponent implements OnInit {
-  // Para búsqueda de contrato
+  
   programas: Programa[] = [];
   programaSeleccionado: number | null = null;
   manzanaBusqueda: string = '';
@@ -36,14 +36,9 @@ export class PagoletraListarComponent implements OnInit {
   letrasPagadas: LetraCambio[] = [];
   cargandoLetras: boolean = false;
 
-  // Control del modal de pago
-  mostrarModalPago: boolean = false;
   letraSeleccionada: LetraCambio | null = null;
-
-  // Tipo de lista a mostrar
   tipoLista: 'pendientes' | 'pagadas' = 'pendientes';
 
-  // Paginación
   pageSize: number = 5;
   currentPage: number = 1;
   totalPages: number = 0;
@@ -144,11 +139,9 @@ export class PagoletraListarComponent implements OnInit {
 
   abrirModalPago(letra: LetraCambio): void {
     this.letraSeleccionada = letra;
-    this.mostrarModalPago = true;
   }
 
   cerrarModalPago(): void {
-    this.mostrarModalPago = false;
     this.letraSeleccionada = null;
   }
 
@@ -157,16 +150,14 @@ export class PagoletraListarComponent implements OnInit {
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
     }
-    this.toastr.success('Pago registrado correctamente', 'Éxito');
   }
 
   isLetraVencida(fechaVencimiento: string): boolean {
     const hoy = new Date();
     const fechaVen = new Date(fechaVencimiento);
-    return fechaVen < hoy;
+    return hoy > fechaVen;
   }
 
-  // ========== CAMBIO DE LISTA ==========
   cambiarTipoLista(tipo: 'pendientes' | 'pagadas'): void {
     if (this.tipoLista !== tipo) {
       this.tipoLista = tipo;
@@ -179,7 +170,6 @@ export class PagoletraListarComponent implements OnInit {
     return this.tipoLista === 'pendientes' ? 'Letras Pendientes de Pago' : 'Letras Pagadas';
   }
 
-  // ========== PAGINACIÓN ==========
   aplicarPaginacion(): void {
     const listaActual = this.tipoLista === 'pendientes' ? this.letrasPendientes : this.letrasPagadas;
     this.totalPages = Math.ceil(listaActual.length / this.pageSize);
