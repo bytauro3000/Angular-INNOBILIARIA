@@ -60,16 +60,36 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     this.modal.show();
   }
 
+  cerrarModal(): void {
+    this.modal?.hide();
+    setTimeout(() => {
+      this.onClose.emit();
+    }, 300);
+  }
+
   get numeroLetraLimpio(): string {
     return this.letra?.numeroLetra ? this.letra.numeroLetra.split('/')[0] : '';
   }
 
   private generarObservaciones(): void {
-    const primerLote = this.contrato?.lotes?.[0]?.lote;
-    const mz = primerLote?.manzana || '';
-    const lt = primerLote?.numeroLote || '';
-    const programa = primerLote?.programa?.nombrePrograma || '';
-    
+    if (!this.contrato || !this.contrato.lotes || this.contrato.lotes.length === 0) {
+      this.pagoRequest.observaciones = '';
+      return;
+    }
+
+    const primerLote = this.contrato.lotes[0];
+    const mz = primerLote.manzana || '';
+    const lt = primerLote.numeroLote || '';
+
+    let programa = '';
+    if (primerLote.programa?.nombrePrograma) {
+      programa = primerLote.programa.nombrePrograma;
+    } else if (primerLote.nombrePrograma) {
+      programa = primerLote.nombrePrograma;
+    } else if (this.contrato.programa?.nombrePrograma) {
+      programa = this.contrato.programa.nombrePrograma;
+    }
+
     this.pagoRequest.observaciones = `Pago de letra N° ${this.numeroLetraLimpio} de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
   }
 
@@ -81,47 +101,33 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   }
 
   onMedioPagoChange(): void {
+    // Si es EFECTIVO, limpiamos los campos que se bloquean (opcional)
     if (this.pagoRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoRequest.numeroOperacion = '';
       this.voucherFile = null;
+      // Resetear input file
+      const fileInput = document.getElementById('voucher') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
     }
-  }
-
-  cerrarModal(): void {
-    this.modal?.hide();
-    setTimeout(() => this.onClose.emit(), 300);
   }
 
   guardarPago(): void {
-    // VALIDACIONES DE CAMPOS OBLIGATORIOS
     if (!this.pagoRequest.importePagado || this.pagoRequest.importePagado <= 0) {
-      this.toastr.error('El importe pagado debe ser válido y mayor a cero.', 'Error de Validación');
+      this.toastr.warning('El importe pagado debe ser mayor a cero', 'Validación');
       return;
     }
-
-    if (!this.pagoRequest.fechaOperacion) {
-      this.toastr.error('Debe seleccionar la fecha de la operación.', 'Error de Validación');
+    if (!this.pagoRequest.medioPago) {
+      this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
       return;
     }
-
-    if (!this.pagoRequest.tipoComprobante) {
-      this.toastr.error('Debe seleccionar un tipo de comprobante.', 'Error de Validación');
-      return;
-    }
-
-    if (!this.pagoRequest.numeroComprobante || this.pagoRequest.numeroComprobante.trim() === '') {
-      this.toastr.error('El número de comprobante es obligatorio.', 'Error de Validación');
-      return;
-    }
-
-    // VALIDACIÓN ESPECIAL PARA PAGOS NO EFECTIVOS
+    // Si no es efectivo, validamos que los campos estén llenos
     if (this.pagoRequest.medioPago !== MedioPago.EFECTIVO) {
-      if (!this.pagoRequest.numeroOperacion || this.pagoRequest.numeroOperacion.trim() === '') {
-        this.toastr.warning('El número de operación es obligatorio para este medio de pago.', 'Validación');
+      if (!this.pagoRequest.numeroOperacion?.trim()) {
+        this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
         return;
       }
       if (!this.voucherFile) {
-        this.toastr.warning('Debe adjuntar la imagen del voucher para continuar.', 'Validación');
+        this.toastr.warning('Debe adjuntar un voucher para este medio de pago', 'Validación');
         return;
       }
     }
@@ -129,14 +135,14 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     this.enviando = true;
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFile || undefined).subscribe({
       next: () => {
-        this.toastr.success('¡Pago registrado con éxito!', 'Completado');
+        this.toastr.success('Pago registrado correctamente', 'Éxito');
         this.enviando = false;
         this.cerrarModal();
         this.onPagoExitoso.emit();
       },
       error: (err) => {
-        console.error(err);
-        this.toastr.error('No se pudo registrar el pago. Verifique los datos.', 'Error de Servidor');
+        console.error('Error al registrar pago:', err);
+        this.toastr.error('Error al registrar el pago', 'Error');
         this.enviando = false;
       }
     });

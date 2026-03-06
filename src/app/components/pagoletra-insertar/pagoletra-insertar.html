@@ -25,12 +25,12 @@
             <div class="form-group">
               <label for="importePagado">Importe Pagado *</label>
               <input type="number" step="0.01" id="importePagado" class="form-control"
-                     [(ngModel)]="pagoRequest.importePagado" name="importePagado" required>
+                     [(ngModel)]="pagoRequest.importePagado" name="importePagado">
             </div>
             <div class="form-group">
               <label for="medioPago">Medio de Pago *</label>
               <select id="medioPago" class="form-select" [(ngModel)]="pagoRequest.medioPago"
-                      name="medioPago" required (change)="onMedioPagoChange()">
+                      name="medioPago" (change)="onMedioPagoChange()">
                 <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
@@ -46,14 +46,14 @@
             <div class="form-group">
               <label for="fechaOperacion">Fecha Operación *</label>
               <input type="date" id="fechaOperacion" class="form-control"
-                     [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion" required>
+                     [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion">
             </div>
           </div>
 
           <div class="form-row form-2-col">
             <div class="form-group">
               <label for="tipoComprobante">Tipo Comprobante *</label>
-              <select id="tipoComprobante" class="form-select" [(ngModel)]="pagoRequest.tipoComprobante" name="tipoComprobante" required>
+              <select id="tipoComprobante" class="form-select" [(ngModel)]="pagoRequest.tipoComprobante" name="tipoComprobante">
                 <option [ngValue]="undefined">-- Seleccione --</option>
                 <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
               </select>
@@ -61,7 +61,7 @@
             <div class="form-group">
               <label for="numeroComprobante">N° Comprobante *</label>
               <input type="text" id="numeroComprobante" class="form-control"
-                     [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante" required>
+                     [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante">
             </div>
           </div>
 
@@ -77,9 +77,9 @@
             <div class="form-group width-100">
               <label>Voucher (imagen) <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span></label>
               <div class="custom-file-upload" [class.disabled]="pagoRequest.medioPago === 'EFECTIVO'">
-                <div class="file-browse">Elegir Archivo</div>
+                <div class="file-browse">Subir Imagen</div>
                 <div class="file-name">
-                  {{ voucherFile ? voucherFile.name : 'No se ha seleccionado ningún archivo' }}
+                  {{ voucherFile ? voucherFile.name : 'Seleccione el comprobante de pago...' }}
                 </div>
                 <input type="file" id="voucher" (change)="onFileSelected($event)"
                        accept="image/*" [disabled]="pagoRequest.medioPago === 'EFECTIVO'">
@@ -93,7 +93,7 @@
         <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">Cancelar</button>
         <button type="submit" class="btn btn-save" (click)="guardarPago()" [disabled]="enviando">
           <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ enviando ? 'Registrando...' : 'Registrar Pago' }}
+          {{ enviando ? 'Procesando...' : 'Registrar Pago' }}
         </button>
       </div>
     </div>
