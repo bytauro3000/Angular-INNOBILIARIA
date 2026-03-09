@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ============================================
 // VARIABLES (mismas que en pagoletra-listar)
 // ============================================
@@ -129,7 +131,7 @@ $input-bg: #f9fafc;
   }
 
   &:hover {
-    background: darken($light-blue, 10%);
+    background: color.adjust($light-blue, $lightness: -10%, $space: hsl);
   }
 }
 
