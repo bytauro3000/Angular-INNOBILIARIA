@@ -1,0 +1,72 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-cash-stack"></i> Pagos del Contrato #{{ idContrato }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div *ngIf="cargando" class="text-center py-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+
+                <div *ngIf="!cargando && pagos.length === 0" class="text-center py-4">
+                    <p class="text-muted">No hay pagos registrados para este contrato.</p>
+                </div>
+
+                <div *ngIf="!cargando && pagos.length > 0" class="table-responsive">
+                    <table class="table-pagos">
+                        <thead>
+                            <tr>
+                                <th>Letra</th>
+                                <th>Fecha Pago</th>
+                                <th>Importe</th>
+                                <th>Medio</th>
+                                <th>Comprobante</th>
+                                <th>Voucher(s)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let pago of pagos">
+                                <td>{{ getNumeroLetraLimpio(pago.numeroLetra) }}</td>
+                                <td>{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
+                                <td>{{ pago.importePagado | currency }}</td>
+                                <td>{{ pago.medioPago }}</td>
+                                <td>
+                                    <span *ngIf="pago.tipoComprobante">{{ pago.tipoComprobante }} - {{
+                                        pago.numeroComprobante }}</span>
+                                    <span *ngIf="!pago.tipoComprobante">-</span>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="pago.urlsVoucher && pago.urlsVoucher.length > 0">
+                                        <a *ngFor="let url of pago.urlsVoucher; let i = index" 
+                                           [href]="url" target="_blank" class="btn-ver-voucher me-1">
+                                            <i class="bi bi-eye"></i> {{ i+1 }}
+                                        </a>
+                                    </ng-container>
+                                    <span *ngIf="!pago.urlsVoucher || pago.urlsVoucher.length === 0">-</span>
+                                </td>
+                                <td>
+                                    <button class="btn-eliminar-pago" (click)="eliminarPago(pago.idPago!)"
+                                        [disabled]="eliminando">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" (click)="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

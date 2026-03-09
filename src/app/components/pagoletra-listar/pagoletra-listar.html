@@ -58,20 +58,21 @@
     <div class="tabla-header">
       <div class="header-left">
         <div class="toggle-container">
-          <button 
-            class="toggle-btn" 
-            [class.active]="tipoLista === 'pendientes'"
-            (click)="cambiarTipoLista('pendientes')">
-            Pendientes
-          </button>
-          <button 
-            class="toggle-btn" 
-            [class.active]="tipoLista === 'pagadas'"
-            (click)="cambiarTipoLista('pagadas')">
-            Pagadas
-          </button>
+          <button class="toggle-btn" [class.active]="tipoLista === 'pendientes'" (click)="cambiarTipoLista('pendientes')">Pendientes</button>
+          <button class="toggle-btn" [class.active]="tipoLista === 'pagadas'" (click)="cambiarTipoLista('pagadas')">Pagadas</button>
         </div>
+        <!-- Botón para ver pagos (siempre visible cuando hay contrato) -->
+        <button *ngIf="contratoEncontrado" class="btn-ver-pagos" (click)="abrirListaPagos()">
+          <i class="bi bi-list-ul"></i> Ver Pagos
+        </button>
+        <!-- Botón para pagar múltiples (solo visible en pendientes) -->
+        <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 0" 
+                class="btn-pagar-multiple" 
+                (click)="abrirModalPagoMultiple()">
+          <i class="bi bi-cash-stack"></i> Pagar {{ cantidadSeleccionadas }} letras
+        </button>
       </div>
+      <!-- PAGINACIÓN SUPERIOR -->
       <div *ngIf="totalPages > 1" class="paginacion-superior">
         <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
           Anterior
@@ -96,6 +97,12 @@
     <table *ngIf="!cargandoLetras && paginatedLetras.length > 0" class="tabla-custom">
       <thead>
         <tr>
+          <!-- Columna de checkbox solo en pendientes -->
+          <th *ngIf="tipoLista === 'pendientes'" style="width: 40px;">
+            <input type="checkbox" 
+                   (change)="seleccionarTodas($event)"
+                   [checked]="isTodasSeleccionadas()">
+          </th>
           <th>N° Letra</th>
           <th>Fecha Vencimiento</th>
           <th>Importe</th>
@@ -106,6 +113,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let letra of paginatedLetras" [class.vencida]="tipoLista === 'pendientes' && isLetraVencida(letra.fechaVencimiento)">
+          <!-- Checkbox solo en pendientes -->
+          <td *ngIf="tipoLista === 'pendientes'" data-label="Seleccionar">
+            <input type="checkbox" 
+                   [checked]="isSeleccionada(letra.idLetra)"
+                   (change)="toggleSeleccion(letra)">
+          </td>
           <td data-label="N° Letra">{{ letra.numeroLetra }}</td>
           <td data-label="Fecha Vencimiento">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
           <td data-label="Importe">{{ letra.importe | currency }}</td>
@@ -115,16 +128,14 @@
               'estado-pendiente': letra.estadoLetra === 'PENDIENTE',
               'estado-vencido': letra.estadoLetra === 'VENCIDO',
               'estado-pagado': letra.estadoLetra === 'PAGADO'
-            }">
-              {{ letra.estadoLetra }}
-            </span>
+            }">{{ letra.estadoLetra }}</span>
           </td>
           <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
               <button *ngIf="tipoLista === 'pendientes'" 
                       class="btn-pagar" 
                       (click)="abrirModalPago(letra)" 
-                      title="Registrar pago">
+                      title="Registrar pago individual">
                 <i class="bi bi-cash-stack"></i>
               </button>
             </div>
@@ -139,6 +150,7 @@
   </div>
 </div>
 
+<!-- Modal individual -->
 <app-pago-letra-form
   *ngIf="letraSeleccionada && letraSeleccionada.idLetra"
   [letra]="letraSeleccionada"
@@ -146,3 +158,20 @@
   (onClose)="cerrarModalPago()"
   (onPagoExitoso)="onPagoRegistrado()">
 </app-pago-letra-form>
+
+<!-- Modal para pago múltiple -->
+<app-pago-multiple-form
+  *ngIf="modoPagoMultiple"
+  [letras]="letrasSeleccionadasTemp"
+  [contrato]="contratoEncontrado"
+  (onClose)="cerrarModalPagoMultiple()"
+  (onPagoExitoso)="onPagoMultipleRegistrado()">
+</app-pago-multiple-form>
+
+<!-- Modal de lista de pagos -->
+<app-pago-lista-modal
+  *ngIf="mostrarListaPagos && idContratoParaLista"
+  [idContrato]="idContratoParaLista"
+  (onClose)="cerrarListaPagos()"
+  (onPagoEliminado)="onPagoEliminado()">
+</app-pago-lista-modal>

@@ -1,70 +1,69 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered"> 
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg">
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="bi bi-cash-stack"></i> Registrar Pago - Letra N° {{ numeroLetraLimpio }}
+          <i class="bi bi-cash-stack"></i> Pagar {{ letras.length }} letras
         </h5>
         <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
       </div>
 
       <div class="modal-body">
-        <div class="info-letra form-row form-2-col">
-          <div class="info-item">
-            <label>Importe de la letra</label>
-            <p class="info-value">{{ letra.importe | currency }}</p>
+        <div class="info-letra" *ngIf="letras.length > 0">
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <label>Letras a pagar:</label>
+            <div class="info-value">
+              <ul class="lista-letras">
+                <li *ngFor="let l of letras">
+                  {{ getNumeroLetraLimpio(l.numeroLetra) }} - {{ l.importe | currency }}
+                </li>
+              </ul>
+            </div>
           </div>
-          <div class="info-item">
-            <label>Fecha vencimiento</label>
-            <p class="info-value">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</p>
+          <div class="info-item" style="grid-column: 1 / -1; margin-top: 8px;">
+            <label>Importe Total</label>
+            <p class="info-value total-importe">{{ importeTotal | currency }}</p>
           </div>
         </div>
 
-        <form #pagoForm="ngForm">
+        <form #form="ngForm">
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="importePagado">Importe Pagado *</label>
-              <input type="number" step="0.01" id="importePagado" class="form-control"
-                     [(ngModel)]="pagoRequest.importePagado" name="importePagado">
-            </div>
-            <div class="form-group">
               <label for="medioPago">Medio de Pago *</label>
-              <select id="medioPago" class="form-select" [(ngModel)]="pagoRequest.medioPago"
-                      name="medioPago" (change)="onMedioPagoChange()">
+              <select id="medioPago" class="form-select" [(ngModel)]="datosComunes.medioPago"
+                      name="medioPago" required (change)="onMedioPagoChange()">
                 <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
+            <div class="form-group">
+              <label for="numeroOperacion">N° Operación <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span></label>
+              <input type="text" id="numeroOperacion" class="form-control"
+                     [(ngModel)]="datosComunes.numeroOperacion" name="numeroOperacion"
+                     [disabled]="datosComunes.medioPago === 'EFECTIVO'">
+            </div>
           </div>
 
           <div class="form-row form-2-col">
-            <div class="form-group">
-              <label for="numeroOperacion">N° Operación <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span></label>
-              <input type="text" id="numeroOperacion" class="form-control"
-                     [(ngModel)]="pagoRequest.numeroOperacion" name="numeroOperacion"
-                     [disabled]="pagoRequest.medioPago === 'EFECTIVO'">
-            </div>
             <div class="form-group">
               <label for="fechaOperacion">Fecha Operación *</label>
               <input type="date" id="fechaOperacion" class="form-control"
-                     [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion">
+                     [(ngModel)]="datosComunes.fechaOperacion" name="fechaOperacion" required>
             </div>
-          </div>
-
-          <div class="form-row form-2-col">
             <div class="form-group">
               <label for="tipoComprobante">Tipo Comprobante *</label>
-              <select id="tipoComprobante" class="form-select" 
-                      [(ngModel)]="pagoRequest.tipoComprobante" 
-                      name="tipoComprobante" 
-                      (change)="onTipoComprobanteChange()" required>
+              <select id="tipoComprobante" class="form-select" [(ngModel)]="datosComunes.tipoComprobante"
+                      name="tipoComprobante" (change)="onTipoComprobanteChange()" required>
                 <option [ngValue]="undefined">-- Seleccione --</option>
                 <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
+          </div>
+
+          <div class="form-row form-2-col">
             <div class="form-group">
               <label for="numeroComprobante">N° Comprobante *</label>
               <input type="text" id="numeroComprobante" class="form-control"
-                     [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante">
+                     [(ngModel)]="datosComunes.numeroComprobante" name="numeroComprobante" required>
             </div>
           </div>
 
@@ -72,17 +71,16 @@
             <div class="form-group width-100">
               <label for="observaciones">Observaciones</label>
               <textarea id="observaciones" class="form-control" rows="2"
-                        [(ngModel)]="pagoRequest.observaciones" name="observaciones"></textarea>
+                        [(ngModel)]="datosComunes.observaciones" name="observaciones"></textarea>
             </div>
           </div>
 
-          <!-- Reemplazo del voucher -->
           <div class="form-row mb-0">
             <div class="form-group width-100">
-              <label>Voucher (imagen) <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span></label>
+              <label>Voucher (imagen) <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span></label>
               <app-voucher-preview
                 [(ngModel)]="voucherFiles"
-                [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
+                [disabled]="datosComunes.medioPago === 'EFECTIVO'"
                 name="vouchers">
               </app-voucher-preview>
             </div>
@@ -92,9 +90,9 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">Cancelar</button>
-        <button type="submit" class="btn btn-save" (click)="guardarPago()" [disabled]="enviando">
+        <button type="submit" class="btn btn-save" (click)="guardar()" [disabled]="enviando">
           <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ enviando ? 'Procesando...' : 'Registrar Pago' }}
+          {{ enviando ? 'Procesando...' : 'Pagar letras' }}
         </button>
       </div>
     </div>

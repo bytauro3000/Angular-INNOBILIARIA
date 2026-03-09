@@ -2,16 +2,16 @@ import { TipoComprobante } from '../enums/tipocomprobante';
 import { MedioPago } from '../enums/mediopago.enum';
 
 export interface PagoLetraResponse {
-  idPago: number;
-  idLetra: number;
-  numeroLetra: string;
-  fechaPago: string;  
-  importePagado: number;
-  medioPago: MedioPago;
+  idPago?: number;
+  idLetra?: number;
+  numeroLetra?: string;
+  fechaPago?: Date;
+  importePagado?: number;
+  medioPago?: string;
   numeroOperacion?: string;
-  fechaOperacion?: string;
-  urlVoucher?: string;
-  tipoComprobante?: TipoComprobante;
+  fechaOperacion?: Date;
+  tipoComprobante?: string;
   numeroComprobante?: string;
   observaciones?: string;
+  urlsVoucher: string[];  // 👈 nuevo
 }

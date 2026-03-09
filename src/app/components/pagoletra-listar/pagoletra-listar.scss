@@ -226,6 +226,7 @@ $border-color: #e9ecef;
       display: flex;
       align-items: center;
       gap: 16px;
+      flex-wrap: wrap;
     }
   }
 
@@ -349,6 +350,73 @@ $border-color: #e9ecef;
       color: white;
       transform: scale(1.05);
     }
+  }
+}
+
+// ============================================
+// BOTONES GLOBALES (fuera de la tabla)
+// ============================================
+.btn-ver-pagos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1px solid $light-blue;
+  background: linear-gradient(135deg, $light-blue, #1e6f9f);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba($light-blue, 0.2);
+  height: 38px;
+
+  i {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba($light-blue, 0.3);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.btn-pagar-multiple {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1px solid $green;
+  background: linear-gradient(135deg, $green, #219150);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba($green, 0.2);
+  height: 38px;
+
+  i {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba($green, 0.3);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 

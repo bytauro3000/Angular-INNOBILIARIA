@@ -11,6 +11,12 @@ import { PagoLetraService } from '../../services/pagoletra.service';
 import { Programa } from '../../models/programa.model';
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
+import { PagoLetraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
+import { PagoListaModalComponent } from '../pago-lista-modal/pago-lista-modal.component';
+
+interface LetraCambioConSeleccion extends LetraCambio {
+  seleccionada?: boolean;
+}
 
 @Component({
   selector: 'app-pago-letra',
@@ -19,7 +25,9 @@ import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-inse
     CommonModule,
     FormsModule,
     RouterModule,
-    PagoletraInsertarComponent
+    PagoletraInsertarComponent,
+    PagoLetraMultipleInsertarComponent,
+    PagoListaModalComponent
   ],
   templateUrl: './pagoletra-listar.html',
   styleUrls: ['./pagoletra-listar.scss'],
@@ -32,9 +40,12 @@ export class PagoletraListarComponent implements OnInit {
   numeroLoteBusqueda: string = '';
 
   contratoEncontrado: any = null;
-  letrasPendientes: LetraCambio[] = [];
+  letrasPendientes: LetraCambioConSeleccion[] = [];
   letrasPagadas: LetraCambio[] = [];
   cargandoLetras: boolean = false;
+
+  mostrarListaPagos: boolean = false;
+idContratoParaLista: number | null = null;
 
   letraSeleccionada: LetraCambio | null = null;
   tipoLista: 'pendientes' | 'pagadas' = 'pendientes';
@@ -42,7 +53,12 @@ export class PagoletraListarComponent implements OnInit {
   pageSize: number = 5;
   currentPage: number = 1;
   totalPages: number = 0;
-  paginatedLetras: LetraCambio[] = [];
+  paginatedLetras: LetraCambioConSeleccion[] = [];
+
+  // Selección persistente
+  seleccionadasMap: Set<number> = new Set();
+  modoPagoMultiple: boolean = false;
+  letrasSeleccionadasTemp: LetraCambio[] = [];
 
   constructor(
     private contratoService: ContratoService,
@@ -50,7 +66,7 @@ export class PagoletraListarComponent implements OnInit {
     private letrasService: LetrasCambioService,
     private pagoService: PagoLetraService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -98,8 +114,12 @@ export class PagoletraListarComponent implements OnInit {
     this.cargandoLetras = true;
     this.letrasService.listarPorContrato(idContrato).subscribe({
       next: (letras) => {
-        this.letrasPendientes = letras.filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO');
+        this.letrasPendientes = letras
+          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
+          .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
+        
+        this.seleccionadasMap.clear();
         this.currentPage = 1;
         this.aplicarPaginacion();
         this.cargandoLetras = false;
@@ -135,7 +155,82 @@ export class PagoletraListarComponent implements OnInit {
     this.contratoEncontrado = null;
     this.letrasPendientes = [];
     this.letrasPagadas = [];
+    this.seleccionadasMap.clear();
   }
+
+  // ========== SELECCIÓN MÚLTIPLE ==========
+  seleccionarTodas(event: any): void {
+    const checked = event.target.checked;
+    if (checked) {
+      this.paginatedLetras.forEach(letra => this.seleccionadasMap.add(letra.idLetra));
+    } else {
+      this.paginatedLetras.forEach(letra => this.seleccionadasMap.delete(letra.idLetra));
+    }
+  }
+
+  toggleSeleccion(letra: LetraCambioConSeleccion): void {
+    if (this.seleccionadasMap.has(letra.idLetra)) {
+      this.seleccionadasMap.delete(letra.idLetra);
+    } else {
+      this.seleccionadasMap.add(letra.idLetra);
+    }
+  }
+
+  isSeleccionada(idLetra: number): boolean {
+    return this.seleccionadasMap.has(idLetra);
+  }
+
+  // NUEVO: Verifica si todas las letras de la página actual están seleccionadas
+  isTodasSeleccionadas(): boolean {
+    return this.paginatedLetras.length > 0 && this.paginatedLetras.every(l => this.isSeleccionada(l.idLetra));
+  }
+
+  get cantidadSeleccionadas(): number {
+    return this.seleccionadasMap.size;
+  }
+
+  abrirModalPagoMultiple(): void {
+    if (this.cantidadSeleccionadas === 0) {
+      this.toastr.warning('Seleccione al menos una letra', 'Atención');
+      return;
+    }
+    this.letrasSeleccionadasTemp = this.letrasPendientes.filter(l => this.seleccionadasMap.has(l.idLetra));
+    this.modoPagoMultiple = true;
+  }
+
+  abrirListaPagos(): void {
+  if (this.contratoEncontrado) {
+    this.idContratoParaLista = this.contratoEncontrado.idContrato;
+    this.mostrarListaPagos = true;
+  }
+}
+
+cerrarListaPagos(): void {
+  this.mostrarListaPagos = false;
+  this.idContratoParaLista = null;
+}
+
+onPagoEliminado(): void {
+  // Recargar letras pendientes/pagadas
+  if (this.contratoEncontrado) {
+    this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+  }
+}
+
+  cerrarModalPagoMultiple(): void {
+    this.modoPagoMultiple = false;
+    this.letrasSeleccionadasTemp = [];
+  }
+
+  onPagoMultipleRegistrado(): void {
+    this.cerrarModalPagoMultiple();
+    this.seleccionadasMap.clear();
+    if (this.contratoEncontrado) {
+      this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+    }
+    this.toastr.success('Pago múltiple registrado correctamente', 'Éxito');
+  }
+  // ========================================
 
   abrirModalPago(letra: LetraCambio): void {
     this.letraSeleccionada = letra;
@@ -163,8 +258,10 @@ export class PagoletraListarComponent implements OnInit {
       this.tipoLista = tipo;
       this.currentPage = 1;
       this.aplicarPaginacion();
+      this.seleccionadasMap.clear();
     }
   }
+
 
   get tituloLista(): string {
     return this.tipoLista === 'pendientes' ? 'Letras Pendientes de Pago' : 'Letras Pagadas';
@@ -175,7 +272,7 @@ export class PagoletraListarComponent implements OnInit {
     this.totalPages = Math.ceil(listaActual.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    this.paginatedLetras = listaActual.slice(start, end);
+    this.paginatedLetras = listaActual.slice(start, end) as LetraCambioConSeleccion[];
   }
 
   previousPage(): void {

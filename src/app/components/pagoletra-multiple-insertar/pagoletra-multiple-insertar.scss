@@ -1,0 +1,261 @@
+// ============================================
+// VARIABLES (mismas que en el modal individual)
+// ============================================
+$navy: #023e8a;
+$green: #27ae60;
+$light-blue: #3498db;
+$text-dark: #1e293b;
+$text-light: #334155;
+$border-color: #e9ecef;
+$input-bg: #f9fafc;
+
+// ============================================
+// MODAL PRINCIPAL
+// ============================================
+.modal-content {
+  background-color: white !important;
+  border-radius: 16px;
+  border: 1px solid $border-color !important;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-dialog {
+  max-width: 600px;
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center; 
+  min-height: 100vh;
+}
+
+.modal-header {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: $text-dark;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      color: $green;
+      font-size: 1.3rem;
+    }
+  }
+
+  .btn-close {
+    filter: none;
+    opacity: 0.6;
+    &:hover { opacity: 1; }
+  }
+}
+
+.modal-body {
+  padding: 0.8rem 1.2rem;
+  overflow-y: auto;
+}
+
+// ============================================
+// FORMULARIOS
+// ============================================
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+
+  label {
+    color: $text-light;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+.width-100 { grid-column: 1 / -1; }
+
+.form-row {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.6rem;
+  width: 100%;
+}
+
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+
+input, select, textarea {
+  background-color: $input-bg !important;
+  border: 1px solid $border-color !important;
+  color: $text-dark !important;
+  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  font-size: 0.85rem !important;
+  height: 36px !important;
+  width: 100% !important;
+
+  &:disabled {
+    background-color: #cbd5e1 !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+    opacity: 1;
+  }
+}
+
+textarea {
+  min-height: 50px !important;
+  resize: none;
+}
+
+// ============================================
+// ESTILO PARA EL INPUT FILE
+// ============================================
+.custom-file-upload {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  background-color: $input-bg;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &:hover:not(.disabled) {
+    border-color: $light-blue;
+    background-color: #f0f7ff;
+  }
+  
+  &.disabled {
+    background-color: #cbd5e1;
+    border-style: solid;
+    cursor: not-allowed;
+  }
+
+  .file-browse {
+    background-color: $navy;
+    color: white;
+    height: 100%;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .file-name {
+    padding: 0 12px;
+    font-size: 0.8rem;
+    color: #64748b;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+// ============================================
+// ESTILO PARA LA LISTA DE LETRAS
+// ============================================
+.info-letra {
+  background-color: #f8fafc;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.8rem;
+
+  .info-item {
+    label {
+      color: $navy;
+      font-size: 0.65rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      display: block;
+    }
+    .info-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+
+  .lista-letras {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    li {
+      margin-bottom: 2px;
+      color: $text-dark;
+    }
+  }
+
+  .total-importe {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $green;
+  }
+}
+
+// ============================================
+// BOTONES DEL MODAL
+// ============================================
+.modal-footer {
+  border-top: 1px solid $border-color;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+
+  .btn {
+    padding: 8px 22px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, #27ae60, #219150);
+    color: white;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba($green, 0.3);
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: $text-light;
+    border: 1px solid $border-color !important;
+
+    &:hover:not(:disabled) {
+      background: #f1f5f9;
+    }
+  }
+}
