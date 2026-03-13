@@ -112,7 +112,7 @@ export class ClienteEditarComponent implements OnInit {
           this.modal?.hide();
           this.clienteActualizado.emit();
         },
-        error: (err) => this.toastr.error('Error: ' + err.message)
+        error: (err) => this.toastr.error(err.error?.message || 'Error al actualizar')
       });
     }
   }

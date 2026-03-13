@@ -112,7 +112,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let letra of paginatedLetras" [class.vencida]="tipoLista === 'pendientes' && isLetraVencida(letra.fechaVencimiento)">
+       <tr *ngFor="let letra of paginatedLetras" [class.vencida]="letra.estadoLetra === 'VENCIDO'">
           <!-- Checkbox solo en pendientes -->
           <td *ngIf="tipoLista === 'pendientes'" data-label="Seleccionar">
             <input type="checkbox" 

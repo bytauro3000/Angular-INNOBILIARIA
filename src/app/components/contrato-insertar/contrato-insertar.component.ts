@@ -13,28 +13,23 @@ import { Programa } from '../../models/programa.model';
 import { Vendedor } from '../../models/vendedor.model';
 import { SeparacionDTO } from '../../dto/separacion.dto';
 import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
-import { RouterModule, Router } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 import { ProgramaInsetEdit } from '../programa-inset-edit/programa-inset-edit';
-import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar'; // 🟢 Importado
+import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar';
+import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 
 @Component({
   selector: 'app-contrato-insertar',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    RouterModule, 
-    FormsModule, 
-    FontAwesomeModule, 
-    VendedorInsertar, 
-    ClienteInsertarComponent, 
-    ProgramaInsetEdit,
-    LotesInsertarEditar // 🟢 Añadido a imports
+    CommonModule, ReactiveFormsModule, RouterModule, FormsModule,
+    FontAwesomeModule, VendedorInsertar, ClienteInsertarComponent,
+    ProgramaInsetEdit, LotesInsertarEditar, CurrencyFormatterDirective
   ],
   templateUrl: './contrato-insertar.html',
   styleUrls: ['./contrato-insertar.scss'],
@@ -43,12 +38,12 @@ export class ContratoInsertarComponent implements OnInit {
   @ViewChild('vendedorModalContrato') vendedorModalContrato!: VendedorInsertar;
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
   @ViewChild('registroModalPrograma') registroModalPrograma!: ProgramaInsetEdit;
-  @ViewChild('loteModalContrato') loteModalContrato!: LotesInsertarEditar; // 🟢 Añadido ViewChild
-  
+  @ViewChild('loteModalContrato') loteModalContrato!: LotesInsertarEditar;
+
   @ViewChild('vendedorBusquedaContainer') vendedorBusquedaContainer!: ElementRef;
   @ViewChild('programaBusquedaContainer') programaBusquedaContainer!: ElementRef;
   @ViewChild('clienteBusquedaContainer') clienteBusquedaContainer!: ElementRef;
-  @ViewChild('loteBusquedaContainer') loteBusquedaContainer!: ElementRef; 
+  @ViewChild('loteBusquedaContainer') loteBusquedaContainer!: ElementRef;
 
   contratoForm!: FormGroup;
   programas: Programa[] = [];
@@ -64,6 +59,9 @@ export class ContratoInsertarComponent implements OnInit {
   terminoBusquedaSeparacion: string = '';
   showSeparacionList: boolean = false;
   faPlus = faPlus;
+  isGuardando: boolean = false;
+  mostrarModalConfirmacion: boolean = false;
+  saldoDisplay: string = '$ 0.00';
 
   vendedoresFiltrados: Vendedor[] = [];
   filtroVendedor: string = '';
@@ -72,8 +70,7 @@ export class ContratoInsertarComponent implements OnInit {
   programasFiltrados: Programa[] = [];
   filtroPrograma: string = '';
   mostrarProgramas: boolean = false;
-  programaSeleccionado: Programa | null = null;
-  
+
   clientesFiltrados: Cliente[] = [];
   filtroCliente: string = '';
   mostrarClientes: boolean = false;
@@ -81,6 +78,28 @@ export class ContratoInsertarComponent implements OnInit {
   lotesFiltrados: Lote[] = [];
   filtroLote: string = '';
   mostrarLotes: boolean = false;
+
+  get esDirecto(): boolean { return this.contratoForm?.get('modalidadContrato')?.value === 'DIRECTO'; }
+  get esFinanciado(): boolean { return this.contratoForm?.get('tipoContrato')?.value !== 'CONTADO'; }
+  get montoTotalNum(): number { return Number(this.contratoForm?.get('montoTotal')?.value) || 0; }
+  get inicialNum(): number { return Number(this.contratoForm?.get('inicial')?.value) || 0; }
+  get saldoNum(): number { return Number(this.contratoForm?.get('saldo')?.value) || 0; }
+  get cantidadLetrasNum(): number { return Number(this.contratoForm?.get('cantidadLetras')?.value) || 0; }
+
+  get cuotaMensual(): number {
+    const s = this.saldoNum, l = this.cantidadLetrasNum;
+    return l > 0 ? Math.floor(s / l) : 0;
+  }
+  get ultimaLetra(): number {
+    const s = this.saldoNum, l = this.cantidadLetrasNum;
+    if (l <= 0) return 0;
+    return s - Math.floor(s / l) * (l - 1);
+  }
+  get tieneResiduo(): boolean { return this.ultimaLetra !== this.cuotaMensual; }
+
+  // Flag para mostrar banner de transferencia en el formulario
+  esTransferencia = false;
+  idContratoOrigen: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -91,274 +110,113 @@ export class ContratoInsertarComponent implements OnInit {
     private separacionService: SeparacionService,
     private loteService: LoteService,
     public router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService
   ) {}
 
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (this.vendedorBusquedaContainer && !this.vendedorBusquedaContainer.nativeElement.contains(target)) this.mostrarVendedores = false;
-    if (this.programaBusquedaContainer && !this.programaBusquedaContainer.nativeElement.contains(target)) this.mostrarProgramas = false;
-    if (this.clienteBusquedaContainer && !this.clienteBusquedaContainer.nativeElement.contains(target)) this.mostrarClientes = false;
-    if (this.loteBusquedaContainer && !this.loteBusquedaContainer.nativeElement.contains(target)) this.mostrarLotes = false;
-  }
-
-  abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }
-  abrirModalCliente(cliente?: Cliente) { this.registroModal.abrirModalCliente(cliente); }
-  abrirModalPrograma(Programa?: Programa) { this.registroModalPrograma.abrirModal(Programa); }
-  abrirModalLote() { this.loteModalContrato.abrirModal(); } // 🟢 Función para abrir modal lote
-
-  getAbreviatura(lote: Lote): string {
-    const nombre = lote.programa?.nombrePrograma || this.filtroPrograma;
-    if (!nombre) return 'S/P';
-    const excluidas = ['de', 'la', 'lo', 'los', 'las', 'el', 'en', 'y', 'viv.'];
-    return nombre
-      .split(' ')
-      .filter(palabra => palabra.length > 1 && !excluidas.includes(palabra.toLowerCase()))
-      .map(palabra => palabra[0].toUpperCase())
-      .join('') + '.';
-  }
-
-  recargarVendedores() {
-    this.vendedorService.listarVendedores().subscribe(v => {
-      this.vendedores = v;
-      this.vendedoresFiltrados = [...v];
-    });
-  }
-
-  RecargarClientes(): void {
-    this.clienteService.listarClientes().subscribe(c => {
-      this.clientes = c;
-      this.clientesFiltrados = [...c];
-    });
-  }
-
-  RecargarProgramas(): void {
-    this.programaService.listarProgramas().subscribe(p => {
-      this.programas = p;
-      this.programasFiltrados = [...p];
-    });
-  }
-
-  // 🟢 Recarga los lotes del programa actual para que aparezca el nuevo creado
-  RecargarLotes(): void {
-    const idProg = this.contratoForm.get('idPrograma')?.value;
-    if (idProg) {
-      this.loteService.listarLotesPorPrograma(idProg).subscribe(l => {
-        this.lotes = l || [];
-        this.lotesFiltrados = [...this.lotes];
-      });
-    }
+    const t = event.target as HTMLElement;
+    if (this.vendedorBusquedaContainer && !this.vendedorBusquedaContainer.nativeElement.contains(t)) this.mostrarVendedores = false;
+    if (this.programaBusquedaContainer && !this.programaBusquedaContainer.nativeElement.contains(t)) this.mostrarProgramas = false;
+    if (this.clienteBusquedaContainer && !this.clienteBusquedaContainer.nativeElement.contains(t)) this.mostrarClientes = false;
+    if (this.loteBusquedaContainer && !this.loteBusquedaContainer.nativeElement.contains(t)) this.mostrarLotes = false;
   }
 
   ngOnInit(): void {
     this.initForm();
     this.cargarCombos();
     this.handleFormChanges();
+    this.cargarDatosTransferencia();
   }
 
-  onCurrencyInput(event: Event, controlName: string) {
-    const input = event.target as HTMLInputElement;
-    const numericValue = this.extractNumericValue(input.value);
-    const formattedValue = this.formatCurrency(numericValue);
-    this.contratoForm.get(controlName)?.setValue(formattedValue, { emitEvent: false });
-    this.actualizarSaldo();
-  }
+  /**
+   * Si venimos de una transferencia, pre-llena los campos con los datos calculados.
+   */
+  private cargarDatosTransferencia(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['transferencia'] !== '1') return;
 
-  onFocusInput(event: Event, controlName: string) {
-    const control = this.contratoForm.get(controlName);
-    const numericValue = this.extractNumericValue(control?.value);
-    if (numericValue === 0) control?.setValue('', { emitEvent: false });
-    else control?.setValue(numericValue.toString(), { emitEvent: false });
+      this.esTransferencia = true;
+      this.idContratoOrigen = +params['idContratoOrigen'];
+
+      // Pre-llenar montos
+      const montoTotal    = +params['montoTotal'];
+      const inicial       = +params['inicial'];
+      const saldo         = +params['saldo'];
+      const cantidadLetras = +params['cantidadLetras'];
+
+      this.contratoForm.patchValue({
+        tipoContrato:    'FINANCIADO',
+        montoTotal:      montoTotal,
+        inicial:         inicial,
+        cantidadLetras:  cantidadLetras
+      });
+
+      // Forzar saldo (campo disabled no lo recibe con patchValue)
+      this.contratoForm.get('saldo')?.setValue(saldo, { emitEvent: false });
+      this.saldoDisplay = this.formatearMoneda(saldo);
+
+      // Pre-seleccionar vendedor
+      if (params['idVendedor']) {
+        const idVendedor = +params['idVendedor'];
+        this.vendedorService.listarVendedores().subscribe(vendedores => {
+          const v = vendedores.find((v: any) => v.idVendedor === idVendedor);
+          if (v) {
+            this.contratoForm.get('vendedorId')?.setValue(v.idVendedor);
+            this.filtroVendedor = `${v.nombre} ${v.apellidos}`;
+          }
+        });
+      }
+
+      // Pre-seleccionar lotes
+      if (params['idLotes']) {
+        const ids: number[] = params['idLotes'].split(',').map(Number);
+        ids.forEach(idLote => {
+          this.loteService.obtenerLotePorId(idLote).subscribe({
+            next: (lote: any) => {
+              if (lote && !this.lotesSeleccionados.some(l => l.idLote === lote.idLote)) {
+                this.lotesSeleccionados.push(lote);
+                this.actualizarIdsLotes();
+                // Pre-llenar programa desde el primer lote
+                if (this.lotesSeleccionados.length === 1 && lote.programa) {
+                  this.contratoForm.get('idPrograma')?.setValue(lote.programa.idPrograma);
+                  this.filtroPrograma = lote.programa.nombrePrograma;
+                }
+              }
+            }
+          });
+        });
+      }
+
+      this.toastr.info(
+        `Formulario pre-llenado desde contrato #${this.idContratoOrigen}. Asigne el nuevo cliente.`,
+        'Transferencia'
+      );
+    });
   }
 
   private initForm() {
     this.contratoForm = this.fb.group({
       modalidadContrato: ['DIRECTO', Validators.required],
       tipoContrato: ['FINANCIADO', Validators.required],
-      fechaContrato: ['', Validators.required],
+      fechaContrato: [new Date().toISOString().split('T')[0], Validators.required],
       vendedorId: [null, Validators.required],
       idPrograma: [null, Validators.required],
       idSeparacion: [null],
-      montoTotal: [this.formatCurrency(0), [Validators.required, Validators.min(0)]],
-      inicial: [this.formatCurrency(0), [Validators.min(0)]],
-      saldo: [{ value: this.formatCurrency(0), disabled: true }],
-      cantidadLetras: [0, [Validators.min(0)]],
+      montoTotal: [0, [Validators.required, Validators.min(1)]],
+      inicial: [0],
+      saldo: [{ value: 0, disabled: true }],
+      cantidadLetras: [null, [Validators.min(0)]],
       observaciones: [''],
       idClientes: [[], Validators.required],
       idLotes: [[], Validators.required]
     });
   }
 
- public getLoteCosto(lote: Lote): number {
-  const area = Number(lote.area) || 0;
-  const precio = Number(lote.precioM2) || 0;
-  const total = area * precio;
-
-  // 🟢 CAMBIO: Redondeamos al entero más cercano para coincidir con el Backend
-  return Math.round(total); 
-}
-
-  private calcularMontoTotalLotes() {
-    if (this.contratoForm.get('modalidadContrato')?.value !== 'DIRECTO') return;
-    const total = this.lotesSeleccionados.reduce((acc, lote) => acc + this.getLoteCosto(lote), 0);
-    this.contratoForm.get('montoTotal')?.setValue(this.formatCurrency(total));
-    this.actualizarSaldo();
-  }
-
   private cargarCombos() {
-    this.RecargarProgramas();
-    this.recargarVendedores();
-    this.RecargarClientes();
-  }
-  
-  toggleVendedores() {
-    this.mostrarVendedores = !this.mostrarVendedores;
-    if (this.mostrarVendedores && this.filtroVendedor.trim() === '') this.vendedoresFiltrados = [...this.vendedores];
-  }
-
-  filtrarVendedores() {
-    const filtro = this.filtroVendedor.toLowerCase().trim();
-    if (filtro === '') {
-      this.vendedoresFiltrados = [...this.vendedores];
-    } else {
-      this.vendedoresFiltrados = this.vendedores.filter(v => {
-        const nombreCompleto = `${v.nombre} ${v.apellidos}`.toLowerCase();
-        return nombreCompleto.includes(filtro) || (v.dni && v.dni.toLowerCase().includes(filtro));
-      });
-    }
-    this.mostrarVendedores = true;
-  }
-
-  seleccionarVendedor(vendedor: Vendedor) {
-    this.contratoForm.get('vendedorId')?.setValue(vendedor.idVendedor);
-    this.filtroVendedor = `${vendedor.nombre} ${vendedor.apellidos}`;
-    this.mostrarVendedores = false; 
-  }
-
-  toggleProgramas() {
-    this.mostrarProgramas = !this.mostrarProgramas;
-    if (this.mostrarProgramas && this.filtroPrograma.trim() === '') this.programasFiltrados = [...this.programas];
-  }
-
-  filtrarProgramas() {
-    const filtro = this.filtroPrograma.toLowerCase().trim();
-    this.programasFiltrados = this.programas.filter(p => p.nombrePrograma.toLowerCase().includes(filtro));
-    this.mostrarProgramas = true;
-  }
-
-  seleccionarPrograma(programa: Programa) {
-    this.programaSeleccionado = programa;
-    this.contratoForm.get('idPrograma')?.setValue(programa.idPrograma);
-    this.filtroPrograma = programa.nombrePrograma;
-    setTimeout(() => { this.mostrarProgramas = false; }, 0);
-  }
-
-  toggleClientes() {
-  this.mostrarClientes = !this.mostrarClientes;
-
-  // Si se abre el selector y no hay nada escrito, cargamos la lista general
-  if (this.mostrarClientes && this.filtroCliente.trim() === '') {
-    this.clienteService.listarClientes().subscribe({
-      next: (data) => {
-        // Mostramos todos los clientes excepto los que ya están seleccionados
-        this.clientesFiltrados = data.filter(c => 
-          !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente)
-        );
-      },
-      error: (err) => console.error('Error al cargar lista inicial:', err)
-    });
-  }
-}
-  filtrarClientes() {
-  const filtro = this.filtroCliente.trim();
-  
-  if (filtro.length < 2) {
-    this.clientesFiltrados = [];
-    return;
-  }
-
-  // Detectar automáticamente si es búsqueda por Documento (si es número) o Nombres
-  const esNumero = /^\d+$/.test(filtro);
-  const tipoBusqueda = esNumero ? 'documento' : 'nombres';
-
-  // Llamamos al servicio del backend que configuramos previamente
-  this.clienteService.buscarClientesPorFiltro(filtro, tipoBusqueda).subscribe({
-    next: (data) => {
-      // Excluimos a los clientes que YA están seleccionados en la lista de abajo
-      this.clientesFiltrados = data.filter(c => 
-        !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente)
-      );
-      this.mostrarClientes = true;
-    },
-    error: (err) => {
-      console.error('Error en búsqueda de clientes:', err);
-    }
-  });
-}
-
-  seleccionarCliente(cliente: Cliente) {
-    if (!this.clientesSeleccionados.some(c => c.idCliente === cliente.idCliente)) {
-      this.clientesSeleccionados.push(cliente);
-      this.actualizarIdsClientes();
-    }
-    this.filtroCliente = '';
-    this.filtrarClientes();
-    setTimeout(() => { this.mostrarClientes = false; }, 0);
-  }
-
-  eliminarCliente(idCliente: number) {
-    this.clientesSeleccionados = this.clientesSeleccionados.filter(c => c.idCliente !== idCliente);
-    this.actualizarIdsClientes();
-  }
-  
-  private actualizarIdsClientes() {
-    const ids = this.clientesSeleccionados.map(c => c.idCliente);
-    this.contratoForm.get('idClientes')?.setValue(ids);
-  }
-
-  toggleLotes() {
-    if(!this.contratoForm.get('idPrograma')?.value) return; 
-    this.mostrarLotes = !this.mostrarLotes;
-    if (this.mostrarLotes && this.filtroLote.trim() === '') this.lotesFiltrados = this.lotes.filter(l => !this.isLoteSeleccionado(l.idLote));
-    else this.filtrarLotes();
-  }
-
-  filtrarLotes() {
-    const filtro = this.filtroLote.toLowerCase().trim();
-    let disponibles = this.lotes.filter(l => !this.isLoteSeleccionado(l.idLote));
-    this.lotesFiltrados = filtro === '' ? disponibles : disponibles.filter(l => `manzana ${l.manzana} lote ${l.numeroLote}`.toLowerCase().includes(filtro));
-    this.mostrarLotes = true;
-  }
-
-  seleccionarLote(lote: Lote) {
-    if (!this.isLoteSeleccionado(lote.idLote)) {
-      if (!lote.programa) {
-        lote.programa = { nombrePrograma: this.filtroPrograma } as Programa;
-      }
-      this.lotesSeleccionados.push(lote);
-      this.actualizarIdsLotes();
-      this.calcularMontoTotalLotes(); 
-    }
-    this.filtroLote = '';
-    this.filtrarLotes();
-    setTimeout(() => { this.mostrarLotes = false; }, 0);
-  }
-
-  eliminarLote(idLote: number | undefined) {
-    if (idLote === undefined) return;
-    this.lotesSeleccionados = this.lotesSeleccionados.filter(l => l.idLote !== idLote);
-    this.actualizarIdsLotes();
-    this.calcularMontoTotalLotes(); 
-  }
-
-  isLoteSeleccionado(idLote: number | undefined): boolean {
-    return idLote !== undefined && this.lotesSeleccionados.some(lo => lo.idLote === idLote);
-  }
-
-  private actualizarIdsLotes() {
-    const ids = this.lotesSeleccionados.map(l => l.idLote!);
-    this.contratoForm.get('idLotes')?.setValue(ids);
+    this.programaService.listarProgramas().subscribe(p => { this.programas = p; this.programasFiltrados = [...p]; });
+    this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; });
   }
 
   private handleFormChanges() {
@@ -367,69 +225,153 @@ export class ContratoInsertarComponent implements OnInit {
 
     this.contratoForm.get('tipoContrato')?.valueChanges.subscribe(tipo => {
       if (tipo === 'CONTADO') {
-        this.contratoForm.get('inicial')?.disable({emitEvent: false});
-        this.contratoForm.get('cantidadLetras')?.disable({emitEvent: false});
-        this.contratoForm.patchValue({
-          inicial: this.formatCurrency(this.extractNumericValue(this.contratoForm.getRawValue().montoTotal)),
-          saldo: this.formatCurrency(0),
-          cantidadLetras: 0
-        }, {emitEvent: false});
-      } else {
-        this.contratoForm.get('inicial')?.enable({emitEvent: false});
-        this.contratoForm.get('cantidadLetras')?.enable({emitEvent: false});
+        this.contratoForm.get('inicial')?.setValue(this.montoTotalNum, { emitEvent: false });
+        this.contratoForm.get('cantidadLetras')?.setValue(0, { emitEvent: false });
+        this.actualizarSaldo();
       }
+      this.actualizarObservacion();
     });
 
     this.contratoForm.get('modalidadContrato')?.valueChanges.subscribe(modo => {
-      if (modo === 'DIRECTO') {
-        this.contratoForm.get('idSeparacion')?.reset(null, {emitEvent: false});
-        this.separaciones = [];
-        this.contratoForm.get('vendedorId')?.setValidators(Validators.required);
-        this.contratoForm.get('idPrograma')?.setValidators(Validators.required);
-        this.contratoForm.get('idClientes')?.setValidators(Validators.required);
-        this.contratoForm.get('idLotes')?.setValidators(Validators.required);
-        this.calcularMontoTotalLotes(); 
-      } else { 
-        this.clientesSeleccionados = [];
-        this.lotesSeleccionados = [];
-        this.actualizarIdsClientes();
-        this.actualizarIdsLotes();
-        this.contratoForm.get('vendedorId')?.clearValidators();
-        this.contratoForm.get('idPrograma')?.clearValidators();
-        this.contratoForm.get('idClientes')?.clearValidators();
-        this.contratoForm.get('idLotes')?.clearValidators(); 
+      const esSep = modo === 'SEPARACION';
+      ['vendedorId', 'idPrograma', 'idClientes', 'idLotes'].forEach(f => {
+        esSep ? this.contratoForm.get(f)?.clearValidators() : this.contratoForm.get(f)?.setValidators(Validators.required);
+        this.contratoForm.get(f)?.updateValueAndValidity({ emitEvent: false });
+      });
+      if (esSep) {
+        this.clientesSeleccionados = []; this.lotesSeleccionados = [];
+        this.actualizarIdsClientes(); this.actualizarIdsLotes();
+      } else {
+        this.calcularMontoTotalLotes();
       }
-      this.contratoForm.updateValueAndValidity({emitEvent: false});
     });
 
     this.contratoForm.get('idPrograma')?.valueChanges.subscribe(id => {
-      if (!id) {
-          this.lotes = [];
-          this.lotesFiltrados = [];
-          return;
-      }
-      this.loteService.listarLotesPorPrograma(id).subscribe(l => {
-        this.lotes = l || [];
-        this.lotesFiltrados = [...this.lotes];
-      });
+      if (!id) { this.lotes = []; this.lotesFiltrados = []; return; }
+      this.loteService.listarLotesPorPrograma(id).subscribe(l => { this.lotes = l || []; this.lotesFiltrados = [...this.lotes]; });
     });
   }
 
   actualizarSaldo() {
-    const total = this.extractNumericValue(this.contratoForm.get('montoTotal')?.value);
-    const inicial = this.extractNumericValue(this.contratoForm.get('inicial')?.value);
-    const saldo = total - inicial;
-    this.contratoForm.get('saldo')?.setValue(this.formatCurrency(saldo >= 0 ? saldo : 0), { emitEvent: false });
+    const saldo = Math.max(0, this.montoTotalNum - this.inicialNum);
+    this.contratoForm.get('saldo')?.setValue(saldo, { emitEvent: false });
+    this.saldoDisplay = this.formatearMoneda(saldo);
   }
 
-  private formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  formatearMoneda(v: number): string {
+    return '$ ' + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
   }
 
-  private extractNumericValue(value: any): number {
-    if (value === null || value === undefined) return 0;
-    const str = value.toString().replace(/[^\d.-]/g, "");
-    return parseFloat(str) || 0;
+  getLoteCosto(lote: Lote): number {
+    return Math.round((Number(lote.area) || 0) * (Number(lote.precioM2) || 0));
+  }
+
+  private calcularMontoTotalLotes() {
+    if (!this.esDirecto) return;
+    const total = this.lotesSeleccionados.reduce((a, l) => a + this.getLoteCosto(l), 0);
+    this.contratoForm.get('montoTotal')?.setValue(total);
+    this.actualizarSaldo();
+  }
+
+  campoInvalido(campo: string): boolean {
+    const c = this.contratoForm.get(campo);
+    return !!(c && c.invalid && c.touched);
+  }
+
+  filtrarVendedores() {
+    const f = this.filtroVendedor.toLowerCase();
+    this.vendedoresFiltrados = this.vendedores.filter(v => `${v.nombre} ${v.apellidos}`.toLowerCase().includes(f) || v.dni?.includes(f));
+    this.mostrarVendedores = true;
+  }
+  seleccionarVendedor(v: Vendedor) {
+    this.contratoForm.get('vendedorId')?.setValue(v.idVendedor);
+    this.filtroVendedor = `${v.nombre} ${v.apellidos}`;
+    this.mostrarVendedores = false;
+  }
+
+  filtrarProgramas() {
+    const f = this.filtroPrograma.toLowerCase();
+    this.programasFiltrados = this.programas.filter(p => p.nombrePrograma.toLowerCase().includes(f));
+    this.mostrarProgramas = true;
+  }
+  seleccionarPrograma(p: Programa) {
+    this.contratoForm.get('idPrograma')?.setValue(p.idPrograma);
+    this.filtroPrograma = p.nombrePrograma;
+    this.mostrarProgramas = false;
+    this.actualizarObservacion();
+  }
+
+  abrirListaClientes() {
+    // Al hacer focus sin texto: cargar lista completa menos los ya seleccionados
+    if (this.filtroCliente.trim().length < 2) {
+      this.clienteService.listarClientes().subscribe(data => {
+        this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
+        this.mostrarClientes = true;
+      });
+    } else {
+      this.filtrarClientes();
+    }
+  }
+
+  // Genera la observación automática en tiempo real
+  private generarObservacion(): string {
+    const tipo = this.contratoForm.get('tipoContrato')?.value || '';
+    const manzanas = this.lotesSeleccionados.map(l => `Mz. ${l.manzana} Lt. ${l.numeroLote}`);
+    const loteStr = manzanas.length > 0 ? manzanas.join(', ') : 'Mz. ___ Lt. ___';
+    const programa = this.filtroPrograma || '___';
+    return `Se realizó un contrato ${tipo} de la ${loteStr} del Programa: ${programa}`;
+  }
+
+  private actualizarObservacion() {
+    this.contratoForm.get('observaciones')?.setValue(this.generarObservacion(), { emitEvent: false });
+  }
+
+  filtrarClientes() {
+    const f = this.filtroCliente.trim();
+    if (f.length < 2) { this.clientesFiltrados = []; this.mostrarClientes = true; return; }
+    this.clienteService.buscarClientesPorFiltro(f, /^\d+$/.test(f) ? 'documento' : 'nombres').subscribe(data => {
+      this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
+      this.mostrarClientes = true;
+    });
+  }
+  seleccionarCliente(c: Cliente) {
+    if (!this.clientesSeleccionados.some(s => s.idCliente === c.idCliente)) {
+      this.clientesSeleccionados.push(c); this.actualizarIdsClientes();
+    }
+    this.filtroCliente = ''; this.clientesFiltrados = [];
+    setTimeout(() => { this.mostrarClientes = false; }, 0);
+  }
+  eliminarCliente(id: number) {
+    this.clientesSeleccionados = this.clientesSeleccionados.filter(c => c.idCliente !== id);
+    this.actualizarIdsClientes();
+  }
+  private actualizarIdsClientes() {
+    this.contratoForm.get('idClientes')?.setValue(this.clientesSeleccionados.map(c => c.idCliente));
+  }
+
+  filtrarLotes() {
+    if (!this.contratoForm.get('idPrograma')?.value) { this.toastr.warning('Primero selecciona un programa', 'Atención'); return; }
+    const f = this.filtroLote.toLowerCase();
+    this.lotesFiltrados = this.lotes.filter(l =>
+      !this.lotesSeleccionados.some(s => s.idLote === l.idLote) &&
+      `mz ${l.manzana} lt ${l.numeroLote}`.toLowerCase().includes(f));
+    this.mostrarLotes = true;
+  }
+  seleccionarLote(l: Lote) {
+    if (!l.programa) l.programa = { nombrePrograma: this.filtroPrograma } as Programa;
+    this.lotesSeleccionados.push(l); this.actualizarIdsLotes(); this.calcularMontoTotalLotes();
+    this.filtroLote = ''; this.filtrarLotes();
+    this.actualizarObservacion();
+    setTimeout(() => { this.mostrarLotes = false; }, 0);
+  }
+  eliminarLote(id?: number) {
+    if (id === undefined) return;
+    this.lotesSeleccionados = this.lotesSeleccionados.filter(l => l.idLote !== id);
+    this.actualizarIdsLotes(); this.calcularMontoTotalLotes(); this.filtrarLotes();
+    this.actualizarObservacion();
+  }
+  private actualizarIdsLotes() {
+    this.contratoForm.get('idLotes')?.setValue(this.lotesSeleccionados.map(l => l.idLote!));
   }
 
   buscarSeparaciones(event: Event) {
@@ -446,102 +388,76 @@ export class ContratoInsertarComponent implements OnInit {
     this.contratoForm.get('idSeparacion')?.setValue(sep.id);
     this.terminoBusquedaSeparacion = sep.text;
     this.showSeparacionList = false;
-
-    this.separacionService.obtenerSeparacionPorId(sep.id!).subscribe({ 
-        next: (res: any) => {
-            if (!res) return;
-            this.contratoForm.get('montoTotal')?.setValue(this.formatCurrency(res.monto || 0));
-            this.actualizarSaldo(); 
-            
-            if (res.clientes && Array.isArray(res.clientes)) {
-                this.clientesSeleccionados = res.clientes.map((i: any) => i.cliente).filter((c: any) => c !== null);
-                this.actualizarIdsClientes();
-            }
-
-            if (res.lotes && Array.isArray(res.lotes)) {
-                this.lotesSeleccionados = res.lotes.map((i: any) => i.lote).filter((l: any) => l !== null);
-                this.actualizarIdsLotes();
-                
-                if (this.lotesSeleccionados.length > 0) {
-                    const prog = this.lotesSeleccionados[0].programa;
-                    if (prog) {
-                        this.contratoForm.get('idPrograma')?.setValue(prog.idPrograma);
-                        this.filtroPrograma = prog.nombrePrograma;
-                    }
-                }
-            }
-            
-            if (res.vendedor) {
-                this.contratoForm.get('vendedorId')?.setValue(res.vendedor.idVendedor);
-                this.filtroVendedor = `${res.vendedor.nombre} ${res.vendedor.apellidos}`;
-            }
-            this.toastr.info('Separación cargada correctamente.', 'Información');
-        },
-        error: (err: any) => {
-            this.toastr.error('No se pudieron cargar los detalles.', 'Error');
+    this.separacionService.obtenerSeparacionPorId(sep.id!).subscribe({
+      next: (res: any) => {
+        if (!res) return;
+        this.contratoForm.get('montoTotal')?.setValue(res.monto || 0);
+        this.actualizarSaldo();
+        if (res.clientes?.length) { this.clientesSeleccionados = res.clientes.map((i: any) => i.cliente).filter(Boolean); this.actualizarIdsClientes(); }
+        if (res.lotes?.length) {
+          this.lotesSeleccionados = res.lotes.map((i: any) => i.lote).filter(Boolean); this.actualizarIdsLotes();
+          const prog = this.lotesSeleccionados[0]?.programa;
+          if (prog) { this.contratoForm.get('idPrograma')?.setValue(prog.idPrograma); this.filtroPrograma = prog.nombrePrograma; }
         }
+        if (res.vendedor) { this.contratoForm.get('vendedorId')?.setValue(res.vendedor.idVendedor); this.filtroVendedor = `${res.vendedor.nombre} ${res.vendedor.apellidos}`; }
+        this.toastr.info('Separación cargada correctamente.');
+      },
+      error: () => this.toastr.error('No se pudieron cargar los detalles.')
     });
   }
 
-  guardarContrato() {
+  solicitarConfirmacion() {
     if (this.contratoForm.invalid) {
       this.contratoForm.markAllAsTouched();
-      this.toastr.error('Por favor, completa todos los campos requeridos.', 'Formulario Inválido');
+      this.toastr.warning('Por favor completa todos los campos requeridos', 'Formulario incompleto');
       return;
     }
+    this.mostrarModalConfirmacion = true;
+  }
 
-    const values = this.contratoForm.getRawValue();
-
+  confirmarGuardado() {
+    this.mostrarModalConfirmacion = false;
+    this.isGuardando = true;
+    const v = this.contratoForm.getRawValue();
     const request: ContratoRequestDTO = {
-      fechaContrato: values.fechaContrato,
-      tipoContrato: values.tipoContrato,
-      montoTotal: this.extractNumericValue(values.montoTotal),
-      inicial: this.extractNumericValue(values.inicial),
-      saldo: this.extractNumericValue(values.saldo),
-      cantidadLetras: values.cantidadLetras,
-      observaciones: values.observaciones,
-      idVendedor: values.vendedorId,
-      idSeparacion: values.idSeparacion, 
-      idClientes: values.idClientes,
-      idLotes: values.idLotes
+      fechaContrato: v.fechaContrato,
+      tipoContrato: v.tipoContrato,
+      montoTotal: Number(v.montoTotal) || 0,
+      inicial: Number(v.inicial) || 0,
+      saldo: Number(v.saldo) || 0,
+      cantidadLetras: v.cantidadLetras,
+      observaciones: v.observaciones,
+      idVendedor: v.vendedorId,
+      idSeparacion: v.idSeparacion,
+      idClientes: v.idClientes,
+      idLotes: v.idLotes
     };
-
     this.contratoService.guardarContrato(request).subscribe({
-      next: () => {
-        this.toastr.success('Contrato guardado con éxito', '¡Éxito!');
-        this.resetFormulario();
-      },
-      error: (err) => {
-        this.toastr.error('❌ Error al guardar el contrato', 'Error');
-      }
+      next: () => { this.isGuardando = false; this.toastr.success('Contrato guardado con éxito'); this.resetFormulario(); },
+      error: (err) => { this.isGuardando = false; this.toastr.error(err.error?.message || 'Error al guardar el contrato'); }
     });
   }
 
-  private resetFormulario() {
-    this.contratoForm.reset({
-      modalidadContrato: 'DIRECTO',
-      tipoContrato: 'FINANCIADO',
-      montoTotal: this.formatCurrency(0),
-      inicial: this.formatCurrency(0),
-      saldo: this.formatCurrency(0),
-      cantidadLetras: 0
-    }, { emitEvent: false });
+  cancelarConfirmacion() { this.mostrarModalConfirmacion = false; }
 
-    this.clientesSeleccionados = [];
-    this.lotesSeleccionados = [];
-    this.separaciones = [];
-    this.filtroVendedor = '';
-    this.filtroPrograma = '';
-    this.filtroCliente = '';
-    this.filtroLote = '';
-    this.lotes = [];
-    this.lotesFiltrados = [];
-    this.showSeparacionList = false;
-    this.terminoBusquedaSeparacion = '';
-    this.contratoForm.updateValueAndValidity({ emitEvent: false });
+  private resetFormulario() {
+    this.contratoForm.reset({ modalidadContrato: 'DIRECTO', tipoContrato: 'FINANCIADO', montoTotal: 0, inicial: 0, saldo: 0, cantidadLetras: null }, { emitEvent: false });
+    this.clientesSeleccionados = []; this.lotesSeleccionados = []; this.separaciones = [];
+    this.filtroVendedor = ''; this.filtroPrograma = ''; this.filtroCliente = ''; this.filtroLote = '';
+    this.lotes = []; this.lotesFiltrados = []; this.showSeparacionList = false;
+    this.terminoBusquedaSeparacion = ''; this.saldoDisplay = '$ 0.00';
   }
 
-  get esContado(): boolean {
-    return this.contratoForm.get('tipoContrato')?.value === 'CONTADO';
+  abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }
+  abrirModalCliente() { this.registroModal.abrirModalCliente(); }
+  abrirModalPrograma() { this.registroModalPrograma.abrirModal(); }
+  abrirModalLote() { this.loteModalContrato.abrirModal(); }
+
+  recargarVendedores() { this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; }); }
+  RecargarClientes() { this.clienteService.listarClientes().subscribe(c => { this.clientes = c; }); }
+  RecargarProgramas() { this.programaService.listarProgramas().subscribe(p => { this.programas = p; this.programasFiltrados = [...p]; }); }
+  RecargarLotes() {
+    const id = this.contratoForm.get('idPrograma')?.value;
+    if (id) this.loteService.listarLotesPorPrograma(id).subscribe(l => { this.lotes = l || []; this.filtrarLotes(); });
   }
 }

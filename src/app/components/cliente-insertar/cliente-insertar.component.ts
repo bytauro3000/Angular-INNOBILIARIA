@@ -197,7 +197,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
           this.cerrarModal();
           this.clienteGuardado.emit();
         },
-        error: (err) => this.toastr.error(err.message)
+        error: (err) => this.toastr.error(err.error?.message || 'Error al guardar el cliente')
       });
     } else {
       this.clienteForm.markAllAsTouched();

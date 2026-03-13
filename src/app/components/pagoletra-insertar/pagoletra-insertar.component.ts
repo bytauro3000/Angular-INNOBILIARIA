@@ -47,7 +47,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   constructor(
     private pagoService: PagoLetraService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
@@ -144,7 +144,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
       },
       error: (err) => {
         console.error('Error al registrar pago:', err);
-        this.toastr.error('Error al registrar el pago', 'Error');
+        const mensaje = err.error?.message || 'Error al registrar el pago'; // ✅ Accede a la propiedad message
+        this.toastr.error(mensaje, 'Error');
         this.enviando = false;
       }
     });

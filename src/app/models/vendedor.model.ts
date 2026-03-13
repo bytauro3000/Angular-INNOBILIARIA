@@ -1,4 +1,5 @@
 import { Distrito } from "./distrito.model";
+import { Genero } from "../enums/Genero.enum";
 
 export interface Vendedor{
   idVendedor?: number;
@@ -9,7 +10,7 @@ export interface Vendedor{
   email?: string;
   direccion?: string;   // 👈 importante
   fechaNacimiento?: Date | null;
-  genero?: string;
+  genero?: Genero;
   comision?: number | null;
   distrito: Distrito;
 }

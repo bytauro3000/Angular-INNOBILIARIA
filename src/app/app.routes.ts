@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
+import { authGuard } from './auth/auth.guard';
 
 // Importacion de Mensajeria
 import { MensajeriaComponent } from './components/mensajeria/mensajeria.component';
@@ -54,6 +55,7 @@ export const routes: Routes = [
   {
     path: 'secretaria-menu',
     component: SecretariaMenuComponent,
+    canActivate: [authGuard], 
     children: [
       // 🟢 DASHBOARD (Esta es la ruta que hace que aparezca al inicio)
       { path: '', component: SecretariaDashboard },
@@ -101,10 +103,14 @@ export const routes: Routes = [
   { 
     path: 'soporte-menu', 
     component: SoporteMenuComponent,
+    canActivate: [authGuard], 
     children: [
       { path: '', component: MenuSoportePrincipal }
     ]
   },
   
-  { path: 'admin-menu', component: AdminMenuComponent },
+  { path: 'admin-menu',  
+    component: AdminMenuComponent,
+  canActivate: [authGuard],
+ },
 ];

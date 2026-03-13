@@ -18,7 +18,7 @@ export class LoginService {
     // 👇 Importante: aquí no mandamos el token en el login
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
-    });1
+    });
 
     return this.http.post<LoginResponse>(this.URL_AUTH, credentials, { headers });
   }

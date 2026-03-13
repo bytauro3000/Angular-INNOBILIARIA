@@ -16,11 +16,11 @@ $text-light: #334155;
 $border-color: #e9ecef;
 
 // ============================================
-// CONTENEDOR PRINCIPAL (más ancho)
+// CONTENEDOR PRINCIPAL
 // ============================================
 .contratos-container {
   padding: 24px;
-  max-width: 1800px;    // Aumentado de 1400px a 1800px
+  max-width: 1800px;
   margin: 0 auto;
   font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 
@@ -32,7 +32,6 @@ $border-color: #e9ecef;
     font-size: 1.3rem;
     margin-bottom: 24px;
     padding-left: 20px;
-    border-left: none;
 
     &::before {
       content: '';
@@ -57,21 +56,24 @@ $border-color: #e9ecef;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 
+  // ── 3 PESTAÑAS ──
   .selector-busqueda {
     display: flex;
-    background: #e2e8f0;
-    padding: 4px;
+    background: #f0f4f8;
+    border: 1px solid $border-color;
     border-radius: 10px;
-    gap: 4px;
+    padding: 3px;
+    gap: 3px;
+    flex-shrink: 0;
 
     .btn-toggle {
       border: none;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
       color: $text-light;
@@ -79,229 +81,162 @@ $border-color: #e9ecef;
       transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 6px;
-
-      i { font-size: 1rem; }
-
-      &.active {
-        background: white;
-        color: $navy;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
+      gap: 5px;
+      white-space: nowrap;
+      i { font-size: 0.9rem; }
+      &.active { background: white; color: $navy; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+      &:hover:not(.active) { background: rgba(255,255,255,0.6); color: $text-dark; }
     }
   }
 
   .filtros-operativos {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
     flex: 1;
   }
 
+  // ── SEARCH BOX (ID y CLIENTE) ──
   .search-box {
-    display: flex;
-    align-items: center;
+    flex: 1 1 auto;
+    min-width: 240px;
+    max-width: 380px;
     background: white;
     border: 1px solid $border-color;
     border-radius: 10px;
-    padding: 0 12px;
-    width: 300px;
-    max-width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    transition: box-shadow 0.2s;
+    &:focus-within { box-shadow: 0 0 0 3px rgba($navy, 0.12); border-color: $navy; }
 
-    .search-icon {
-      color: $text-light;
-      font-size: 1rem;
-      margin-right: 8px;
-    }
+    .search-icon { color: #94a3b8; font-size: 0.9rem; flex-shrink: 0; }
 
     input {
-      border: none;
-      padding: 10px 0;
-      width: 100%;
-      outline: none;
-      font-size: 0.95rem;
-      background: transparent;
-      color: $text-dark;
+      border: none; padding: 10px 0; flex: 1; outline: none;
+      font-size: 0.95rem; background: transparent; color: $text-dark; min-width: 0;
+      &::placeholder { color: #94a3b8; }
+    }
 
-      &::placeholder {
-        color: #94a3b8;
-      }
+    .spinner-search {
+      flex-shrink: 0;
+      color: $navy;
+      font-size: 0.85rem;
+    }
+
+    .btn-clear-inline {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: #e74c3c; font-size: 1rem; display: flex; align-items: center;
+      flex-shrink: 0; transition: color 0.2s, opacity 0.2s;
+      opacity: 0; pointer-events: none;
+      &.active { opacity: 1; pointer-events: auto; }
+      &:hover { color: color.adjust(#e74c3c, $lightness: -10%, $space: hsl); }
     }
   }
 
+  // ── BÚSQUEDA POR LOTE ──
   .busqueda-lote {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    flex: 1;
 
     .select-programa {
-      width: 220px;
-      padding: 8px 10px;
+      width: 280px; // más ancho que antes (era 220px)
+      padding: 9px 12px;
       border: 1px solid $border-color;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.9rem;
-      background-color: white;
-
-      &:focus {
-        outline: none;
-        border-color: $navy;
-        box-shadow: 0 0 0 2px rgba(2, 62, 138, 0.1);
-      }
+      background-color: #f9fafc;
+      color: $text-dark;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 15px;
+      &:focus { outline: none; border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, 0.12); background-color: white; }
     }
 
     .input-lote {
       width: 100px;
-      padding: 8px 10px;
+      padding: 9px 12px;
       border: 1px solid $border-color;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.9rem;
-
-      &:focus {
-        outline: none;
-        border-color: $navy;
-        box-shadow: 0 0 0 2px rgba(2, 62, 138, 0.1);
-      }
+      background-color: #f9fafc;
+      color: $text-dark;
+      &:focus { outline: none; border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, 0.12); background-color: white; }
+      &::placeholder { color: #94a3b8; }
     }
 
-    .btn-buscar-lote, .btn-limpiar {
-      height: 38px;
-      border: none;
-      border-radius: 8px;
-      padding: 0 12px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
-
-      i {
-        font-size: 1rem;
-      }
-    }
-
-    .btn-buscar-lote {
-      background: $navy;
-      color: white;
-
-      &:hover {
-        background: color.adjust($navy, $lightness: -10%, $space: hsl);
-      }
-    }
-
-    .btn-limpiar {
-      background: #e74c3c;
-      color: white;
-
-      &:hover {
-        background: color.adjust(#e74c3c, $lightness: -10%, $space: hsl);
-      }
+    // Botón limpiar dentro del lote — mismo estilo que search-box
+    .btn-clear-inline {
+      background: none; border: none; padding: 4px; cursor: pointer;
+      color: #e74c3c; font-size: 1.15rem; display: flex; align-items: center;
+      flex-shrink: 0; transition: color 0.2s, opacity 0.2s;
+      opacity: 0; pointer-events: none;
+      &.active { opacity: 1; pointer-events: auto; }
+      &:hover { color: color.adjust(#e74c3c, $lightness: -10%, $space: hsl); }
     }
   }
 
+  // ── BOTÓN NUEVO ──
   .btn-nuevo {
     background: linear-gradient(135deg, #27ae60, #219150);
-    color: white;
-    border: none;
-    height: 40px;
-    width: auto;
-    min-width: 110px;
-    padding: 0 18px 0 8px;
-    flex-shrink: 0;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    left: 4px !important;
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 18px rgba(39, 174, 96, 0.35);
-      filter: brightness(1.1);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
+    color: white; border: none; height: 40px; min-width: 110px;
+    padding: 0 18px 0 42px; flex-shrink: 0; border-radius: 50px;
+    font-weight: 600; font-size: 0.95rem; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    position: relative; transition: all 0.3s ease; text-decoration: none;
+    &:hover { transform: translateY(-3px); box-shadow: 0 10px 18px rgba(39,174,96,0.35); filter: brightness(1.1); }
+    &:active { transform: scale(0.95); }
     .icono-agregar {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
+      position: absolute !important; left: 5px !important; top: 50% !important;
+      margin-top: -16px; width: 32px; height: 32px; object-fit: contain;
       filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white) drop-shadow(-0.5px 0px 0px white);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease; transform-origin: center center;
     }
-
-    &:hover .icono-agregar {
-      transform: rotate(90deg);
-    }
+    &:hover .icono-agregar { transform: rotate(90deg); }
+    span { line-height: 1; }
   }
 }
 
 // ============================================
-// TABLA (con anchos mínimos para mejor distribución)
+// TABLA
 // ============================================
 .tabla-wrapper {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  overflow-x: auto;   // solo scroll horizontal, sin overflow:visible que causaba el scrollbar lateral
   margin-top: 20px;
 }
 
 .table-custom {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  overflow-x: auto;
 
-  thead tr {
-    background: linear-gradient(135deg, $navy, #0353a4);
-  }
+  thead tr { background: linear-gradient(135deg, $navy, #0353a4); }
 
   th {
-    color: white;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 16px 12px;
-    white-space: nowrap;
-
+    color: white; font-weight: 600; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    padding: 12px 8px; white-space: nowrap;
     &.text-center { text-align: center; }
     &.text-end { text-align: right; }
   }
 
   td {
-    padding: 10px 12px;
-    color: $text-dark;
-    border-bottom: 1px solid $border-color;
-    vertical-align: middle;
-
+    padding: 8px 8px; color: $text-dark;
+    border-bottom: 1px solid $border-color; vertical-align: middle;
     &.text-center { text-align: center; }
     &.text-end { text-align: right; }
     &.fw-bold { font-weight: 600; }
-  }
-
-  // Anchos mínimos para cada columna (opcional, mejora la distribución)
-  th, td {
-    &:nth-child(1) { min-width: 70px; }   // ID
-    &:nth-child(2) { min-width: 200px; }  // CLIENTE(S)
-    &:nth-child(3) { min-width: 120px; }  // DOCUMENTO
-    &:nth-child(4) { min-width: 100px; }  // MZ Y LT
-    &:nth-child(5) { min-width: 90px; }   // FECHA C.
-    &:nth-child(6) { min-width: 90px; }   // TIPO C.
-    &:nth-child(7) { min-width: 100px; }  // TOTAL
-    &:nth-child(8) { min-width: 90px; }   // INICIAL
-    &:nth-child(9) { min-width: 90px; }   // SALDO
-    &:nth-child(10) { min-width: 70px; }  // LETRAS
-    &:nth-child(11) { min-width: 160px; } // ACCIONES
   }
 
   tbody tr {
@@ -311,74 +246,135 @@ $border-color: #e9ecef;
   }
 
   .id-service-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-
-    .id-number {
-      font-weight: 600;
-      color: $navy;
-    }
-
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    .id-number { font-weight: 600; color: $navy; }
     .service-indicators {
-      display: flex;
-      gap: 6px;
-      font-size: 0.9rem;
+      display: flex; gap: 6px; font-size: 0.9rem;
       i.bi-lightning-charge-fill { color: $orange; }
       i.bi-droplet-fill { color: $light-blue; }
     }
   }
 
   .multi-item-container {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    div {
-      padding: 2px 0;
-      &:not(:last-child) { border-bottom: 1px dashed #ddd; }
-    }
+    display: flex; flex-direction: column; gap: 4px;
+    div { padding: 2px 0; white-space: nowrap; &:not(:last-child) { border-bottom: 1px dashed #ddd; } }
   }
 
   .acciones-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
+    display: flex; justify-content: center; align-items: center;
+    gap: 6px; flex-wrap: nowrap; white-space: nowrap;
   }
 
   .btn-action {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    background: transparent;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 1rem;
-    flex-shrink: 0;
-
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid transparent;
+    background: transparent; display: inline-flex; align-items: center;
+    justify-content: center; cursor: pointer; transition: all 0.2s;
+    font-size: 1rem; flex-shrink: 0; text-decoration: none;
     i { font-size: 1.1rem; }
-
-    &.btn-print { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
-    &.btn-edit { color: $navy; border-color: $navy; &:hover { background: $navy; color: white; } }
-    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
-    &.btn-inscripcion { color: $light-blue; border-color: $light-blue; &:hover:not(:disabled) { background: $light-blue; color: white; } }
-    &.btn-letras { color: $green; border-color: $green; &:hover { background: $green; color: white; } }
+    &.btn-print    { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
+    &.btn-edit     { color: $navy;   border-color: $navy;   &:hover { background: $navy;   color: white; } }
+    &.btn-delete   { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+    &.btn-letras   { color: $green;  border-color: $green;  &:hover { background: $green;  color: white; } }
+    &.btn-inscripcion {
+      color: $light-blue; border-color: $light-blue;
+      &:hover:not(:disabled) { background: $light-blue; color: white; }
+    }
     &.btn-success-active {
-      color: $green !important;
-      border-color: $green !important;
-      background: #e8f5e9 !important;
-      opacity: 0.8;
-      cursor: not-allowed;
+      color: $green !important; border-color: $green !important;
+      background: #e8f5e9 !important; opacity: 0.8; cursor: not-allowed;
     }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
+}
+
+// ============================================
+// BADGES DE ESTADO
+// ============================================
+.estado-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+}
+
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  i { font-size: 0.8rem; }
+
+  &.badge-activo      { background: #d1fae5; color: #065f46; }
+  &.badge-mora        { background: #fef3c7; color: #92400e; }
+  &.badge-carta       { background: #fee2e2; color: #991b1b; }
+  &.badge-resolucion  { background: #fce7f3; color: #9d174d; }
+  &.badge-resuelto    { background: #f3f4f6; color: #374151; }
+  &.badge-cancelado   { background: #dbeafe; color: #1e40af; }
+  &.badge-renuncia    { background: #fdf4ff; color: #7e22ce; }
+  &.badge-transferido { background: #fff7ed; color: #c2410c; }
+}
+
+// ============================================
+// DROPDOWN DE ESTADO
+// ============================================
+.estado-dropdown {
+  position: relative;
+
+  .btn-estado-menu {
+    background: none;
+    border: 1px solid $border-color;
+    padding: 3px 7px;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    &:hover { color: $navy; background: #f0f4f8; border-color: $navy; }
+    i { transition: transform 0.2s; }
+  }
+
+  &.open .btn-estado-menu i { transform: rotate(180deg); }
+
+  .estado-menu {
+    position: fixed;    // sale del flujo normal — ya no queda atrapado por overflow
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 99999;     // por encima de todo
+    min-width: 210px;
+    overflow: hidden;
+    padding: 4px 0;
+    animation: fadeInDown 0.15s ease;
+
+    .estado-menu-item {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 0.85rem;
+      color: $text-dark;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+      &:hover { background: #f0f4f8; color: $navy; font-weight: 500; }
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 // ============================================
@@ -393,22 +389,61 @@ $border-color: #e9ecef;
   flex-wrap: wrap;
 
   .btn-paginacion {
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 30px;
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: $text-dark;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 40px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
+    background: white; border: 1px solid $border-color; border-radius: 30px;
+    padding: 8px 16px; font-size: 0.9rem; font-weight: 500; color: $text-dark;
+    cursor: pointer; transition: all 0.2s; min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     &:hover:not(:disabled) { background: $navy; color: white; border-color: $navy; }
     &:disabled { opacity: 0.5; cursor: not-allowed; }
     &.active { background: $navy; color: white; border-color: $navy; }
   }
+}
+
+// ============================================
+// LOADING DENTRO DEL TBODY
+// ============================================
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40%           { transform: scale(1); opacity: 1; }
+}
+
+.loading-row td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.loading-dots-wrapper-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2.5rem 1rem;
+  background: white;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 10px;
+
+  span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #0353a4;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+    &:nth-child(3) { animation-delay: 0s; }
+  }
+}
+
+.loading-text {
+  color: #64748b;
+  font-size: 0.82rem;
+  margin: 0;
+  font-style: italic;
 }
 
 // ============================================
@@ -421,6 +456,7 @@ $border-color: #e9ecef;
     td { padding: 8px 8px; }
     .btn-action { width: 28px; height: 28px; font-size: 0.9rem; i { font-size: 1rem; } }
   }
+  .estado-badge { font-size: 0.7rem; padding: 3px 8px; }
 }
 
 // ============================================
@@ -430,44 +466,27 @@ $border-color: #e9ecef;
   .table-custom thead { display: none; }
 
   .table-custom tbody tr {
-    display: block;
-    margin-bottom: 16px;
-    border: 1px solid $border-color;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgb(255, 255, 255);
+    display: block; margin-bottom: 16px;
+    border: 1px solid $border-color; border-radius: 12px;
+    overflow: hidden; background: white;
   }
 
   .table-custom tbody td {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid #f0f0f0;
-    text-align: right;
-
+    display: grid; grid-template-columns: 130px 1fr;
+    align-items: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid #f0f0f0; text-align: right;
     &::before {
-      content: attr(data-label);
-      font-weight: 600;
-      color: #022654;
-      text-align: left;
-      justify-self: start;
+      content: attr(data-label); font-weight: 600; color: #022654;
+      text-align: left; justify-self: start;
     }
-
     &:first-child {
-      background: #f8f8fa;
-      font-weight: bold;
+      background: #f8f8fa; font-weight: bold;
       border-bottom: 2px solid $green;
-      display: flex;
-      justify-content: center;
-      text-align: center;
+      display: flex; justify-content: center; text-align: center;
       &::before { display: none; }
     }
-
     &.acciones-cell {
-      display: flex;
-      text-align: initial;
+      display: flex; text-align: initial;
       &::before { display: none; }
       .acciones-container { justify-content: flex-end !important; width: 100%; }
     }
@@ -478,50 +497,67 @@ $border-color: #e9ecef;
   .multi-item-container { width: 100%; }
   .multi-item-container div { width: 100%; text-align: right; }
 
-  .filtros-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+  // el estado-menu usa position:fixed — la posición la maneja ngStyle en el TS
+  .estado-cell { justify-content: flex-end; }
 
+  .filtros-header {
+    flex-direction: column; align-items: center; gap: 12px;
     .selector-busqueda { width: 100%; justify-content: center; }
     .filtros-operativos { width: 100%; flex-direction: column; }
-
-    .search-box { width: 100%; }
-
+    .search-box { width: 100%; max-width: 100%; }
     .busqueda-lote {
-      width: 100%;
-      flex-direction: column;
-      align-items: stretch;
-      .select-programa, .input-lote, .btn-buscar-lote, .btn-limpiar { width: 100%; }
-      .btn-buscar-lote, .btn-limpiar { justify-content: center; }
+      width: 100%; flex-direction: column; align-items: stretch;
+      .select-programa, .input-lote { width: 100%; }
+      .btn-clear-inline { align-self: flex-end; }
     }
-
     .btn-nuevo {
-      width: 100%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      height: 45px;
-
+      width: 100%; height: 45px;
+      display: flex !important; align-items: center !important; justify-content: center !important;
+      position: relative; padding: 0 20px;
       .icono-agregar {
-        position: absolute;
-        left: 5px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 35px;
-        height: 35px;
-        margin-left: 0;
-        filter: brightness(0) invert(1);
-        pointer-events: none;
+        position: absolute !important; left: 8px !important; top: 50% !important;
+        margin-top: -16px; width: 32px; height: 32px;
+        filter: brightness(0) invert(1); pointer-events: none;
       }
-
-      span, text { margin: 0; padding: 0; }
+      &:hover .icono-agregar { transform: rotate(90deg) !important; }
+      span { margin: 0; padding: 0; }
     }
   }
 
-  .paginacion-controles {
-    .btn-paginacion { padding: 6px 12px; font-size: 0.8rem; }
+  .paginacion-controles .btn-paginacion { padding: 6px 12px; font-size: 0.8rem; }
+}
+
+// ============================================
+// FILA VACÍA — sin resultados
+// ============================================
+.empty-row td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  background: white;
+
+  i {
+    font-size: 2.2rem;
+    color: #cbd5e1;
+  }
+
+  .empty-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .empty-subtitle {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin: 0;
   }
 }

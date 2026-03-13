@@ -45,7 +45,7 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
   constructor(
     private pagoService: PagoLetraService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.datosComunes.fechaOperacion = new Date().toISOString().split('T')[0];
@@ -167,7 +167,8 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       },
       error: (err) => {
         console.error('Error al registrar pagos múltiples:', err);
-        this.toastr.error('Error al registrar los pagos', 'Error');
+        const mensaje = err.error?.message || 'Error al registrar los pagos';
+        this.toastr.error(mensaje, 'Error');
         this.enviando = false;
       }
     });

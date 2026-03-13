@@ -6,6 +6,7 @@ import { UsuarioListadoDTO} from '../../dto/UsuarioListadoDTO';
 import { UsuarioRegistroDTO } from '../../dto/UsuarioRegistroDTO';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LogoutService } from '../../auth/logout.service';
 
 @Component({
   selector: 'app-admin-menu',
@@ -33,7 +34,8 @@ export class AdminMenuComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
-    private router: Router // <-- Inyectado
+    private router: Router,
+    private logoutService: LogoutService
   ) {}
 
   ngOnInit(): void {
@@ -86,9 +88,8 @@ cargarUsuarios(): void {
 
   // --- CERRAR SESIÓN ---
   cerrarSesion(): void {
-    localStorage.removeItem('token'); // O session storage, donde guardes tu JWT
-    this.router.navigate(['/login']); // Redirigir a tu ruta pública
-  }
+    this.logoutService.logout();
+}
 
   // --- NOTIFICACIONES MEJORADAS ---
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error'): void {

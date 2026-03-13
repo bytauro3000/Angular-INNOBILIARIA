@@ -45,7 +45,7 @@ export class PagoletraListarComponent implements OnInit {
   cargandoLetras: boolean = false;
 
   mostrarListaPagos: boolean = false;
-idContratoParaLista: number | null = null;
+  idContratoParaLista: number | null = null;
 
   letraSeleccionada: LetraCambio | null = null;
   tipoLista: 'pendientes' | 'pagadas' = 'pendientes';
@@ -180,7 +180,6 @@ idContratoParaLista: number | null = null;
     return this.seleccionadasMap.has(idLetra);
   }
 
-  // NUEVO: Verifica si todas las letras de la página actual están seleccionadas
   isTodasSeleccionadas(): boolean {
     return this.paginatedLetras.length > 0 && this.paginatedLetras.every(l => this.isSeleccionada(l.idLetra));
   }
@@ -199,23 +198,23 @@ idContratoParaLista: number | null = null;
   }
 
   abrirListaPagos(): void {
-  if (this.contratoEncontrado) {
-    this.idContratoParaLista = this.contratoEncontrado.idContrato;
-    this.mostrarListaPagos = true;
+    if (this.contratoEncontrado) {
+      this.idContratoParaLista = this.contratoEncontrado.idContrato;
+      this.mostrarListaPagos = true;
+    }
   }
-}
 
-cerrarListaPagos(): void {
-  this.mostrarListaPagos = false;
-  this.idContratoParaLista = null;
-}
-
-onPagoEliminado(): void {
-  // Recargar letras pendientes/pagadas
-  if (this.contratoEncontrado) {
-    this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+  cerrarListaPagos(): void {
+    this.mostrarListaPagos = false;
+    this.idContratoParaLista = null;
   }
-}
+
+  onPagoEliminado(): void {
+    if (this.contratoEncontrado) {
+      this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.refrescarContrato(); // actualiza el estado MORA/ACTIVO en pantalla
+    }
+  }
 
   cerrarModalPagoMultiple(): void {
     this.modoPagoMultiple = false;
@@ -227,10 +226,10 @@ onPagoEliminado(): void {
     this.seleccionadasMap.clear();
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.refrescarContrato();
     }
     this.toastr.success('Pago múltiple registrado correctamente', 'Éxito');
   }
-  // ========================================
 
   abrirModalPago(letra: LetraCambio): void {
     this.letraSeleccionada = letra;
@@ -243,15 +242,30 @@ onPagoEliminado(): void {
   onPagoRegistrado(): void {
     this.cerrarModalPago();
     if (this.contratoEncontrado) {
+      // Recargar letras Y refrescar estado del contrato (puede haber salido de MORA)
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.refrescarContrato();
     }
   }
 
-  isLetraVencida(fechaVencimiento: string): boolean {
-    const hoy = new Date();
-    const fechaVen = new Date(fechaVencimiento);
-    return hoy > fechaVen;
+  /** Vuelve a buscar el contrato para obtener el estado actualizado desde el backend */
+  refrescarContrato(): void {
+    if (!this.programaSeleccionado || !this.manzanaBusqueda.trim() || !this.numeroLoteBusqueda.trim()) return;
+    this.contratoService.buscarPorProgramaManzanaLote(
+      this.programaSeleccionado,
+      this.manzanaBusqueda.trim(),
+      this.numeroLoteBusqueda.trim()
+    ).subscribe({
+      next: (contrato) => {
+        if (contrato) {
+          this.contratoEncontrado = contrato;
+        }
+      },
+      error: (err) => console.error('Error al refrescar contrato:', err)
+    });
   }
+
+  // Eliminamos el método isLetraVencida
 
   cambiarTipoLista(tipo: 'pendientes' | 'pagadas'): void {
     if (this.tipoLista !== tipo) {
@@ -261,7 +275,6 @@ onPagoEliminado(): void {
       this.seleccionadasMap.clear();
     }
   }
-
 
   get tituloLista(): string {
     return this.tipoLista === 'pendientes' ? 'Letras Pendientes de Pago' : 'Letras Pagadas';

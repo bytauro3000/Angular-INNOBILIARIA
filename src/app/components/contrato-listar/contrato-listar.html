@@ -1,8 +1,10 @@
-<div class="contratos-container">
+<div class="contratos-container" (click)="cerrarDropdowns()">
   <h2>GESTIÓN DE CONTRATOS</h2>
 
+  <!-- ══════════════════ BARRA DE BÚSQUEDA ══════════════════ -->
   <div class="filtros-header">
-    
+
+    <!-- Pestañas de modo -->
     <div class="selector-busqueda">
       <button class="btn-toggle" [class.active]="tipoBusqueda === 'ID'" (click)="cambiarModoBusqueda('ID')">
         <i class="bi bi-hash"></i> Por ID
@@ -10,33 +12,57 @@
       <button class="btn-toggle" [class.active]="tipoBusqueda === 'LOTE'" (click)="cambiarModoBusqueda('LOTE')">
         <i class="bi bi-geo-alt"></i> Por Lote
       </button>
+      <button class="btn-toggle" [class.active]="tipoBusqueda === 'CLIENTE'" (click)="cambiarModoBusqueda('CLIENTE')">
+        <i class="bi bi-person"></i> Por Cliente
+      </button>
     </div>
 
+    <!-- Campos de búsqueda según pestaña activa -->
     <div class="filtros-operativos">
+
+      <!-- Búsqueda por ID -->
       <div class="search-box" *ngIf="tipoBusqueda === 'ID'">
-        <span class="search-icon">🔍</span>
-        <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarContratos()" placeholder="Buscar por ID Contrato"
-          class="form-control" />
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" [(ngModel)]="terminoBusqueda" (input)="filtrarContratos()"
+          placeholder="Buscar por ID Contrato" />
+        <button class="btn-clear-inline" (click)="limpiarBusqueda()" title="Limpiar"
+          [class.active]="terminoBusqueda">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
       </div>
 
+      <!-- Búsqueda por Lote -->
       <div class="busqueda-lote" *ngIf="tipoBusqueda === 'LOTE'">
-        <select [(ngModel)]="programaSeleccionado" class="form-control select-programa">
+        <select [(ngModel)]="programaSeleccionado" (change)="filtrarPorLote()"
+          class="form-control select-programa">
           <option [ngValue]="null" disabled selected>-- Seleccione Programa --</option>
-          <option *ngFor="let prog of programas" [ngValue]="prog.idPrograma">
-            {{ prog.nombrePrograma }}
-          </option>
+          <option *ngFor="let prog of programas" [ngValue]="prog.idPrograma">{{ prog.nombrePrograma }}</option>
         </select>
-
-        <input type="text" [(ngModel)]="manzanaBusqueda" placeholder="Manzana" class="form-control input-lote" />
-        <input type="text" [(ngModel)]="numeroLoteBusqueda" placeholder="N° Lote" class="form-control input-lote" />
-        
-        <button (click)="buscarPorLote()" class="btn-buscar-lote" title="Buscar por lote">
-          <i class="bi bi-search"></i> Buscar
-        </button>
-        <button (click)="limpiarBusqueda()" class="btn-limpiar" title="Limpiar búsqueda">
-          <i class="bi bi-x-circle"></i>
+        <input type="text" [(ngModel)]="manzanaBusqueda" (input)="filtrarPorLote()"
+          placeholder="Manzana" class="form-control input-lote" />
+        <input type="text" [(ngModel)]="numeroLoteBusqueda" (input)="formatearNumeroLote()"
+          placeholder="N° Lote" class="form-control input-lote" maxlength="2" />
+        <button class="btn-clear-inline" (click)="limpiarBusqueda()" title="Limpiar filtros"
+          [class.active]="programaSeleccionado || manzanaBusqueda || numeroLoteBusqueda">
+          <i class="bi bi-x-circle-fill"></i>
         </button>
       </div>
+
+      <!-- Búsqueda por Cliente -->
+      <div class="search-box" *ngIf="tipoBusqueda === 'CLIENTE'">
+        <i class="bi bi-person-circle search-icon"></i>
+        <input type="text" [(ngModel)]="nombreClienteBusqueda"
+          (input)="filtrarPorCliente()"
+          placeholder="Nombre y apellidos del cliente..." />
+        <span class="spinner-search" *ngIf="buscandoCliente">
+          <span class="spinner-border spinner-border-sm"></span>
+        </span>
+        <button class="btn-clear-inline" (click)="limpiarBusqueda()" title="Limpiar"
+          [class.active]="nombreClienteBusqueda">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+
     </div>
 
     <button [routerLink]="['/secretaria-menu/contratos/registrar']" class="btn-nuevo">
@@ -46,26 +72,42 @@
     </button>
   </div>
 
+  <!-- ══════════════════ TABLA ══════════════════ -->
   <div class="tabla-wrapper">
     <table class="table-custom">
       <thead>
         <tr>
-          <th class="text-center" style="width: 60px;">ID</th>
+          <th class="text-center" style="width:60px;">ID</th>
           <th>CLIENTE(S)</th>
           <th class="text-center">DOCUMENTO</th>
           <th class="text-center">MZ Y LT</th>
           <th class="text-center">FECHA C.</th>
           <th class="text-center">TIPO C.</th>
+          <th class="text-center">ESTADO</th>
           <th class="text-center">TOTAL</th>
           <th class="text-end">INICIAL</th>
           <th class="text-end">SALDO</th>
-          <th class="text-center" style="width: 70px;">LETRAS</th>
-          <th class="text-center" style="width: 160px;">ACCIONES</th>
+          <th class="text-center" style="width:70px;">LETRAS</th>
+          <th class="text-center" style="width:180px;">ACCIONES</th>
         </tr>
       </thead>
       <tbody>
+
+        <!-- LOADING ROW -->
+        <tr *ngIf="isCargando" class="loading-row">
+          <td colspan="12">
+            <div class="loading-dots-wrapper-inline">
+              <div class="loading-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <p class="loading-text">Cargando contratos...</p>
+            </div>
+          </td>
+        </tr>
+
         <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
 
+          <!-- ID + servicios -->
           <td class="text-center" data-label="ID">
             <div class="id-service-wrapper">
               <span class="id-number">{{ contrato.idContrato }}</span>
@@ -76,54 +118,67 @@
             </div>
           </td>
 
+          <!-- Clientes -->
           <td data-label="Cliente(s)">
             <div class="multi-item-container">
-              <div *ngFor="let cliente of contrato.clientes">
-                {{ cliente.nombre }} {{ cliente.apellidos }}
-              </div>
+              <div *ngFor="let cliente of contrato.clientes">{{ cliente.nombre }} {{ cliente.apellidos }}</div>
             </div>
           </td>
 
+          <!-- Documentos -->
           <td class="text-center" data-label="Documento">
             <div class="multi-item-container">
-              <div *ngFor="let cliente of contrato.clientes">
-                {{ cliente.numDoc }}
-              </div>
+              <div *ngFor="let cliente of contrato.clientes">{{ cliente.numDoc }}</div>
             </div>
           </td>
 
+          <!-- Lotes -->
           <td class="text-center" data-label="Mz y Lt">
             <div class="multi-item-container">
-              <div *ngFor="let lote of contrato.lotes">
-                Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
+              <div *ngFor="let lote of contrato.lotes">Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}</div>
+            </div>
+          </td>
+
+          <!-- Fecha -->
+          <td class="text-center" data-label="Fecha C.">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+
+          <!-- Tipo -->
+          <td class="text-center" data-label="Tipo C.">{{ contrato.tipoContrato }}</td>
+
+          <!-- Estado con badge + dropdown -->
+          <td class="text-center" data-label="Estado">
+            <div class="estado-cell">
+              <span class="estado-badge" [ngClass]="getEstadoConfig(contrato.estadoContrato).cssClass">
+                <i class="bi" [ngClass]="getEstadoConfig(contrato.estadoContrato).icon"></i>
+                {{ getEstadoConfig(contrato.estadoContrato).label }}
+              </span>
+              <div class="estado-dropdown"
+                   *ngIf="getTransicionesDisponibles(contrato).length > 0"
+                   [class.open]="dropdownEstadoAbierto === contrato.idContrato">
+                <button class="btn-estado-menu" title="Cambiar estado"
+                        (click)="toggleDropdownEstado(contrato.idContrato, $event)">
+                  <i class="bi bi-chevron-down"></i>
+                </button>
+                <div class="estado-menu"
+                     *ngIf="dropdownEstadoAbierto === contrato.idContrato"
+                     [ngStyle]="{ top: dropdownPos.top + 'px', left: dropdownPos.left + 'px' }">
+                  <button *ngFor="let t of getTransicionesDisponibles(contrato)"
+                    class="estado-menu-item"
+                    (click)="ejecutarTransicion(contrato, t.estado)">
+                    {{ t.label }}
+                  </button>
+                </div>
               </div>
             </div>
           </td>
 
-          <td class="text-center" data-label="Fecha C.">
-            {{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}
-          </td>
+          <!-- Montos -->
+          <td class="text-end fw-bold" data-label="Total">{{ contrato.montoTotal | currency: 'USD' }}</td>
+          <td class="text-end" data-label="Inicial">{{ contrato.inicial | currency: 'USD' }}</td>
+          <td class="text-end" data-label="Saldo">{{ contrato.saldo | currency: 'USD' }}</td>
+          <td class="text-center" data-label="Letras">{{ contrato.cantidadLetras }}</td>
 
-          <td class="text-center" data-label="Tipo C.">
-            {{ contrato.tipoContrato }}
-          </td>
-
-          <td class="text-end fw-bold" data-label="Total">
-            {{ contrato.montoTotal | currency: 'USD' }}
-          </td>
-
-          <td class="text-end" data-label="Inicial">
-            {{ contrato.inicial | currency: 'USD' }}
-          </td>
-
-          <td class="text-end" data-label="Saldo">
-            {{ contrato.saldo | currency: 'USD' }}
-          </td>
-
-          <td class="text-center" data-label="Letras">
-            {{ contrato.cantidadLetras }}
-          </td>
-
+          <!-- Acciones -->
           <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
 
@@ -139,45 +194,49 @@
 
               <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action btn-inscripcion"
                 [ngClass]="{'btn-success-active': contrato.tieneLuz && contrato.tieneAgua}"
-                [disabled]="contrato.tieneLuz && contrato.tieneAgua" [title]="(contrato.tieneLuz && contrato.tieneAgua) 
-        ? 'Servicios completos' 
-        : 'Inscribir servicio'">
+                [disabled]="contrato.tieneLuz && contrato.tieneAgua"
+                [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'">
                 <i class="bi" [ngClass]="{
-          'bi-lightning-charge': !contrato.tieneLuz,
-          'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
-          'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
-        }"></i>
+                  'bi-lightning-charge': !contrato.tieneLuz,
+                  'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
+                  'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
+                }"></i>
               </button>
 
               <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir contrato">
-                <i class="bi bi-printer"></i>
+                <i class="bi bi-file-earmark-richtext"></i>
               </button>
 
               <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
-                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" class="btn-action btn-letras"
-                title="Generar letras">
-                <i class="bi bi-file-earmark-plus"></i>
+                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
+                class="btn-action btn-letras" title="Generar letras">
+                <i class="bi bi-receipt-cutoff"></i>
               </a>
 
             </div>
           </td>
 
         </tr>
+        <!-- FILA VACÍA: sin resultados -->
+        <tr *ngIf="!isCargando && contratosFiltrados.length === 0" class="empty-row">
+          <td colspan="12">
+            <div class="empty-state">
+              <i class="bi bi-search"></i>
+              <p class="empty-title">Sin resultados</p>
+              <p class="empty-subtitle">No se encontraron contratos para tu búsqueda</p>
+            </div>
+          </td>
+        </tr>
+
       </tbody>
     </table>
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
-      Anterior
-    </button>
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">Anterior</button>
     <button *ngFor="let page of getPagesArray()" (click)="goToPage(page)" class="btn-paginacion"
-      [class.active]="currentPage === page">
-      {{ page }}
-    </button>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
-      Siguiente
-    </button>
+      [class.active]="currentPage === page">{{ page }}</button>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">Siguiente</button>
   </div>
 </div>
 

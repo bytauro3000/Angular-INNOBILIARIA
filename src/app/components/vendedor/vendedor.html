@@ -1,71 +1,122 @@
-<div class="vendedor-container">
-  <h2>Listado de Vendedores</h2>
+<div class="vendedores-container">
+  <h2>GESTIÓN DE VENDEDORES</h2>
 
-  <div class="filtros">
-    <button class="btn btn-success" (click)="abrirModal()">
-      <i class="bi bi-plus-lg"></i> Agregar Vendedor
-    </button>
-    <button class="btn btn-outline-primary" (click)="descargarExcel()">
-      📥 Exportar Excel
-    </button>
-    <button class="btn btn-outline-danger" (click)="exportarPDF()">
-      📄 Exportar PDF
-    </button>
+  <!-- FILTROS -->
+  <div class="filtros-header">
+    <!-- Select de filtro (sin implementación backend aún) -->
+    <div class="filtro-select-wrapper">
+      <select [(ngModel)]="tipoFiltro" class="filtro-select">
+        <option value="nombres">Nombres y Apellidos</option>
+        <option value="dni">DNI</option>
+      </select>
+    </div>
+
+    <!-- Input de búsqueda -->
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        (input)="filtrarVendedores()"
+        placeholder="Ingresa el término de búsqueda..."
+        class="form-control"
+      />
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="acciones-header">
+      <button class="btn-exportar btn-excel" (click)="descargarExcel()" title="Exportar Excel">
+        <i class="bi bi-file-earmark-excel"></i>
+        <span>Excel</span>
+      </button>
+      <button class="btn-exportar btn-pdf" (click)="exportarPDF()" title="Exportar PDF">
+        <i class="bi bi-file-earmark-pdf"></i>
+        <span>PDF</span>
+      </button>
+      <button (click)="abrirModal()" class="btn-nuevo">
+        <img
+          src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772509954/botonagregar_zkxrvd.png"
+          alt="Agregar"
+          class="icono-agregar"
+        />
+        <span>Agregar</span>
+      </button>
+    </div>
   </div>
 
-  <div class="tabla-vendedor">
-    <table>
+  <!-- TABLA -->
+  <div class="tabla-wrapper">
+    <table class="table-custom">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Apellidos</th>
-          <th>DNI</th>
-          <th>Celular</th>
-          <th>Email</th>
-          <th>Dirección</th>
-          <th>Fecha Nac.</th>
-          <th>Género</th>
-          <th>Comisión</th>
-          <th>Distrito</th>
-          <th>Acciones</th>
+          <th class="text-center" style="width: 55px;">ID</th>
+          <th>NOMBRE</th>
+          <th>APELLIDOS</th>
+          <th class="text-center">DNI</th>
+          <th class="text-center">CELULAR</th>
+          <th class="text-center">EMAIL</th>
+          <th class="text-center">GÉNERO</th>
+          <th class="text-center">COMISIÓN</th>
+          <th class="text-center">DISTRITO</th>
+          <th class="text-center" style="width: 120px;">ACCIONES</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let v of vendedores">
-          <td>{{ v.idVendedor }}</td>
-          <td>{{ v.nombre }}</td>
-          <td>{{ v.apellidos }}</td>
-          <td>{{ v.dni }}</td>
-          <td>{{ v.celular || '—' }}</td>
-          <td>{{ v.email || '—' }}</td>
-          <td>{{ v.direccion || '—' }}</td>
-          <td>
-            {{ v.fechaNacimiento ? (v.fechaNacimiento | date: 'yyyy-MM-dd') : '—' }}
+        <tr *ngFor="let v of paginatedVendedores">
+          <td class="text-center" data-label="ID">{{ v.idVendedor }}</td>
+          <td data-label="Nombre">{{ v.nombre }}</td>
+          <td data-label="Apellidos">{{ v.apellidos }}</td>
+          <td class="text-center" data-label="DNI">{{ v.dni }}</td>
+          <td class="text-center" data-label="Celular">{{ v.celular || '—' }}</td>
+          <td class="text-center" data-label="Email">{{ v.email || '—' }}</td>
+          <td class="text-center" data-label="Género">
+            <span class="badge-genero">{{ v.genero || '—' }}</span>
           </td>
-          <td><span class="estado-activo">{{ v.genero || '—' }}</span></td>
-          <td>
+          <td class="text-center" data-label="Comisión">
             {{ v.comision != null ? (v.comision | number:'1.2-2') + '%' : '—' }}
           </td>
-          <td>{{ v.distrito.nombre || '—' }}</td>
-          <td class="acciones-cell">
-            <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(v)" title="Editar">
+          <td class="text-center" data-label="Distrito">{{ v.distrito.nombre || '—' }}</td>
+          <td class="acciones-cell" data-label="Acciones">
+            <div class="acciones-container">
+              <button class="btn-action btn-edit" (click)="abrirModal(v)" title="Editar vendedor">
                 <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminarVendedor(v.idVendedor!)" title="Eliminar">
+              </button>
+              <button class="btn-action btn-delete" (click)="eliminarVendedor(v.idVendedor!)" title="Eliminar vendedor">
                 <i class="bi bi-trash"></i>
-            </button>
+              </button>
+            </div>
           </td>
         </tr>
-
-        <tr *ngIf="vendedores?.length === 0">
-          <td colspan="12" class="no-results">No hay vendedores registrados.</td>
+        <tr *ngIf="paginatedVendedores.length === 0">
+          <td colspan="10" class="no-data">No se encontraron vendedores que coincidan con la búsqueda.</td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <!-- PAGINACIÓN -->
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
+      Anterior
+    </button>
+    <ng-container *ngFor="let page of getPagesArray()">
+      <button
+        *ngIf="page !== '...'"
+        (click)="goToPage($any(page))"
+        class="btn-paginacion"
+        [class.active]="page === currentPage"
+      >
+        {{ page }}
+      </button>
+      <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+    </ng-container>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
+      Siguiente
+    </button>
+  </div>
 </div>
 
-<app-vendedor-insertar 
-  #registroModal 
-  (vendedorGuardado)="cargarVendedores()"> </app-vendedor-insertar>
+<!-- Modal -->
+<app-vendedor-insertar
+  #registroModal
+  (vendedorGuardado)="cargarVendedores()">
+</app-vendedor-insertar>

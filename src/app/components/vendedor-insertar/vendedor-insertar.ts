@@ -7,6 +7,7 @@ import { Distrito } from '../../models/distrito.model';
 import { VendedorService } from '../../services/vendedor.service';
 import { DistritoService } from '../../services/distrito.service';
 import { ToastrService } from 'ngx-toastr';
+import { Genero } from '../../enums/Genero.enum';
 
 // Librería del teléfono
 import { NgxIntlTelInputModule, CountryISO, SearchCountryField } from 'ngx-intl-tel-input';
@@ -64,6 +65,8 @@ export class VendedorInsertar implements OnInit, AfterViewInit {
     private distritoService: DistritoService,
     private toastr: ToastrService
   ) {}
+
+  Generos = Object.values(Genero);
 
   ngOnInit(): void {
     this.cargarDistritos();

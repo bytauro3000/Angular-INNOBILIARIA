@@ -244,7 +244,7 @@ private verificarSiLoteExiste(): void {
         Swal.close(); // Cerramos el "Procesando..."
 
         // Capturamos el mensaje: "El lote X de la manzana Y ya existe..." enviado por el Backend
-        const errorMsg = err.error || 'No se pudo completar la operación';
+        const errorMsg = err.error?.message || 'No se pudo completar la operación'
 
         this.toastr.warning(errorMsg, 'Registro Duplicado', {
           timeOut: 4000,       // Dura 4 segundos

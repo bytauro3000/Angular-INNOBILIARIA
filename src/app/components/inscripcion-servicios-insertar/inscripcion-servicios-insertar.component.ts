@@ -59,7 +59,7 @@ export class InscripcionServiciosInsertarComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.toastr.error(err.error || 'Error al procesar la inscripción.', 'Error');
+        this.toastr.error(err.error?.message || 'Error al procesar la inscripción.', 'Error')
       }
     });
   }

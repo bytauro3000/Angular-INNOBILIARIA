@@ -1,151 +1,334 @@
 <div class="contratos-container">
-  <h2>Modificar Contrato ID: {{ contratoId }}</h2>
 
-  <div class="form-wrapper">
-    <form [formGroup]="contratoForm" (ngSubmit)="guardarCambios()">
+  <!-- ══════════════════════════════════════ CABECERA ══════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <i class="bi bi-pencil-square header-icon"></i>
+      <div>
+        <h2>Modificar Contrato</h2>
+        <span class="contrato-id">#{{ contratoId }}</span>
+      </div>
+    </div>
+    <div class="header-badge" [class.badge-financiado]="esFinanciado" [class.badge-contado]="!esFinanciado">
+      <i class="bi" [class.bi-calendar-range]="esFinanciado" [class.bi-cash-stack]="!esFinanciado"></i>
+      {{ contratoForm.get('tipoContrato')?.value }}
+    </div>
+  </div>
 
-      <div class="form-row form-3-col">
-        <div class="form-group">
-          <label for="modalidadContrato">Modalidad de Contrato</label>
-          <select id="modalidadContrato" formControlName="modalidadContrato">
-            <option *ngFor="let modo of modalidadContratoValues" [value]="modo">{{ modo }}</option>
-          </select>
+  <!-- ══════════════════ SKELETON DE CARGA ══════════════════ -->
+  <div class="loading-dots-wrapper" *ngIf="isCargando">
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <p class="loading-text">Cargando contrato...</p>
+  </div>
+
+  <!-- ══════════════════ FORMULARIO REAL ══════════════════ -->
+  <div class="form-wrapper" *ngIf="!isCargando">
+    <form [formGroup]="contratoForm" (ngSubmit)="solicitarConfirmacion()">
+
+      <!-- ══════════ SECCIÓN 1: DATOS GENERALES ══════════ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-file-earmark-text"></i> Datos Generales
         </div>
+        <div class="form-row form-3-col">
 
-        <div class="form-group">
-          <label for="tipoContrato">Tipo de Contrato</label>
-          <select id="tipoContrato" formControlName="tipoContrato">
-            <option *ngFor="let tipo of tipoContratoValues" [value]="tipo">{{ tipo }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="modalidadContrato"><i class="bi bi-ui-checks-grid"></i> Modalidad</label>
+            <select id="modalidadContrato" formControlName="modalidadContrato"
+              [class.field-error]="campoInvalido('modalidadContrato')">
+              <option *ngFor="let modo of modalidadContratoValues" [value]="modo">{{ modo }}</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label for="fechaContrato">Fecha del Contrato</label>
-          <input type="date" id="fechaContrato" formControlName="fechaContrato" />
+          <div class="form-group">
+            <label for="tipoContrato"><i class="bi bi-tag"></i> Tipo de Contrato</label>
+            <select id="tipoContrato" formControlName="tipoContrato"
+              [class.field-error]="campoInvalido('tipoContrato')">
+              <option *ngFor="let tipo of tipoContratoValues" [value]="tipo">{{ tipo }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fechaContrato"><i class="bi bi-calendar-event"></i> Fecha del Contrato</label>
+            <input type="date" id="fechaContrato" formControlName="fechaContrato"
+              [class.field-error]="campoInvalido('fechaContrato')" />
+            <span class="error-msg" *ngIf="campoInvalido('fechaContrato')">La fecha es requerida</span>
+          </div>
+
         </div>
       </div>
 
-      <div class="form-row form-2-col">
-        <div class="form-group">
-          <label>Vendedor</label>
-          <div class="input-with-button">
-            <div class="custom-select-container" #vendedorBusquedaContainer (click)="mostrarVendedores = !mostrarVendedores">
-              <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
-                [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()" [ngModelOptions]="{standalone: true}" autocomplete="off" />
-              <ul class="custom-select-list" *ngIf="mostrarVendedores">
-                <li *ngFor="let v of vendedoresFiltrados" (click)="seleccionarVendedor(v)">
-                  {{ v.nombre }} {{ v.apellidos }} (DNI: {{ v.dni }})
-                </li>
-                <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">No se encontraron vendedores</li>
-              </ul>
+      <!-- ══════════ SECCIÓN 2: VENDEDOR Y PROGRAMA ══════════ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-people"></i> Asignación
+        </div>
+        <div class="form-row form-2-col">
+
+          <div class="form-group">
+            <label><i class="bi bi-person-badge"></i> Vendedor</label>
+            <div class="input-with-button" [class.field-error-wrap]="campoInvalido('vendedorId')">
+              <div class="custom-select-container" #vendedorBusquedaContainer>
+                <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
+                  [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()" (focus)="mostrarVendedores = true"
+                  [ngModelOptions]="{standalone: true}" autocomplete="off" />
+                <ul class="custom-select-list" *ngIf="mostrarVendedores">
+                  <li *ngFor="let v of vendedoresFiltrados" (mousedown)="seleccionarVendedor(v)">
+                    <span class="list-item-main"><i class="bi bi-person"></i> {{ v.nombre }} {{ v.apellidos }}</span>
+                    <span class="list-badge">DNI: {{ v.dni }}</span>
+                  </li>
+                  <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">
+                    <i class="bi bi-search"></i> No se encontraron vendedores
+                  </li>
+                </ul>
+              </div>
+              <button type="button" class="btn-add-mini" (click)="abrirModalVendedor()" title="Nuevo vendedor">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
             </div>
-            <button type="button" class="btn-add-mini" (click)="abrirModalVendedor()">
-              <fa-icon [icon]="faPlus"></fa-icon>
-            </button>
+            <span class="error-msg" *ngIf="campoInvalido('vendedorId')">Selecciona un vendedor</span>
+          </div>
+
+          <div class="form-group">
+            <label><i class="bi bi-map"></i> Programa / Proyecto</label>
+            <div class="input-with-button" [class.field-error-wrap]="campoInvalido('idPrograma')">
+              <div class="custom-select-container" #programaBusquedaContainer>
+                <input type="text" placeholder="Buscar programa..." class="custom-select-input"
+                  [(ngModel)]="filtroPrograma" (input)="filtrarProgramas()" (focus)="mostrarProgramas = true"
+                  [ngModelOptions]="{standalone: true}" autocomplete="off" />
+                <ul class="custom-select-list" *ngIf="mostrarProgramas">
+                  <li *ngFor="let prog of programasFiltrados" (mousedown)="seleccionarPrograma(prog)">
+                    <i class="bi bi-geo-alt"></i> {{ prog.nombrePrograma }}
+                  </li>
+                  <li *ngIf="programasFiltrados.length === 0" class="no-data">
+                    <i class="bi bi-search"></i> No se encontraron programas
+                  </li>
+                </ul>
+              </div>
+              <button type="button" class="btn-add-mini" (click)="abrirModalPrograma()" title="Nuevo programa">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
+            </div>
+            <span class="error-msg" *ngIf="campoInvalido('idPrograma')">Selecciona un programa</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════ SECCIÓN 3: MONTOS ══════════ -->
+      <div class="form-section finance-card">
+        <div class="section-title">
+          <i class="bi bi-currency-dollar"></i> Información Financiera
+        </div>
+        <div class="form-row form-3-col">
+
+          <div class="form-group">
+            <label for="montoTotal"><i class="bi bi-cash-coin"></i> Monto Total</label>
+            <input type="text" id="montoTotal" #inputMontoTotal formControlName="montoTotal"
+              appCurrencyFormatter [class.field-error]="campoInvalido('montoTotal')" />
+            <span class="error-msg" *ngIf="campoInvalido('montoTotal')">El monto debe ser mayor a 0</span>
+          </div>
+
+          <div class="form-group" *ngIf="esFinanciado">
+            <label for="inicial"><i class="bi bi-wallet2"></i> Inicial</label>
+            <input type="text" id="inicial" #inputInicial formControlName="inicial" appCurrencyFormatter />
+          </div>
+
+          <div class="form-group" *ngIf="esFinanciado">
+            <label for="saldo"><i class="bi bi-calculator"></i> Saldo a Financiar</label>
+            <input type="text" id="saldo" [value]="saldoDisplay" disabled class="field-calculated" />
+          </div>
+
+        </div>
+
+        <div class="form-row form-2-col" *ngIf="esFinanciado">
+          <div class="form-group">
+            <label for="cantidadLetras"><i class="bi bi-list-ol"></i> Cantidad de Letras</label>
+            <input type="number" id="cantidadLetras" formControlName="cantidadLetras" min="0" />
+          </div>
+          <div class="form-group">
+            <label><i class="bi bi-calendar-check"></i> Cuota Mensual Estimada</label>
+            <div class="cuota-display">
+              <ng-container *ngIf="cuotaMensual > 0">
+                <span class="cuota-valor">{{ formatearMoneda(cuotaMensual) }}</span>
+                <span class="cuota-detalle" *ngIf="tieneResiduo">
+                  · última: {{ formatearMoneda(ultimaLetra) }}
+                </span>
+              </ng-container>
+              <span class="cuota-vacia" *ngIf="cuotaMensual <= 0">Ingresa saldo y cantidad de letras</span>
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Programa</label>
-          <div class="input-with-button">
-            <div class="custom-select-container" #programaBusquedaContainer (click)="mostrarProgramas = !mostrarProgramas">
-              <input type="text" placeholder="Buscar programa..." class="custom-select-input"
-                [(ngModel)]="filtroPrograma" (input)="filtrarProgramas()" [ngModelOptions]="{standalone: true}" autocomplete="off" />
-              <ul class="custom-select-list" *ngIf="mostrarProgramas">
-                <li *ngFor="let prog of programasFiltrados" (click)="seleccionarPrograma(prog)">
-                  {{ prog.nombrePrograma }}
-                </li>
-                <li *ngIf="programasFiltrados.length === 0" class="no-data">No se encontraron programas</li>
-              </ul>
-            </div>
-            <button type="button" class="btn-add-mini" (click)="abrirModalPrograma()">
-              <fa-icon [icon]="faPlus"></fa-icon>
-            </button>
+        <div class="resumen-financiero" *ngIf="montoTotalNum > 0">
+          <div class="resumen-item">
+            <span class="resumen-label"><i class="bi bi-cash-coin"></i> Total</span>
+            <span class="resumen-valor">{{ formatearMoneda(montoTotalNum) }}</span>
+          </div>
+          <div class="resumen-divider" *ngIf="esFinanciado">|</div>
+          <div class="resumen-item" *ngIf="esFinanciado">
+            <span class="resumen-label"><i class="bi bi-wallet2"></i> Inicial</span>
+            <span class="resumen-valor">{{ formatearMoneda(inicialNum) }}</span>
+          </div>
+          <div class="resumen-divider" *ngIf="esFinanciado">|</div>
+          <div class="resumen-item" *ngIf="esFinanciado">
+            <span class="resumen-label"><i class="bi bi-calculator"></i> Saldo</span>
+            <span class="resumen-valor accent">{{ formatearMoneda(saldoNum) }}</span>
+          </div>
+          <div class="resumen-divider" *ngIf="esFinanciado && cantidadLetrasNum > 0">|</div>
+          <div class="resumen-item" *ngIf="esFinanciado && cantidadLetrasNum > 0">
+            <span class="resumen-label"><i class="bi bi-list-ol"></i> Letras</span>
+            <span class="resumen-valor">{{ cantidadLetrasNum }} cuotas</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══════════ SECCIÓN 4: OBSERVACIONES ══════════ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-chat-left-text"></i> Observaciones
+        </div>
+        <div class="form-row form-1-col">
+          <div class="form-group">
+            <label for="observaciones"><i class="bi bi-pencil"></i> Notas del Contrato</label>
+            <input type="text" id="observaciones" formControlName="observaciones"
+              placeholder="Ingrese observaciones del contrato..." />
           </div>
         </div>
       </div>
 
-      <div class="form-row form-3-col">
-        <div class="form-group">
-          <label for="montoTotal">Monto Total</label>
-          <input type="text" id="montoTotal" formControlName="montoTotal" (blur)="onCurrencyInput($event, 'montoTotal')" />
+      <!-- ══════════ SECCIÓN 5: CLIENTES Y LOTES ══════════ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-people-fill"></i> Clientes y Lotes
         </div>
-        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
-          <label for="inicial">Inicial</label>
-          <input type="text" id="inicial" formControlName="inicial" (blur)="onCurrencyInput($event, 'inicial')" />
-        </div>
-        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
-          <label for="saldo">Saldo</label>
-          <input type="text" id="saldo" formControlName="saldo" />
-        </div>
-      </div>
+        <div class="form-row form-2-col">
 
-      <div class="form-row form-2-col">
-        <div class="form-group" *ngIf="contratoForm.get('tipoContrato')?.value !== 'CONTADO'">
-          <label for="cantidadLetras">Cantidad de Letras</label>
-          <input type="number" id="cantidadLetras" formControlName="cantidadLetras" />
-        </div>
-        <div class="form-group">
-          <label for="observaciones">Observaciones</label>
-          <input type="text" id="observaciones" formControlName="observaciones" />
-        </div>
-      </div>
-
-      <div class="form-row form-2-col">
-        <div class="form-group">
-          <label>Agregar Cliente</label>
-          <div class="input-with-button">
-            <div class="custom-select-container" #clienteBusquedaContainer (click)="mostrarClientes = !mostrarClientes">
-              <input type="text" placeholder="Buscar por nombre o DNI" class="custom-select-input"
-                [(ngModel)]="filtroCliente" (input)="filtrarClientes()" [ngModelOptions]="{standalone: true}" autocomplete="off" />
-              <ul class="custom-select-list" *ngIf="mostrarClientes">
-                <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">{{ c.nombre }} {{ c.apellidos }}</li>
-              </ul>
+          <div class="form-group">
+            <label><i class="bi bi-person-check"></i> Agregar Cliente</label>
+            <div class="input-with-button" [class.field-error-wrap]="campoInvalido('idClientes')">
+              <div class="custom-select-container" #clienteBusquedaContainer>
+                <input type="text" placeholder="Buscar por nombre o DNI" class="custom-select-input"
+                  [(ngModel)]="filtroCliente" (input)="filtrarClientes()" (focus)="mostrarClientes = true"
+                  [ngModelOptions]="{standalone: true}" autocomplete="off" />
+                <ul class="custom-select-list" *ngIf="mostrarClientes">
+                  <li *ngFor="let c of clientesFiltrados" (mousedown)="seleccionarCliente(c)">
+                    <i class="bi bi-person"></i> {{ c.nombre }} {{ c.apellidos }}
+                  </li>
+                  <li *ngIf="clientesFiltrados.length === 0" class="no-data">
+                    <i class="bi bi-search"></i> Escribe para buscar clientes
+                  </li>
+                </ul>
+              </div>
+              <button type="button" class="btn-add-mini" (click)="abrirModalCliente()" title="Nuevo cliente">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
             </div>
-            <button type="button" class="btn-add-mini" (click)="abrirModalCliente()">
-              <fa-icon [icon]="faPlus"></fa-icon>
-            </button>
+            <span class="error-msg" *ngIf="campoInvalido('idClientes')">Agrega al menos un cliente</span>
+            <ul class="selected-items-list">
+              <li *ngFor="let cli of clientesSeleccionados" class="item-tag">
+                <span><i class="bi bi-person-fill"></i> {{ cli.nombre }} {{ cli.apellidos }}</span>
+                <button type="button" (click)="eliminarCliente(cli.idCliente)" title="Quitar cliente">✕</button>
+              </li>
+            </ul>
           </div>
-          <ul class="selected-items-list">
-            <li *ngFor="let cli of clientesSeleccionados" class="item-pequeno">
-              {{ cli.nombre }} {{ cli.apellidos }}
-              <button type="button" (click)="eliminarCliente(cli.idCliente)">❌</button>
-            </li>
-          </ul>
-        </div>
 
-        <div class="form-group">
-          <label>Agregar Lote</label>
-          <div class="input-with-button">
-            <div class="custom-select-container" #loteBusquedaContainer (click)="mostrarLotes = !mostrarLotes">
-              <input type="text" placeholder="Buscar Manzana o Lote..." class="custom-select-input"
-                [(ngModel)]="filtroLote" (input)="filtrarLotes()" [ngModelOptions]="{standalone: true}" autocomplete="off" />
-              <ul class="custom-select-list" *ngIf="mostrarLotes">
-                <li *ngFor="let l of lotesFiltrados" (click)="seleccionarLote(l)">Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}</li>
-              </ul>
+          <div class="form-group">
+            <label><i class="bi bi-grid-3x3-gap"></i> Agregar Lote</label>
+            <div class="input-with-button" [class.field-error-wrap]="campoInvalido('idLotes')">
+              <div class="custom-select-container" #loteBusquedaContainer>
+                <input type="text" placeholder="Buscar Manzana o Lote..." class="custom-select-input"
+                  [(ngModel)]="filtroLote" (input)="filtrarLotes()" (focus)="filtrarLotes()"
+                  [ngModelOptions]="{standalone: true}" autocomplete="off" />
+                <ul class="custom-select-list" *ngIf="mostrarLotes">
+                  <li *ngFor="let l of lotesFiltrados" (mousedown)="seleccionarLote(l)">
+                    <div class="lote-list-item">
+                      <span><i class="bi bi-geo"></i> Mz. {{ l.manzana }} — Lt. {{ l.numeroLote }}</span>
+                      <span class="list-badge green" *ngIf="getLoteCosto(l) > 0">{{ formatearMoneda(getLoteCosto(l)) }}</span>
+                    </div>
+                  </li>
+                  <li *ngIf="lotesFiltrados.length === 0" class="no-data">
+                    <i class="bi bi-search"></i> No hay lotes disponibles
+                  </li>
+                </ul>
+              </div>
+              <button type="button" class="btn-add-mini" (click)="abrirModalLote()" title="Nuevo lote">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
             </div>
-            <button type="button" class="btn-add-mini" (click)="abrirModalLote()">
-              <fa-icon [icon]="faPlus"></fa-icon>
-            </button>
+            <span class="error-msg" *ngIf="campoInvalido('idLotes')">Agrega al menos un lote</span>
+            <ul class="selected-items-list">
+              <li *ngFor="let lote of lotesSeleccionados" class="item-tag lote-tag">
+                <span>
+                  <i class="bi bi-geo-fill"></i> Mz. {{ lote.manzana }} — Lt. {{ lote.numeroLote }}
+                </span>
+                <div class="lote-tag-right">
+                  <span class="lote-precio" *ngIf="getLoteCosto(lote) > 0">{{ formatearMoneda(getLoteCosto(lote)) }}</span>
+                  <button type="button" (click)="eliminarLote(lote.idLote)" title="Quitar lote">✕</button>
+                </div>
+              </li>
+            </ul>
           </div>
-          <ul class="selected-items-list">
-            <li *ngFor="let lote of lotesSeleccionados" class="item-pequeno">
-              Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}
-              <button type="button" (click)="eliminarLote(lote.idLote)">❌</button>
-            </li>
-          </ul>
+
         </div>
       </div>
 
+      <!-- ══════════ ACCIONES ══════════ -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="!contratoForm.valid">
-          <i class="bi bi-save"></i> Guardar Cambios
+        <button type="submit" class="btn btn-save" [disabled]="isGuardando">
+          <span *ngIf="isGuardando" class="spinner-border spinner-border-sm" role="status"></span>
+          <i *ngIf="!isGuardando" class="bi bi-save2"></i>
+          {{ isGuardando ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
-        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/secretaria-menu/contratos'])">
-          Cancelar
+        <button type="button" class="btn btn-cancel" (click)="router.navigate(['/secretaria-menu/contratos'])">
+          <i class="bi bi-x-circle"></i> Cancelar
         </button>
       </div>
+
     </form>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL DE CONFIRMACIÓN ══════════════ -->
+<div class="confirm-overlay" *ngIf="mostrarModalConfirmacion" (click)="cancelarConfirmacion()">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="bi bi-shield-check"></i>
+    </div>
+    <h3>Confirmar cambios</h3>
+    <p>¿Estás seguro de que deseas guardar los cambios del contrato <strong>#{{ contratoId }}</strong>?</p>
+    <div class="confirm-resumen">
+      <div class="confirm-item">
+        <span>Total</span>
+        <strong>{{ formatearMoneda(montoTotalNum) }}</strong>
+      </div>
+      <div class="confirm-item" *ngIf="esFinanciado">
+        <span>Saldo</span>
+        <strong>{{ formatearMoneda(saldoNum) }}</strong>
+      </div>
+      <div class="confirm-item" *ngIf="esFinanciado && cantidadLetrasNum > 0">
+        <span>Letras</span>
+        <strong>
+          <ng-container *ngIf="tieneResiduo">
+            {{ cantidadLetrasNum - 1 }} × {{ formatearMoneda(cuotaMensual) }} + última {{ formatearMoneda(ultimaLetra) }}
+          </ng-container>
+          <ng-container *ngIf="!tieneResiduo">
+            {{ cantidadLetrasNum }} × {{ formatearMoneda(cuotaMensual) }}
+          </ng-container>
+        </strong>
+      </div>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-save" (click)="confirmarGuardado()">
+        <i class="bi bi-check-lg"></i> Sí, guardar
+      </button>
+      <button class="btn btn-cancel" (click)="cancelarConfirmacion()">
+        Cancelar
+      </button>
+    </div>
   </div>
 </div>
 
