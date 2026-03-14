@@ -10,13 +10,13 @@ import { Programa } from '../../models/programa.model';
 import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar';
 
 @Component({
-  selector: 'app-lote',
+  selector: 'app-lote-listar',
   standalone: true,
   imports: [CommonModule, FormsModule, LotesInsertarEditar],
-  templateUrl: './lote.html',
-  styleUrls: ['./lote.scss']
+  templateUrl: './lote-listar.html',
+  styleUrls: ['./lote-listar.scss']
 })
-export class LoteComponent implements OnInit {
+export class LoteLitarComponent implements OnInit {
   @ViewChild('loteModal') loteModal!: LotesInsertarEditar;
 
   lotes: LoteResumen[] = [];

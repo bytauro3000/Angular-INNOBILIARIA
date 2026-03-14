@@ -36,7 +36,7 @@ export class LecturaPlanillaComponent implements OnInit {
   constructor(
     private lecturaService: LecturaService,
     private programaService: ProgramaService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarProgramas();
@@ -55,14 +55,14 @@ export class LecturaPlanillaComponent implements OnInit {
   onCambioPrograma() {
     this.planillaCompleta = [];
     this.planillaFiltrada = [];
-    
+
     if (!this.programaId) {
       this.mensajeEstado = '⚠️ Seleccione un programa para cargar la lista de Luz y Agua.';
       return;
     }
 
     this.cargando = true;
-    this.mensajeEstado = '⌛ Cargando planilla unificada, por favor espere...'; 
+    this.mensajeEstado = '⌛ Cargando planilla unificada, por favor espere...';
 
     this.lecturaService.prepararPlanillaUnificada(this.programaId).subscribe({
       next: (data) => {
@@ -148,7 +148,7 @@ export class LecturaPlanillaComponent implements OnInit {
 
   esPlanillaValida(): boolean {
     if (this.planillaCompleta.length === 0) return false;
-    return this.planillaCompleta.every(f => 
+    return this.planillaCompleta.every(f =>
       (!f.inscritoLuz || (f.lecturaActLuz !== null && f.lecturaActLuz > f.lecturaAntLuz && !f.errorLuz)) &&
       (!f.inscritoAgua || (f.lecturaActAgua !== null && f.lecturaActAgua > f.lecturaAntAgua && !f.errorAgua))
     );
@@ -170,7 +170,7 @@ export class LecturaPlanillaComponent implements OnInit {
 
     this.guardando = true;
     this.lecturaService.guardarPlanillaUnificada(
-      this.planillaCompleta, 
+      this.planillaCompleta,
       this.fechaGiroManual,
       this.fechaLecturaManual
     ).subscribe({
@@ -187,16 +187,7 @@ export class LecturaPlanillaComponent implements OnInit {
       },
       error: (err) => {
         this.guardando = false;
-        let mensaje = 'No se pudo guardar la planilla';
-        if (err.error?.error) {
-          mensaje = err.error.error;
-        } else if (err.error?.detalle) {
-          mensaje = err.error.detalle;
-        } else if (err.error && typeof err.error === 'string') {
-          mensaje = err.error;
-        } else if (err.message) {
-          mensaje = err.message;
-        }
+        const mensaje = err.error?.message || 'No se pudo guardar la planilla';
         Swal.fire('Error', mensaje, 'error');
       }
     });

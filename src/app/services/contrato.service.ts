@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ContratoResponseDTO } from '../dto/contratoreponse.dto';
 import { TransferenciaResponseDTO } from '../dto/Transferenciaresponse.dto';
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
-import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +14,6 @@ export class ContratoService {
   private readonly apiUrl = `${environment.apiUrl}/api/contratos`;
 
   constructor(private http: HttpClient) { }
-
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-  }
 
   listarContrato(): Observable<ContratoResponseDTO[]> {
     return this.http.get<ContratoResponseDTO[]>(`${this.apiUrl}/listar`);
@@ -45,20 +38,17 @@ export class ContratoService {
   }
 
   guardarContrato(request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
-    return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request, { headers: this.getHeaders() });
+    return this.http.post<ContratoResponseDTO>(`${this.apiUrl}/agregar`, request);
   }
 
   actualizarContrato(id: number, request: ContratoRequestDTO): Observable<ContratoResponseDTO> {
-    return this.http.put<ContratoResponseDTO>(`${this.apiUrl}/actualizar/${id}`, request, {
-      headers: this.getHeaders()
-    });
+    return this.http.put<ContratoResponseDTO>(`${this.apiUrl}/actualizar/${id}`, request);
   }
 
   eliminarContrato(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/eliminar/${id}`);
   }
 
-  //Método para descargar el PDF generado en el Backend
   imprimirContratoPdf(id: number): Observable<Blob> {
     const timestamp = new Date().getTime();
     return this.http.get(`${this.apiUrl}/${id}/imprimir?t=${timestamp}`, {
@@ -66,18 +56,15 @@ export class ContratoService {
     });
   }
 
-  // Cambiar estado del contrato manualmente (secretaria)
   cambiarEstado(id: number, estado: string): Observable<ContratoResponseDTO> {
     const params = new HttpParams().set('estado', estado);
     return this.http.patch<ContratoResponseDTO>(`${this.apiUrl}/${id}/estado`, null, { params });
   }
 
-  // Registrar renuncia voluntaria del cliente
   registrarRenuncia(id: number): Observable<ContratoResponseDTO> {
     return this.http.patch<ContratoResponseDTO>(`${this.apiUrl}/${id}/renuncia`, null);
   }
 
-  // Registrar transferencia — devuelve datos calculados para el nuevo contrato
   registrarTransferencia(id: number): Observable<TransferenciaResponseDTO> {
     return this.http.patch<TransferenciaResponseDTO>(`${this.apiUrl}/${id}/transferencia`, null);
   }

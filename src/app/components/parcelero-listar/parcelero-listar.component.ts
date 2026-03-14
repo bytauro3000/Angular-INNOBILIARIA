@@ -9,13 +9,13 @@ import { DistritoService } from '../../services/distrito.service';
 import * as bootstrap from 'bootstrap';
 
 @Component({
-  selector: 'app-parcelero',
+  selector: 'app-parcelero-listar',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './parcelero.html',
-  styleUrls: ['./parcelero.scss']
+  templateUrl: './parcelero-listar.html',
+  styleUrls: ['./parcelero-listar.scss']
 })
-export class ParceleroComponent implements OnInit, AfterViewInit {
+export class ParceleroListarComponent implements OnInit, AfterViewInit {
   parceleros: Parcelero[] = [];
   distritos: Distrito[] = []; // 👈 lista de distritos
 

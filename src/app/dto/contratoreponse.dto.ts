@@ -2,6 +2,7 @@ import { ClienteResponseDTO } from "./clienteresponse.dto";
 import { LoteResponseDTO } from "./lote-response.dto";
 import { LetraResponseDTO } from "./letra-response.dto";
 import { EstadoContrato } from "../enums/Estadocontrato.enum";
+import { VendedorResponseDTO } from "./vendedorreponse.dto";
 
 export interface ContratoResponseDTO {
     idContrato: number;
@@ -16,6 +17,7 @@ export interface ContratoResponseDTO {
     clientes: ClienteResponseDTO[];
     lotes: LoteResponseDTO[];
     letras: LetraResponseDTO[]; 
+    vendedor?: VendedorResponseDTO;
 
     //NUEVOS CAMPOS PARA LOS INDICADORES VISUALES
     tieneLuz: boolean;

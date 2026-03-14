@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ParceleroListarComponent} from './parcelero-listar.component';
 
-import { ParceleroComponent } from './parcelero';
-
-describe('Parcelero', () => {
-  let component: ParceleroComponent;
-  let fixture: ComponentFixture<ParceleroComponent>;
+describe('ParceleroListarComponent', () => {
+  let component: ParceleroListarComponent;
+  let fixture: ComponentFixture<ParceleroListarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ParceleroComponent]
+      imports: [ParceleroListarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ParceleroComponent);
+    fixture = TestBed.createComponent(ParceleroListarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
