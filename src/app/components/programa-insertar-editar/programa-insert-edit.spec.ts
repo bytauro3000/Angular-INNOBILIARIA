@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VendedorComponent } from './vendedor';
+import { ProgramaInsertEdit } from './programa-inset-edit';
 
-describe('Vendedor', () => {
-  let component: VendedorComponent;
-  let fixture: ComponentFixture<VendedorComponent>;
+describe('ProgramaInsetEdit', () => {
+  let component: ProgramaInsertEdit;
+  let fixture: ComponentFixture<ProgramaInsertEdit>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VendedorComponent]
+      imports: [ProgramaInsertEdit]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(VendedorComponent);
+    fixture = TestBed.createComponent(ProgramaInsertEdit);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

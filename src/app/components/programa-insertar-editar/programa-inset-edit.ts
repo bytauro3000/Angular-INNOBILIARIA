@@ -19,12 +19,12 @@ import { ParceleroService } from '../../services/parcelero.service';
   standalone: true,
   // Agregar la Directiva y el Pipe de Angular en imports
   imports: [CommonModule, ReactiveFormsModule, CurrencyFormatterDirective], 
-  templateUrl: './programa-inset-edit.html',
-  styleUrls: ['./programa-inset-edit.scss'],
+  templateUrl: './programa-insert-edit.html',
+  styleUrls: ['./programa-insert-edit.scss'],
   // Proveedor para usarlo en el componente
   providers: [DecimalPipe] 
 })
-export class ProgramaInsetEdit implements OnInit, AfterViewInit {
+export class ProgramaInsertEdit implements OnInit, AfterViewInit {
   @ViewChild('modalElement') modalElement!: ElementRef;
   private modal?: bootstrap.Modal;
   @Output() programaGuardado = new EventEmitter<void>();

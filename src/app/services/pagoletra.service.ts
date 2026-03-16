@@ -58,6 +58,13 @@ export class PagoLetraService {
   }
 
   sugerirNumeroComprobante(tipo: string): Observable<{ numeroSugerido: string }> {
-  return this.http.get<{ numeroSugerido: string }>(`${this.apiUrl}/sugerir-numero?tipoComprobante=${tipo}`);
-}
+    return this.http.get<{ numeroSugerido: string }>(`${this.apiUrl}/sugerir-numero?tipoComprobante=${tipo}`);
+  }
+
+  // NUEVO: descarga el comprobante PDF de un pago específico
+  descargarComprobante(idPago: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${idPago}/comprobante-pdf`, {
+      responseType: 'blob'
+    });
+  }
 }

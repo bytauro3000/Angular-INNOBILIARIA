@@ -33,7 +33,7 @@ interface LetraCambioConSeleccion extends LetraCambio {
   styleUrls: ['./pagoletra-listar.scss'],
 })
 export class PagoletraListarComponent implements OnInit {
-  
+
   programas: Programa[] = [];
   programaSeleccionado: number | null = null;
   manzanaBusqueda: string = '';
@@ -118,7 +118,7 @@ export class PagoletraListarComponent implements OnInit {
           .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
-        
+
         this.seleccionadasMap.clear();
         this.currentPage = 1;
         this.aplicarPaginacion();
@@ -158,7 +158,8 @@ export class PagoletraListarComponent implements OnInit {
     this.seleccionadasMap.clear();
   }
 
-  // ========== SELECCIÓN MÚLTIPLE ==========
+  // ── SELECCIÓN MÚLTIPLE ────────────────────────────────────────────────────
+
   seleccionarTodas(event: any): void {
     const checked = event.target.checked;
     if (checked) {
@@ -181,7 +182,8 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   isTodasSeleccionadas(): boolean {
-    return this.paginatedLetras.length > 0 && this.paginatedLetras.every(l => this.isSeleccionada(l.idLetra));
+    return this.paginatedLetras.length > 0 &&
+           this.paginatedLetras.every(l => this.isSeleccionada(l.idLetra));
   }
 
   get cantidadSeleccionadas(): number {
@@ -193,7 +195,8 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.warning('Seleccione al menos una letra', 'Atención');
       return;
     }
-    this.letrasSeleccionadasTemp = this.letrasPendientes.filter(l => this.seleccionadasMap.has(l.idLetra));
+    this.letrasSeleccionadasTemp = this.letrasPendientes
+      .filter(l => this.seleccionadasMap.has(l.idLetra));
     this.modoPagoMultiple = true;
   }
 
@@ -212,7 +215,7 @@ export class PagoletraListarComponent implements OnInit {
   onPagoEliminado(): void {
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
-      this.refrescarContrato(); // actualiza el estado MORA/ACTIVO en pantalla
+      this.refrescarContrato();
     }
   }
 
@@ -242,13 +245,11 @@ export class PagoletraListarComponent implements OnInit {
   onPagoRegistrado(): void {
     this.cerrarModalPago();
     if (this.contratoEncontrado) {
-      // Recargar letras Y refrescar estado del contrato (puede haber salido de MORA)
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
       this.refrescarContrato();
     }
   }
 
-  /** Vuelve a buscar el contrato para obtener el estado actualizado desde el backend */
   refrescarContrato(): void {
     if (!this.programaSeleccionado || !this.manzanaBusqueda.trim() || !this.numeroLoteBusqueda.trim()) return;
     this.contratoService.buscarPorProgramaManzanaLote(
@@ -257,15 +258,11 @@ export class PagoletraListarComponent implements OnInit {
       this.numeroLoteBusqueda.trim()
     ).subscribe({
       next: (contrato) => {
-        if (contrato) {
-          this.contratoEncontrado = contrato;
-        }
+        if (contrato) this.contratoEncontrado = contrato;
       },
       error: (err) => console.error('Error al refrescar contrato:', err)
     });
   }
-
-  // Eliminamos el método isLetraVencida
 
   cambiarTipoLista(tipo: 'pendientes' | 'pagadas'): void {
     if (this.tipoLista !== tipo) {
@@ -281,10 +278,12 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   aplicarPaginacion(): void {
-    const listaActual = this.tipoLista === 'pendientes' ? this.letrasPendientes : this.letrasPagadas;
+    const listaActual = this.tipoLista === 'pendientes'
+      ? this.letrasPendientes
+      : this.letrasPagadas;
     this.totalPages = Math.ceil(listaActual.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
+    const end   = start + this.pageSize;
     this.paginatedLetras = listaActual.slice(start, end) as LetraCambioConSeleccion[];
   }
 
@@ -310,7 +309,7 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   getPagesArray(): (number | string)[] {
-    const total = this.totalPages;
+    const total   = this.totalPages;
     const current = this.currentPage;
     const pages: (number | string)[] = [];
 
@@ -320,7 +319,7 @@ export class PagoletraListarComponent implements OnInit {
       pages.push(1);
       if (current > 3) pages.push('...');
       let start = Math.max(2, current - 1);
-      let end = Math.min(total - 1, current + 1);
+      let end   = Math.min(total - 1, current + 1);
       if (current <= 3) end = 4;
       if (current >= total - 2) start = total - 3;
       for (let i = start; i <= end; i++) pages.push(i);
@@ -328,5 +327,27 @@ export class PagoletraListarComponent implements OnInit {
       pages.push(total);
     }
     return pages;
+  }
+
+  // ── NUEVO: imprime el comprobante de una letra pagada ─────────────────────
+  // Busca el pago asociado a la letra y abre el PDF en una nueva pestaña.
+  imprimirComprobante(idLetra: number): void {
+    this.pagoService.listarPorLetra(idLetra).subscribe({
+      next: (pagos) => {
+        if (!pagos || pagos.length === 0) {
+          this.toastr.warning('No se encontró el pago de esta letra', 'Aviso');
+          return;
+        }
+        const idPago = pagos[0].idPago;
+        this.pagoService.descargarComprobante(idPago).subscribe({
+          next: (blob) => {
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+          },
+          error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
+        });
+      },
+      error: () => this.toastr.error('Error al buscar el pago de la letra', 'Error')
+    });
   }
 }

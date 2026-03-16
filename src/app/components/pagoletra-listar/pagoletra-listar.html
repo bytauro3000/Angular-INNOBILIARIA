@@ -66,8 +66,8 @@
           <i class="bi bi-list-ul"></i> Ver Pagos
         </button>
         <!-- Botón para pagar múltiples (solo visible en pendientes) -->
-        <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 0" 
-                class="btn-pagar-multiple" 
+        <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 0"
+                class="btn-pagar-multiple"
                 (click)="abrirModalPagoMultiple()">
           <i class="bi bi-cash-stack"></i> Pagar {{ cantidadSeleccionadas }} letras
         </button>
@@ -78,9 +78,9 @@
           Anterior
         </button>
         <ng-container *ngFor="let page of getPagesArray()">
-          <button *ngIf="page !== '...'" 
-                  (click)="goToPage(+page)" 
-                  [class.active]="page === currentPage" 
+          <button *ngIf="page !== '...'"
+                  (click)="goToPage(+page)"
+                  [class.active]="page === currentPage"
                   class="btn-paginacion">
             {{ page }}
           </button>
@@ -99,7 +99,7 @@
         <tr>
           <!-- Columna de checkbox solo en pendientes -->
           <th *ngIf="tipoLista === 'pendientes'" style="width: 40px;">
-            <input type="checkbox" 
+            <input type="checkbox"
                    (change)="seleccionarTodas($event)"
                    [checked]="isTodasSeleccionadas()">
           </th>
@@ -112,10 +112,10 @@
         </tr>
       </thead>
       <tbody>
-       <tr *ngFor="let letra of paginatedLetras" [class.vencida]="letra.estadoLetra === 'VENCIDO'">
+        <tr *ngFor="let letra of paginatedLetras" [class.vencida]="letra.estadoLetra === 'VENCIDO'">
           <!-- Checkbox solo en pendientes -->
           <td *ngIf="tipoLista === 'pendientes'" data-label="Seleccionar">
-            <input type="checkbox" 
+            <input type="checkbox"
                    [checked]="isSeleccionada(letra.idLetra)"
                    (change)="toggleSeleccion(letra)">
           </td>
@@ -126,18 +126,29 @@
           <td data-label="Estado">
             <span class="estado-badge" [ngClass]="{
               'estado-pendiente': letra.estadoLetra === 'PENDIENTE',
-              'estado-vencido': letra.estadoLetra === 'VENCIDO',
-              'estado-pagado': letra.estadoLetra === 'PAGADO'
+              'estado-vencido':   letra.estadoLetra === 'VENCIDO',
+              'estado-pagado':    letra.estadoLetra === 'PAGADO'
             }">{{ letra.estadoLetra }}</span>
           </td>
           <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
-              <button *ngIf="tipoLista === 'pendientes'" 
-                      class="btn-pagar" 
-                      (click)="abrirModalPago(letra)" 
+
+              <!-- Botón pagar — solo en pestaña Pendientes -->
+              <button *ngIf="tipoLista === 'pendientes'"
+                      class="btn-pagar"
+                      (click)="abrirModalPago(letra)"
                       title="Registrar pago individual">
                 <i class="bi bi-cash-stack"></i>
               </button>
+
+              <!-- Botón imprimir comprobante — solo en pestaña Pagadas -->
+              <button *ngIf="tipoLista === 'pagadas'"
+                      class="btn-imprimir"
+                      (click)="imprimirComprobante(letra.idLetra)"
+                      title="Imprimir comprobante de pago">
+                <i class="bi bi-printer"></i>
+              </button>
+
             </div>
           </td>
         </tr>

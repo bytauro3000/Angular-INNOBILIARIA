@@ -136,15 +136,27 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
 
     this.enviando = true;
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFiles).subscribe({
-      next: () => {
+      next: (response) => {
         this.toastr.success('Pago registrado correctamente', 'Éxito');
         this.enviando = false;
         this.cerrarModal();
         this.onPagoExitoso.emit();
+
+        // Abrir comprobante PDF automáticamente en nueva pestaña
+        this.pagoService.descargarComprobante(response.idPago).subscribe({
+          next: (blob) => {
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+          },
+          error: () => {
+            // No interrumpir el flujo si el PDF falla — el pago ya quedó guardado
+            this.toastr.warning('Pago guardado. No se pudo abrir el comprobante automáticamente.', 'Aviso');
+          }
+        });
       },
       error: (err) => {
         console.error('Error al registrar pago:', err);
-        const mensaje = err.error?.message || 'Error al registrar el pago'; // ✅ Accede a la propiedad message
+        const mensaje = err.error?.message || 'Error al registrar el pago';
         this.toastr.error(mensaje, 'Error');
         this.enviando = false;
       }

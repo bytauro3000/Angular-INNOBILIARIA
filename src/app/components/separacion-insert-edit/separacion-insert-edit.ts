@@ -24,7 +24,7 @@ import { SeparacionService } from '../../services/separacion.service';
 // Importa tus componentes de inserción rápida
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
-import { ProgramaInsetEdit } from '../programa-inset-edit/programa-inset-edit';
+import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit';
 
 // Calendario Material
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -39,7 +39,7 @@ import { MatInputModule } from '@angular/material/input';
   ],
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, RouterModule,
-    ClienteInsertarComponent, VendedorInsertar, ProgramaInsetEdit, 
+    ClienteInsertarComponent, VendedorInsertar, ProgramaInsertEdit, 
     MatDatepickerModule, MatNativeDateModule, MatInputModule,
   ],
   templateUrl: './separacion-insert-edit.html',
@@ -50,7 +50,7 @@ export class SeparacionInsertEdit implements OnInit {
 
   @ViewChild('clienteModal') clienteModal!: ClienteInsertarComponent;
   @ViewChild('vendedorModal') vendedorModal!: VendedorInsertar;
-  @ViewChild('programaModal') programaModal!: ProgramaInsetEdit;
+  @ViewChild('programaModal') programaModal!: ProgramaInsertEdit;
 
   @ViewChild('vendedorContainer') vendedorContainer!: ElementRef;
   @ViewChild('programaContainer') programaContainer!: ElementRef;

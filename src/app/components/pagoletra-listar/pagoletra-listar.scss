@@ -351,6 +351,29 @@ $border-color: #e9ecef;
       transform: scale(1.05);
     }
   }
+
+  .btn-imprimir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: 8px;
+  border: 1px solid #154378;
+  background: transparent;
+  color: #154378;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+
+  i { font-size: 1.1rem; }
+
+  &:hover {
+    background: #154378;
+    color: white;
+    transform: scale(1.05);
+  }
+}
 }
 
 // ============================================

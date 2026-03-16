@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ProgramaListarComponent } from './programa-listar.componente';
 
-import { ProgramaInsetEdit } from './programa-inset-edit';
-
-describe('ProgramaInsetEdit', () => {
-  let component: ProgramaInsetEdit;
-  let fixture: ComponentFixture<ProgramaInsetEdit>;
+describe('Programa', () => {
+  let component: ProgramaListarComponent;
+  let fixture: ComponentFixture<ProgramaListarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProgramaInsetEdit]
+      imports: [ProgramaListarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ProgramaInsetEdit);
+    fixture = TestBed.createComponent(ProgramaListarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

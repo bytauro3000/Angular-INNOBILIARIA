@@ -20,7 +20,7 @@ import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
 
 import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
-import { ProgramaInsetEdit } from '../programa-inset-edit/programa-inset-edit';
+import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit';
 import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 
@@ -30,7 +30,7 @@ import { CurrencyFormatterDirective } from '../../directives/currency-formatter'
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule, FormsModule,
     FontAwesomeModule, VendedorInsertar, ClienteInsertarComponent,
-    ProgramaInsetEdit, LotesInsertarEditar, CurrencyFormatterDirective
+    ProgramaInsertEdit, LotesInsertarEditar, CurrencyFormatterDirective
   ],
   templateUrl: './contrato-editar.html',
   styleUrls: ['./contrato-editar.scss']
@@ -38,7 +38,7 @@ import { CurrencyFormatterDirective } from '../../directives/currency-formatter'
 export class ContratoEditarComponent implements OnInit {
   @ViewChild('vendedorModalContrato') vendedorModalContrato!: VendedorInsertar;
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
-  @ViewChild('registroModalPrograma') registroModalPrograma!: ProgramaInsetEdit;
+  @ViewChild('registroModalPrograma') registroModalPrograma!: ProgramaInsertEdit;
   @ViewChild('loteModalContrato') loteModalContrato!: LotesInsertarEditar;
 
   @ViewChild('vendedorBusquedaContainer') vendedorBusquedaContainer!: ElementRef;

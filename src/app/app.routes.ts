@@ -39,8 +39,8 @@ import { RecibosListarComponent } from './components/recibos-listar/recibos-list
 
 // Otros componentes
 import { ParceleroListarComponent } from './components/parcelero-listar/parcelero-listar.component';
-import { VendedorComponent } from './components/vendedor/vendedor';
-import { ProgramaComponent } from './components/programa/programa';
+import { VendedorListarComponent } from './components/vendedor-listar/vendedor-listar.component';
+import { ProgramaListarComponent } from './components/programa-listar/programa-listar.componente';
 import { LoteLitarComponent } from './components/lote-listar/lote-listar.component';
 
 // Dashboard y Letras
@@ -88,8 +88,8 @@ export const routes: Routes = [
       { path: 'pagoletras/insertar', component: PagoletraInsertarComponent },
 
       // Otros
-      { path: 'programas', component: ProgramaComponent },
-      { path: 'vendedores', component: VendedorComponent },
+      { path: 'programas', component: ProgramaListarComponent },
+      { path: 'vendedores', component: VendedorListarComponent },
       { path: 'lotes', component: LoteLitarComponent },
       { path: 'parceleros', component: ParceleroListarComponent },
 

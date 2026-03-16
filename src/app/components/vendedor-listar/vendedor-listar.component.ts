@@ -9,13 +9,13 @@ import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-vendedor',
+  selector: 'app-vendedor-listar',
   standalone: true,
   imports: [CommonModule, FormsModule, VendedorInsertar],
-  templateUrl: './vendedor.html',
-  styleUrls: ['./vendedor.scss']
+  templateUrl: './vendedor-listar.html',
+  styleUrls: ['./vendedor-listar.scss']
 })
-export class VendedorComponent implements OnInit {
+export class VendedorListarComponent implements OnInit {
 
   @ViewChild('registroModal') registroModal!: VendedorInsertar;
 

@@ -3,21 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProgramaService } from '../../services/programa.service';
 import { DistritoService } from '../../services/distrito.service';
-import { ProgramaInsetEdit } from '../programa-inset-edit/programa-inset-edit'; // Importar el componente hijo del modal
+import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit'; // Importar el componente hijo del modal
 import { Programa } from '../../models/programa.model';
 import { Distrito } from '../../models/distrito.model';
 
 @Component({
-  selector: 'app-programa',
+  selector: 'app-programa-listar',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProgramaInsetEdit],
-  templateUrl: './programa.html',
-  styleUrls: ['./programa.scss']
+  imports: [CommonModule, FormsModule, ProgramaInsertEdit],
+  templateUrl: './programa-listar.html',
+  styleUrls: ['./programa-listar.scss']
 })
-export class ProgramaComponent implements OnInit {
+export class ProgramaListarComponent implements OnInit {
 
   // REFERENCIA AL COMPONENTE DEL MODAL
-  @ViewChild('registroModal') registroModal!: ProgramaInsetEdit;
+  @ViewChild('registroModal') registroModal!: ProgramaInsertEdit;
 
   programas: Programa[] = [];
   distritos: Distrito[] = [];

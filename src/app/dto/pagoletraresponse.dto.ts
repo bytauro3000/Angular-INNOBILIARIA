@@ -2,7 +2,7 @@ import { TipoComprobante } from '../enums/tipocomprobante';
 import { MedioPago } from '../enums/mediopago.enum';
 
 export interface PagoLetraResponse {
-  idPago?: number;
+  idPago: number;
   idLetra?: number;
   numeroLetra?: string;
   fechaPago?: Date;
