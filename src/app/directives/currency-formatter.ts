@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Renderer2, OnInit } from '@angular/core';
+import { Directive, ElementRef, HostListener, Renderer2, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 
@@ -7,8 +7,9 @@ import { DecimalPipe } from '@angular/common';
   standalone: true,
   providers: [DecimalPipe]
 })
-export class CurrencyFormatterDirective implements OnInit {
-  private currencySymbol: string = '$ ';
+export class CurrencyFormatterDirective implements OnInit, OnChanges {
+
+  @Input() currencySymbol: string = '$ ';
 
   constructor(
     private el: ElementRef,
@@ -18,19 +19,33 @@ export class CurrencyFormatterDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Suscribirse a cambios del formControl para formatear cuando llega el valor del servidor
     this.control.control?.valueChanges.subscribe(value => {
-      // Solo formatear si el input no tiene foco (el usuario no está escribiendo)
       if (document.activeElement !== this.el.nativeElement) {
         this.aplicarFormato(value);
       }
     });
 
-    // Formatear el valor inicial si ya existe
     const valorInicial = this.control.control?.value;
     if (valorInicial !== null && valorInicial !== undefined && valorInicial !== 0) {
-      // Esperar que el DOM esté listo
       setTimeout(() => this.aplicarFormato(valorInicial), 0);
+    }
+  }
+
+  // Se dispara cada vez que cambia currencySymbol desde el componente padre
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currencySymbol'] && !changes['currencySymbol'].firstChange) {
+      const value = this.control.control?.value;
+      // Reformatear inmediatamente con el nuevo símbolo
+      if (value !== null && value !== undefined && !isNaN(Number(value)) && Number(value) !== 0) {
+        this.aplicarFormato(value);
+      } else {
+        // Si el valor es 0 o vacío, limpiar el símbolo del input
+        const current = this.el.nativeElement.value;
+        const limpio = current.replace(/[^0-9.]/g, '');
+        if (limpio) {
+          this.renderer.setProperty(this.el.nativeElement, 'value', this.currencySymbol + limpio);
+        }
+      }
     }
   }
 
@@ -47,7 +62,7 @@ export class CurrencyFormatterDirective implements OnInit {
     let rawValue = input.value;
 
     let cleanValue = rawValue.replace(/[^0-9.]/g, '');
-    
+
     const parts = cleanValue.split('.');
     if (parts.length > 2) cleanValue = parts[0] + '.' + parts.slice(1).join('');
 
@@ -63,7 +78,7 @@ export class CurrencyFormatterDirective implements OnInit {
     const integerPart = parts[0];
     const decimalPart = parts[1];
     const formattedInteger = this.decimalPipe.transform(integerPart, '1.0-0', 'en-US') || '';
-    
+
     let formattedValue = this.currencySymbol + formattedInteger;
     if (cleanValue.includes('.')) {
       formattedValue += '.' + (decimalPart !== undefined ? decimalPart : '');
@@ -82,7 +97,6 @@ export class CurrencyFormatterDirective implements OnInit {
     if (value !== null && !isNaN(value)) {
       const finalFormat = this.currencySymbol + this.decimalPipe.transform(value, '1.2-2', 'en-US');
       this.renderer.setProperty(this.el.nativeElement, 'value', finalFormat);
-      // Emitir para que valueChanges dispare y recalcule el saldo
       this.control.control?.setValue(value, { emitEvent: true });
     }
   }

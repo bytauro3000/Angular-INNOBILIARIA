@@ -155,18 +155,34 @@ export class ProgramaInsertEdit implements OnInit, AfterViewInit {
     this.programaForm.reset();
     if (programa) {
       this.programaEditando = programa;
-      // Usar getRawValue para obtener valores de campos deshabilitados (como costoTotal)
-      const programaData = this.programaForm.getRawValue();
-      this.programaForm.patchValue(programaData);
-      this.filtroDistrito = programa.distrito.nombre;
-      
-      // Asegurar que costoTotal se formatee al abrir para editar
+
+      // Cargar los datos del programa recibido en el formulario
+      this.programaForm.patchValue({
+        nombrePrograma: programa.nombrePrograma,
+        ubicacion:      programa.ubicacion,
+        areaTotal:      programa.areaTotal,
+        precioM2:       programa.precioM2,
+        distrito: {
+          idDistrito: programa.distrito?.idDistrito
+        },
+        parcelero: {
+          idParcelero: programa.parcelero?.idParcelero
+        }
+      });
+
+      // Mostrar el nombre del distrito en el campo de búsqueda
+      this.filtroDistrito = programa.distrito?.nombre || '';
+
+      // Calcular y mostrar el costoTotal
       if (programa.costoTotal) {
-          this.programaForm.get('costoTotal')?.setValue(programa.costoTotal.toFixed(2));
+        this.programaForm.get('costoTotal')?.setValue(programa.costoTotal.toFixed(2));
+      } else {
+        this.calcularCostoTotal();
       }
 
     } else {
       this.programaEditando = null;
+      this.filtroDistrito = '';
     }
 
     this.modal?.show();

@@ -44,6 +44,7 @@ export class LetracambioListarComponent implements OnInit {
   // Edición en línea
   editingLetraId: number | null = null;
   campoEditando: 'importe' | 'importeLetras' | null = null;
+  monedaContrato: string = 'USD'; // Se carga al obtener las letras
   valorTemporal: string | number = '';
 
   constructor(
@@ -80,6 +81,10 @@ export class LetracambioListarComponent implements OnInit {
         this.letrasFiltradas = [...letras];
         this.aplicarPaginacion();
         this.cargando = false;
+        // Obtener moneda del contrato desde la primera letra
+        if (letras.length > 0 && letras[0].monedaContrato) {
+          this.monedaContrato = letras[0].monedaContrato;
+        }
       },
       error: () => {
         this.error = 'Ocurrió un error al cargar las letras.';
@@ -133,7 +138,7 @@ export class LetracambioListarComponent implements OnInit {
           doc.text(this.formatearFechaVista(reporte.fechaVencimiento), 155, 24); // Fecha de Vencimiento formateada
           // Formatear el importe con separadores de miles y dos decimales
           const importeFormateado = reporte.importe.toLocaleString('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          doc.text(`$. ${importeFormateado}`, 182, 22); // Importe con separadores de miles y decimales
+          doc.text(`${this.monedaContrato === 'PEN' ? 'S/ ' : '$ '} ${importeFormateado}`, 182, 22); // Importe con separadores de miles y decimales
           y += espaciadoVertical;
 
           // Segunda fila
@@ -270,12 +275,13 @@ export class LetracambioListarComponent implements OnInit {
 
           const numeroLetra = letra.numeroLetra.split('/')[0];
           doc.setFont('times', 'normal');
+          doc.setFontSize(10);
           doc.setDrawColor(200, 200, 200);
           doc.rect(tableX, y, tableWidth, rowHeight);
 
           doc.text(numeroLetra, colStarts['N°'] + colWidths['N°'] / 2, y + 4.5, { align: 'center' });
           doc.text(this.formatearFechaVista(letra.fechaVencimiento), colStarts['Vencimiento'] + colWidths['Vencimiento'] / 2, y + 4.5, { align: 'center' });
-          doc.text(`$ ${letra.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+          doc.text(`${this.monedaContrato === 'PEN' ? 'S/ ' : '$ '}${letra.importe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
           doc.line(colStarts['Vencimiento'], y, colStarts['Vencimiento'], y + rowHeight);
           doc.line(colStarts['Importe'], y, colStarts['Importe'], y + rowHeight);
@@ -290,9 +296,10 @@ export class LetracambioListarComponent implements OnInit {
           y = margin;
         }
         doc.setFont('times', 'bold');
+        doc.setFontSize(10);
         doc.rect(tableX, y, tableWidth, rowHeight);
         doc.text('SUMA DE IMPORTE:', colStarts['N°'] + (colWidths['N°'] + colWidths['Vencimiento']) / 2, y + 4.5, { align: 'center' });
-        doc.text(`$ ${totalImporte.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
+        doc.text(`${this.monedaContrato === 'PEN' ? 'S/ ' : '$ '}${totalImporte.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, colStarts['Importe'] + colWidths['Importe'] / 2, y + 4.5, { align: 'center' });
 
         // 2. LÓGICA DE FIRMAS
         y += 28; // Espacio mínimo después de la tabla (reducido de 15 a 5)
@@ -382,7 +389,7 @@ export class LetracambioListarComponent implements OnInit {
 
   // Dibuja el encabezado de la tabla
   private drawTableHeader(doc: jsPDF, y: number, margin: number, colWidths: any, colStarts: any, tableWidth: number): void {
-    doc.setFontSize(8);
+    doc.setFontSize(10);
     doc.setFont('times', 'bold');
     doc.setFillColor(200, 200, 200);
 
@@ -454,10 +461,10 @@ export class LetracambioListarComponent implements OnInit {
     }
     doc.text(`N° de Letras:${data.cantidadLetras}`, 94, y + 5);
     doc.setFont('times', 'bold');
-    doc.text(`Inicial: $. ${data.inicial?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 145, y + 5);
+    doc.text(`Inicial: ${this.monedaContrato === 'PEN' ? 'S/' : '$'} ${data.inicial?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 145, y + 5);
 
-    doc.text(`Monto Total: $. ${data.montoTotal?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 94, y + 10);
-    doc.text(`Saldo: $. ${data.saldo?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 145, y + 10);
+    doc.text(`Monto Total: ${this.monedaContrato === 'PEN' ? 'S/' : '$'} ${data.montoTotal?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 94, y + 10);
+    doc.text(`Saldo: ${this.monedaContrato === 'PEN' ? 'S/' : '$'} ${data.saldo?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 145, y + 10);
 
 
     // **Eliminado el if(page === 1) para que no se imprima aquí, ya que se hará en un bucle al final**
@@ -716,4 +723,3 @@ export class LetracambioListarComponent implements OnInit {
     return `${dia}/${mes}/${anio}`;
   }
 }
-

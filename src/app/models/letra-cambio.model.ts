@@ -1,6 +1,7 @@
 // src/app/models/letra-cambio.model.ts
 
 import { Contrato } from './contrato.model';
+import { Moneda } from '../dto/moneda.enum';
 import { EstadoLetra } from '../enums/estadoletra';
 import { TipoComprobante } from '../enums/tipocomprobante';
 import { Distrito } from './distrito.model';
@@ -20,4 +21,6 @@ export interface LetraCambio {
   tipoComprobante?: TipoComprobante;
   numeroComprobante?: string;
   observaciones?: string;
+  monedaContrato?: Moneda;
+  esMultiple?: boolean;
 }

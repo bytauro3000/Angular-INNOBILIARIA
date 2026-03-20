@@ -84,7 +84,7 @@
               autofocus
             />
             <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'importe')">
-              ${{ letra.importe | number: '1.2-2' }}
+              {{ letra.monedaContrato === 'PEN' ? 'S/' : '$' }}{{ letra.importe | number: '1.2-2' }}
             </span>
           </td>
 

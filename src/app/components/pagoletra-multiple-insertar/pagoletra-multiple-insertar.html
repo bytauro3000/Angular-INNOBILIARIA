@@ -15,14 +15,14 @@
             <div class="info-value">
               <ul class="lista-letras">
                 <li *ngFor="let l of letras">
-                  {{ getNumeroLetraLimpio(l.numeroLetra) }} - {{ l.importe | currency }}
+                  {{ getNumeroLetraLimpio(l.numeroLetra) }} - {{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{l.importe | number:'1.2-2'}}
                 </li>
               </ul>
             </div>
           </div>
           <div class="info-item" style="grid-column: 1 / -1; margin-top: 8px;">
             <label>Importe Total</label>
-            <p class="info-value total-importe">{{ importeTotal | currency }}</p>
+            <p class="info-value total-importe">{{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{importeTotal | number:'1.2-2'}}</p>
           </div>
         </div>
 

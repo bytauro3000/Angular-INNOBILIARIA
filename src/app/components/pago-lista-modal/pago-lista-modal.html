@@ -36,7 +36,7 @@
                             <tr *ngFor="let pago of pagos">
                                 <td>{{ getNumeroLetraLimpio(pago.numeroLetra) }}</td>
                                 <td>{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
-                                <td>{{ pago.importePagado | currency }}</td>
+                                <td>{{monedaContrato === 'PEN' ? 'S/.' : '$'}} {{pago.importePagado | number:'1.2-2'}}</td>
                                 <td>{{ pago.medioPago }}</td>
                                 <td>
                                     <span *ngIf="pago.tipoComprobante">{{ pago.tipoComprobante }} - {{

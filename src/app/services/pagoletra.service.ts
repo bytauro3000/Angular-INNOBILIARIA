@@ -62,6 +62,12 @@ export class PagoLetraService {
   }
 
   // NUEVO: descarga el comprobante PDF de un pago específico
+  descargarComprobanteMultiple(numeroComprobante: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/comprobante-multiple/${numeroComprobante}`, {
+      responseType: 'blob'
+    });
+  }
+
   descargarComprobante(idPago: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${idPago}/comprobante-pdf`, {
       responseType: 'blob'

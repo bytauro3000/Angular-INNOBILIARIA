@@ -59,7 +59,6 @@ $border-color: #e9ecef;
   gap: 12px;
   flex-wrap: wrap;
 
-  // ── 3 PESTAÑAS ──
   .selector-busqueda {
     display: flex;
     background: #f0f4f8;
@@ -96,7 +95,6 @@ $border-color: #e9ecef;
     flex: 1;
   }
 
-  // ── SEARCH BOX (ID y CLIENTE) ──
   .search-box {
     flex: 1 1 auto;
     min-width: 240px;
@@ -120,11 +118,7 @@ $border-color: #e9ecef;
       &::placeholder { color: #94a3b8; }
     }
 
-    .spinner-search {
-      flex-shrink: 0;
-      color: $navy;
-      font-size: 0.85rem;
-    }
+    .spinner-search { flex-shrink: 0; color: $navy; font-size: 0.85rem; }
 
     .btn-clear-inline {
       background: none; border: none; padding: 0; cursor: pointer;
@@ -136,7 +130,6 @@ $border-color: #e9ecef;
     }
   }
 
-  // ── BÚSQUEDA POR LOTE ──
   .busqueda-lote {
     display: flex;
     align-items: center;
@@ -145,7 +138,7 @@ $border-color: #e9ecef;
     flex: 1;
 
     .select-programa {
-      width: 280px; // más ancho que antes (era 220px)
+      width: 280px;
       padding: 9px 12px;
       border: 1px solid $border-color;
       border-radius: 10px;
@@ -172,7 +165,6 @@ $border-color: #e9ecef;
       &::placeholder { color: #94a3b8; }
     }
 
-    // Botón limpiar dentro del lote — mismo estilo que search-box
     .btn-clear-inline {
       background: none; border: none; padding: 4px; cursor: pointer;
       color: #e74c3c; font-size: 1.15rem; display: flex; align-items: center;
@@ -183,7 +175,6 @@ $border-color: #e9ecef;
     }
   }
 
-  // ── BOTÓN NUEVO ──
   .btn-nuevo {
     background: linear-gradient(135deg, #27ae60, #219150);
     color: white; border: none; height: 40px; min-width: 110px;
@@ -211,7 +202,7 @@ $border-color: #e9ecef;
   background: white;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  overflow-x: auto;   // solo scroll horizontal, sin overflow:visible que causaba el scrollbar lateral
+  overflow-x: auto;
   margin-top: 20px;
 }
 
@@ -344,12 +335,12 @@ $border-color: #e9ecef;
   &.open .btn-estado-menu i { transform: rotate(180deg); }
 
   .estado-menu {
-    position: fixed;    // sale del flujo normal — ya no queda atrapado por overflow
+    position: fixed;
     background: white;
     border: 1px solid $border-color;
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    z-index: 99999;     // por encima de todo
+    z-index: 99999;
     min-width: 210px;
     overflow: hidden;
     padding: 4px 0;
@@ -407,10 +398,7 @@ $border-color: #e9ecef;
   40%           { transform: scale(1); opacity: 1; }
 }
 
-.loading-row td {
-  padding: 0 !important;
-  border: none !important;
-}
+.loading-row td { padding: 0 !important; border: none !important; }
 
 .loading-dots-wrapper-inline {
   display: flex;
@@ -463,61 +451,199 @@ $border-color: #e9ecef;
 // RESPONSIVE: MÓVILES
 // ============================================
 @media screen and (max-width: 767px) {
+
+  .contratos-container { padding: 12px; }
+
   .table-custom thead { display: none; }
 
   .table-custom tbody tr {
-    display: block; margin-bottom: 16px;
-    border: 1px solid $border-color; border-radius: 12px;
-    overflow: hidden; background: white;
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
   .table-custom tbody td {
-    display: grid; grid-template-columns: 130px 1fr;
-    align-items: center; gap: 12px;
-    padding: 12px 16px; border-bottom: 1px solid #f0f0f0; text-align: right;
+    // ✅ auto en vez de 130px fijo — la etiqueta toma solo lo que necesita
+    // y el valor ocupa todo el resto sin cortarse
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: right;
+
+    // ✅ Etiqueta izquierda
     &::before {
-      content: attr(data-label); font-weight: 600; color: #022654;
-      text-align: left; justify-self: start;
+      content: attr(data-label);
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: #022654;
+      text-align: left;
+      justify-self: start;
+      white-space: nowrap;    // la etiqueta nunca se parte
+      padding-top: 2px;       // alineación vertical con el valor
     }
+
+    // ✅ El valor derecho puede partir palabras largas si es necesario
+    // (ej: números de documento o nombres largos)
+    & > *:not(::before) {
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    // Fila del ID — centrada, sin etiqueta
     &:first-child {
-      background: #f8f8fa; font-weight: bold;
-      border-bottom: 2px solid $green;
-      display: flex; justify-content: center; text-align: center;
+      background: linear-gradient(135deg, $navy, #0353a4);
+      font-weight: bold;
+      border-bottom: none;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 14px;
       &::before { display: none; }
+
+      .id-service-wrapper {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+
+        .id-number {
+          color: white;
+          font-size: 1rem;
+          font-weight: 700;
+        }
+
+        .service-indicators {
+          i.bi-lightning-charge-fill { color: #ffd166; }
+          i.bi-droplet-fill          { color: #90e0ef; }
+        }
+      }
     }
+
+    // Fila de acciones — flex, sin etiqueta
     &.acciones-cell {
-      display: flex; text-align: initial;
-      &::before { display: none; }
-      .acciones-container { justify-content: flex-end !important; width: 100%; }
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      &::before {
+        display: block;
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: #022654;
+      }
+      .acciones-container {
+        justify-content: flex-end !important;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
     }
   }
 
-  .table-custom tbody td > div { justify-self: end; text-align: right; width: 100%; }
-  .table-custom tbody td.text-center { text-align: right !important; }
-  .multi-item-container { width: 100%; }
-  .multi-item-container div { width: 100%; text-align: right; }
+  // ✅ Contenedores de valores — alineados a la derecha, con posibilidad de romper
+  .table-custom tbody td > div,
+  .table-custom tbody td > span {
+    justify-self: end;
+    text-align: right;
+    min-width: 0;
+    word-break: break-word;
+  }
 
-  // el estado-menu usa position:fixed — la posición la maneja ngStyle en el TS
+  .table-custom tbody td.text-center { text-align: right !important; }
+
+  // ✅ Multi-item (clientes y lotes) — se apilan bien en móvil
+  .multi-item-container {
+    width: 100%;
+    div {
+      width: 100%;
+      text-align: right;
+      white-space: normal;      // permite partir en dos líneas si el nombre es largo
+      word-break: break-word;
+      font-size: 0.8rem;
+    }
+  }
+
+  // Estado alineado a la derecha en móvil
   .estado-cell { justify-content: flex-end; }
 
+  // Badge de estado más compacto en móvil
+  .estado-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    gap: 4px;
+  }
+
+  // Botones de acción más grandes para facilitar el toque
+  .btn-action {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1rem !important;
+    i { font-size: 1.1rem !important; }
+  }
+
+  // ============================================
+  // FILTROS EN MÓVIL
+  // ============================================
   .filtros-header {
-    flex-direction: column; align-items: center; gap: 12px;
-    .selector-busqueda { width: 100%; justify-content: center; }
-    .filtros-operativos { width: 100%; flex-direction: column; }
-    .search-box { width: 100%; max-width: 100%; }
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+
+    .selector-busqueda {
+      width: 100%;
+      justify-content: center;
+
+      .btn-toggle {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+      }
+    }
+
+    .filtros-operativos {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .search-box {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
     .busqueda-lote {
-      width: 100%; flex-direction: column; align-items: stretch;
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
       .select-programa, .input-lote { width: 100%; }
       .btn-clear-inline { align-self: flex-end; }
     }
+
     .btn-nuevo {
-      width: 100%; height: 45px;
-      display: flex !important; align-items: center !important; justify-content: center !important;
-      position: relative; padding: 0 20px;
+      width: 100%;
+      height: 48px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative;
+      padding: 0 20px;
+      font-size: 1rem;
       .icono-agregar {
-        position: absolute !important; left: 8px !important; top: 50% !important;
-        margin-top: -16px; width: 32px; height: 32px;
-        filter: brightness(0) invert(1); pointer-events: none;
+        position: absolute !important;
+        left: 8px !important;
+        top: 50% !important;
+        margin-top: -16px;
+        width: 32px;
+        height: 32px;
+        filter: brightness(0) invert(1);
+        pointer-events: none;
       }
       &:hover .icono-agregar { transform: rotate(90deg) !important; }
       span { margin: 0; padding: 0; }
@@ -530,10 +656,7 @@ $border-color: #e9ecef;
 // ============================================
 // FILA VACÍA — sin resultados
 // ============================================
-.empty-row td {
-  padding: 0 !important;
-  border: none !important;
-}
+.empty-row td { padding: 0 !important; border: none !important; }
 
 .empty-state {
   display: flex;
@@ -543,21 +666,7 @@ $border-color: #e9ecef;
   padding: 3rem 1rem;
   background: white;
 
-  i {
-    font-size: 2.2rem;
-    color: #cbd5e1;
-  }
-
-  .empty-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #64748b;
-    margin: 0;
-  }
-
-  .empty-subtitle {
-    font-size: 0.82rem;
-    color: #94a3b8;
-    margin: 0;
-  }
+  i { font-size: 2.2rem; color: #cbd5e1; }
+  .empty-title   { font-size: 0.95rem; font-weight: 600; color: #64748b; margin: 0; }
+  .empty-subtitle { font-size: 0.82rem; color: #94a3b8; margin: 0; }
 }

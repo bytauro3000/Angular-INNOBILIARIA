@@ -88,13 +88,14 @@ $input-bg: #f9fafc;
     letter-spacing: 0.5px;
     padding: 12px 8px;
     white-space: nowrap;
-    text-align: left;
+    text-align: center;
   }
 
   td {
     padding: 8px 8px;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
+    text-align: center;
     color: $text-dark;
   }
 

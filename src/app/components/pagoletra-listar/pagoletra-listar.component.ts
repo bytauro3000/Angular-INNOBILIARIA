@@ -338,14 +338,29 @@ export class PagoletraListarComponent implements OnInit {
           this.toastr.warning('No se encontró el pago de esta letra', 'Aviso');
           return;
         }
-        const idPago = pagos[0].idPago;
-        this.pagoService.descargarComprobante(idPago).subscribe({
-          next: (blob) => {
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-          },
-          error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
-        });
+        const pago = pagos[0];
+        const numeroComprobante = pago.numeroComprobante;
+
+        if (numeroComprobante) {
+          // Usar siempre el endpoint múltiple — si solo hay 1 pago con ese número,
+          // el backend lo detecta y genera el comprobante individual normalmente
+          this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
+            next: (blob) => {
+              const url = URL.createObjectURL(blob);
+              window.open(url, '_blank');
+            },
+            error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
+          });
+        } else {
+          // Sin número de comprobante (recibo sin numerar) — usar endpoint individual
+          this.pagoService.descargarComprobante(pago.idPago).subscribe({
+            next: (blob) => {
+              const url = URL.createObjectURL(blob);
+              window.open(url, '_blank');
+            },
+            error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
+          });
+        }
       },
       error: () => this.toastr.error('Error al buscar el pago de la letra', 'Error')
     });

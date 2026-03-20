@@ -46,4 +46,10 @@ export class LetrasCambioService {
     const url = `${this.apiUrl}/repcronograma/${idContrato}`;
     return this.http.get<ReporteCronogramaPagosClientesDTO[]>(url);
   }
+
+  existenLetras(idContrato: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/existe/${idContrato}`);
+  }
+ 
+  
 }

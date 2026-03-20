@@ -7,6 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
+import { ContratoService } from '../../services/contrato.service';
+import { Moneda } from '../../dto/moneda.enum';
 import { Router } from '@angular/router';
 
 @Component({
@@ -17,10 +19,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./letracambio-insertar.scss'],
 })
 export class LetracambioInsertarComponent implements OnInit {
-  idContrato!: number; // Ahora se obtiene desde la URL
+  idContrato!: number;
   @Output() letrasGeneradas = new EventEmitter<void>();
 
-  tieneLetras: boolean = false; // <-- bandera para saber si existen letras ya generadas
+  tieneLetras: boolean = false;
+  monedaContrato: Moneda = 'USD';
 
   generarLetrasRequest: GenerarLetrasRequest = this.crearRequestConFechaLocal();
   distritos: Distrito[] = [];
@@ -32,7 +35,8 @@ export class LetracambioInsertarComponent implements OnInit {
     private letrasService: LetrasCambioService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private contratoService: ContratoService
   ) {}
 
   ngOnInit(): void {
@@ -44,21 +48,32 @@ export class LetracambioInsertarComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('idContrato');
       this.idContrato = id ? +id : 0;
-      console.log('ID de contrato recibido:', this.idContrato);
 
       if (this.idContrato > 0) {
+        this.cargarMonedaContrato();
+        // Siempre consultamos al backend si ya existen letras reales generadas.
+        // NO usamos el queryParam 'cantidadLetras' del contrato porque ese campo
+        // representa las letras planificadas al crear el contrato, no las generadas.
         this.verificarLetrasExistentes();
       }
     });
   }
 
+  cargarMonedaContrato(): void {
+    this.contratoService.obtenerContratoPorId(this.idContrato).subscribe({
+      next: (contrato) => { this.monedaContrato = contrato.moneda || 'USD'; },
+      error: () => { this.monedaContrato = 'USD'; }
+    });
+  }
+
   verificarLetrasExistentes(): void {
-    this.letrasService.listarPorContrato(this.idContrato).subscribe({
-      next: (letras) => {
-        this.tieneLetras = letras.length > 0;
+    // Usa el endpoint liviano GET /api/letras/existe/{idContrato}
+    // que devuelve solo true/false sin traer los datos de las letras
+    this.letrasService.existenLetras(this.idContrato).subscribe({
+      next: (existe) => {
+        this.tieneLetras = existe;
       },
-      error: (err) => {
-        console.error('Error al verificar letras existentes', err);
+      error: () => {
         this.tieneLetras = false;
       }
     });
@@ -98,7 +113,6 @@ export class LetracambioInsertarComponent implements OnInit {
     this.success = null;
 
     if (!this.generarLetrasRequest.modoAutomatico) {
-      // En modo manual, desformateamos importe antes de enviar
       const importeDesformateado = this.unformatCurrency(this.generarLetrasRequest.importe);
       this.generarLetrasRequest.importe = importeDesformateado;
     }
@@ -111,11 +125,9 @@ export class LetracambioInsertarComponent implements OnInit {
         this.letrasGeneradas.emit();
 
         if (this.generarLetrasRequest.modoAutomatico) {
-          // En modo automático, traemos las letras generadas para actualizar el importe y texto en frontend
           this.letrasService.listarPorContrato(this.idContrato).subscribe({
             next: (letras) => {
               if (letras.length > 0) {
-                // Suponemos que todas las letras tienen el mismo importe, tomamos la primera
                 const importe = letras[0].importe;
                 this.generarLetrasRequest.importe = importe.toString();
                 this.convertirImporteALetras(this.generarLetrasRequest.importe);
@@ -127,7 +139,6 @@ export class LetracambioInsertarComponent implements OnInit {
           });
         }
 
-        // Redirige al listado de letras del contrato generado
         this.router.navigate(['/secretaria-menu/letras/listar', this.idContrato]);
       },
       error: (err) => {
@@ -165,7 +176,8 @@ export class LetracambioInsertarComponent implements OnInit {
       const parteDecimal = Math.round((valorFloat - parteEntera) * 100);
       const letras = this.numeroALetras(parteEntera).toUpperCase();
       const centavos = parteDecimal.toString().padStart(2, '0');
-      this.generarLetrasRequest.importeLetras = `${letras} CON ${centavos}/100 DÓLARES AMERICANOS`;
+      const sufijo = this.monedaContrato === 'PEN' ? 'SOLES' : 'DÓLARES AMERICANOS';
+      this.generarLetrasRequest.importeLetras = `${letras} CON ${centavos}/100 ${sufijo}`;
     } else {
       this.generarLetrasRequest.importeLetras = '';
     }
@@ -176,16 +188,17 @@ export class LetracambioInsertarComponent implements OnInit {
     if (!rawValue) return '';
     let floatVal = parseFloat(rawValue);
     if (isNaN(floatVal)) return '';
+    const currencyCode = this.monedaContrato === 'PEN' ? 'PEN' : 'USD';
     return floatVal.toLocaleString('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currencyCode,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
   }
 
   private unformatCurrency(value: string): string {
-    return value.replace(/[$,]/g, '');
+    return value.replace(/[$,S\/. ]/g, '');
   }
 
   private numeroALetras(num: number): string {

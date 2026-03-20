@@ -122,25 +122,43 @@
         <div class="section-title">
           <i class="bi bi-currency-dollar"></i> Información Financiera
         </div>
-        <div class="form-row form-3-col">
 
+        <div class="form-row form-2-col" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label><i class="bi bi-coin"></i> Moneda del Contrato</label>
+            <select formControlName="moneda" (change)="onMonedaChange()" class="form-control">
+              <option value="USD">🇺🇸 Dólares Americanos (USD)</option>
+              <option value="PEN">🇵🇪 Soles Peruanos (PEN)</option>
+            </select>
+          </div>
+          <div class="form-group" *ngIf="tipoCambioCompra > 0">
+            <label><i class="bi bi-currency-exchange"></i> Tipo de Cambio Referencial</label>
+            <div class="cuota-display">
+              <span class="cuota-valor">S/ {{ tipoCambioCompra | number:'1.3-3' }} = $ 1.00</span>
+              <span class="cuota-detalle">· Compra (S/ → $)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row form-3-col">
           <div class="form-group">
             <label for="montoTotal"><i class="bi bi-cash-coin"></i> Monto Total</label>
             <input type="text" id="montoTotal" #inputMontoTotal formControlName="montoTotal"
-              appCurrencyFormatter [class.field-error]="campoInvalido('montoTotal')" />
+              appCurrencyFormatter [currencySymbol]="contratoForm.get('moneda')?.value === 'PEN' ? 'S/ ' : '$ '"
+              [class.field-error]="campoInvalido('montoTotal')" />
             <span class="error-msg" *ngIf="campoInvalido('montoTotal')">El monto debe ser mayor a 0</span>
           </div>
 
           <div class="form-group" *ngIf="esFinanciado">
             <label for="inicial"><i class="bi bi-wallet2"></i> Inicial</label>
-            <input type="text" id="inicial" #inputInicial formControlName="inicial" appCurrencyFormatter />
+            <input type="text" id="inicial" #inputInicial formControlName="inicial"
+              appCurrencyFormatter [currencySymbol]="contratoForm.get('moneda')?.value === 'PEN' ? 'S/ ' : '$ '" />
           </div>
 
           <div class="form-group" *ngIf="esFinanciado">
             <label for="saldo"><i class="bi bi-calculator"></i> Saldo a Financiar</label>
             <input type="text" id="saldo" [value]="saldoDisplay" disabled class="field-calculated" />
           </div>
-
         </div>
 
         <div class="form-row form-2-col" *ngIf="esFinanciado">
@@ -153,9 +171,7 @@
             <div class="cuota-display">
               <ng-container *ngIf="cuotaMensual > 0">
                 <span class="cuota-valor">{{ formatearMoneda(cuotaMensual) }}</span>
-                <span class="cuota-detalle" *ngIf="tieneResiduo">
-                  · última: {{ formatearMoneda(ultimaLetra) }}
-                </span>
+                <span class="cuota-detalle" *ngIf="tieneResiduo">· última: {{ formatearMoneda(ultimaLetra) }}</span>
               </ng-container>
               <span class="cuota-vacia" *ngIf="cuotaMensual <= 0">Ingresa saldo y cantidad de letras</span>
             </div>
@@ -183,7 +199,6 @@
             <span class="resumen-valor">{{ cantidadLetrasNum }} cuotas</span>
           </div>
         </div>
-
       </div>
 
       <!-- ══════════ SECCIÓN 4: OBSERVACIONES ══════════ -->
@@ -292,7 +307,30 @@
   </div>
 </div>
 
-<!-- ══════════════ MODAL DE CONFIRMACIÓN ══════════════ -->
+<!-- ══════════════ MODAL ADVERTENCIA LETRAS ══════════════ -->
+<!-- Aparece al presionar "Guardar Cambios" solo si el contrato tiene letras generadas -->
+<div class="confirm-overlay" *ngIf="mostrarModalAdvertenciaLetras" (click)="cancelarAdvertenciaLetras()">
+  <div class="confirm-modal alerta-letras-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-icon alerta-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h3>Advertencia</h3>
+    <p>
+      Al realizar la modificación de <strong>inicial</strong>, <strong>costo total</strong>
+      o <strong>cantidad de letras</strong> se eliminarán todas las letras y pagos de dicho contrato.
+    </p>
+    <div class="confirm-actions">
+      <button class="btn btn-save" (click)="aceptarAdvertenciaLetras()">
+        <i class="bi bi-check-lg"></i> Aceptar
+      </button>
+      <button class="btn btn-cancel" (click)="cancelarAdvertenciaLetras()">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL DE CONFIRMACIÓN NORMAL ══════════════ -->
 <div class="confirm-overlay" *ngIf="mostrarModalConfirmacion" (click)="cancelarConfirmacion()">
   <div class="confirm-modal" (click)="$event.stopPropagation()">
     <div class="confirm-icon">

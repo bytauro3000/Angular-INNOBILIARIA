@@ -6,6 +6,14 @@ import { TransferenciaResponseDTO } from '../dto/Transferenciaresponse.dto';
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 import { environment } from '../../environments/environment';
 
+// ✅ NUEVO: respuesta del endpoint /impacto-edicion
+export interface ImpactoEdicionDTO {
+  tieneLetras:    boolean;
+  tienePagos:     boolean;
+  cantidadLetras: number;
+  cantidadPagos:  number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -67,5 +75,10 @@ export class ContratoService {
 
   registrarTransferencia(id: number): Observable<TransferenciaResponseDTO> {
     return this.http.patch<TransferenciaResponseDTO>(`${this.apiUrl}/${id}/transferencia`, null);
+  }
+
+  //consulta previa al editar — informa si hay letras/pagos en riesgo
+  consultarImpactoEdicion(id: number): Observable<ImpactoEdicionDTO> {
+    return this.http.get<ImpactoEdicionDTO>(`${this.apiUrl}/${id}/impacto-edicion`);
   }
 }

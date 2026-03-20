@@ -12,7 +12,7 @@
         <div class="info-letra form-row form-2-col">
           <div class="info-item">
             <label>Importe de la letra</label>
-            <p class="info-value">{{ letra.importe | currency }}</p>
+            <p class="info-value">{{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{letra.importe | number:'1.2-2'}}</p>
           </div>
           <div class="info-item">
             <label>Fecha vencimiento</label>

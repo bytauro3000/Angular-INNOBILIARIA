@@ -162,6 +162,16 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       next: () => {
         this.toastr.success('Pagos registrados correctamente', 'Éxito');
         this.enviando = false;
+        // Abrir comprobante consolidado automáticamente
+        if (this.datosComunes.numeroComprobante) {
+          this.pagoService.descargarComprobanteMultiple(this.datosComunes.numeroComprobante).subscribe({
+            next: (blob) => {
+              const url = URL.createObjectURL(blob);
+              window.open(url, '_blank');
+            },
+            error: () => {} // Si falla no interrumpir el flujo
+          });
+        }
         this.cerrarModal();
         this.onPagoExitoso.emit();
       },

@@ -48,8 +48,8 @@
       </div>
       <div><strong>Fecha contrato:</strong> {{ contratoEncontrado.fechaContrato | date:'dd/MM/yyyy' }}</div>
       <div class="total-saldo-row">
-        <span class="total-label"><strong>Total:</strong> {{ contratoEncontrado.montoTotal | currency }}</span>
-        <span class="saldo-label"><strong>Saldo:</strong> {{ contratoEncontrado.saldo | currency }}</span>
+        <span class="total-label"><strong>Total:</strong> {{contratoEncontrado.moneda === 'PEN' ? 'S/.' : '$'}} {{contratoEncontrado.montoTotal | number:'1.2-2'}}</span>
+        <span class="saldo-label"><strong>Saldo:</strong> {{contratoEncontrado.moneda === 'PEN' ? 'S/.' : '$'}} {{contratoEncontrado.saldo | number:'1.2-2'}}</span>
       </div>
     </div>
   </div>
@@ -121,7 +121,7 @@
           </td>
           <td data-label="N° Letra">{{ letra.numeroLetra }}</td>
           <td data-label="Fecha Vencimiento">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
-          <td data-label="Importe">{{ letra.importe | currency }}</td>
+          <td data-label="Importe">{{contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$'}} {{letra.importe | number:'1.2-2'}}</td>
           <td data-label="Importe en texto">{{ letra.importeLetras || '-' }}</td>
           <td data-label="Estado">
             <span class="estado-badge" [ngClass]="{
@@ -143,10 +143,12 @@
 
               <!-- Botón imprimir comprobante — solo en pestaña Pagadas -->
               <button *ngIf="tipoLista === 'pagadas'"
-                      class="btn-imprimir"
+                      [class.btn-imprimir]="!letra.esMultiple"
+                      [class.btn-imprimir-multiple]="letra.esMultiple"
                       (click)="imprimirComprobante(letra.idLetra)"
-                      title="Imprimir comprobante de pago">
+                      [title]="letra.esMultiple ? 'Comprobante múltiple (N° ' + letra.numeroComprobante + ')' : 'Imprimir comprobante'">
                 <i class="bi bi-printer"></i>
+                <span *ngIf="letra.esMultiple" class="badge-multiple">M</span>
               </button>
 
             </div>
@@ -183,6 +185,7 @@
 <app-pago-lista-modal
   *ngIf="mostrarListaPagos && idContratoParaLista"
   [idContrato]="idContratoParaLista"
+  [monedaContrato]="contratoEncontrado?.moneda || 'USD'"
   (onClose)="cerrarListaPagos()"
   (onPagoEliminado)="onPagoEliminado()">
 </app-pago-lista-modal>

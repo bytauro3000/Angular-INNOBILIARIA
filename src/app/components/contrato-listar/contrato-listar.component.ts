@@ -1,5 +1,5 @@
 import { Component, ViewChild, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, of } from 'rxjs';
@@ -21,7 +21,6 @@ import Swal from 'sweetalert2';
     CommonModule,
     FormsModule,
     RouterModule,
-    CurrencyPipe,
     DatePipe,
     InscripcionServiciosInsertarComponent
   ],
@@ -198,19 +197,31 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
 
 
   // ─── AUTO-FORMATO NÚMERO DE LOTE (igual que pagoletra-listar) ─────────
-  formatearNumeroLote(): void {
-    const soloNumeros = this.numeroLoteBusqueda.replace(/\D/g, '');
-    const procesado = soloNumeros.length > 2 ? soloNumeros.slice(-2) : soloNumeros;
-    if (procesado.length === 1) {
-      const num = parseInt(procesado, 10);
-      if (num >= 1 && num <= 9) {
-        this.numeroLoteBusqueda = '0' + num;
-      } else {
-        this.numeroLoteBusqueda = procesado;
-      }
+  formatearNumeroLote(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    // Leer el valor crudo directo del DOM (sin ngModel que ya lo procesó)
+    const raw = input.value.replace(/\D/g, '');
+
+    let resultado = '';
+    if (raw.length === 0) {
+      resultado = '';
+    } else if (raw.length === 1) {
+      // Un dígito solo → prefijarlo con 0: "1" → "01"
+      resultado = '0' + raw;
+    } else if (raw.length === 2) {
+      // Dos dígitos exactos → mostrar tal cual
+      resultado = raw;
     } else {
-      this.numeroLoteBusqueda = procesado;
+      // Más de 2 dígitos → tomar los últimos 2 significativos
+      // "011" → quitar el 0 inicial → "11"
+      const sinCero = raw.replace(/^0+/, '') || '0';
+      resultado = sinCero.padStart(2, '0').slice(-2);
     }
+
+    // Actualizar el modelo Y el DOM directamente para evitar el ciclo ngModel
+    this.numeroLoteBusqueda = resultado;
+    input.value = resultado;
+
     this.filtrarPorLote();
   }
 

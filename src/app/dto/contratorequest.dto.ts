@@ -1,3 +1,4 @@
+import { Moneda } from "./moneda.enum";
 export interface ContratoRequestDTO {
   fechaContrato: string;
   tipoContrato: string;
@@ -11,6 +12,5 @@ export interface ContratoRequestDTO {
   idSeparacion?: number;
   idClientes: number[];
   idLotes: number[];
-
-  
+  moneda: Moneda;
 }

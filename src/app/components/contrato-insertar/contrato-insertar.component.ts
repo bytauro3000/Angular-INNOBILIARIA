@@ -22,6 +22,8 @@ import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.c
 import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit';
 import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-editar';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
+import { Moneda } from '../../dto/moneda.enum';
+import { TipoCambioService } from '../../services/tipo-cambio.service';
 
 @Component({
   selector: 'app-contrato-insertar',
@@ -62,6 +64,9 @@ export class ContratoInsertarComponent implements OnInit {
   isGuardando: boolean = false;
   mostrarModalConfirmacion: boolean = false;
   saldoDisplay: string = '$ 0.00';
+  monedaSeleccionada: Moneda = 'USD';
+  tipoCambioEmpresa: number = 0;
+  tipoCambioCompra: number = 0;
 
   vendedoresFiltrados: Vendedor[] = [];
   filtroVendedor: string = '';
@@ -111,7 +116,8 @@ export class ContratoInsertarComponent implements OnInit {
     private loteService: LoteService,
     public router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tipoCambioService: TipoCambioService
   ) {}
 
   @HostListener('document:click', ['$event'])
@@ -128,6 +134,20 @@ export class ContratoInsertarComponent implements OnInit {
     this.cargarCombos();
     this.handleFormChanges();
     this.cargarDatosTransferencia();
+    this.cargarTipoCambio();
+  }
+
+  cargarTipoCambio(): void {
+    this.tipoCambioService.obtenerTipoCambio().subscribe({
+      next: (tc) => { this.tipoCambioEmpresa = tc.empresa; this.tipoCambioCompra = tc.compra; },
+      error: () => { this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0; }
+    });
+  }
+
+  onMonedaChange(): void {
+    // Recalcular el monto total de los lotes según la nueva moneda
+    this.calcularMontoTotalLotes();
+    this.saldoDisplay = this.formatearMoneda(this.saldoNum);
   }
 
   /**
@@ -210,7 +230,8 @@ export class ContratoInsertarComponent implements OnInit {
       cantidadLetras: [null, [Validators.min(0)]],
       observaciones: [''],
       idClientes: [[], Validators.required],
-      idLotes: [[], Validators.required]
+      idLotes: [[], Validators.required],
+      moneda: ['USD', Validators.required]
     });
   }
 
@@ -259,11 +280,24 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   formatearMoneda(v: number): string {
-    return '$ ' + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+    const moneda = this.contratoForm?.get('moneda')?.value || this.monedaSeleccionada;
+    const simbolo = moneda === 'PEN' ? 'S/ ' : '$ ';
+    return simbolo + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+  }
+
+  getLoteCostoUSD(lote: Lote): number {
+    // Precio base siempre en USD (area * precioM2)
+    return Math.round((Number(lote.area) || 0) * (Number(lote.precioM2) || 0));
   }
 
   getLoteCosto(lote: Lote): number {
-    return Math.round((Number(lote.area) || 0) * (Number(lote.precioM2) || 0));
+    const costoUSD = this.getLoteCostoUSD(lote);
+    const moneda = this.contratoForm?.get('moneda')?.value || 'USD';
+    if (moneda === 'PEN' && this.tipoCambioEmpresa > 0) {
+      // Convertir a soles y redondear al entero más cercano
+      return Math.round(costoUSD * this.tipoCambioEmpresa);
+    }
+    return costoUSD;
   }
 
   private calcularMontoTotalLotes() {
@@ -430,7 +464,8 @@ export class ContratoInsertarComponent implements OnInit {
       idVendedor: v.vendedorId,
       idSeparacion: v.idSeparacion,
       idClientes: v.idClientes,
-      idLotes: v.idLotes
+      idLotes: v.idLotes,
+      moneda: v.moneda
     };
     this.contratoService.guardarContrato(request).subscribe({
       next: () => { this.isGuardando = false; this.toastr.success('Contrato guardado con éxito'); this.resetFormulario(); },
@@ -441,11 +476,13 @@ export class ContratoInsertarComponent implements OnInit {
   cancelarConfirmacion() { this.mostrarModalConfirmacion = false; }
 
   private resetFormulario() {
-    this.contratoForm.reset({ modalidadContrato: 'DIRECTO', tipoContrato: 'FINANCIADO', montoTotal: 0, inicial: 0, saldo: 0, cantidadLetras: null }, { emitEvent: false });
+    this.monedaSeleccionada = 'USD';
+    this.contratoForm.reset({ modalidadContrato: 'DIRECTO', tipoContrato: 'FINANCIADO', montoTotal: 0, inicial: 0, saldo: 0, cantidadLetras: null, moneda: 'USD' }, { emitEvent: false });
     this.clientesSeleccionados = []; this.lotesSeleccionados = []; this.separaciones = [];
     this.filtroVendedor = ''; this.filtroPrograma = ''; this.filtroCliente = ''; this.filtroLote = '';
     this.lotes = []; this.lotesFiltrados = []; this.showSeparacionList = false;
     this.terminoBusquedaSeparacion = ''; this.saldoDisplay = '$ 0.00';
+    this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0;
   }
 
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }

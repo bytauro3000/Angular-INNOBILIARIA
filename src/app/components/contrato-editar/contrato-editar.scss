@@ -583,3 +583,15 @@ $error-bg:    #fff5f5;
   text-align: left;
   flex: 1;
 }
+// ============================================
+// MODAL DE ADVERTENCIA DE LETRAS
+// ============================================
+.alerta-letras-modal {
+  border-top: 4px solid #f59e0b;
+}
+
+.alerta-icon {
+  color: #f59e0b !important;
+
+  i { color: #f59e0b !important; }
+}

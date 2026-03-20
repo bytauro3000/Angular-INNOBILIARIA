@@ -40,8 +40,8 @@
         </select>
         <input type="text" [(ngModel)]="manzanaBusqueda" (input)="filtrarPorLote()"
           placeholder="Manzana" class="form-control input-lote" />
-        <input type="text" [(ngModel)]="numeroLoteBusqueda" (input)="formatearNumeroLote()"
-          placeholder="N° Lote" class="form-control input-lote" maxlength="2" />
+        <input type="text" [value]="numeroLoteBusqueda" (input)="formatearNumeroLote($event)"
+          placeholder="N° Lote" class="form-control input-lote" maxlength="3" />
         <button class="btn-clear-inline" (click)="limpiarBusqueda()" title="Limpiar filtros"
           [class.active]="programaSeleccionado || manzanaBusqueda || numeroLoteBusqueda">
           <i class="bi bi-x-circle-fill"></i>
@@ -173,9 +173,9 @@
           </td>
 
           <!-- Montos -->
-          <td class="text-end fw-bold" data-label="Total">{{ contrato.montoTotal | currency: 'USD' }}</td>
-          <td class="text-end" data-label="Inicial">{{ contrato.inicial | currency: 'USD' }}</td>
-          <td class="text-end" data-label="Saldo">{{ contrato.saldo | currency: 'USD' }}</td>
+          <td class="text-end fw-bold" data-label="Total" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' : '$' }}{{ contrato.montoTotal | number:'1.2-2' }}</td>
+          <td class="text-end" data-label="Inicial" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' : '$' }}{{ contrato.inicial | number:'1.2-2' }}</td>
+          <td class="text-end" data-label="Saldo" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' : '$' }}{{ contrato.saldo | number:'1.2-2' }}</td>
           <td class="text-center" data-label="Letras">{{ contrato.cantidadLetras }}</td>
 
           <!-- Acciones -->
@@ -208,7 +208,7 @@
               </button>
 
               <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
-                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
+                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" [queryParams]="{tieneLetras: (contrato.cantidadLetras > 0) ? '1' : '0'}"
                 class="btn-action btn-letras" title="Generar letras">
                 <i class="bi bi-receipt-cutoff"></i>
               </a>
