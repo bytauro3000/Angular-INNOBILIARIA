@@ -1,16 +1,15 @@
 // ============================================
-// VARIABLES (tomadas de contratos/clientes)
+// VARIABLES
 // ============================================
 $navy: #023e8a;
 $green: #27ae60;
-$light-blue: #3498db;
 $text-dark: #1e293b;
 $text-light: #334155;
 $border-color: #e9ecef;
 $input-bg: #f9fafc;
 
 // ============================================
-// MODAL PRINCIPAL
+// MODAL
 // ============================================
 .modal-content {
   background-color: white !important;
@@ -22,12 +21,13 @@ $input-bg: #f9fafc;
 .custom-modal-width {
   max-width: 850px;
   width: 95%;
-  margin: 10px auto;
+  margin: auto;
 }
 
 .modal-header {
-  padding: 1.2rem 1.5rem;
+  padding: 0.9rem 1.2rem;
   border-bottom: 1px solid $border-color;
+  flex-shrink: 0;
 
   .modal-title {
     font-weight: 600;
@@ -36,25 +36,32 @@ $input-bg: #f9fafc;
     display: flex;
     align-items: center;
     gap: 10px;
-
-    i {
-      color: $green;
-      font-size: 1.4rem;
-    }
+    i { color: $green; font-size: 1.4rem; }
   }
 
-  .btn-close {
-    filter: none;
-    opacity: 0.6;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
+  .btn-close { filter: none; opacity: 0.6; &:hover { opacity: 1; } }
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch; // scroll suave en iOS
+}
+
+// Botones al final del formulario (dentro del scroll)
+.form-botones {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 0.8rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid $border-color;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    .btn { width: 100%; }
+  }
 }
 
 // ============================================
@@ -63,31 +70,28 @@ $input-bg: #f9fafc;
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
 
   label {
     color: $text-light;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }
 }
 
-.width-100 {
-  grid-column: 1 / -1;
-}
+.width-100 { grid-column: 1 / -1; }
 
-/* --- INPUTS Y SELECTS --- */
 input, select, textarea {
   background-color: $input-bg !important;
   border: 1px solid $border-color !important;
   color: $text-dark !important;
-  border-radius: 10px !important;
-  padding: 10px 12px !important;
-  font-size: 0.95rem !important;
-  height: 42px !important;
+  border-radius: 8px !important;
+  padding: 7px 10px !important;
+  font-size: 0.85rem !important;
+  height: 36px !important;
   width: 100% !important;
   transition: all 0.2s ease;
 
@@ -98,39 +102,110 @@ input, select, textarea {
     outline: none !important;
   }
 
-  &::placeholder {
-    color: #94a3b8;
-    font-size: 0.9rem;
+  &::placeholder { color: #94a3b8; font-size: 0.82rem; }
+}
+
+textarea { height: auto !important; min-height: 80px; }
+
+// ============================================
+// DROPDOWN PAIS CON BANDERAS
+// ============================================
+.pais-dropdown {
+  position: relative;
+  width: 100%;
+
+  .pais-trigger {
+    width: 100%;
+    height: 36px;
+    background-color: $input-bg;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: $text-dark;
+    text-align: left;
+    transition: border-color 0.2s;
+
+    &:focus { outline: none; border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, 0.15); }
+    &.is-invalid { border-color: #e53e3e; }
+
+    .placeholder-text { color: #94a3b8; }
+
+    .pais-chevron {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: $text-light;
+      transition: transform 0.2s;
+    }
+
+    .pais-flag {
+      width: 20px;
+      height: 14px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+      image-rendering: -webkit-optimize-contrast; // Chrome/Safari
+      image-rendering: crisp-edges;               // Firefox/otros
+    }
+  }
+
+  &.open .pais-trigger .pais-chevron {
+    transform: rotate(180deg);
+  }
+
+  .pais-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+    padding: 4px 0;
+    margin: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: $text-dark;
+      transition: background 0.15s;
+
+      &:hover { background: #f1f5f9; }
+
+      .pais-flag {
+        width: 20px;
+        height: 14px;
+        object-fit: cover;
+        border-radius: 2px;
+        flex-shrink: 0;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+      }
+    }
   }
 }
 
-// Para textarea si se usara (no en este formulario)
-textarea {
-  height: auto !important;
-  min-height: 80px;
-}
-
-/* --- GRID --- */
-.form-row {
-  display: grid;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
-  width: 100%;
-}
-
-.form-1-col { grid-template-columns: 1fr; }
-.form-2-col { grid-template-columns: repeat(2, 1fr); }
-.form-3-col { grid-template-columns: repeat(3, 1fr); }
-
-/* --- CONTENEDOR DNI CON SPINNER --- */
+// ============================================
+// SPINNER DNI
+// ============================================
 .input-container-relative {
   position: relative;
   width: 100%;
 
-  input {
-    width: 100%;
-    padding-right: 40px !important;
-  }
+  input { width: 100%; padding-right: 40px !important; }
 
   .spinner-dni {
     position: absolute;
@@ -140,142 +215,100 @@ textarea {
     pointer-events: none;
     z-index: 5;
 
-    .spinner-border {
-      width: 18px;
-      height: 18px;
-      border-width: 2px;
-      color: $green !important;
-    }
+    .spinner-border { width: 18px; height: 18px; border-width: 2px; color: $green !important; }
   }
 }
 
-/* --- COMPONENTE DE TELÉFONO INTERNACIONAL --- */
-:host ::ng-deep .celular-wrapper {
+// ============================================
+// GRID
+// ============================================
+.form-row {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
   width: 100%;
-
-  .iti {
-    width: 100%;
-  }
-
-  .iti__flag-container {
-    // Ajustes visuales
-  }
-
-  input.form-control.custom-intl-input {
-    background-color: $input-bg !important;
-    height: 42px !important;
-    width: 100% !important;
-    border: 1px solid $border-color !important;
-    color: $text-dark !important;
-    border-radius: 10px !important;
-    padding-left: 52px !important; // espacio para la bandera
-
-    &:focus {
-      border-color: $navy !important;
-      box-shadow: 0 0 0 3px rgba($navy, 0.15) !important;
-      background-color: white !important;
-    }
-  }
-
-  .iti__selected-flag {
-    background-color: transparent !important;
-    border-radius: 10px 0 0 10px;
-  }
 }
 
-/* --- BOTONES DEL MODAL --- */
-.modal-footer {
-  border-top: 1px solid $border-color;
-  padding: 1.2rem 1.5rem;
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+.form-1-col { grid-template-columns: 1fr; }
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.form-3-col { grid-template-columns: repeat(3, 1fr); }
+.form-4-col { grid-template-columns: repeat(4, 1fr); }
 
-  .btn {
-    padding: 10px 24px;
-    border-radius: 40px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
+// ============================================
+// BOTONES
+// ============================================
+.btn {
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #27ae60, #219150);
+  color: white;
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+    filter: brightness(1.05);
   }
 
-  .btn-save {
-    background: linear-gradient(135deg, #27ae60, #219150);
-    color: white;
-    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
 
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
-      filter: brightness(1.05);
-    }
+.btn-cancel {
+  background: transparent;
+  color: $text-light;
+  border: 1px solid $border-color !important;
+  &:hover { background: #f1f5f9; border-color: #cbd5e1 !important; }
+}
 
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
+.error-msg { color: #e53e3e; font-size: 0.72rem; margin-top: 2px; }
 
-  .btn-cancel {
-    background: transparent;
-    color: $text-light;
-    border: 1px solid $border-color !important;
+// Texto opcional en labels
+.label-opcional {
+  font-weight: 400;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
-    &:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1 !important;
-    }
-  }
+// Centrado vertical correcto cuando se combina modal-dialog-centered con modal-dialog-scrollable
+:host ::ng-deep .modal.show {
+  display: flex !important;
+  align-items: center;
+  min-height: 100%;
+}
+
+:host ::ng-deep .modal-dialog {
+  margin: auto;
 }
 
 // ============================================
 // RESPONSIVE
 // ============================================
 @media (max-width: 992px) {
-  .form-3-col {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .form-3-col { grid-template-columns: repeat(2, 1fr); }
+  .form-4-col { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .form-2-col { grid-template-columns: 1fr; }
+  .form-3-col { grid-template-columns: 1fr !important; }
+  .form-4-col { grid-template-columns: 1fr !important; }
 }
 
 @media (max-width: 576px) {
-  .form-row {
-    grid-template-columns: 1fr !important;
-    gap: 0.8rem;
-  }
-
-  .modal-footer {
-    flex-direction: column;
-    .btn {
-      width: 100%;
-    }
-  }
-
-  :host ::ng-deep .celular-wrapper input.form-control.custom-intl-input {
-    padding-left: 46px !important;
-  }
-}
-
-// Fuerza el centrado vertical del modal
-.modal.show .modal-dialog.modal-dialog-centered {
-  display: flex;
-  align-items: center;
-  min-height: calc(100% - 1rem);
-}
-
-// Limita la altura del contenido y permite scroll interno
-.modal-content {
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-body {
-  overflow-y: auto;
-  flex: 1 1 auto;
+  .form-row   { grid-template-columns: 1fr !important; gap: 0.8rem; }
+  .modal-body { padding: 0.75rem; }
 }

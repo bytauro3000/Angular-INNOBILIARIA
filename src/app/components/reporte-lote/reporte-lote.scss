@@ -1,0 +1,429 @@
+// ============================================
+// VARIABLES
+// ============================================
+$navy:      #023e8a;
+$navy-mid:  #0353a4;
+$green:     #27ae60;
+$text-dark: #1e293b;
+$text-soft: #64748b;
+$border:    #e2e8f0;
+
+// ============================================
+// TOOLBAR
+// ============================================
+.reporte-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid $border;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  z-index: 98;
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: $navy;
+    i { font-size: 1.2rem; color: $green; }
+  }
+}
+
+.btn-imprimir {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, $green, #219150);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(39,174,96,0.3);
+  i { font-size: 1rem; }
+  &:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ============================================
+// LOADING
+// ============================================
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40%           { transform: scale(1); opacity: 1; }
+}
+.loading-dots-wrapper {
+  padding-top: 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 4rem;
+}
+.loading-dots {
+  display: flex;
+  gap: 10px;
+  span {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: $navy-mid;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+    &:nth-child(3) { animation-delay: 0s; }
+  }
+}
+.loading-text { color: $text-soft; font-size: 0.85rem; margin: 0; font-style: italic; }
+
+// ============================================
+// PANTALLA — print-area
+// ============================================
+.print-area {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 7rem 2rem 3rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.88rem;
+  color: $text-dark;
+}
+
+.reporte-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.empresa-nombre    { font-size: 1.4rem; font-weight: 700; color: $navy; margin: 0 0 4px; }
+.empresa-subtitulo { font-size: 0.8rem; color: $text-soft; margin: 0; }
+.reporte-meta      { text-align: right; }
+.reporte-titulo    { font-size: 1.1rem; font-weight: 700; color: $text-dark; margin: 0 0 6px; }
+.reporte-fecha,
+.reporte-total     { font-size: 0.82rem; color: $text-soft; margin: 2px 0; }
+.reporte-divider   { display: none; }
+.reporte-footer    { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: $text-soft; }
+
+// ── Tabla envolvente: visible en pantalla pero sin encabezado ni título ──
+.tabla-pagina { display: none; }
+.tabla-envolvente {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+// ── Thead del encabezado (logo+empresa) — oculto en pantalla ──────────
+.enc-thead-print { display: none; }
+
+// ── Título del reporte dentro de cada programa — oculto en pantalla ───
+.titulo-reporte-print { display: none; }
+
+// ============================================
+// PANTALLA — grupos y tabla de lotes
+// ============================================
+.programa-bloque { margin-bottom: 2rem; }
+
+.programa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, $navy, $navy-mid);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px 6px 0 0;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.programa-nombre    { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+.programa-meta-info { display: flex; align-items: center; gap: 16px; font-size: 0.78rem; opacity: 0.9; }
+.programa-count     { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; }
+
+.tabla-lotes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  border: 1px solid $border;
+  border-top: none;
+
+  thead tr { background: #eef2f7; }
+  th {
+    padding: 8px 6px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    color: $navy;
+    border-bottom: 2px solid $navy;
+    border-right: 1px solid $border;
+    white-space: nowrap;
+    text-align: center;
+    &:last-child { border-right: none; }
+  }
+  td {
+    padding: 6px;
+    border-bottom: 1px solid $border;
+    border-right: 1px solid $border;
+    vertical-align: middle;
+    &:last-child { border-right: none; }
+  }
+  .fila-par td { background: #f8fafc; }
+  tbody tr:hover td { background: #eef2f7; }
+  tfoot { border-top: 2px solid $border; }
+  .fila-subtotal td {
+    padding: 6px; font-size: 0.78rem; font-weight: 600;
+    color: $navy; background: #eef2f7;
+  }
+  .subtotal-label { color: $text-soft; font-weight: 600; }
+}
+
+.col-mz         { width: 50px; }
+.col-lt         { width: 50px; }
+.col-area       { width: 90px; }
+.col-precio     { width: 110px; }
+.col-total      { width: 110px; }
+.col-estado     { width: 90px; }
+.col-colindante { min-width: 80px; font-size: 0.72rem; color: $text-soft; }
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+.fw-bold     { font-weight: 600; }
+
+.badge-estado {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  &.estado-disponible { background: #d1fae5; color: #065f46; }
+  &.estado-vendido    { background: #fee2e2; color: #991b1b; }
+  &.estado-separado   { background: #fef3c7; color: #92400e; }
+}
+
+// ============================================
+// MEDIA PRINT
+// ============================================
+@media print {
+
+  @page {
+    size: A4 landscape;
+    margin-top: 0;
+    margin-bottom: 1.2cm;
+    margin-left: 0.8cm;
+    margin-right: 0.8cm;
+
+    @bottom-right {
+      content: "Página " counter(page) " de " counter(pages);
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      color: #64748b;
+    }
+  }
+
+  body > * { display: none !important; }
+
+  app-root > *:not(router-outlet),
+  .menu-secretaria-header-futuristic,
+  header {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  app-reporte-lotes { display: block !important; }
+  .screen-only      { display: none !important; }
+
+  .print-area {
+    display: block !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  // ── Tabla envolvente ──────────────────────────────────────────
+  .tabla-pagina {
+    display: table !important;
+    width: 100%;
+    border-collapse: collapse;
+    thead { display: table-header-group; }
+    tbody { display: table-row-group; }
+  }
+
+  // ── Encabezado empresa/logo ───────────────────────────────────
+  .enc-fila-top td {
+    padding-top: 6px;
+    padding-bottom: 2px;
+    vertical-align: middle;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .enc-empresa {
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: 700;
+    color: #334155;
+    width: 100%;
+  }
+
+  .enc-logo-cell {
+    text-align: right;
+    white-space: nowrap;
+    width: 1.2cm;
+  }
+
+  .enc-logo {
+    width: 1.1cm;
+    height: 1.1cm;
+    object-fit: contain;
+    display: block;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  // ── Thead del encabezado: visible en print ────────────────────
+  .enc-thead-print { display: table-header-group !important; }
+
+  // ── Título al inicio de cada programa ─────────────────────────
+  .titulo-reporte-print {
+    display: block !important;
+    text-align: center;
+    margin: 4px 0 8px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .titulo-reporte-texto {
+    font-family: Arial, sans-serif;
+    font-size: 15pt;
+    font-weight: 800;
+    color: #023e8a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .titulo-reporte-sub {
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    color: #64748b;
+    margin-top: 2px;
+    display: block;
+  }
+
+  // ── Encabezado de programa ────────────────────────────────────
+  .programa-header {
+    padding: 4px 8px;
+    font-size: 9.5px;
+    border-radius: 0;
+    margin-top: 4px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  // ── Tabla de lotes ────────────────────────────────────────────
+  .tabla-lotes {
+    font-size: 9.5px;
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: none !important;
+
+    thead tr {
+      background: #dde4f0 !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    th {
+      padding: 5px 4px;
+      font-size: 8.5px;
+      font-weight: 700;
+      border-top: 1px solid #dde3ea !important;
+      border-left: none !important;
+      border-right: 1px solid #dde3ea !important;
+      border-bottom: 1px solid #c5cdd8 !important;
+      text-align: center !important;
+      color: #023e8a;
+      white-space: nowrap;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+      &:first-child { border-left: 1px solid #dde3ea !important; }
+    }
+
+    td {
+      padding: 3px 4px;
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: none !important;
+      border-left: none !important;
+      border-right: 1px solid #dde3ea !important;
+      border-bottom: 1px solid #dde3ea !important;
+      &:first-child { border-left: 1px solid #dde3ea !important; }
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+
+    .fila-par td {
+      background: #f5f7fa !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+
+  .col-mz         { width: 1.1cm !important; }
+  .col-lt         { width: 1.1cm !important; }
+  .col-area       { width: 1.9cm !important; }
+  .col-precio     { width: 2.1cm !important; }
+  .col-total      { width: 2.1cm !important; }
+  .col-estado     { width: 1.9cm !important; }
+  .col-colindante { width: 3.1cm !important; }
+
+  .badge-estado {
+    font-size: 7px;
+    padding: 1px 3px;
+    border-radius: 2px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    &.estado-disponible { background: #d1fae5 !important; color: #065f46 !important; }
+    &.estado-vendido    { background: #fee2e2 !important; color: #991b1b !important; }
+    &.estado-separado   { background: #fef3c7 !important; color: #92400e !important; }
+  }
+
+  thead { display: table-header-group; }
+  tfoot { display: table-row-group; }
+  .tfoot-resumen { page-break-before: avoid; }
+
+  .fila-subtotal td {
+    font-size: 9px;
+    padding: 3px;
+    font-weight: 700;
+    border-top: 1px solid #c5cdd8 !important;
+    border-right: 1px solid #dde3ea !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    background: #dde4f0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    &:first-child { border-left: 1px solid #dde3ea !important; }
+    &:last-child  { border-right: 1px solid #dde3ea !important; }
+  }
+
+  .page-break      { display: none !important; }
+  .programa-bloque { margin-bottom: 0; break-after: page; }
+  .ultimo-bloque   { break-after: avoid !important; }
+}

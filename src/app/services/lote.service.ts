@@ -16,9 +16,6 @@ export class LoteService {
 
   constructor(private http: HttpClient) { }
 
-
-
-
   // 🔹 Listado principal (Resumen para la tabla)
   obtenerLotesResumen(): Observable<LoteResumen[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
@@ -39,6 +36,11 @@ export class LoteService {
   // 🔹 Listado Completo (Entidad Lote)
   listarLotes(): Observable<Lote[]> {
     return this.http.get<Lote[]>(this.apiUrl);
+  }
+
+  // Listado para reporte — ordenado por programa, manzana y numero de lote
+  listarLotesParaReporte(): Observable<Lote[]> {
+    return this.http.get<Lote[]>(`${this.apiUrl}/reporte`);
   }
 
   // 🔹 Listar lotes por programa usando el DTO optimizado

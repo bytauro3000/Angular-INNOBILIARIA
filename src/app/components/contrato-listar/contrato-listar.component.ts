@@ -199,29 +199,24 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
   // ─── AUTO-FORMATO NÚMERO DE LOTE (igual que pagoletra-listar) ─────────
   formatearNumeroLote(event: Event): void {
     const input = event.target as HTMLInputElement;
-    // Leer el valor crudo directo del DOM (sin ngModel que ya lo procesó)
     const raw = input.value.replace(/\D/g, '');
 
     let resultado = '';
-    if (raw.length === 0) {
+    if (raw.length === 0 || raw === '0') {
+      // Vacío o solo "0" (usuario borró el segundo dígito de "07") → limpiar
       resultado = '';
     } else if (raw.length === 1) {
-      // Un dígito solo → prefijarlo con 0: "1" → "01"
+      // Un dígito significativo → prefijarlo con 0: "7" → "07"
       resultado = '0' + raw;
     } else if (raw.length === 2) {
-      // Dos dígitos exactos → mostrar tal cual
-      resultado = raw;
+      resultado = raw === '00' ? '' : raw;
     } else {
-      // Más de 2 dígitos → tomar los últimos 2 significativos
-      // "011" → quitar el 0 inicial → "11"
-      const sinCero = raw.replace(/^0+/, '') || '0';
-      resultado = sinCero.padStart(2, '0').slice(-2);
+      const sinCero = raw.replace(/^0+/, '') || '';
+      resultado = sinCero.length === 0 ? '' : sinCero.padStart(2, '0').slice(-2);
     }
 
-    // Actualizar el modelo Y el DOM directamente para evitar el ciclo ngModel
     this.numeroLoteBusqueda = resultado;
     input.value = resultado;
-
     this.filtrarPorLote();
   }
 

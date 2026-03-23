@@ -1,5 +1,5 @@
 import { EstadoCliente } from '../enums/estadocliente.enum';
-import {TipoCliente } from '../enums/tipocliente.enum';
+import { TipoCliente } from '../enums/tipocliente.enum';
 import { Distrito } from './distrito.model';
 import { Genero } from '../enums/Genero.enum';
 import { EstadoCivil } from '../enums/estadocivil.enum';
@@ -8,7 +8,7 @@ export interface Cliente {
   idCliente: number;
   nombre: string;
   apellidos: string;
-  estadoCivil: EstadoCivil; 
+  estadoCivil: EstadoCivil;
   tipoCliente: TipoCliente;
   numDoc: string;
   celular: string;
@@ -16,7 +16,8 @@ export interface Cliente {
   direccion: string;
   email?: string;
   genero: Genero;
-  fechaRegistro?: Date | string; // ✅ solo lectura, lo llena el backend
+  fechaRegistro?: Date | string;
   estado: EstadoCliente;
-  distrito: Distrito; // Relación ManyToOne
+  distrito: Distrito;
+  nacionalidad?: string;
 }

@@ -468,7 +468,7 @@ export class ContratoInsertarComponent implements OnInit {
       moneda: v.moneda
     };
     this.contratoService.guardarContrato(request).subscribe({
-      next: () => { this.isGuardando = false; this.toastr.success('Contrato guardado con éxito'); this.resetFormulario(); },
+      next: () => { this.isGuardando = false; this.toastr.success('Contrato guardado con éxito'); this.router.navigate(['/secretaria-menu/contratos']); },
       error: (err) => { this.isGuardando = false; this.toastr.error(err.error?.message || 'Error al guardar el contrato'); }
     });
   }

@@ -35,6 +35,7 @@
           <th class="text-center">TIPO</th>
           <th class="text-center">DOCUMENTO</th>
           <th class="text-center">CELULAR</th>
+          <th>CORREO</th>
           <th class="text-center">ESTADO</th>
           <th class="text-center" style="width: 140px;">ACCIONES</th>
         </tr>
@@ -42,25 +43,23 @@
       <tbody>
         <tr *ngFor="let cliente of paginatedClientes">
           <td class="text-center" data-label="ID">{{ cliente.idCliente }}</td>
-          <td data-label="Nombre">{{ cliente.nombre }}</td>
-          <td data-label="Apellidos">{{ cliente.apellidos || '-' }}</td>
+          <td data-label="Nombre">{{ (cliente.nombre || '-') | uppercase }}</td>
+          <td data-label="Apellidos">{{ (cliente.apellidos || '-') | uppercase }}</td>
           <td class="text-center" data-label="Tipo">{{ cliente.tipoCliente }}</td>
           <td class="text-center" data-label="Documento">{{ cliente.numDoc || '-' }}</td>
           <td class="text-center" data-label="Celular">{{ cliente.celular }}</td>
+          <td data-label="Correo">{{ cliente.email || '-' }}</td>
           <td class="text-center" data-label="Estado">{{ cliente.estado }}</td>
           <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
-              <!-- Ver cliente -->
               <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]"
                 class="btn-action btn-view" title="Ver cliente">
                 <i class="bi bi-eye"></i>
               </button>
-              <!-- Editar cliente -->
               <button (click)="editarModal.abrirModal(cliente.idCliente)"
                 class="btn-action btn-edit" title="Editar cliente">
                 <i class="bi bi-pencil"></i>
               </button>
-              <!-- Eliminar cliente -->
               <button class="btn-action btn-delete" (click)="eliminarCliente(cliente.idCliente)"
                 title="Eliminar cliente">
                 <i class="bi bi-trash"></i>
@@ -69,7 +68,7 @@
           </td>
         </tr>
         <tr *ngIf="paginatedClientes.length === 0">
-          <td colspan="8" class="no-data">No se encontraron clientes que coincidan con la búsqueda.</td>
+          <td colspan="9" class="no-data">No se encontraron clientes que coincidan con la búsqueda.</td>
         </tr>
       </tbody>
     </table>

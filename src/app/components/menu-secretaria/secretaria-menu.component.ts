@@ -19,6 +19,7 @@ export class SecretariaMenuComponent implements OnInit {
     isClientesSubmenuOpen: boolean = false;
     isContratoSubmenuOpen: boolean = false;
     isServiciosBasicosSubmenuOpen: boolean = false;
+    isLotesSubmenuOpen: boolean = false;
     isUserDropdownOpen: boolean = false;
 
     constructor(
@@ -70,6 +71,7 @@ export class SecretariaMenuComponent implements OnInit {
         this.isUserDropdownOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
         this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen;
     }
 
@@ -77,6 +79,7 @@ export class SecretariaMenuComponent implements OnInit {
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
         this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen;
     }
 
@@ -84,7 +87,16 @@ export class SecretariaMenuComponent implements OnInit {
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = !this.isServiciosBasicosSubmenuOpen;
+    }
+
+    toggleLotesSubmenu() {
+        this.isUserDropdownOpen = false;
+        this.isClientesSubmenuOpen = false;
+        this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = !this.isLotesSubmenuOpen;
     }
 
     toggleUserDropdown(event: Event) {
@@ -92,6 +104,7 @@ export class SecretariaMenuComponent implements OnInit {
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
         this.isUserDropdownOpen = !this.isUserDropdownOpen;
     }
 
@@ -102,6 +115,7 @@ export class SecretariaMenuComponent implements OnInit {
             this.isClientesSubmenuOpen = false;
             this.isContratoSubmenuOpen = false;
             this.isServiciosBasicosSubmenuOpen = false;
+            this.isLotesSubmenuOpen = false;
             this.isUserDropdownOpen = false;
         }
     }
@@ -111,6 +125,7 @@ export class SecretariaMenuComponent implements OnInit {
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
         this.isUserDropdownOpen = false;
     }
 

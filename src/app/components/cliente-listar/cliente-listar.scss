@@ -178,7 +178,7 @@ $border-color: #e9ecef;
 .table-custom {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 
   thead tr {
     background: linear-gradient(135deg, $navy, #0353a4);
@@ -187,10 +187,10 @@ $border-color: #e9ecef;
   th {
     color: white;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 16px 12px;
+    letter-spacing: 0.4px;
+    padding: 12px 8px;
     white-space: nowrap;
 
     &.text-center { text-align: center; }
@@ -198,7 +198,7 @@ $border-color: #e9ecef;
   }
 
   td {
-    padding: 10px 12px;
+    padding: 8px 8px;
     color: $text-dark;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
@@ -224,8 +224,8 @@ $border-color: #e9ecef;
   }
 
   .btn-action {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     border: 1px solid transparent;
     background: transparent;
@@ -234,14 +234,14 @@ $border-color: #e9ecef;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 1rem;
+    font-size: 0.9rem;
     flex-shrink: 0;
 
-    i { font-size: 1.1rem; }
+    i { font-size: 1rem; }
 
-    &.btn-view { color: #17a2b8; border-color: #17a2b8; &:hover { background: #17a2b8; color: white; } }
-    &.btn-edit { color: $navy; border-color: $navy; &:hover { background: $navy; color: white; } }
-    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
+    &.btn-view  { color: #17a2b8; border-color: #17a2b8; &:hover { background: #17a2b8; color: white; } }
+    &.btn-edit  { color: $navy;   border-color: $navy;   &:hover { background: $navy;   color: white; } }
+    &.btn-delete{ color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 
@@ -249,7 +249,7 @@ $border-color: #e9ecef;
     text-align: center;
     padding: 40px;
     color: $text-light;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 }
 
@@ -299,10 +299,10 @@ $border-color: #e9ecef;
 // ============================================
 @media screen and (max-width: 992px) and (min-width: 768px) {
   .table-custom {
-    font-size: 0.8rem;
-    th { padding: 12px 8px; font-size: 0.75rem; }
-    td { padding: 8px 8px; }
-    .btn-action { width: 28px; height: 28px; font-size: 0.9rem; i { font-size: 1rem; } }
+    font-size: 0.75rem;
+    th { padding: 10px 6px; font-size: 0.7rem; }
+    td { padding: 7px 6px; }
+    .btn-action { width: 26px; height: 26px; font-size: 0.85rem; i { font-size: 0.9rem; } }
   }
 }
 

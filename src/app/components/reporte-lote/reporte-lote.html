@@ -1,0 +1,151 @@
+<!-- TOOLBAR — solo pantalla -->
+<div class="reporte-toolbar screen-only">
+  <div class="toolbar-left">
+    <i class="bi bi-file-earmark-text"></i>
+    <span>Reporte de Lotes por Programa</span>
+  </div>
+  <button class="btn-imprimir" (click)="imprimir()" [disabled]="cargando">
+    <i class="bi bi-printer"></i>
+    Imprimir / Exportar PDF
+  </button>
+</div>
+
+<!-- LOADING — solo pantalla -->
+<div class="loading-dots-wrapper screen-only" *ngIf="cargando">
+  <div class="loading-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <p class="loading-text">Cargando reporte...</p>
+</div>
+
+<div class="print-area" *ngIf="!cargando">
+
+  <!-- ══════════════════════════════════════════════
+       ENCABEZADO PANTALLA — oculto en print
+       ══════════════════════════════════════════════ -->
+  <div class="reporte-header screen-only">
+    <div class="empresa-info">
+      <h1 class="empresa-nombre">INMOBILIARIA IVAN E.I.R.L</h1>
+      <p class="empresa-subtitulo">Sistema de Gestión Inmobiliario</p>
+    </div>
+    <div class="reporte-meta">
+      <h2 class="reporte-titulo">LISTADO DE LOTES</h2>
+      <p class="reporte-fecha">Fecha: {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p class="reporte-total">Total de lotes: <strong>{{ totalLotes }}</strong></p>
+    </div>
+  </div>
+  <hr class="reporte-divider screen-only" />
+
+  <!-- ══════════════════════════════════════════════
+       ENCABEZADO EMPRESA+LOGO — solo print.
+       Está dentro de un <thead> de tabla envolvente
+       para que se repita en CADA hoja automáticamente.
+       Solo contiene: empresa (izq) + logo (der).
+       ══════════════════════════════════════════════ -->
+  <table class="tabla-envolvente">
+    <thead class="enc-thead-print">
+      <tr class="enc-fila-empresa">
+        <td class="enc-empresa">INMOBILIARIA CONSTRUCTORA IVAN EIRL</td>
+        <td class="enc-logo-cell">
+          <img
+            src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1773723460/logo_y1ygeg.png"
+            alt="Logo" class="enc-logo" />
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2" class="cuerpo-envolvente">
+
+          <!-- GRUPOS POR PROGRAMA -->
+          <div class="programa-bloque" *ngFor="let grupo of grupos; let first = first; let last = last"
+               [class.ultimo-bloque]="last">
+
+            <!-- ══════════════════════════════════════════════
+                 TÍTULO — aparece solo en la primera hoja
+                 de CADA programa (flujo normal, no thead).
+                 ══════════════════════════════════════════════ -->
+            <div class="titulo-reporte-print">
+              <div class="titulo-reporte-texto">LISTADO DE LOTES</div>
+              <div class="titulo-reporte-sub">
+                Fecha: {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}&nbsp;&nbsp;|&nbsp;&nbsp;Total lotes: {{ totalLotes }}
+              </div>
+            </div>
+
+            <div class="programa-header">
+              <div class="programa-nombre">
+                <i class="bi bi-geo-fill screen-only"></i>
+                {{ grupo.nombrePrograma | uppercase }}
+              </div>
+              <div class="programa-meta-info">
+                <span *ngIf="grupo.ubicacion">📍 {{ grupo.ubicacion }}</span>
+                <span class="programa-count">{{ grupo.lotes.length }} lote(s)</span>
+              </div>
+            </div>
+
+            <table class="tabla-lotes">
+              <thead>
+                <tr>
+                  <th class="col-mz">MZ</th>
+                  <th class="col-lt">LT</th>
+                  <th class="col-area">ÁREA (m²)</th>
+                  <th class="col-precio">PRECIO x m²</th>
+                  <th class="col-total">PRECIO TOTAL</th>
+                  <th class="col-estado">ESTADO</th>
+                  <th class="col-colindante">FRENTE</th>
+                  <th class="col-colindante">FONDO</th>
+                  <th class="col-colindante">DERECHA</th>
+                  <th class="col-colindante">IZQUIERDA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let lote of grupo.lotes; let i = index" [class.fila-par]="i % 2 === 0">
+                  <td class="col-mz text-center fw-bold">{{ lote.manzana }}</td>
+                  <td class="col-lt text-center">{{ lote.numeroLote }}</td>
+                  <td class="col-area text-right">{{ lote.area | number:'1.2-2' }}</td>
+                  <td class="col-precio text-right">
+                    <ng-container *ngIf="lote.precioM2">$ {{ lote.precioM2 | number:'1.2-2' }}</ng-container>
+                    <ng-container *ngIf="!lote.precioM2">—</ng-container>
+                  </td>
+                  <td class="col-total text-right fw-bold">
+                    <ng-container *ngIf="calcularPrecioTotal(lote) > 0">$ {{ calcularPrecioTotal(lote) | number:'1.0-0' }}</ng-container>
+                    <ng-container *ngIf="calcularPrecioTotal(lote) === 0">—</ng-container>
+                  </td>
+                  <td class="col-estado text-center">
+                    <span class="badge-estado" [ngClass]="{
+                      'estado-disponible': lote.estado === 'Disponible',
+                      'estado-vendido':    lote.estado === 'Vendido',
+                      'estado-separado':   lote.estado === 'Separado'
+                    }">{{ lote.estado }}</span>
+                  </td>
+                  <td class="col-colindante">{{ lote.colindanteNorte || '—' }}</td>
+                  <td class="col-colindante">{{ lote.colindanteSur   || '—' }}</td>
+                  <td class="col-colindante">{{ lote.colindanteEste  || '—' }}</td>
+                  <td class="col-colindante">{{ lote.colindanteOeste || '—' }}</td>
+                </tr>
+              </tbody>
+              <tfoot class="tfoot-resumen">
+                <tr class="fila-subtotal">
+                  <td colspan="2" class="subtotal-label text-right">Total área:</td>
+                  <td class="text-right fw-bold">{{ sumarAreas(grupo.lotes) | number:'1.2-2' }} m²</td>
+                  <td colspan="3"></td>
+                  <td colspan="4" class="text-right subtotal-label">
+                    Total lotes: <strong>{{ grupo.lotes.length }}</strong>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+
+          </div>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pie solo pantalla -->
+  <div class="reporte-footer screen-only">
+    <p>Reporte generado — {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}</p>
+  </div>
+
+</div>

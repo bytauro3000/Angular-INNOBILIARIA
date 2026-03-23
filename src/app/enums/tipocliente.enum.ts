@@ -1,5 +1,5 @@
 export enum TipoCliente {
-  NATURAL = 'NATURAL',
+  NATURAL  = 'NATURAL',
   JURIDICO = 'JURIDICO',
-  CE = 'CARNET DE EXTRANJERIA'
+  CE       = 'CE'   // Carnet de Extranjeria — debe coincidir exactamente con el backend
 }

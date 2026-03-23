@@ -11,3 +11,12 @@ body {
   opacity: 0.4; /* Fondo más suave */
   backdrop-filter: blur(4px); /* Desenfoque elegante */
 }
+// Ocultar el menu y todo lo que no sea el reporte al imprimir
+@media print {
+  .menu-secretaria-header-futuristic {
+    display: none !important;
+  }
+  .content-placeholder {
+    padding-top: 0 !important;
+  }
+}

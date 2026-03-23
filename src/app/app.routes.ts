@@ -42,6 +42,7 @@ import { ParceleroListarComponent } from './components/parcelero-listar/parceler
 import { VendedorListarComponent } from './components/vendedor-listar/vendedor-listar.component';
 import { ProgramaListarComponent } from './components/programa-listar/programa-listar.componente';
 import { LoteLitarComponent } from './components/lote-listar/lote-listar.component';
+import { ReporteLotesComponent } from './components/reporte-lote/reporte-lote';
 
 // Dashboard y Letras
 import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-soporte-principal';
@@ -91,6 +92,7 @@ export const routes: Routes = [
       { path: 'programas', component: ProgramaListarComponent },
       { path: 'vendedores', component: VendedorListarComponent },
       { path: 'lotes', component: LoteLitarComponent },
+      { path: 'lotes/reporte', component: ReporteLotesComponent },
       { path: 'parceleros', component: ParceleroListarComponent },
 
       // Servicios Básicos

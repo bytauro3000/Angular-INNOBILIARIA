@@ -1,128 +1,163 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered custom-modal-width">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable custom-modal-width">
     <div class="modal-content shadow-lg">
-      <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
-        
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-person-plus"></i> Insertar Nuevo Cliente
-          </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
-        </div>
 
-        <div class="modal-body compact-body">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-person-plus"></i> Insertar Nuevo Cliente
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body compact-body">
+        <form id="formInsertar" [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
           <div class="form-wrapper-modal">
 
-             <div class="form-row form-3-col">
+            <!-- Tipo doc | N° Doc | País (solo CE) | Género -->
+            <div class="form-row" [class.form-4-col]="esCarnetExtranjeria" [class.form-3-col]="!esCarnetExtranjeria">
+
               <div class="form-group">
-                <label for="tipoCliente">Tipo de Cliente</label>
+                <label for="tipoCliente"><i class="bi bi-card-list"></i> Tipo de Documento</label>
                 <select id="tipoCliente" formControlName="tipoCliente" required>
-                  <option [value]="null" disabled>Seleccione tipo</option>
-                  <option value="NATURAL">Natural</option>
-                  <option value="JURIDICO">Jurídico</option>
+                  <option [value]="null" disabled>Seleccione</option>
+                  <option value="NATURAL">DNI</option>
+                  <option value="JURIDICO">RUC</option>
+                  <option value="CE">C.E.</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="numDoc">DNI / RUC</label>
+                <label for="numDoc">
+                  <ng-container *ngIf="!esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° Documento</ng-container>
+                  <ng-container *ngIf="esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° C.E.</ng-container>
+                </label>
                 <div class="input-container-relative">
-                  <input type="text" id="numDoc" formControlName="numDoc" placeholder="Documento" required
-                    [maxlength]="clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11"
-                    (input)="limpiarNoNumericos('numDoc'); onDniInput()" 
+                  <input type="text" id="numDoc" formControlName="numDoc"
+                    [placeholder]="esCarnetExtranjeria ? 'Número C.E.' : 'Número de documento'"
+                    required
+                    [maxlength]="esCarnetExtranjeria ? 12 : (clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11)"
+                    (input)="limpiarNoNumericos('numDoc'); onDniInput()"
                     [attr.title]="getErrorMessage('numDoc')"
                     [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"
                     #numDocInput (focus)="onInputFocus('numDoc')" (blur)="onInputBlur('numDoc')" />
-                  
                   <div *ngIf="cargandoDni" class="spinner-dni">
                     <div class="spinner-border spinner-border-sm text-success" role="status"></div>
                   </div>
                 </div>
               </div>
 
+              <div class="form-group" *ngIf="esCarnetExtranjeria">
+                <label><i class="bi bi-globe-americas"></i> País de Origen</label>
+                <div class="pais-dropdown" [class.open]="dropdownPaisAbierto">
+                  <button type="button" class="pais-trigger"
+                    [class.is-invalid]="clienteForm.get('nacionalidad')?.invalid && clienteForm.get('nacionalidad')?.touched"
+                    (click)="dropdownPaisAbierto = !dropdownPaisAbierto">
+                    <ng-container *ngIf="paisSeleccionado; else sinPais">
+                      <img [src]="paisSeleccionado.bandera" class="pais-flag" alt="" />
+                      <span>{{ paisSeleccionado.nombre }}</span>
+                    </ng-container>
+                    <ng-template #sinPais><span class="placeholder-text">Seleccione</span></ng-template>
+                    <i class="bi bi-chevron-down pais-chevron"></i>
+                  </button>
+                  <ul class="pais-list" *ngIf="dropdownPaisAbierto">
+                    <li *ngFor="let p of paises" (click)="seleccionarPais(p)">
+                      <img [src]="p.bandera" class="pais-flag" alt="" />
+                      <span>{{ p.nombre }}</span>
+                    </li>
+                  </ul>
+                </div>
+                <span class="error-msg"
+                  *ngIf="clienteForm.get('nacionalidad')?.invalid && clienteForm.get('nacionalidad')?.touched">
+                  Selecciona el país
+                </span>
+              </div>
+
               <div class="form-group">
-                <label for="genero">Género</label>
+                <label for="genero"><i class="bi bi-gender-ambiguous"></i> Género</label>
                 <select id="genero" formControlName="genero" required>
                   <option value="" disabled selected>Seleccione</option>
                   <option *ngFor="let g of Generos" [value]="g">{{ g }}</option>
                 </select>
               </div>
+
             </div>
 
+            <!-- Nombre y Apellidos -->
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label for="nombre">Nombre</label>
+                <label for="nombre"><i class="bi bi-person"></i> Nombre</label>
                 <input type="text" id="nombre" formControlName="nombre" placeholder="Nombre del cliente" required
                   (input)="formatearTexto($event, 'nombre')" />
               </div>
-
               <div class="form-group">
-                <label for="apellidos">Apellidos</label>
+                <label for="apellidos"><i class="bi bi-person-fill"></i> Apellidos</label>
                 <input type="text" id="apellidos" formControlName="apellidos" placeholder="Apellidos del cliente"
                   (input)="formatearTexto($event, 'apellidos')" />
               </div>
             </div>
 
-           
-
+            <!-- Estado Civil, Celular, Email -->
             <div class="form-row form-3-col">
               <div class="form-group">
-                <label for="estadoCivil">Estado Civil</label>
+                <label for="estadoCivil"><i class="bi bi-hearts"></i> Estado Civil</label>
                 <select id="estadoCivil" formControlName="estadoCivil" required>
                   <option value="" disabled selected>Seleccione</option>
                   <option *ngFor="let ec of EstadosCiviles" [value]="ec">{{ ec }}</option>
                 </select>
               </div>
-
               <div class="form-group">
-  <label for="celular">Celular</label>
-  <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999"
-         (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)"
-         [ngClass]="{'is-invalid': clienteForm.get('celular')?.invalid && clienteForm.get('celular')?.touched}" />
-</div>
-              
+                <label for="celular"><i class="bi bi-phone"></i> Celular</label>
+                <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999"
+                  (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)"
+                  [ngClass]="{'is-invalid': clienteForm.get('celular')?.invalid && clienteForm.get('celular')?.touched}" />
+              </div>
               <div class="form-group">
-                <label for="email">Email (Opcional)</label> 
+                <label for="email"><i class="bi bi-envelope"></i> Email <span class="label-opcional">(Opcional)</span></label>
                 <input type="email" id="email" formControlName="email" placeholder="correo@ejemplo.com"
                   [attr.title]="getErrorMessage('email')"
                   [ngClass]="{'is-invalid': clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched}"
-                  #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" /> 
+                  #emailInput (focus)="onInputFocus('email')" (blur)="onInputBlur('email')" />
               </div>
             </div>
 
+            <!-- Dirección -->
             <div class="form-row">
-               <div class="form-group width-100">
-                <label for="direccion">Dirección Completa</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Avenida, Mz y Lote..." required />
+              <div class="form-group width-100">
+                <label for="direccion"><i class="bi bi-geo-alt"></i> Dirección Completa</label>
+                <input type="text" id="direccion" formControlName="direccion"
+                  placeholder="Calle, Avenida, Mz y Lote..." required />
               </div>
             </div>
 
+            <!-- Distrito y Teléfono fijo -->
             <div class="form-row form-2-col">
               <div class="form-group" formGroupName="distrito">
-                <label for="idDistrito">Distrito</label>
+                <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
                 <select id="idDistrito" formControlName="idDistrito" required>
                   <option value="">Selecciona distrito</option>
                   <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
                 </select>
               </div>
-
               <div class="form-group">
-                <label for="telefono">Teléfono Fijo (Opcional)</label>
+                <label for="telefono"><i class="bi bi-telephone"></i> Teléfono Fijo <span class="label-opcional">(Opcional)</span></label>
                 <input type="tel" id="telefono" formControlName="telefono" placeholder="Número fijo" />
               </div>
             </div>
 
-          </div>
-        </div>
+            <!-- Botones -->
+            <div class="form-botones">
+              <button type="submit" class="btn btn-save" [disabled]="!clienteForm.valid">
+                <i class="bi bi-person-plus"></i> Guardar Cliente
+              </button>
+              <button type="button" class="btn btn-cancel" (click)="cerrarModal()">
+                Cancelar
+              </button>
+            </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-save" [disabled]="!clienteForm.valid">
-            <i class="bi bi-person-plus"></i> Guardar Cliente
-          </button>
-          <button type="button" class="btn btn-secondary btn-cancel" (click)="cerrarModal()">
-            Cancelar
-          </button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>
