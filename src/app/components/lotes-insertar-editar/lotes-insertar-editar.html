@@ -1,56 +1,92 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable custom-modal-width">
     <div class="modal-content shadow-lg">
       <form [formGroup]="loteForm" (ngSubmit)="onSubmit()">
+
         <div class="modal-header">
           <h5 class="modal-title">
-            <i class="bi bi-grid-3x3-gap"></i> {{ isEditMode ? 'Editar Lote' : 'Insertar Nuevo Lote' }}
+            <i class="bi bi-grid-3x3-gap"></i>
+            {{ isEditMode ? 'Editar Lote' : 'Insertar Nuevo Lote' }}
           </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
         </div>
 
         <div class="modal-body">
-          <div class="form-wrapper">
+          <div class="form-wrapper-modal">
 
+            <!-- Programa -->
             <div class="form-row">
               <div class="form-group">
-                <label>Programa Inmobiliario</label>
-                <ng-select [items]="programas" bindLabel="nombrePrograma" formControlName="programa" [searchable]="true"
-                  appendTo="body" [compareWith]="comparePrograma" placeholder="Seleccione el proyecto">
+                <label><i class="bi bi-buildings"></i> Programa Inmobiliario</label>
+                <ng-select
+                  [items]="programas"
+                  bindLabel="nombrePrograma"
+                  formControlName="programa"
+                  [searchable]="true"
+                  appendTo="body"
+                  [compareWith]="comparePrograma"
+                  placeholder="Seleccione el proyecto"
+                  (keydown)="onKeydownNgSelect($event)">
                 </ng-select>
+                <span class="error-msg"
+                  *ngIf="loteForm.get('programa')?.invalid && loteForm.get('programa')?.touched">
+                  Seleccione un programa
+                </span>
               </div>
             </div>
 
+            <!-- Manzana | N° Lote | Área -->
             <div class="form-row form-3-col">
               <div class="form-group">
-                <label>Manzana</label>
+                <label><i class="bi bi-grid"></i> Manzana</label>
                 <input type="text" formControlName="manzana" placeholder="Ej. MZ 01"
-                  (input)="formatearTexto($event, 'manzana')" required />
+                  (input)="formatearTexto($event, 'manzana')"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('manzana')?.invalid && loteForm.get('manzana')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('manzana')?.invalid && loteForm.get('manzana')?.touched">
+                  Campo requerido
+                </span>
               </div>
               <div class="form-group">
-                <label>N° Lote</label>
-                <input type="text" formControlName="numeroLote" placeholder="Ej. 15" required />
+                <label><i class="bi bi-hash"></i> N° Lote</label>
+                <input type="text" formControlName="numeroLote" placeholder="Ej. 15"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('numeroLote')?.invalid && loteForm.get('numeroLote')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('numeroLote')?.invalid && loteForm.get('numeroLote')?.touched">
+                  Campo requerido
+                </span>
               </div>
               <div class="form-group">
-  <label>Área (m²)</label>
-  <input type="text" 
-         formControlName="area" 
-         #areaInput
-         placeholder="0.00" 
-         class="form-control" 
-         (input)="validarSoloNumeros($event, 'area')" />
-</div>
+                <label><i class="bi bi-rulers"></i> Área (m²)</label>
+                <input type="text" formControlName="area" #areaInput placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'area')"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('area')?.invalid && loteForm.get('area')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('area')?.invalid && loteForm.get('area')?.touched">
+                  Campo requerido
+                </span>
+              </div>
             </div>
 
+            <!-- Precio m² | Estado -->
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label>Precio por m²</label>
-                <input type="text" formControlName="precioM2" (input)="validarSoloNumeros($event, 'precioM2')"
-                  placeholder="0.00" required />
+                <label><i class="bi bi-currency-dollar"></i> Precio por m²</label>
+                <input type="text" formControlName="precioM2" placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'precioM2')"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('precioM2')?.invalid && loteForm.get('precioM2')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('precioM2')?.invalid && loteForm.get('precioM2')?.touched">
+                  Campo requerido
+                </span>
               </div>
               <div class="form-group">
-                <label>Estado</label>
-                <select formControlName="estado" required>
+                <label><i class="bi bi-toggle-on"></i> Estado</label>
+                <select formControlName="estado" (keydown)="onKeydown($event)">
                   <option value="Disponible">Disponible</option>
                   <option value="Separado">Separado</option>
                   <option value="Vendido">Vendido</option>
@@ -58,57 +94,100 @@
               </div>
             </div>
 
+            <!-- Medidas -->
             <div class="form-row form-4-col">
               <div class="form-group">
-                <label>Ancho 1 (Frente)</label>
-                <input type="text" formControlName="ancho1" (input)="validarSoloNumeros($event, 'ancho1')"
-                  placeholder="0.00" />
+                <label><i class="bi bi-arrow-left-right"></i> Ancho 1 (Frente)</label>
+                <input type="text" formControlName="ancho1" placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'ancho1')"
+                  (keydown)="onKeydown($event)" />
               </div>
               <div class="form-group">
-                <label>Ancho 2 (Fondo)</label>
-                <input type="text" formControlName="ancho2" (input)="validarSoloNumeros($event, 'ancho2')"
-                  placeholder="0.00" />
+                <label><i class="bi bi-arrow-left-right"></i> Ancho 2 (Fondo)</label>
+                <input type="text" formControlName="ancho2" placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'ancho2')"
+                  (keydown)="onKeydown($event)" />
               </div>
               <div class="form-group">
-                <label>Largo 2 (Izquierdo)</label>
-                <input type="text" formControlName="largo2" (input)="validarSoloNumeros($event, 'largo2')"
-                  placeholder="0.00" />
+                <label><i class="bi bi-arrow-down-up"></i> Largo 2 (Izquierdo)</label>
+                <input type="text" formControlName="largo2" placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'largo2')"
+                  (keydown)="onKeydown($event)" />
               </div>
               <div class="form-group">
-                <label>Largo 1 (Derecho)</label>
-                <input type="text" formControlName="largo1" (input)="validarSoloNumeros($event, 'largo1')"
-                  placeholder="0.00" />
-              </div>  
+                <label><i class="bi bi-arrow-down-up"></i> Largo 1 (Derecho)</label>
+                <input type="text" formControlName="largo1" placeholder="0.00"
+                  (input)="validarSoloNumeros($event, 'largo1')"
+                  (keydown)="onKeydown($event)" />
+              </div>
             </div>
 
+            <!-- Colindantes fila 1 -->
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label>Colindante Norte (Frente)</label>
-                <input type="text" formControlName="colindanteNorte" list="opcionesColindantes"
+                <label><i class="bi bi-compass"></i> Colindante Norte (Frente)</label>
+                <input type="text" formControlName="colindanteNorte"
+                  list="opcionesColindantes"
+                  placeholder="Ej: Con el lote N° 05"
                   (input)="formatearTexto($event, 'colindanteNorte')"
-                  (change)="formatearTexto($event, 'colindanteNorte')" placeholder="Límite Norte" />
+                  (change)="onColindanteChange($event, 'colindanteNorte')"
+                  (focus)="abrirDatalist($event)"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('colindanteNorte')?.invalid && loteForm.get('colindanteNorte')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('colindanteNorte')?.invalid && loteForm.get('colindanteNorte')?.touched">
+                  Campo requerido
+                </span>
               </div>
               <div class="form-group">
-                <label>Colindante Sur (Fondo)</label>
-                <input type="text" formControlName="colindanteSur" list="opcionesColindantes"
-                  (input)="formatearTexto($event, 'colindanteSur')" (change)="formatearTexto($event, 'colindanteSur')"
-                  placeholder="Límite Sur" />
+                <label><i class="bi bi-compass-fill"></i> Colindante Sur (Fondo)</label>
+                <input type="text" formControlName="colindanteSur"
+                  list="opcionesColindantes"
+                  placeholder="Ej: Con la calle N° 3"
+                  (input)="formatearTexto($event, 'colindanteSur')"
+                  (change)="onColindanteChange($event, 'colindanteSur')"
+                  (focus)="abrirDatalist($event)"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('colindanteSur')?.invalid && loteForm.get('colindanteSur')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('colindanteSur')?.invalid && loteForm.get('colindanteSur')?.touched">
+                  Campo requerido
+                </span>
               </div>
             </div>
 
+            <!-- Colindantes fila 2 -->
             <div class="form-row form-2-col">
               <div class="form-group">
-                <label>Colindante Oeste (Izquierda)</label>
-                <input type="text" formControlName="colindanteOeste" list="opcionesColindantes"
+                <label><i class="bi bi-compass"></i> Colindante Oeste (Izquierda)</label>
+                <input type="text" formControlName="colindanteOeste"
+                  list="opcionesColindantes"
+                  placeholder="Ej: Con La Avenida Principal"
                   (input)="formatearTexto($event, 'colindanteOeste')"
-                  (change)="formatearTexto($event, 'colindanteOeste')" placeholder="Límite Oeste" />
+                  (change)="onColindanteChange($event, 'colindanteOeste')"
+                  (focus)="abrirDatalist($event)"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('colindanteOeste')?.invalid && loteForm.get('colindanteOeste')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('colindanteOeste')?.invalid && loteForm.get('colindanteOeste')?.touched">
+                  Campo requerido
+                </span>
               </div>
               <div class="form-group">
-                <label>Colindante Este (Derecha)</label>
-                <input type="text" formControlName="colindanteEste" list="opcionesColindantes"
-                  (input)="formatearTexto($event, 'colindanteEste')" (change)="formatearTexto($event, 'colindanteEste')"
-                  placeholder="Límite Este" />
-              </div> 
+                <label><i class="bi bi-compass"></i> Colindante Este (Derecha)</label>
+                <input type="text" formControlName="colindanteEste"
+                  list="opcionesColindantes"
+                  placeholder="Ej: Con el lote N° 08"
+                  (input)="formatearTexto($event, 'colindanteEste')"
+                  (change)="onColindanteChange($event, 'colindanteEste')"
+                  (focus)="abrirDatalist($event)"
+                  (keydown)="onKeydown($event)"
+                  [ngClass]="{'is-invalid': loteForm.get('colindanteEste')?.invalid && loteForm.get('colindanteEste')?.touched}" />
+                <span class="error-msg"
+                  *ngIf="loteForm.get('colindanteEste')?.invalid && loteForm.get('colindanteEste')?.touched">
+                  Campo requerido
+                </span>
+              </div>
             </div>
 
             <datalist id="opcionesColindantes">
@@ -118,17 +197,20 @@
               <option value="Con La Avenida ">
             </datalist>
 
+            <!-- Botones dentro del scroll (igual que cliente-insertar) -->
+            <div class="form-botones">
+              <button type="button" class="btn btn-save" (click)="validarYSubmit()">
+                <i class="bi bi-check-circle"></i>
+                {{ isEditMode ? 'Actualizar Lote' : 'Guardar Lote' }}
+              </button>
+              <button type="button" class="btn btn-cancel" (click)="cerrarModal()">
+                Cancelar
+              </button>
+            </div>
+
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary btn-save" [disabled]="!loteForm.valid">
-            <i class="bi bi-check-circle"></i> {{ isEditMode ? 'Actualizar Lote' : 'Guardar Lote' }}
-          </button>
-          <button type="button" class="btn btn-secondary btn-cancel" (click)="cerrarModal()">
-            <i class="bi bi-x-lg"></i> Cancelar
-          </button>
-        </div>
       </form>
     </div>
   </div>

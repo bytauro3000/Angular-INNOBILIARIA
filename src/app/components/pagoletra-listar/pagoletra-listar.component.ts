@@ -158,6 +158,70 @@ export class PagoletraListarComponent implements OnInit {
     this.seleccionadasMap.clear();
   }
 
+  // ── UTILIDAD: extrae el número de letra de "N/Total" o "N" ─────────────────
+  private extraerNumeroLetra(numeroLetra: string): number {
+    if (!numeroLetra) return 0;
+    const parte = numeroLetra.includes('/') ? numeroLetra.split('/')[0] : numeroLetra;
+    return parseInt(parte.trim(), 10) || 0;
+  }
+
+  /**
+   * Calcula el máximo número de letra YA pagado para el contrato actual.
+   * Usa letrasPagadas (ya disponibles en memoria) para evitar una llamada HTTP extra.
+   * Retorna 0 si no hay ningún pago previo.
+   */
+  private maxNumeroLetraPagado(): number {
+    if (!this.letrasPagadas || this.letrasPagadas.length === 0) return 0;
+    return Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)));
+  }
+
+  /**
+   * Valida si una letra individual puede pagarse dado el historial actual.
+   * Retorna null si es válida, o un mensaje de error si no lo es.
+   */
+  private validarLetraParaPago(letra: LetraCambio): string | null {
+    const numLetra = this.extraerNumeroLetra(letra.numeroLetra);
+    const maxPagado = this.maxNumeroLetraPagado();
+
+    // Si no hay pagos previos, cualquier letra es válida
+    if (maxPagado === 0) return null;
+
+    // Si la letra está por delante del consecutivo permitido → bloquear
+    if (numLetra > maxPagado + 1) {
+      return `No puede pagar la letra N° ${numLetra} porque el siguiente pago debe ser ` +
+             `la letra N° ${maxPagado + 1}. Solo puede pagar letras anteriores o la N° ${maxPagado + 1}.`;
+    }
+
+    return null; // OK
+  }
+
+  /**
+   * Valida si un grupo de letras seleccionadas puede pagarse en conjunto.
+   * Retorna null si es válido, o un mensaje de error si no lo es.
+   */
+  private validarLetrasMultipleParaPago(letras: LetraCambio[]): string | null {
+    if (!letras || letras.length === 0) return null;
+
+    const nums = letras.map(l => this.extraerNumeroLetra(l.numeroLetra)).sort((a, b) => a - b);
+    const maxPagado = this.maxNumeroLetraPagado();
+
+    // El primero de la selección no puede saltarse el consecutivo
+    if (maxPagado > 0 && nums[0] > maxPagado + 1) {
+      return `No puede pagar la letra N° ${nums[0]} porque el siguiente pago debe ser ` +
+             `la letra N° ${maxPagado + 1}. Ajuste su selección.`;
+    }
+
+    // Las letras seleccionadas deben ser consecutivas entre sí
+    for (let i = 1; i < nums.length; i++) {
+      if (nums[i] !== nums[i - 1] + 1) {
+        return `Las letras seleccionadas no son consecutivas: tiene la N° ${nums[i - 1]} ` +
+               `y la N° ${nums[i]}, pero falta la N° ${nums[i - 1] + 1} entre ellas.`;
+      }
+    }
+
+    return null; // OK
+  }
+
   // ── SELECCIÓN MÚLTIPLE ────────────────────────────────────────────────────
 
   seleccionarTodas(event: any): void {
@@ -195,8 +259,19 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.warning('Seleccione al menos una letra', 'Atención');
       return;
     }
-    this.letrasSeleccionadasTemp = this.letrasPendientes
+
+    const letrasElegidas = this.letrasPendientes
       .filter(l => this.seleccionadasMap.has(l.idLetra));
+
+    // ── VALIDACIÓN DE ORDEN ────────────────────────────────────────────────
+    const errorOrden = this.validarLetrasMultipleParaPago(letrasElegidas);
+    if (errorOrden) {
+      this.toastr.error(errorOrden, 'Pago no permitido');
+      return;
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
+    this.letrasSeleccionadasTemp = letrasElegidas;
     this.modoPagoMultiple = true;
   }
 
@@ -235,6 +310,14 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   abrirModalPago(letra: LetraCambio): void {
+    // ── VALIDACIÓN DE ORDEN ────────────────────────────────────────────────
+    const errorOrden = this.validarLetraParaPago(letra);
+    if (errorOrden) {
+      this.toastr.error(errorOrden, 'Pago no permitido');
+      return;
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
     this.letraSeleccionada = letra;
   }
 
@@ -329,8 +412,6 @@ export class PagoletraListarComponent implements OnInit {
     return pages;
   }
 
-  // ── NUEVO: imprime el comprobante de una letra pagada ─────────────────────
-  // Busca el pago asociado a la letra y abre el PDF en una nueva pestaña.
   imprimirComprobante(idLetra: number): void {
     this.pagoService.listarPorLetra(idLetra).subscribe({
       next: (pagos) => {
@@ -342,8 +423,6 @@ export class PagoletraListarComponent implements OnInit {
         const numeroComprobante = pago.numeroComprobante;
 
         if (numeroComprobante) {
-          // Usar siempre el endpoint múltiple — si solo hay 1 pago con ese número,
-          // el backend lo detecta y genera el comprobante individual normalmente
           this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
             next: (blob) => {
               const url = URL.createObjectURL(blob);
@@ -352,7 +431,6 @@ export class PagoletraListarComponent implements OnInit {
             error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
           });
         } else {
-          // Sin número de comprobante (recibo sin numerar) — usar endpoint individual
           this.pagoService.descargarComprobante(pago.idPago).subscribe({
             next: (blob) => {
               const url = URL.createObjectURL(blob);
