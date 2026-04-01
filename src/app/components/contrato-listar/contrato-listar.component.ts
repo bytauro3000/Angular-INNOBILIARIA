@@ -12,6 +12,7 @@ import { TipoContrato } from '../../enums/tipocontrato.enum';
 import { EstadoContrato } from '../../enums/Estadocontrato.enum';
 import { ToastrService } from 'ngx-toastr';
 import { InscripcionServiciosInsertarComponent } from '../inscripcion-servicios-insertar/inscripcion-servicios-insertar.component';
+import { LetrasCambioService } from '../../services/letracambio.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -60,6 +61,9 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
 
   isCargando: boolean = false;
   dropdownEstadoAbierto: number | null = null;
+
+  /** Mapa idContrato → true/false indicando si ya tiene letras generadas en BD */
+  letrasExistenMap: Map<number, boolean> = new Map();
   dropdownPos: { top: number; left: number } = { top: 0, left: 0 };
 
   // ─── DEBOUNCE: Subject que recibe cada tecla y espera 400ms ──────────
@@ -72,7 +76,8 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
     private programaService: ProgramaService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private letrasService: LetrasCambioService
   ) { }
 
   ngOnInit(): void {
@@ -136,6 +141,8 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
         this.contratos = [...data];
         this.filtrarContratos();
         this.cdr.markForCheck();
+        // Verificar existencia de letras para contratos FINANCIADOS
+        this.verificarLetrasParaContratos(data);
       },
       error: (error) => {
         this.isCargando = false;
@@ -144,6 +151,28 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  /** Consulta si ya existen letras generadas para cada contrato FINANCIADO */
+  verificarLetrasParaContratos(contratos: ContratoResponseDTO[]): void {
+    contratos
+      .filter(c => c.tipoContrato === 'FINANCIADO' && c.idContrato)
+      .forEach(c => {
+        this.letrasService.existenLetras(c.idContrato).subscribe({
+          next: (existe) => {
+            this.letrasExistenMap.set(c.idContrato, existe);
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.letrasExistenMap.set(c.idContrato, false);
+          }
+        });
+      });
+  }
+
+  /** True si el contrato ya tiene letras generadas en BD */
+  tieneLetrasGeneradas(idContrato: number): boolean {
+    return this.letrasExistenMap.get(idContrato) ?? false;
   }
 
   cargarProgramas(): void {

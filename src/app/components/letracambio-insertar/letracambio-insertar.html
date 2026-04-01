@@ -101,15 +101,6 @@
           Generar Letras
         </button>
 
-        <a
-          [routerLink]="['/secretaria-menu/letras/listar', idContrato]"
-          class="btn btn-info"
-          [class.disabled]="!tieneLetras"
-          [attr.aria-disabled]="!tieneLetras"
-        >
-          Ver Letras
-        </a>
-
         <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-secondary">
           Cancelar
         </a>

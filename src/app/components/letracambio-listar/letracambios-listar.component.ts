@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LetrasCambioService } from '../../services/letracambio.service';
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { FormsModule } from '@angular/forms';
@@ -50,6 +50,7 @@ export class LetracambioListarComponent implements OnInit {
   constructor(
     private letrasService: LetrasCambioService,
     private route: ActivatedRoute,
+    private router: Router,
     private toastr: ToastrService,
     //Inyecta la librería de iconos en el constructor
     library: FaIconLibrary
@@ -578,6 +579,8 @@ export class LetracambioListarComponent implements OnInit {
             this.letrasFiltradas = [];
             this.paginatedLetras = [];
             this.cargando = false;
+            // Redirigir al formulario de generar letras ahora que no hay letras
+            this.router.navigate(['/secretaria-menu/letras/insertar', this.idContrato]);
           },
           error: () => {
             this.toastr.error('Error al eliminar las letras.', 'Error');

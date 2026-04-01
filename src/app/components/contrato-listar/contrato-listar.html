@@ -207,11 +207,21 @@
                 <i class="bi bi-file-earmark-richtext"></i>
               </button>
 
-              <a *ngIf="contrato.tipoContrato === 'FINANCIADO'"
-                [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]" [queryParams]="{tieneLetras: (contrato.cantidadLetras > 0) ? '1' : '0'}"
-                class="btn-action btn-letras" title="Generar letras">
-                <i class="bi bi-receipt-cutoff"></i>
-              </a>
+              <!-- Botón dinámico: "Generar letras" si no existen, "Ver letras" si ya existen -->
+              <ng-container *ngIf="contrato.tipoContrato === 'FINANCIADO'">
+                <!-- Sin letras → ir al formulario de generación -->
+                <a *ngIf="!tieneLetrasGeneradas(contrato.idContrato)"
+                  [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
+                  class="btn-action btn-letras" title="Generar letras">
+                  <i class="bi bi-receipt-cutoff"></i>
+                </a>
+                <!-- Con letras → ir directamente al listado -->
+                <a *ngIf="tieneLetrasGeneradas(contrato.idContrato)"
+                  [routerLink]="['/secretaria-menu/letras/listar', contrato.idContrato]"
+                  class="btn-action btn-letras btn-letras-ver" title="Ver letras">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </ng-container>
 
             </div>
           </td>
