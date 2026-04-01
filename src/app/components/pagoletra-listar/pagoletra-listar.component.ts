@@ -8,11 +8,18 @@ import { ContratoService } from '../../services/contrato.service';
 import { ProgramaService } from '../../services/programa.service';
 import { LetrasCambioService } from '../../services/letracambio.service';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { MoraService } from '../../services/mora.service';
+
 import { Programa } from '../../models/programa.model';
 import { LetraCambio } from '../../models/letra-cambio.model';
+import { MoraResumenContratoDTO } from '../../dto/moraresumencontrato.dto';
+import { CalculoMoraDTO } from '../../dto/calculomora.dto';
+
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
 import { PagoLetraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
 import { PagoListaModalComponent } from '../pago-lista-modal/pago-lista-modal.component';
+import { MoraListarComponent } from '../mora-listar/mora-listar.component';
+import { MoraAlertaComponent } from '../mora-alerta/mora-alerta.component';
 
 interface LetraCambioConSeleccion extends LetraCambio {
   seleccionada?: boolean;
@@ -27,7 +34,9 @@ interface LetraCambioConSeleccion extends LetraCambio {
     RouterModule,
     PagoletraInsertarComponent,
     PagoLetraMultipleInsertarComponent,
-    PagoListaModalComponent
+    PagoListaModalComponent,
+    MoraListarComponent,
+    MoraAlertaComponent,
   ],
   templateUrl: './pagoletra-listar.html',
   styleUrls: ['./pagoletra-listar.scss'],
@@ -60,11 +69,28 @@ export class PagoletraListarComponent implements OnInit {
   modoPagoMultiple: boolean = false;
   letrasSeleccionadasTemp: LetraCambio[] = [];
 
+  // ── MORA ────────────────────────────────────────────────────────────────────
+  moraResumen: MoraResumenContratoDTO | null = null;
+  mostrarMoraListar: boolean = false;
+  mostrarMoraAlerta: boolean = false;
+  letraParaPagarConMora: LetraCambio | null = null;
+  /** Cálculo de mora a pasar al modal de pago (solo cuando elige pagar mora ahora) */
+  calculoMoraParaPago: CalculoMoraDTO | null = null;
+
+  /**
+   * NUEVO: indica al modal de pago de letra que la mora ya fue cobrada
+   * en el paso anterior (desde mora-alerta → Pagar Mora).
+   * Cuando es true, el modal de pago NO mostrará el aviso de mora
+   * ni intentará crear/registrar la mora nuevamente.
+   */
+  moraPreviamentePagada: boolean = false;
+
   constructor(
     private contratoService: ContratoService,
     private programaService: ProgramaService,
     private letrasService: LetrasCambioService,
     private pagoService: PagoLetraService,
+    private moraService: MoraService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -75,13 +101,8 @@ export class PagoletraListarComponent implements OnInit {
 
   cargarProgramas(): void {
     this.programaService.listarProgramas().subscribe({
-      next: (data) => {
-        this.programas = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar programas:', err);
-        this.toastr.warning('No se pudieron cargar los programas', 'Aviso');
-      }
+      next: (data) => { this.programas = data; },
+      error: () => { this.toastr.warning('No se pudieron cargar los programas', 'Aviso'); }
     });
   }
 
@@ -90,7 +111,6 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.warning('Debe seleccionar programa, manzana y número de lote', 'Atención');
       return;
     }
-
     this.contratoService.buscarPorProgramaManzanaLote(
       this.programaSeleccionado,
       this.manzanaBusqueda.trim().toUpperCase(),
@@ -99,13 +119,14 @@ export class PagoletraListarComponent implements OnInit {
       next: (contrato) => {
         this.contratoEncontrado = contrato;
         this.cargarLetrasPendientes(contrato.idContrato);
+        this.cargarResumenMora(contrato.idContrato);
       },
-      error: (err) => {
-        console.error('Error al buscar contrato:', err);
+      error: () => {
         this.toastr.error('No se encontró ningún contrato para esos datos', 'Error');
         this.contratoEncontrado = null;
         this.letrasPendientes = [];
         this.letrasPagadas = [];
+        this.moraResumen = null;
       }
     });
   }
@@ -118,31 +139,125 @@ export class PagoletraListarComponent implements OnInit {
           .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
-
         this.seleccionadasMap.clear();
         this.currentPage = 1;
         this.aplicarPaginacion();
         this.cargandoLetras = false;
         this.cdr.markForCheck();
       },
-      error: (err) => {
-        console.error('Error al cargar letras:', err);
+      error: () => {
         this.toastr.error('Error al cargar las letras', 'Error');
         this.cargandoLetras = false;
       }
     });
   }
 
+  // ── MORA ────────────────────────────────────────────────────────────────────
+
+  cargarResumenMora(idContrato: number): void {
+    this.moraService.obtenerResumenPorContrato(idContrato).subscribe({
+      next: (resumen) => { this.moraResumen = resumen; },
+      error: () => { this.moraResumen = null; }
+    });
+  }
+
+  abrirMoraListar(): void {
+    this.mostrarMoraListar = true;
+  }
+
+  cerrarMoraListar(): void {
+    this.mostrarMoraListar = false;
+    if (this.contratoEncontrado) {
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
+    }
+  }
+
+  /**
+   * CORRECCIÓN PRINCIPAL — Flujo: Pagar Mora → Pagar Letra
+   *
+   * El operador pagó la mora desde mora-alerta y luego quiere cobrar la letra.
+   * En este caso:
+   *   - calculoMoraParaPago = NULL  (la mora ya fue pagada, no hay nada pendiente)
+   *   - moraPreviamentePagada = TRUE (le avisamos al modal de pago que no cree otra mora)
+   *
+   * Así, cuando el modal de pagoletra-insertar registre el pago de la letra,
+   * el backend puede crear la mora en PENDIENTE (comportamiento normal del backend)
+   * PERO el frontend NO intentará registrar un segundo pago de mora,
+   * porque moraPreviamentePagada = true bloquea ese camino.
+   */
+  onMoraPagadaQuierePagarLetra(calculo: CalculoMoraDTO): void {
+    this.mostrarMoraAlerta = false;
+    this.calculoMoraParaPago = null;      // mora ya pagada → no mostrar bloque de mora en el modal
+    this.moraPreviamentePagada = true;    // ← NUEVO: le dice al modal que NO registre mora de nuevo
+    this.letraSeleccionada = this.letraParaPagarConMora;
+    this.letraParaPagarConMora = null;
+    if (this.contratoEncontrado) {
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
+    }
+  }
+
+  onMoraPagadaSinLetra(): void {
+    this.mostrarMoraAlerta = false;
+    this.letraParaPagarConMora = null;
+    this.calculoMoraParaPago = null;
+    this.moraPreviamentePagada = false;
+    if (this.contratoEncontrado) {
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
+    }
+  }
+
+  /** El operador hizo clic en "Pagar" sobre una letra VENCIDA → mostrar alerta de mora */
+  iniciarFlujoPago(letra: LetraCambio): void {
+    const errorOrden = this.validarLetraParaPago(letra);
+    if (errorOrden) {
+      this.toastr.error(errorOrden, 'Pago no permitido');
+      return;
+    }
+
+    if (letra.estadoLetra === 'VENCIDO') {
+      this.letraParaPagarConMora = letra;
+      this.moraPreviamentePagada = false; // resetear al iniciar flujo nuevo
+      this.mostrarMoraAlerta = true;
+    } else {
+      this.calculoMoraParaPago = null;
+      this.moraPreviamentePagada = false;
+      this.letraSeleccionada = letra;
+    }
+  }
+
+  /** Operador eligió "Pagar letra + mora ahora" (desde el checkbox dentro del modal de pago) */
+  onConfirmarConMora(calculo: CalculoMoraDTO): void {
+    this.mostrarMoraAlerta = false;
+    this.calculoMoraParaPago = calculo;           // ← se pasa al modal de pago
+    this.moraPreviamentePagada = false;
+    this.letraSeleccionada = this.letraParaPagarConMora;
+    this.letraParaPagarConMora = null;
+  }
+
+  /** Operador eligió "Pagar solo la letra" → mora queda PENDIENTE en el backend */
+  onConfirmarSinPagarMora(calculo: CalculoMoraDTO): void {
+    this.mostrarMoraAlerta = false;
+    this.calculoMoraParaPago = null;              // sin mora — el backend la crea como PENDIENTE
+    this.moraPreviamentePagada = false;
+    this.letraSeleccionada = this.letraParaPagarConMora;
+    this.letraParaPagarConMora = null;
+  }
+
+  onCancelarMoraAlerta(): void {
+    this.mostrarMoraAlerta = false;
+    this.letraParaPagarConMora = null;
+    this.calculoMoraParaPago = null;
+    this.moraPreviamentePagada = false;
+  }
+
+  // ── MÉTODOS EXISTENTES ───────────────────────────────────────────────────────
+
   formatearNumeroLote(): void {
     const soloNumeros = this.numeroLoteBusqueda.replace(/\D/g, '');
     const procesado = soloNumeros.length > 2 ? soloNumeros.slice(-2) : soloNumeros;
     if (procesado.length === 1) {
       const num = parseInt(procesado, 10);
-      if (num >= 1 && num <= 9) {
-        this.numeroLoteBusqueda = '0' + num;
-      } else {
-        this.numeroLoteBusqueda = procesado;
-      }
+      this.numeroLoteBusqueda = (num >= 1 && num <= 9) ? '0' + num : procesado;
     } else {
       this.numeroLoteBusqueda = procesado;
     }
@@ -156,81 +271,41 @@ export class PagoletraListarComponent implements OnInit {
     this.letrasPendientes = [];
     this.letrasPagadas = [];
     this.seleccionadasMap.clear();
+    this.moraResumen = null;
+    this.calculoMoraParaPago = null;
+    this.moraPreviamentePagada = false;
   }
 
-  // ── UTILIDAD: extrae el número de letra de "N/Total" o "N" ─────────────────
   private extraerNumeroLetra(numeroLetra: string): number {
     if (!numeroLetra) return 0;
     const parte = numeroLetra.includes('/') ? numeroLetra.split('/')[0] : numeroLetra;
     return parseInt(parte.trim(), 10) || 0;
   }
 
-  /**
-   * Calcula el máximo número de letra YA pagado para el contrato actual.
-   * Usa letrasPagadas (ya disponibles en memoria) para evitar una llamada HTTP extra.
-   * Retorna 0 si no hay ningún pago previo.
-   */
   private maxNumeroLetraPagado(): number {
     if (!this.letrasPagadas || this.letrasPagadas.length === 0) return 0;
     return Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)));
   }
 
-  /**
-   * Valida si una letra individual puede pagarse dado el historial actual.
-   * Retorna null si es válida, o un mensaje de error si no lo es.
-   */
   private validarLetraParaPago(letra: LetraCambio): string | null {
     const numLetra = this.extraerNumeroLetra(letra.numeroLetra);
     const maxPagado = this.maxNumeroLetraPagado();
-
-    // Si no hay pagos previos, cualquier letra es válida
     if (maxPagado === 0) return null;
-
-    // Si la letra está por delante del consecutivo permitido → bloquear
     if (numLetra > maxPagado + 1) {
       return `No puede pagar la letra N° ${numLetra} porque el siguiente pago debe ser ` +
              `la letra N° ${maxPagado + 1}. Solo puede pagar letras anteriores o la N° ${maxPagado + 1}.`;
     }
-
-    return null; // OK
+    return null;
   }
 
-  /**
-   * Valida si un grupo de letras seleccionadas puede pagarse en conjunto.
-   * Retorna null si es válido, o un mensaje de error si no lo es.
-   */
   private validarLetrasMultipleParaPago(letras: LetraCambio[]): string | null {
-    if (!letras || letras.length === 0) return null;
-
-    const nums = letras.map(l => this.extraerNumeroLetra(l.numeroLetra)).sort((a, b) => a - b);
     const maxPagado = this.maxNumeroLetraPagado();
-
-    // El primero de la selección no puede saltarse el consecutivo
-    if (maxPagado > 0 && nums[0] > maxPagado + 1) {
-      return `No puede pagar la letra N° ${nums[0]} porque el siguiente pago debe ser ` +
-             `la letra N° ${maxPagado + 1}. Ajuste su selección.`;
+    if (maxPagado === 0) return null;
+    const numeros = letras.map(l => this.extraerNumeroLetra(l.numeroLetra)).sort((a, b) => a - b);
+    if (numeros[0] > maxPagado + 1) {
+      return `La selección no puede comenzar en la letra N° ${numeros[0]}. El siguiente pago permitido es la letra N° ${maxPagado + 1}.`;
     }
-
-    // Las letras seleccionadas deben ser consecutivas entre sí
-    for (let i = 1; i < nums.length; i++) {
-      if (nums[i] !== nums[i - 1] + 1) {
-        return `Las letras seleccionadas no son consecutivas: tiene la N° ${nums[i - 1]} ` +
-               `y la N° ${nums[i]}, pero falta la N° ${nums[i - 1] + 1} entre ellas.`;
-      }
-    }
-
-    return null; // OK
-  }
-
-  // ── SELECCIÓN MÚLTIPLE ────────────────────────────────────────────────────
-
-  seleccionarTodas(event: any): void {
-    const checked = event.target.checked;
-    if (checked) {
-      this.paginatedLetras.forEach(letra => this.seleccionadasMap.add(letra.idLetra));
-    } else {
-      this.paginatedLetras.forEach(letra => this.seleccionadasMap.delete(letra.idLetra));
-    }
+    return null;
   }
 
   toggleSeleccion(letra: LetraCambioConSeleccion): void {
@@ -239,6 +314,18 @@ export class PagoletraListarComponent implements OnInit {
     } else {
       this.seleccionadasMap.add(letra.idLetra);
     }
+    letra.seleccionada = this.seleccionadasMap.has(letra.idLetra);
+    this.cdr.markForCheck();
+  }
+
+  seleccionarTodas(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.paginatedLetras.forEach(l => {
+      if (checked) this.seleccionadasMap.add(l.idLetra);
+      else this.seleccionadasMap.delete(l.idLetra);
+      l.seleccionada = checked;
+    });
+    this.cdr.markForCheck();
   }
 
   isSeleccionada(idLetra: number): boolean {
@@ -259,18 +346,12 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.warning('Seleccione al menos una letra', 'Atención');
       return;
     }
-
-    const letrasElegidas = this.letrasPendientes
-      .filter(l => this.seleccionadasMap.has(l.idLetra));
-
-    // ── VALIDACIÓN DE ORDEN ────────────────────────────────────────────────
+    const letrasElegidas = this.letrasPendientes.filter(l => this.seleccionadasMap.has(l.idLetra));
     const errorOrden = this.validarLetrasMultipleParaPago(letrasElegidas);
     if (errorOrden) {
       this.toastr.error(errorOrden, 'Pago no permitido');
       return;
     }
-    // ──────────────────────────────────────────────────────────────────────
-
     this.letrasSeleccionadasTemp = letrasElegidas;
     this.modoPagoMultiple = true;
   }
@@ -304,31 +385,27 @@ export class PagoletraListarComponent implements OnInit {
     this.seleccionadasMap.clear();
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
       this.refrescarContrato();
     }
     this.toastr.success('Pago múltiple registrado correctamente', 'Éxito');
   }
 
   abrirModalPago(letra: LetraCambio): void {
-    // ── VALIDACIÓN DE ORDEN ────────────────────────────────────────────────
-    const errorOrden = this.validarLetraParaPago(letra);
-    if (errorOrden) {
-      this.toastr.error(errorOrden, 'Pago no permitido');
-      return;
-    }
-    // ──────────────────────────────────────────────────────────────────────
-
-    this.letraSeleccionada = letra;
+    this.iniciarFlujoPago(letra);
   }
 
   cerrarModalPago(): void {
     this.letraSeleccionada = null;
+    this.calculoMoraParaPago = null;
+    this.moraPreviamentePagada = false;
   }
 
   onPagoRegistrado(): void {
     this.cerrarModalPago();
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
       this.refrescarContrato();
     }
   }
@@ -340,9 +417,7 @@ export class PagoletraListarComponent implements OnInit {
       this.manzanaBusqueda.trim(),
       this.numeroLoteBusqueda.trim()
     ).subscribe({
-      next: (contrato) => {
-        if (contrato) this.contratoEncontrado = contrato;
-      },
+      next: (contrato) => { if (contrato) this.contratoEncontrado = contrato; },
       error: (err) => console.error('Error al refrescar contrato:', err)
     });
   }
@@ -361,48 +436,24 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   aplicarPaginacion(): void {
-    const listaActual = this.tipoLista === 'pendientes'
-      ? this.letrasPendientes
-      : this.letrasPagadas;
+    const listaActual = this.tipoLista === 'pendientes' ? this.letrasPendientes : this.letrasPagadas;
     this.totalPages = Math.ceil(listaActual.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
-    const end   = start + this.pageSize;
-    this.paginatedLetras = listaActual.slice(start, end) as LetraCambioConSeleccion[];
+    this.paginatedLetras = listaActual.slice(start, start + this.pageSize) as LetraCambioConSeleccion[];
   }
 
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.aplicarPaginacion();
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.aplicarPaginacion();
-    }
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.aplicarPaginacion();
-    }
-  }
+  previousPage(): void { if (this.currentPage > 1) { this.currentPage--; this.aplicarPaginacion(); } }
+  nextPage(): void { if (this.currentPage < this.totalPages) { this.currentPage++; this.aplicarPaginacion(); } }
+  goToPage(page: number): void { if (page >= 1 && page <= this.totalPages) { this.currentPage = page; this.aplicarPaginacion(); } }
 
   getPagesArray(): (number | string)[] {
-    const total   = this.totalPages;
-    const current = this.currentPage;
+    const total = this.totalPages, current = this.currentPage;
     const pages: (number | string)[] = [];
-
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) pages.push(i);
-    } else {
+    if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); }
+    else {
       pages.push(1);
       if (current > 3) pages.push('...');
-      let start = Math.max(2, current - 1);
-      let end   = Math.min(total - 1, current + 1);
+      let start = Math.max(2, current - 1), end = Math.min(total - 1, current + 1);
       if (current <= 3) end = 4;
       if (current >= total - 2) start = total - 3;
       for (let i = start; i <= end; i++) pages.push(i);
@@ -420,22 +471,14 @@ export class PagoletraListarComponent implements OnInit {
           return;
         }
         const pago = pagos[0];
-        const numeroComprobante = pago.numeroComprobante;
-
-        if (numeroComprobante) {
-          this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
-            next: (blob) => {
-              const url = URL.createObjectURL(blob);
-              window.open(url, '_blank');
-            },
+        if (pago.numeroComprobante) {
+          this.pagoService.descargarComprobanteMultiple(pago.numeroComprobante).subscribe({
+            next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
             error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
           });
         } else {
           this.pagoService.descargarComprobante(pago.idPago).subscribe({
-            next: (blob) => {
-              const url = URL.createObjectURL(blob);
-              window.open(url, '_blank');
-            },
+            next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
             error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
           });
         }

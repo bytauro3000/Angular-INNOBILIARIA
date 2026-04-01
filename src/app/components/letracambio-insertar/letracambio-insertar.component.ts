@@ -10,11 +10,12 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { ContratoService } from '../../services/contrato.service';
 import { Moneda } from '../../dto/moneda.enum';
 import { Router } from '@angular/router';
+import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 
 @Component({
   selector: 'app-letracambio-insertar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, CurrencyFormatterDirective],
   templateUrl: './letracambio-insertar.html',
   styleUrls: ['./letracambio-insertar.scss'],
 })
@@ -42,6 +43,11 @@ export class LetracambioInsertarComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerIdContratoDesdeRuta();
     this.cargarDistritos();
+  }
+
+  /** Llamado por ngModel cuando la directiva actualiza el valor numérico del importe */
+  onImporteModelChange(valor: any): void {
+    this.onImporteChange(typeof valor === 'number' ? valor : parseFloat(valor));
   }
 
   obtenerIdContratoDesdeRuta(): void {
@@ -100,7 +106,41 @@ export class LetracambioInsertarComponent implements OnInit {
       importe: '',
       importeLetras: '',
       modoAutomatico: true,
+      usarUltimoDiaMes: false,
     };
+  }
+
+  /** Día numérico de la fecha de vencimiento inicial (para mostrar en el hint) */
+  get diaDeFechaVencimiento(): number {
+    const fechaStr = this.generarLetrasRequest.fechaVencimientoInicial;
+    if (!fechaStr) return 0;
+    return new Date(fechaStr + 'T00:00:00').getDate();
+  }
+
+  /** Símbolo de moneda según el contrato, para la directiva de formato */
+  get simboloMoneda(): string {
+    return this.monedaContrato === 'PEN' ? 'S/ ' : '$ ';
+  }
+
+  /**
+   * Muestra el checkbox solo cuando la fecha inicial ES el último día
+   * de un mes con 30 días o menos (ej: 30/04, 28/02, 29/02).
+   * Cuando el mes tiene 31 días y se elige el 31, el checkbox NO aparece
+   * porque siempre se generará el último día de cada mes sin ambigüedad.
+   */
+  get mostrarCheckUltimoDia(): boolean {
+    const fechaStr = this.generarLetrasRequest.fechaVencimientoInicial;
+    if (!fechaStr) return false;
+    const fecha = new Date(fechaStr + 'T00:00:00');
+    const diasDelMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
+    return fecha.getDate() === diasDelMes && diasDelMes <= 30;
+  }
+
+  /** Al cambiar la fecha, resetea el checkbox si ya no aplica */
+  onFechaVencimientoChange(): void {
+    if (!this.mostrarCheckUltimoDia) {
+      this.generarLetrasRequest.usarUltimoDiaMes = false;
+    }
   }
 
   onGenerarLetras(): void {
@@ -113,8 +153,9 @@ export class LetracambioInsertarComponent implements OnInit {
     this.success = null;
 
     if (!this.generarLetrasRequest.modoAutomatico) {
-      const importeDesformateado = this.unformatCurrency(this.generarLetrasRequest.importe);
-      this.generarLetrasRequest.importe = importeDesformateado;
+      // La directiva guarda el valor numérico en el ngModel; lo limpiamos por si acaso
+      const raw = String(this.generarLetrasRequest.importe).replace(/[^0-9.]/g, '');
+      this.generarLetrasRequest.importe = raw;
     }
 
     this.letrasService.generarLetras(this.idContrato, this.generarLetrasRequest).subscribe({
@@ -128,9 +169,9 @@ export class LetracambioInsertarComponent implements OnInit {
           this.letrasService.listarPorContrato(this.idContrato).subscribe({
             next: (letras) => {
               if (letras.length > 0) {
-                const importe = letras[0].importe;
-                this.generarLetrasRequest.importe = importe.toString();
-                this.convertirImporteALetras(this.generarLetrasRequest.importe);
+                const importe = letras[0].importe as unknown as number;
+                this.generarLetrasRequest.importe = String(importe);
+                this.onImporteChange(parseFloat(String(importe)));
               }
             },
             error: (err) => {
@@ -149,56 +190,18 @@ export class LetracambioInsertarComponent implements OnInit {
     });
   }
 
-  onImporteChange(value: string): void {
-    if (!this.generarLetrasRequest.modoAutomatico) {
-      const rawValue = value.replace(/[^0-9.]/g, '');
-      this.generarLetrasRequest.importe = rawValue;
-      this.convertirImporteALetras(rawValue);
-    }
-  }
-
-  onImporteBlur(): void {
-    if (!this.generarLetrasRequest.modoAutomatico) {
-      this.generarLetrasRequest.importe = this.formatCurrency(this.generarLetrasRequest.importe);
-    }
-  }
-
-  onImporteFocus(): void {
-    if (!this.generarLetrasRequest.modoAutomatico) {
-      this.generarLetrasRequest.importe = this.unformatCurrency(this.generarLetrasRequest.importe);
-    }
-  }
-
-  private convertirImporteALetras(valor: string): void {
-    const valorFloat = parseFloat(valor);
-    if (!isNaN(valorFloat)) {
-      const parteEntera = Math.floor(valorFloat);
-      const parteDecimal = Math.round((valorFloat - parteEntera) * 100);
-      const letras = this.numeroALetras(parteEntera).toUpperCase();
-      const centavos = parteDecimal.toString().padStart(2, '0');
-      const sufijo = this.monedaContrato === 'PEN' ? 'SOLES' : 'DÓLARES AMERICANOS';
-      this.generarLetrasRequest.importeLetras = `${letras} CON ${centavos}/100 ${sufijo}`;
-    } else {
+  /** Convierte el importe numérico a texto (llamado desde onImporteChange) */
+  onImporteChange(valor: number | null): void {
+    if (this.generarLetrasRequest.modoAutomatico || valor == null || isNaN(valor)) {
       this.generarLetrasRequest.importeLetras = '';
+      return;
     }
-  }
-
-  private formatCurrency(value: string): string {
-    let rawValue = value.replace(/[^0-9.]/g, '');
-    if (!rawValue) return '';
-    let floatVal = parseFloat(rawValue);
-    if (isNaN(floatVal)) return '';
-    const currencyCode = this.monedaContrato === 'PEN' ? 'PEN' : 'USD';
-    return floatVal.toLocaleString('en-US', {
-      style: 'currency',
-      currency: currencyCode,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-
-  private unformatCurrency(value: string): string {
-    return value.replace(/[$,S\/. ]/g, '');
+    const parteEntera = Math.floor(valor);
+    const parteDecimal = Math.round((valor - parteEntera) * 100);
+    const letras = this.numeroALetras(parteEntera).toUpperCase();
+    const centavos = parteDecimal.toString().padStart(2, '0');
+    const sufijo = this.monedaContrato === 'PEN' ? 'SOLES' : 'DÓLARES AMERICANOS';
+    this.generarLetrasRequest.importeLetras = `${letras} CON ${centavos}/100 ${sufijo}`;
   }
 
   private numeroALetras(num: number): string {

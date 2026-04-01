@@ -1,0 +1,135 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content shadow-lg">
+
+      <!-- ── Header ──────────────────────────────────────────────────────── -->
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-clock-history"></i>
+          Historial de Moras — Contrato #{{ idContrato }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
+      </div>
+
+      <!-- ── Body ────────────────────────────────────────────────────────── -->
+      <div class="modal-body">
+
+        <!-- Cargando -->
+        <div *ngIf="cargando" class="cargando-wrapper">
+          <div class="spinner-border text-primary"></div>
+          <p>Cargando moras...</p>
+        </div>
+
+        <!-- Sin moras -->
+        <div *ngIf="!cargando && moras.length === 0" class="sin-moras">
+          <i class="bi bi-check-circle-fill text-success"></i>
+          <p>Este contrato no tiene moras registradas.</p>
+        </div>
+
+        <!-- Resumen si hay pendientes -->
+        <div *ngIf="!cargando && morasPendientes.length > 0" class="resumen-pendientes">
+          <div class="resumen-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+          <div class="resumen-texto">
+            <strong>
+              {{ morasPendientes.length }} mora{{ morasPendientes.length > 1 ? 's' : '' }}
+              pendiente{{ morasPendientes.length > 1 ? 's' : '' }}
+            </strong>
+            <span>Total acumulado: {{ simboloMoneda }} {{ totalPendiente | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- Tabla de moras -->
+        <div *ngIf="!cargando && moras.length > 0" class="tabla-wrapper">
+          <table class="tabla-moras">
+            <thead>
+              <tr>
+                <th>Letra</th>
+                <th>Vencimiento</th>
+                <th>Días</th>
+                <th>Interés 5%</th>
+                <th>Diario</th>
+                <th>Total Mora</th>
+                <th>Fecha Reg.</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let mora of moras" [ngClass]="{
+                'row-pendiente': mora.estadoMora === 'PENDIENTE',
+                'row-pagado':    mora.estadoMora === 'PAGADO',
+                'row-anulado':   mora.estadoMora === 'ANULADO'
+              }">
+                <td data-label="Letra">{{ mora.numeroLetra }}</td>
+                <td data-label="Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' }}</td>
+                <td data-label="Días" class="text-center">
+                  <span class="dias-chip">{{ mora.diasMora }}</span>
+                </td>
+                <td data-label="Interés 5%">{{ simboloMoneda }} {{ mora.montoPorcentaje | number:'1.2-2' }}</td>
+                <td data-label="Diario">{{ simboloMoneda }} {{ mora.montoDiario | number:'1.2-2' }}</td>
+                <td data-label="Total Mora" class="mora-total-cell">
+                  {{ simboloMoneda }} {{ mora.montoMoraTotal | number:'1.2-2' }}
+                </td>
+                <td data-label="Fecha Reg.">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' }}</td>
+                <td data-label="Estado">
+                  <span class="estado-badge" [ngClass]="{
+                    'estado-pendiente': mora.estadoMora === 'PENDIENTE',
+                    'estado-pagado':    mora.estadoMora === 'PAGADO',
+                    'estado-anulado':   mora.estadoMora === 'ANULADO'
+                  }">{{ mora.estadoMora }}</span>
+                </td>
+                <td class="acciones-cell">
+                  <div class="acciones-container">
+
+                    <!-- Pagar mora pendiente -->
+                    <button *ngIf="mora.estadoMora === 'PENDIENTE'"
+                            class="btn-accion btn-pagar"
+                            (click)="abrirPagarMora(mora)"
+                            title="Registrar pago de esta mora">
+                      <i class="bi bi-cash-coin"></i>
+                    </button>
+
+                    <!-- Anular mora pendiente -->
+                    <button *ngIf="mora.estadoMora === 'PENDIENTE'"
+                            class="btn-accion btn-anular"
+                            (click)="anularMora(mora)"
+                            title="Anular mora (solo admin)">
+                      <i class="bi bi-slash-circle"></i>
+                    </button>
+
+                    <!-- Comprobante(s) para moras pagadas -->
+                    <ng-container *ngIf="mora.estadoMora === 'PAGADO'">
+                      <button *ngFor="let pago of mora.pagos"
+                              class="btn-accion btn-comprobante"
+                              (click)="descargarComprobanteMora(pago.idPagoMora)"
+                              title="Descargar comprobante N° {{ pago.numeroComprobante || pago.idPagoMora }}">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                      </button>
+                    </ng-container>
+
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <!-- ── Footer ──────────────────────────────────────────────────────── -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Sub-modal para pagar mora -->
+<app-mora-pagar
+  *ngIf="moraParaPagar"
+  [mora]="moraParaPagar"
+  [simboloMoneda]="simboloMoneda"
+  (onClose)="cerrarPagarMora()"
+  (onPagoExitoso)="onMoraPagada($event)">
+</app-mora-pagar>

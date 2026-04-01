@@ -1,8 +1,9 @@
 export interface GenerarLetrasRequest {
     idDistrito: number;
-    fechaGiro: string; 
+    fechaGiro: string;
     fechaVencimientoInicial: string;
     importe: string;
     importeLetras: string;
-    modoAutomatico: boolean; 
+    modoAutomatico: boolean;
+    usarUltimoDiaMes: boolean;
 }

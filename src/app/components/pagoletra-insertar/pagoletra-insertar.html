@@ -1,18 +1,24 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered"> 
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content shadow-lg">
+
+      <!-- ── Header ──────────────────────────────────────────────────── -->
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="bi bi-cash-stack"></i> Registrar Pago - Letra N° {{ numeroLetraLimpio }}
+          <i class="bi bi-cash-stack"></i>
+          Registrar Pago — Letra N° {{ numeroLetraLimpio }}
         </h5>
         <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
       </div>
 
+      <!-- ── Body ────────────────────────────────────────────────────── -->
       <div class="modal-body">
-        <div class="info-letra form-row form-2-col">
+
+        <!-- Información básica de la letra -->
+        <div class="info-letra form-2-col">
           <div class="info-item">
             <label>Importe de la letra</label>
-            <p class="info-value">{{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{letra.importe | number:'1.2-2'}}</p>
+            <p class="info-value">{{ simboloMoneda }} {{ letra.importe | number:'1.2-2' }}</p>
           </div>
           <div class="info-item">
             <label>Fecha vencimiento</label>
@@ -20,17 +26,74 @@
           </div>
         </div>
 
+        <!-- ── ALERTA MORA: se muestra si hay cálculo de mora Y el usuario AÚN no decidió ── -->
+        <!-- Cuando calculoMora existe pero pagarMoraTambien no está confirmado aún           -->
+        <div *ngIf="calculoMora && !moraDecisionTomada" class="mora-alerta-container">
+          <div class="mora-alerta-titulo">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Letra vencida — aplica mora por atraso
+          </div>
+          <p class="mora-alerta-resumen">
+            {{ calculoMora.diasMora }} día(s) de atraso.
+            Mora acumulada:
+            <span>{{ simboloMoneda }} {{ calculoMora.montoMoraTotal | number:'1.2-2' }}</span>
+          </p>
+          <div class="mora-checkbox-row" (click)="togglePagarMora()">
+            <input type="checkbox" [checked]="pagarMoraTambien" (click)="$event.stopPropagation()" (change)="togglePagarMora()" id="chkPagarMora">
+            <label for="chkPagarMora">Pagar mora junto con esta letra (recomendado)</label>
+          </div>
+        </div>
+
+        <!-- ── DETALLE DE MORA (solo cuando el operador eligió pagar mora ahora) ── -->
+        <div *ngIf="calculoMora && pagarMoraTambien" class="mora-detalle-pago">
+          <div class="mora-detalle-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Mora incluida en este pago</span>
+          </div>
+          <div class="mora-detalle-rows">
+            <div class="mora-detalle-row">
+              <span>Días de atraso</span>
+              <strong class="text-warning">
+                {{ calculoMora.diasMora }} día{{ calculoMora.diasMora !== 1 ? 's' : '' }}
+              </strong>
+            </div>
+            <div class="mora-detalle-row">
+              <span>Interés 5% del importe</span>
+              <strong>{{ simboloMoneda }} {{ calculoMora.montoPorcentaje | number:'1.2-2' }}</strong>
+            </div>
+            <div class="mora-detalle-row">
+              <span>Recargo diario ({{ calculoMora.diasMora }} × $1.00)</span>
+              <strong>{{ simboloMoneda }} {{ calculoMora.montoDiario | number:'1.2-2' }}</strong>
+            </div>
+            <div class="mora-detalle-row mora-subtotal">
+              <span>Subtotal mora</span>
+              <strong class="text-danger">
+                {{ simboloMoneda }} {{ calculoMora.montoMoraTotal | number:'1.2-2' }}
+              </strong>
+            </div>
+          </div>
+          <div class="mora-total-pago">
+            <span>TOTAL A COBRAR (letra + mora)</span>
+            <strong>{{ simboloMoneda }} {{ totalConMora | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <!-- ── Formulario ──────────────────────────────────────────── -->
         <form #pagoForm="ngForm">
+
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="importePagado">Importe Pagado *</label>
+              <label for="importePagado">Importe Pagado <span>*</span></label>
               <input type="number" step="0.01" id="importePagado" class="form-control"
-                     [(ngModel)]="pagoRequest.importePagado" name="importePagado">
+                     [(ngModel)]="pagoRequest.importePagado" name="importePagado"
+                     [readonly]="true">
             </div>
             <div class="form-group">
-              <label for="medioPago">Medio de Pago *</label>
-              <select id="medioPago" class="form-select" [(ngModel)]="pagoRequest.medioPago"
-                      name="medioPago" (change)="onMedioPagoChange()">
+              <label for="medioPago">Medio de Pago <span>*</span></label>
+              <select id="medioPago" class="form-select"
+                      [(ngModel)]="pagoRequest.medioPago"
+                      name="medioPago"
+                      (change)="onMedioPagoChange()">
                 <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
@@ -38,13 +101,17 @@
 
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="numeroOperacion">N° Operación <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span></label>
+              <label for="numeroOperacion">
+                N° Operación
+                <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span>
+              </label>
               <input type="text" id="numeroOperacion" class="form-control"
                      [(ngModel)]="pagoRequest.numeroOperacion" name="numeroOperacion"
-                     [disabled]="pagoRequest.medioPago === 'EFECTIVO'">
+                     [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
+                     placeholder="{{ pagoRequest.medioPago === 'EFECTIVO' ? 'N/A' : 'Ingrese N° operación' }}">
             </div>
             <div class="form-group">
-              <label for="fechaOperacion">Fecha Operación *</label>
+              <label for="fechaOperacion">Fecha Operación <span>*</span></label>
               <input type="date" id="fechaOperacion" class="form-control"
                      [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion">
             </div>
@@ -52,19 +119,20 @@
 
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="tipoComprobante">Tipo Comprobante *</label>
-              <select id="tipoComprobante" class="form-select" 
-                      [(ngModel)]="pagoRequest.tipoComprobante" 
-                      name="tipoComprobante" 
+              <label for="tipoComprobante">Tipo Comprobante <span>*</span></label>
+              <select id="tipoComprobante" class="form-select"
+                      [(ngModel)]="pagoRequest.tipoComprobante"
+                      name="tipoComprobante"
                       (change)="onTipoComprobanteChange()" required>
                 <option [ngValue]="undefined">-- Seleccione --</option>
                 <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="numeroComprobante">N° Comprobante *</label>
+              <label for="numeroComprobante">N° Comprobante <span>*</span></label>
               <input type="text" id="numeroComprobante" class="form-control"
-                     [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante">
+                     [(ngModel)]="pagoRequest.numeroComprobante" name="numeroComprobante"
+                     placeholder="Ej: EB01-0001">
             </div>
           </div>
 
@@ -76,10 +144,12 @@
             </div>
           </div>
 
-          <!-- Reemplazo del voucher -->
           <div class="form-row mb-0">
             <div class="form-group width-100">
-              <label>Voucher (imagen) <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span></label>
+              <label>
+                Voucher (imagen)
+                <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span>
+              </label>
               <app-voucher-preview
                 [(ngModel)]="voucherFiles"
                 [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
@@ -87,16 +157,35 @@
               </app-voucher-preview>
             </div>
           </div>
-        </form>
-      </div>
 
+        </form>
+
+        <!-- Indicador mientras se registra la mora en segundo plano -->
+        <div *ngIf="pagandoMora" class="mora-pagando">
+          <div class="spinner-border spinner-border-sm text-warning"></div>
+          Registrando pago de mora...
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <!-- ── Footer ──────────────────────────────────────────────────── -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">Cancelar</button>
-        <button type="submit" class="btn btn-save" (click)="guardarPago()" [disabled]="enviando">
-          <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ enviando ? 'Procesando...' : 'Registrar Pago' }}
+        <button type="button" class="btn btn-cancel"
+                (click)="cerrarModal()" [disabled]="enviando">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-save"
+                [class.btn-mora-activo]="pagarMoraTambien"
+                (click)="guardarPago()" [disabled]="enviando">
+          <span *ngIf="enviando" class="spinner-border spinner-border-sm"></span>
+          <ng-container *ngIf="!enviando">
+            <i class="bi" [class.bi-cash-stack]="!pagarMoraTambien" [class.bi-exclamation-circle]="pagarMoraTambien"></i>
+            {{ pagarMoraTambien ? 'Registrar Pago + Mora' : 'Registrar Pago' }}
+          </ng-container>
+          <ng-container *ngIf="enviando">Procesando...</ng-container>
         </button>
       </div>
+
     </div>
   </div>
 </div>

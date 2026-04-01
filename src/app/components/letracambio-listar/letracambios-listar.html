@@ -68,7 +68,22 @@
           <td data-label="#">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
           <td data-label="Número Letra">{{ letra.numeroLetra }}</td>
           <td data-label="Fecha Giro">{{ letra.fechaGiro | date: 'dd/MM/yyyy' }}</td>
-          <td data-label="Fecha Vencimiento">{{ letra.fechaVencimiento | date: 'dd/MM/yyyy' }}</td>
+          <td data-label="Fecha Vencimiento" (dblclick)="iniciarEdicion(letra, 'fechaVencimiento')" class="celda-importe">
+            <input
+              *ngIf="editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento'"
+              [value]="valorTemporal"
+              (input)="onFechaVencimientoInput($any($event.target).value)"
+              (blur)="guardarEdicion(letra)"
+              (keydown.enter)="guardarEdicion(letra)"
+              (keydown.escape)="cancelarEdicion()"
+              class="input-edicion"
+              type="date"
+              autofocus
+            />
+            <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento')">
+              {{ letra.fechaVencimiento | date: 'dd/MM/yyyy' }}
+            </span>
+          </td>
 
           <td data-label="Importe" (dblclick)="iniciarEdicion(letra, 'importe')" class="celda-importe">
             <input

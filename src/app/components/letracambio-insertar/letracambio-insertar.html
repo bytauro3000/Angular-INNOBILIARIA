@@ -35,8 +35,19 @@
             id="fechaVencimientoInicial"
             [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial"
             name="fechaVencimientoInicial"
+            (change)="onFechaVencimientoChange()"
             required
           >
+          <!-- Checkbox: solo si la fecha es el último día de un mes con ≤30 días -->
+          <div class="check-inline-group" *ngIf="mostrarCheckUltimoDia">
+            <input
+              type="checkbox"
+              id="usarUltimoDiaMes"
+              [(ngModel)]="generarLetrasRequest.usarUltimoDiaMes"
+              name="usarUltimoDiaMes"
+            >
+            <label for="usarUltimoDiaMes">Generar siguientes letras con el último día de cada mes</label>
+          </div>
         </div>
 
         <div class="form-group">
@@ -46,27 +57,22 @@
             id="importe"
             [(ngModel)]="generarLetrasRequest.importe"
             name="importe"
-            (ngModelChange)="onImporteChange($event)"
-            (blur)="onImporteBlur()"
-            (focus)="onImporteFocus()"
+            appCurrencyFormatter
+            [currencySymbol]="simboloMoneda"
+            (ngModelChange)="onImporteModelChange($event)"
             [disabled]="generarLetrasRequest.modoAutomatico"
             [class.disabled-field]="generarLetrasRequest.modoAutomatico"
             required
           >
-        </div>
-      </div>
-
-      <div class="form-row form-2-col">
-        <div class="empty-spacer"></div>
-        <div class="form-group checkbox-group">
-          <label>
+          <div class="check-inline-group">
             <input
               type="checkbox"
+              id="modoAutomatico"
               [(ngModel)]="generarLetrasRequest.modoAutomatico"
               name="modoAutomatico"
             >
-            Calcular automáticamente el importe de la Letra
-          </label>
+            <label for="modoAutomatico">Calcular automáticamente el importe de la Letra</label>
+          </div>
         </div>
       </div>
 

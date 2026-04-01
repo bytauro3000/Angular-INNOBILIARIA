@@ -1,17 +1,19 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable custom-modal-width">
     <div class="modal-content shadow-lg">
-      <form [formGroup]="loteForm" (ngSubmit)="onSubmit()">
 
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-grid-3x3-gap"></i>
-            {{ isEditMode ? 'Editar Lote' : 'Insertar Nuevo Lote' }}
-          </h5>
-          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
-        </div>
+      <!-- HEADER fuera del form — igual que cliente-insertar -->
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-grid-3x3-gap"></i>
+          {{ isEditMode ? 'Editar Lote' : 'Insertar Nuevo Lote' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
 
-        <div class="modal-body">
+      <!-- BODY con el form adentro — igual que cliente-insertar -->
+      <div class="modal-body">
+        <form [formGroup]="loteForm" (ngSubmit)="onSubmit()">
           <div class="form-wrapper-modal">
 
             <!-- Programa -->
@@ -197,7 +199,7 @@
               <option value="Con La Avenida ">
             </datalist>
 
-            <!-- Botones dentro del scroll (igual que cliente-insertar) -->
+            <!-- Botones dentro del scroll -->
             <div class="form-botones">
               <button type="button" class="btn btn-save" (click)="validarYSubmit()">
                 <i class="bi bi-check-circle"></i>
@@ -209,9 +211,9 @@
             </div>
 
           </div>
-        </div>
+        </form>
+      </div>
 
-      </form>
     </div>
   </div>
 </div>

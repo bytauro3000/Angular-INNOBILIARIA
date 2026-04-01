@@ -43,7 +43,7 @@ export class LetracambioListarComponent implements OnInit {
 
   // Edición en línea
   editingLetraId: number | null = null;
-  campoEditando: 'importe' | 'importeLetras' | null = null;
+  campoEditando: 'importe' | 'importeLetras' | 'fechaVencimiento' | null = null;
   monedaContrato: string = 'USD'; // Se carga al obtener las letras
   valorTemporal: string | number = '';
 
@@ -669,10 +669,28 @@ export class LetracambioListarComponent implements OnInit {
   // Métodos para edición en línea
   // ------------------------------
 
-  iniciarEdicion(letra: LetraCambio, campo: 'importe' | 'importeLetras'): void {
+  iniciarEdicion(letra: LetraCambio, campo: 'importe' | 'importeLetras' | 'fechaVencimiento'): void {
     this.editingLetraId = letra.idLetra;
     this.campoEditando = campo;
-    this.valorTemporal = letra[campo] ?? '';
+    if (campo === 'fechaVencimiento') {
+      // El input type="date" necesita el formato YYYY-MM-DD
+      const fv = letra.fechaVencimiento;
+      if (fv) {
+        const str = typeof fv === 'string' ? fv : (fv as Date).toISOString().split('T')[0];
+        // Normalizar: si viene como DD/MM/YYYY convertir a YYYY-MM-DD
+        this.valorTemporal = str.includes('/') 
+          ? str.split('/').reverse().join('-') 
+          : str.split('T')[0];
+      } else {
+        this.valorTemporal = '';
+      }
+    } else {
+      this.valorTemporal = letra[campo] ?? '';
+    }
+  }
+
+  onFechaVencimientoInput(valor: string): void {
+    this.valorTemporal = valor; // formato YYYY-MM-DD del input date
   }
 
   onImporteInput(letra: LetraCambio, valor: string): void {
@@ -693,6 +711,11 @@ export class LetracambioListarComponent implements OnInit {
     if (this.campoEditando === 'importe') {
       letra.importe = Number(this.valorTemporal);
       letra.importeLetras = this.convertirNumeroALetras(letra.importe);
+    }
+
+    if (this.campoEditando === 'fechaVencimiento') {
+      if (!this.valorTemporal) { this.cancelarEdicion(); return; }
+      letra.fechaVencimiento = this.valorTemporal as string;
     }
 
     this.letrasService.actualizarLetra(letra.idLetra, letra).subscribe({

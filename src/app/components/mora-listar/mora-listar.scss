@@ -1,0 +1,253 @@
+$navy:       #023e8a;
+$green:      #27ae60;
+$red:        #dc2626;
+$orange:     #d97706;
+$text-dark:  #1e293b;
+$text-light: #475569;
+$border:     #e2e8f0;
+ 
+.modal-content {
+  background: white !important;
+  border-radius: 16px;
+  border: 1px solid $border !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.modal-dialog {
+  max-width: 880px;
+  width: 96%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+}
+ 
+.modal-header {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid $border;
+  flex-shrink: 0;
+ 
+  .modal-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: $text-dark;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    i { color: $orange; font-size: 1.2rem; }
+  }
+}
+ 
+.modal-body {
+  padding: 1.2rem 1.4rem;
+  overflow-y: auto;
+  flex: 1;
+}
+ 
+.modal-footer {
+  padding: 0.8rem 1.4rem;
+  border-top: 1px solid $border;
+  flex-shrink: 0;
+}
+ 
+// ── Cargando / Sin datos ────────────────────────────────────────────────
+.cargando-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 12px;
+  color: $text-light;
+}
+ 
+.sin-moras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 12px;
+  color: $text-light;
+  i { font-size: 2.5rem; }
+  p { margin: 0; font-size: 1rem; }
+}
+ 
+// ── Resumen pendientes ──────────────────────────────────────────────────
+.resumen-pendientes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  margin-bottom: 16px;
+ 
+  .resumen-icon { font-size: 1.5rem; color: $orange; }
+ 
+  .resumen-texto {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.88rem;
+    gap: 2px;
+    strong { color: #92400e; font-size: 0.92rem; }
+    span   { color: #b45309; }
+  }
+}
+ 
+// ── Tabla ────────────────────────────────────────────────────────────────
+.tabla-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid $border;
+}
+ 
+.tabla-moras {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+ 
+  thead tr { background: linear-gradient(135deg, $navy, #0353a4); }
+ 
+  th {
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 10px 8px;
+    white-space: nowrap;
+    text-align: left;
+  }
+ 
+  td {
+    padding: 8px;
+    border-bottom: 1px solid $border;
+    vertical-align: middle;
+    color: $text-dark;
+  }
+ 
+  tbody tr {
+    transition: background 0.15s;
+ 
+    &:last-child td { border-bottom: none; }
+ 
+    &.row-pendiente { background: #fff7ed; }
+    &.row-pagado    { background: #f0fdf4; }
+    &.row-anulado   { background: #f8fafc; opacity: 0.65; }
+ 
+    &:hover td { filter: brightness(0.97); }
+  }
+ 
+  .dias-chip {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+ 
+  .mora-total-cell {
+    font-weight: 700;
+    color: $red;
+  }
+ 
+  .estado-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+ 
+    &.estado-pendiente { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    &.estado-pagado    { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    &.estado-anulado   { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; text-decoration: line-through; }
+  }
+ 
+  // ── Acciones ──────────────────────────────────────────────────────────
+  .acciones-container {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+ 
+  .btn-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 32px;
+    border-radius: 8px;
+    border: 1.5px solid;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+ 
+    &:focus { outline: 2px solid $navy; outline-offset: 2px; }
+ 
+    &.btn-pagar {
+      border-color: $green;
+      color: $green;
+      &:hover { background: $green; color: white; transform: scale(1.05); }
+    }
+ 
+    &.btn-anular {
+      border-color: $red;
+      color: $red;
+      &:hover { background: $red; color: white; transform: scale(1.05); }
+    }
+ 
+    // ── NUEVO: botón PDF para comprobante de mora pagada ─────────────────
+    &.btn-comprobante {
+      border-color: #7c3aed;
+      color: #7c3aed;
+      &:hover { background: #7c3aed; color: white; transform: scale(1.05); }
+      title { font-size: 0.75rem; }
+    }
+  }
+}
+ 
+// ── Responsive ──────────────────────────────────────────────────────────
+@media (max-width: 700px) {
+  .tabla-moras thead { display: none; }
+ 
+  .tabla-moras tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid $border;
+    border-radius: 10px;
+    overflow: hidden;
+ 
+    &.row-pendiente { border-color: #fed7aa; }
+    &.row-pagado    { border-color: #86efac; }
+  }
+ 
+  .tabla-moras tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+ 
+    &::before {
+      content: attr(data-label);
+      font-weight: 700;
+      color: $navy;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+  }
+ 
+  .acciones-cell {
+    justify-content: flex-end !important;
+    &::before { display: none !important; }
+  }
+}

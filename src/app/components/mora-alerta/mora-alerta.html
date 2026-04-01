@@ -1,0 +1,239 @@
+<div class="mora-overlay">
+    <div class="mora-card" role="dialog" aria-modal="true">
+
+        <!-- ── Cargando ──────────────────────────────────────────────────────── -->
+        <div *ngIf="cargando || cargandoEstadoMora" class="mora-loading">
+            <div class="spinner"></div>
+            <p>Calculando mora...</p>
+        </div>
+
+        <!-- ── Error ────────────────────────────────────────────────────────── -->
+        <div *ngIf="!cargando && !cargandoEstadoMora && error" class="mora-error">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <p>{{ error }}</p>
+            <button class="btn-cancelar" (click)="cancelar()">Cerrar</button>
+        </div>
+
+        <!-- ── Vista principal: Alerta de mora ──────────────────────────────── -->
+        <ng-container *ngIf="!cargando && !cargandoEstadoMora && !error && calculo && !mostrarFormPagarMora">
+            <div class="mora-header">
+                <div class="header-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="header-text">
+                    <h3>¡Letra Vencida!</h3>
+                    <p>La letra N° <strong>{{ calculo.numeroLetra }}</strong> tiene mora acumulada</p>
+                </div>
+            </div>
+
+            <div class="mora-detalle">
+                <div class="detalle-row">
+                    <span class="detalle-label">Fecha de vencimiento</span>
+                    <span class="detalle-valor">{{ calculo.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Días vencida</span>
+                    <span class="detalle-valor dias-badge">{{ calculo.diasMora }} día{{ calculo.diasMora !== 1 ? 's' : '' }}</span>
+                </div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Importe de la letra</span>
+                    <span class="detalle-valor">{{ simboloMoneda }} {{ calculo.importeLetra | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="detalle-row calculo">
+                    <span class="detalle-label">Interés (5% del importe)</span>
+                    <span class="detalle-valor mora-pct">{{ simboloMoneda }} {{ calculo.montoPorcentaje | number:'1.2-2' }}</span>
+                </div>
+                <div class="detalle-row calculo">
+                    <span class="detalle-label">Recargo diario ({{ calculo.diasMora }} × $1.00)</span>
+                    <span class="detalle-valor mora-diario">{{ simboloMoneda }} {{ calculo.montoDiario | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="separador"></div>
+
+                <div class="detalle-row total">
+                    <span class="detalle-label">TOTAL MORA</span>
+                    <span class="detalle-valor mora-total">{{ simboloMoneda }} {{ calculo.montoMoraTotal | number:'1.2-2' }}</span>
+                </div>
+
+                <!-- Aviso cuando la mora YA ESTÁ PAGADA -->
+                <div *ngIf="moraYaPagada" class="mora-previa-aviso mora-pagada-aviso">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    La mora de esta letra ya fue <strong>PAGADA</strong>. No se puede cobrar dos veces.
+                </div>
+
+                <!-- Aviso cuando la mora existe pero aún está PENDIENTE de pago -->
+                <div *ngIf="!moraYaPagada && moraEsPendiente" class="mora-previa-aviso">
+                    <i class="bi bi-info-circle"></i>
+                    Esta mora ya fue registrada (ID #{{ moraPendiente!.idMora }}) y está <strong>PENDIENTE</strong> de pago.
+                </div>
+            </div>
+
+            <div class="mora-acciones">
+                <button class="btn-cancelar" (click)="cancelar()">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </button>
+
+                <!--
+                    BOTÓN AMARILLO: Pagar Mora
+                    ─────────────────────────────────────────────────────────────
+                    DESHABILITADO si:
+                      · moraYaPagada   = true  → la mora YA FUE COBRADA (PAGADO en BD)
+                      · creandoMora    = true  → se está creando la mora (spinner)
+                    HABILITADO si:
+                      · moraEsPendiente = true  → abre formulario con la mora existente, sin crear otra
+                      · sin mora         = true  → crea la mora y abre el formulario
+                -->
+                <button class="btn-pagar-mora"
+                    (click)="abrirFormPagarMora()"
+                    [disabled]="moraYaPagada || creandoMora"
+                    [title]="moraYaPagada
+                        ? 'La mora de esta letra ya fue pagada. No se puede cobrar dos veces.'
+                        : moraEsPendiente
+                            ? 'La mora ya está registrada como PENDIENTE. Haga clic para registrar su pago.'
+                            : 'Registrar la mora y proceder a su cobro.'">
+                    <span *ngIf="creandoMora" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!creandoMora" class="bi bi-clock-history"></i>
+                    <ng-container *ngIf="!creandoMora">
+                        <ng-container *ngIf="moraYaPagada">Mora ya cobrada</ng-container>
+                        <ng-container *ngIf="!moraYaPagada && moraEsPendiente">Pagar Mora (pendiente)</ng-container>
+                        <ng-container *ngIf="!moraYaPagada && !moraEsPendiente">Pagar Mora</ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="creandoMora">Registrando mora...</ng-container>
+                </button>
+
+                <!--
+                    BOTÓN VERDE: Pagar Letra
+                    ─────────────────────────────────────────────────────────────
+                    SIEMPRE habilitado (la letra siempre se puede pagar).
+                    El mensaje/comportamiento varía:
+                      · moraYaPagada   = true  → pagar letra directo, sin SweetAlert (mora ya cobrada)
+                      · moraEsPendiente = true  → pagar letra directo, sin SweetAlert (mora ya registrada)
+                      · sin mora         = true  → SweetAlert avisando que se creará mora PENDIENTE
+                -->
+                <button class="btn-pagar-letra"
+                    (click)="confirmarPagarSoloLetra()"
+                    [title]="moraYaPagada
+                        ? 'Registrar pago de la letra. La mora ya fue cobrada.'
+                        : moraEsPendiente
+                            ? 'Registrar pago de la letra. La mora registrada permanece PENDIENTE.'
+                            : 'Registrar pago de la letra. La mora quedará registrada como PENDIENTE.'">
+                    <i class="bi bi-cash-coin"></i>
+                    <ng-container *ngIf="moraYaPagada">Pagar Letra</ng-container>
+                    <ng-container *ngIf="!moraYaPagada && moraEsPendiente">Pagar Letra (mora pendiente)</ng-container>
+                    <ng-container *ngIf="!moraYaPagada && !moraEsPendiente">Pagar Letra</ng-container>
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- ── Formulario pagar mora ─────────────────────────────────────────── -->
+        <ng-container *ngIf="!cargando && !cargandoEstadoMora && !error && calculo && mostrarFormPagarMora">
+
+            <div class="mora-header form-header">
+                <div class="header-icon"><i class="bi bi-cash-coin"></i></div>
+                <div class="header-text">
+                    <h3>Pagar Mora — Letra N° {{ calculo.numeroLetra }}</h3>
+                    <p>Complete los datos del pago</p>
+                </div>
+            </div>
+
+            <!-- Resumen de la mora -->
+            <div class="mora-resumen-form">
+                <div class="resumen-row">
+                    <span>Importe de la letra</span>
+                    <strong>{{ simboloMoneda }} {{ calculo.importeLetra | number:'1.2-2' }}</strong>
+                </div>
+                <div class="resumen-row">
+                    <span>Días de mora</span>
+                    <strong class="text-warning">{{ calculo.diasMora }} días</strong>
+                </div>
+                <div class="resumen-row">
+                    <span>Interés (5%)</span>
+                    <strong>{{ simboloMoneda }} {{ calculo.montoPorcentaje | number:'1.2-2' }}</strong>
+                </div>
+                <div class="resumen-row">
+                    <span>Recargo diario</span>
+                    <strong>{{ simboloMoneda }} {{ calculo.montoDiario | number:'1.2-2' }}</strong>
+                </div>
+                <div class="resumen-row total-row">
+                    <span>TOTAL A PAGAR</span>
+                    <strong class="text-danger">{{ simboloMoneda }} {{ calculo.montoMoraTotal | number:'1.2-2' }}</strong>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="mora-form-body">
+
+                <div class="form-row form-2-col">
+                    <div class="form-group">
+                        <label>Monto Pagado <span class="required">*</span></label>
+                        <input type="number" class="form-control" [value]="calculo.montoMoraTotal" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Pago <span class="required">*</span></label>
+                        <input type="date" class="form-control" [(ngModel)]="request.fechaPago" name="fechaPago">
+                    </div>
+                </div>
+
+                <div class="form-row form-2-col">
+                    <div class="form-group">
+                        <label>Medio de Pago <span class="required">*</span></label>
+                        <select class="form-select" [(ngModel)]="request.medioPago" name="medioPago"
+                            (change)="onMedioPagoChange()">
+                            <option *ngFor="let op of medioPagoOptions" [value]="op">{{ op }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            N° Operación
+                            <span class="required" *ngIf="request.medioPago !== 'EFECTIVO'">*</span>
+                        </label>
+                        <input type="text" class="form-control" [(ngModel)]="request.numeroOperacion"
+                            name="numeroOperacion" [disabled]="request.medioPago === 'EFECTIVO'"
+                            [placeholder]="request.medioPago === 'EFECTIVO' ? 'N/A' : 'Ingrese N° operación'">
+                    </div>
+                </div>
+
+                <div class="form-row form-2-col">
+                    <div class="form-group">
+                        <label>Tipo Comprobante <span class="required">*</span></label>
+                        <select class="form-select" [(ngModel)]="request.tipoComprobante" name="tipoComprobante"
+                            (change)="onTipoComprobanteChange()">
+                            <option [ngValue]="undefined">-- Seleccione --</option>
+                            <option *ngFor="let op of tipoComprobanteOptions" [value]="op">{{ op }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>N° Comprobante <span class="required">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="request.numeroComprobante"
+                            name="numeroComprobante"
+                            [placeholder]="sugerindoNumero ? 'Generando...' : 'Ej: EB01-0001'"
+                            [readonly]="sugerindoNumero">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group width-100">
+                        <label>Observaciones</label>
+                        <textarea class="form-control" rows="2" [(ngModel)]="request.observaciones"
+                            name="observaciones"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mora-acciones">
+                <button class="btn-cancelar" (click)="mostrarFormPagarMora = false" [disabled]="enviandoMora">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </button>
+                <button class="btn-con-mora" (click)="registrarPagoMora()" [disabled]="enviandoMora">
+                    <span *ngIf="enviandoMora" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!enviandoMora" class="bi bi-cash-coin"></i>
+                    {{ enviandoMora ? 'Procesando...' : 'Registrar Pago de Mora' }}
+                </button>
+            </div>
+
+        </ng-container>
+
+    </div>
+</div>

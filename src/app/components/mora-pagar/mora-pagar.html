@@ -1,0 +1,121 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+
+            <!-- ── Header ──────────────────────────────────────────────────── -->
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-cash-coin"></i>
+                    Pagar Mora — Letra N° {{ mora.numeroLetra }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- ── Body ────────────────────────────────────────────────────── -->
+            <div class="modal-body">
+
+                <!-- Resumen de la mora -->
+                <div class="mora-resumen">
+                    <div class="resumen-row">
+                        <span>Importe de la letra</span>
+                        <strong>{{ simboloMoneda }} {{ mora.importeLetra | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="resumen-row">
+                        <span>Días de mora</span>
+                        <strong class="text-warning">{{ mora.diasMora }} días</strong>
+                    </div>
+                    <div class="resumen-row">
+                        <span>Interés (5%)</span>
+                        <strong>{{ simboloMoneda }} {{ mora.montoPorcentaje | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="resumen-row">
+                        <span>Recargo diario</span>
+                        <strong>{{ simboloMoneda }} {{ mora.montoDiario | number:'1.2-2' }}</strong>
+                    </div>
+                    <div class="resumen-row total-row">
+                        <span>TOTAL A PAGAR</span>
+                        <strong class="text-danger">{{ simboloMoneda }} {{ mora.montoMoraTotal | number:'1.2-2'
+                            }}</strong>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form #pagoForm="ngForm">
+
+                    <div class="form-row form-2-col">
+                        <div class="form-group">
+                            <label for="montoPagado">Monto Pagado <span class="required">*</span></label>
+                            <input type="number" step="0.01" id="montoPagado" class="form-control"
+                                [(ngModel)]="request.montoPagado" name="montoPagado" [readonly]="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaPago">Fecha de Pago <span class="required">*</span></label>
+                            <input type="date" id="fechaPago" class="form-control" [(ngModel)]="request.fechaPago"
+                                name="fechaPago">
+                        </div>
+                    </div>
+
+                    <div class="form-row form-2-col">
+                        <div class="form-group">
+                            <label for="medioPago">Medio de Pago <span class="required">*</span></label>
+                            <select id="medioPago" class="form-select" [(ngModel)]="request.medioPago" name="medioPago"
+                                (change)="onMedioPagoChange()">
+                                <option *ngFor="let op of medioPagoOptions" [value]="op">{{ op }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroOperacion">
+                                N° Operación
+                                <span class="required" *ngIf="request.medioPago !== 'EFECTIVO'">*</span>
+                            </label>
+                            <input type="text" id="numeroOperacion" class="form-control"
+                                [(ngModel)]="request.numeroOperacion" name="numeroOperacion"
+                                [disabled]="request.medioPago === 'EFECTIVO'"
+                                placeholder="{{ request.medioPago === 'EFECTIVO' ? 'N/A' : 'Ingrese N° operación' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row form-2-col">
+                        <div class="form-group">
+                            <label for="tipoComprobante">Tipo Comprobante <span class="required">*</span></label>
+                            <select id="tipoComprobante" class="form-select" [(ngModel)]="request.tipoComprobante"
+                                name="tipoComprobante" (change)="onTipoComprobanteChange()">
+                                <option [ngValue]="undefined">-- Seleccione --</option>
+                                <option *ngFor="let op of tipoComprobanteOptions" [value]="op">{{ op }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="numeroComprobante">N° Comprobante <span class="required">*</span></label>
+                            <input type="text" id="numeroComprobante" class="form-control"
+                                [(ngModel)]="request.numeroComprobante" name="numeroComprobante"
+                                [placeholder]="sugerindoNumero ? 'Generando...' : 'Ej: EB01-0001'"
+                                [readonly]="sugerindoNumero">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group width-100">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" class="form-control" rows="2"
+                                [(ngModel)]="request.observaciones" name="observaciones"></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div><!-- /modal-body -->
+
+            <!-- ── Footer ──────────────────────────────────────────────────── -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-save" (click)="guardarPago()" [disabled]="enviando">
+                    <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!enviando" class="bi bi-cash-coin me-1"></i>
+                    {{ enviando ? 'Procesando...' : 'Registrar Pago de Mora' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

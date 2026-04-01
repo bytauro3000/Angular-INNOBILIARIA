@@ -705,3 +705,87 @@ $border-color: #e9ecef;
     transform: rotate(360deg);
   }
 }
+
+// ── MORA ──────────────────────────────────────────────────────────────────────
+
+/* Banner rojo en la info del contrato cuando hay moras */
+.mora-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: #fff1f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: #fee2e2; }
+
+  i { font-size: 1.1rem; color: #dc2626; }
+
+  .mora-banner-link {
+    margin-left: auto;
+    font-weight: 600;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+}
+
+/* Botón "Ver Moras" en la barra de la tabla */
+.btn-ver-moras {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #fff1f2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover { background: #fee2e2; border-color: #f87171; }
+}
+
+/* Badge numérico sobre el botón Ver Moras */
+.mora-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #dc2626;
+  color: white;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Botón pagar con estado vencido */
+.btn-pagar-vencida {
+  background: #fff7ed !important;
+  border-color: #f97316 !important;
+  color: #c2410c !important;
+
+  &:hover { background: #ffedd5 !important; }
+}
+
+/* Punto rojo indicador sobre el botón de letra vencida */
+.vencida-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  background: #dc2626;
+  border-radius: 50%;
+}

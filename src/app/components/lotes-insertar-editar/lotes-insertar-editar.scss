@@ -123,7 +123,7 @@ input, select, textarea {
 textarea { height: auto !important; min-height: 80px; }
 
 // ============================================
-// NG-SELECT (mismo look que cliente-insertar)
+// NG-SELECT
 // ============================================
 ::ng-deep .ng-select .ng-select-container {
   background-color: $input-bg !important;
@@ -179,7 +179,7 @@ textarea { height: auto !important; min-height: 80px; }
 .form-4-col { grid-template-columns: repeat(4, 1fr); }
 
 // ============================================
-// BOTONES — idénticos a cliente-insertar
+// BOTONES
 // ============================================
 .btn {
   padding: 10px 24px;
@@ -219,7 +219,7 @@ textarea { height: auto !important; min-height: 80px; }
 .error-msg { color: #e53e3e; font-size: 0.72rem; margin-top: 2px; }
 
 // ============================================
-// CENTRADO VERTICAL — igual que cliente-insertar
+// CENTRADO VERTICAL — idéntico a cliente-insertar
 // ============================================
 :host ::ng-deep .modal.show {
   display: flex !important;
