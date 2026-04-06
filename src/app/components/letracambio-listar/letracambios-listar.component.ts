@@ -94,6 +94,28 @@ export class LetracambioListarComponent implements OnInit {
     });
   }
 
+   // ══════════════════════════════════════════════════════════════════════════
+  // IMPRIMIR LETRAS — VERSIÓN BACKEND (PDF generado en el servidor con iText)
+  // Llama a GET /api/letras/pdf/{idContrato} y abre el resultado en nueva pestaña.
+  // ══════════════════════════════════════════════════════════════════════════
+  imprimirLetras(): void {
+    this.cargando = true;
+    this.letrasService.descargarPdfLetrasBackend(this.idContrato).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const pdfWindow = window.open(url, '_blank');
+        if (pdfWindow) {
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+        this.cargando = false;
+      },
+      error: () => {
+        this.toastr.error('Ocurrió un error al generar el reporte PDF.', 'Error');
+        this.cargando = false;
+      }
+    });
+  }
+/* VERSION FRONTEND (PDF generado en el cliente con jsPDF)
   //>>>>>>>>>>>>>>>>>>>>>>>>> INICIO DE IMPRIMIR LETRAS <<<<<<<<<<<<<<<<<<<<<<<//
   imprimirLetras(): void {
     this.cargando = true;
@@ -206,7 +228,7 @@ export class LetracambioListarComponent implements OnInit {
       }
     });
   }
-
+*/
   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INICIO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//
 
   // Nueva función para generar el PDF del cronograma de pagos

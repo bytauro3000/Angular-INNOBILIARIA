@@ -265,8 +265,8 @@ $border-color: #e9ecef;
     &.btn-print    { color: #6f42c1; border-color: #6f42c1; &:hover { background: #6f42c1; color: white; } }
     &.btn-edit     { color: $navy;   border-color: $navy;   &:hover { background: $navy;   color: white; } }
     &.btn-delete   { color: #dc3545; border-color: #dc3545; &:hover { background: #dc3545; color: white; } }
-    &.btn-letras     { color: $green;  border-color: $green;  &:hover { background: $green;  color: white; } }
-    &.btn-letras-ver { color: #0d6efd; border-color: #0d6efd; &:hover { background: #0d6efd; color: white; } }
+    &.btn-letras     { color: $green;       border-color: $green;       &:hover { background: $green;       color: white; } }
+    &.btn-ver-letras { color: #0891b2;      border-color: #0891b2;      &:hover { background: #0891b2;      color: white; } }
     &.btn-inscripcion {
       color: $light-blue; border-color: $light-blue;
       &:hover:not(:disabled) { background: $light-blue; color: white; }

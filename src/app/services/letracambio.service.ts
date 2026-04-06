@@ -51,5 +51,9 @@ export class LetrasCambioService {
     return this.http.get<boolean>(`${this.apiUrl}/existe/${idContrato}`);
   }
  
+    descargarPdfLetrasBackend(idContrato: number): Observable<Blob> {
+    const url = `${this.apiUrl}/pdf/${idContrato}`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
   
 }
