@@ -31,27 +31,27 @@ export class ClienteEditarComponent implements OnInit {
   clienteId!: number;
   distritos: Distrito[] = [];
 
-  estadosCliente  = Object.values(EstadoCliente);
-  tiposCliente    = Object.values(TipoCliente);
-  generos         = Object.values(Genero);
-  estadosCiviles  = Object.values(EstadoCivil);
+  estadosCliente = Object.values(EstadoCliente);
+  tiposCliente = Object.values(TipoCliente);
+  generos = Object.values(Genero);
+  estadosCiviles = Object.values(EstadoCivil);
 
   // Referencia al enum para el HTML
   TipoCliente = TipoCliente;
 
   // Mismo listado de paises que en insertar
   paises: { nombre: string; bandera: string; nacionalidadM: string; nacionalidadF: string }[] = [
-    { nombre: 'Venezuela',  bandera: 'https://flagcdn.com/40x30/ve.png', nacionalidadM: 'venezolano',     nacionalidadF: 'venezolana'     },
-    { nombre: 'Colombia',   bandera: 'https://flagcdn.com/40x30/co.png', nacionalidadM: 'colombiano',     nacionalidadF: 'colombiana'     },
-    { nombre: 'Chile',      bandera: 'https://flagcdn.com/40x30/cl.png', nacionalidadM: 'chileno',        nacionalidadF: 'chilena'        },
-    { nombre: 'Ecuador',    bandera: 'https://flagcdn.com/40x30/ec.png', nacionalidadM: 'ecuatoriano',    nacionalidadF: 'ecuatoriana'    },
-    { nombre: 'Bolivia',    bandera: 'https://flagcdn.com/40x30/bo.png', nacionalidadM: 'boliviano',      nacionalidadF: 'boliviana'      },
-    { nombre: 'Argentina',  bandera: 'https://flagcdn.com/40x30/ar.png', nacionalidadM: 'argentino',      nacionalidadF: 'argentina'      },
-    { nombre: 'Brasil',     bandera: 'https://flagcdn.com/40x30/br.png', nacionalidadM: 'brasileño',      nacionalidadF: 'brasileña'      },
-    { nombre: 'México',     bandera: 'https://flagcdn.com/40x30/mx.png', nacionalidadM: 'mexicano',       nacionalidadF: 'mexicana'       },
-    { nombre: 'España',     bandera: 'https://flagcdn.com/40x30/es.png', nacionalidadM: 'español',        nacionalidadF: 'española'       },
-    { nombre: 'EEUU',       bandera: 'https://flagcdn.com/40x30/us.png', nacionalidadM: 'estadounidense', nacionalidadF: 'estadounidense' },
-    { nombre: 'Otro',       bandera: 'https://flagcdn.com/40x30/un.png', nacionalidadM: 'extranjero',     nacionalidadF: 'extranjera'     },
+    { nombre: 'Venezuela', bandera: 'https://flagcdn.com/40x30/ve.png', nacionalidadM: 'venezolano', nacionalidadF: 'venezolana' },
+    { nombre: 'Colombia', bandera: 'https://flagcdn.com/40x30/co.png', nacionalidadM: 'colombiano', nacionalidadF: 'colombiana' },
+    { nombre: 'Chile', bandera: 'https://flagcdn.com/40x30/cl.png', nacionalidadM: 'chileno', nacionalidadF: 'chilena' },
+    { nombre: 'Ecuador', bandera: 'https://flagcdn.com/40x30/ec.png', nacionalidadM: 'ecuatoriano', nacionalidadF: 'ecuatoriana' },
+    { nombre: 'Bolivia', bandera: 'https://flagcdn.com/40x30/bo.png', nacionalidadM: 'boliviano', nacionalidadF: 'boliviana' },
+    { nombre: 'Argentina', bandera: 'https://flagcdn.com/40x30/ar.png', nacionalidadM: 'argentino', nacionalidadF: 'argentina' },
+    { nombre: 'Brasil', bandera: 'https://flagcdn.com/40x30/br.png', nacionalidadM: 'brasileño', nacionalidadF: 'brasileña' },
+    { nombre: 'México', bandera: 'https://flagcdn.com/40x30/mx.png', nacionalidadM: 'mexicano', nacionalidadF: 'mexicana' },
+    { nombre: 'España', bandera: 'https://flagcdn.com/40x30/es.png', nacionalidadM: 'español', nacionalidadF: 'española' },
+    { nombre: 'EEUU', bandera: 'https://flagcdn.com/40x30/us.png', nacionalidadM: 'estadounidense', nacionalidadF: 'estadounidense' },
+    { nombre: 'Otro', bandera: 'https://flagcdn.com/40x30/un.png', nacionalidadM: 'extranjero', nacionalidadF: 'extranjera' },
   ];
 
   paisSeleccionado: { nombre: string; bandera: string; nacionalidadM: string; nacionalidadF: string } | null = null;
@@ -67,7 +67,7 @@ export class ClienteEditarComponent implements OnInit {
     private clienteService: ClienteService,
     private distritoService: DistritoService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.inicializarFormulario();
@@ -94,20 +94,20 @@ export class ClienteEditarComponent implements OnInit {
   private inicializarFormulario(): void {
     const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     this.clienteForm = this.fb.group({
-      idCliente:    [null],
-      nombre:       ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      apellidos:    ['', [Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
-      tipoCliente:  [null, Validators.required],
-      numDoc:       ['', Validators.required],
-      genero:       ['', Validators.required],
-      estadoCivil:  [null, Validators.required],
-      celular:      ['', Validators.required],
-      email:        ['', [Validators.pattern(EMAIL_REGEX)]],
-      direccion:    ['', Validators.required],
-      distrito:     this.fb.group({ idDistrito: ['', Validators.required] }),
-      estado:       [null, Validators.required],
-      telefono:     [''],
-      fechaRegistro:[{ value: '', disabled: true }],
+      idCliente: [null],
+      nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]+$/)]],
+      apellidos: ['', [Validators.pattern(/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]*$/)]],
+      tipoCliente: [null, Validators.required],
+      numDoc: ['', Validators.required],
+      genero: ['', Validators.required],
+      estadoCivil: [null, Validators.required],
+      celular: ['', Validators.required],
+      email: ['', [Validators.pattern(EMAIL_REGEX)]],
+      direccion: ['', Validators.required],
+      distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
+      estado: [null, Validators.required],
+      telefono: [''],
+      fechaRegistro: [{ value: '', disabled: true }],
       nacionalidad: [null],
     });
 
@@ -161,7 +161,7 @@ export class ClienteEditarComponent implements OnInit {
     );
   }
 
-  onPaisChange(event: Event): void {}
+  onPaisChange(event: Event): void { }
 
   // Devuelve el nombre del pais a partir de la nacionalidad guardada
   // Para preseleccionar el select cuando se carga un cliente CE existente

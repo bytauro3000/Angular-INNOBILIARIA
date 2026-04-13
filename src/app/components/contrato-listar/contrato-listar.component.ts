@@ -153,23 +153,25 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Consulta si ya existen letras generadas para cada contrato FINANCIADO */
   verificarLetrasParaContratos(contratos: ContratoResponseDTO[]): void {
-    contratos
-      .filter(c => c.tipoContrato === 'FINANCIADO' && c.idContrato)
-      .forEach(c => {
-        this.letrasService.existenLetras(c.idContrato).subscribe({
-          next: (existe) => {
-            this.letrasExistenMap.set(c.idContrato, existe);
-            this.cdr.markForCheck();
-          },
-          error: () => {
-            this.letrasExistenMap.set(c.idContrato, false);
-          }
-        });
-      });
-  }
+  const financiados = contratos
+    .filter(c => c.tipoContrato === 'FINANCIADO' && c.idContrato)
+    .map(c => c.idContrato);
 
+  if (financiados.length === 0) return;
+
+  this.letrasService.existenLetrasBatch(financiados).subscribe({
+    next: (mapa: { [id: number]: boolean }) => {
+      Object.entries(mapa).forEach(([id, existe]) => {
+        this.letrasExistenMap.set(Number(id), existe);
+      });
+      this.cdr.markForCheck();
+    },
+    error: () => {
+      financiados.forEach(id => this.letrasExistenMap.set(id, false));
+    }
+  });
+}
   /** True si el contrato ya tiene letras generadas en BD */
   tieneLetrasGeneradas(idContrato: number): boolean {
     return this.letrasExistenMap.get(idContrato) ?? false;

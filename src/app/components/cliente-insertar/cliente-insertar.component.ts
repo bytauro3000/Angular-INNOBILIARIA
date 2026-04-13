@@ -120,8 +120,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   private inicializarFormulario(): void {
     const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     this.clienteForm = this.fb.group({
-      nombre:      ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)]],
-      apellidos:   ['', [Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
+      nombre:    ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]+$/)]],
+      apellidos: ['', [Validators.pattern(/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]*$/)]],
       tipoCliente: [TipoCliente.NATURAL, Validators.required],
       numDoc:      ['', Validators.required],
       estadoCivil: [EstadoCivil.SOLTERO, Validators.required],

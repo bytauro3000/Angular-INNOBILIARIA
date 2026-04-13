@@ -47,9 +47,11 @@ export class LetrasCambioService {
     return this.http.get<ReporteCronogramaPagosClientesDTO[]>(url);
   }
 
-  existenLetras(idContrato: number): Observable<boolean> {
-    return this.http.get<boolean>(`${this.apiUrl}/existe/${idContrato}`);
-  }
+  existenLetrasBatch(ids: number[]): Observable<{ [id: number]: boolean }> {
+  return this.http.post<{ [id: number]: boolean }>(
+    `${this.apiUrl}/existe/batch`, ids
+  );
+}
  
     descargarPdfLetrasBackend(idContrato: number): Observable<Blob> {
     const url = `${this.apiUrl}/pdf/${idContrato}`;

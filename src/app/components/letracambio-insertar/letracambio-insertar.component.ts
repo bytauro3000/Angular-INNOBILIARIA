@@ -73,17 +73,15 @@ export class LetracambioInsertarComponent implements OnInit {
   }
 
   verificarLetrasExistentes(): void {
-    // Usa el endpoint liviano GET /api/letras/existe/{idContrato}
-    // que devuelve solo true/false sin traer los datos de las letras
-    this.letrasService.existenLetras(this.idContrato).subscribe({
-      next: (existe) => {
-        this.tieneLetras = existe;
-      },
-      error: () => {
-        this.tieneLetras = false;
-      }
-    });
-  }
+  this.letrasService.existenLetrasBatch([this.idContrato]).subscribe({
+    next: (resultado) => {
+      this.tieneLetras = resultado[this.idContrato] ?? false;
+    },
+    error: () => {
+      this.tieneLetras = false;
+    }
+  });
+}
 
   cargarDistritos(): void {
     this.distritoService.listarDistritos().subscribe({
