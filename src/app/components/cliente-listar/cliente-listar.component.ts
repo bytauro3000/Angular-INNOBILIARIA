@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClienteService } from '../../services/cliente.service';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +22,7 @@ import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.compone
   templateUrl: './cliente-listar.html',
   styleUrls: ['./cliente-listar.scss']
 })
-export class ClientesComponent implements OnInit {
+export class ClientesComponent implements OnInit, AfterViewInit {
 
   @ViewChild('registroModal') registroModal!: ClienteInsertarComponent;
   @ViewChild('editarModal') editarModal!: ClienteEditarComponent; // 👈 REFERENCIA AL MODAL EDITAR
@@ -34,9 +34,15 @@ export class ClientesComponent implements OnInit {
   terminoBusqueda: string = '';
   tipoFiltro: string = 'nombres';
 
-  pageSize: number = 6;
+  pageSize: number = 7;
   currentPage: number = 1;
   totalPages: number = 0;
+
+  isCargando: boolean = false;
+
+  @ViewChild('tableBody') tableBody!: ElementRef<HTMLElement>;
+  private readonly ROW_HEIGHT_PX = 48;
+  private readonly PAGINATION_RESERVE_PX = 80;
 
   constructor(
     private clienteService: ClienteService,
@@ -57,18 +63,42 @@ export class ClientesComponent implements OnInit {
     this.cargarClientes();
   }
 
-  cargarClientes(): void {
-    this.clienteService.listarClientes().subscribe({
-      next: (data) => {
-        this.clientes = data;
-        this.clientesFiltrados = [...this.clientes];
-        this.aplicarPaginacion();
-      },
-      error: (error) => {
-        console.error('Error al cargar clientes:', error);
-      }
-    });
+  ngAfterViewInit(): void {
+    setTimeout(() => this.calcularPageSize(), 0);
   }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.calcularPageSize();
+  }
+
+  calcularPageSize(): void {
+    if (!this.tableBody?.nativeElement) return;
+    const tbodyTop = this.tableBody.nativeElement.getBoundingClientRect().top;
+    const available = window.innerHeight - tbodyTop - this.PAGINATION_RESERVE_PX;
+    const nuevaPageSize = Math.max(3, Math.floor(available / this.ROW_HEIGHT_PX));
+    if (nuevaPageSize !== this.pageSize) {
+      this.pageSize = nuevaPageSize;
+      this.currentPage = 1;
+      this.aplicarPaginacion();
+    }
+  }
+
+  cargarClientes(): void {
+  this.isCargando = true;
+  this.clienteService.listarClientes().subscribe({
+    next: (data) => {
+      this.isCargando = false;
+      this.clientes = data;
+      this.clientesFiltrados = [...this.clientes];
+      this.aplicarPaginacion();
+    },
+    error: (error) => {
+      this.isCargando = false;
+      console.error('Error al cargar clientes:', error);
+    }
+  });
+}
 
 filtrarClientes(): void {
   const termino = this.terminoBusqueda.trim();

@@ -457,7 +457,9 @@ $border-color: #e9ecef;
 
   .table-custom thead { display: none; }
 
-  .table-custom tbody tr {
+  // ✅ FIX: solo las filas de datos se convierten en tarjeta
+  // las filas loading y empty mantienen su comportamiento de tabla
+  .table-custom tbody tr:not(.loading-row):not(.empty-row) {
     display: block;
     margin-bottom: 16px;
     border: 1px solid $border-color;
@@ -467,9 +469,8 @@ $border-color: #e9ecef;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
-  .table-custom tbody td {
-    // ✅ auto en vez de 130px fijo — la etiqueta toma solo lo que necesita
-    // y el valor ocupa todo el resto sin cortarse
+  // ✅ FIX: solo los td de filas de datos usan display grid
+  .table-custom tbody tr:not(.loading-row):not(.empty-row) td {
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: start;
@@ -478,7 +479,6 @@ $border-color: #e9ecef;
     border-bottom: 1px solid #f0f0f0;
     text-align: right;
 
-    // ✅ Etiqueta izquierda
     &::before {
       content: attr(data-label);
       font-weight: 600;
@@ -486,18 +486,15 @@ $border-color: #e9ecef;
       color: #022654;
       text-align: left;
       justify-self: start;
-      white-space: nowrap;    // la etiqueta nunca se parte
-      padding-top: 2px;       // alineación vertical con el valor
+      white-space: nowrap;
+      padding-top: 2px;
     }
 
-    // ✅ El valor derecho puede partir palabras largas si es necesario
-    // (ej: números de documento o nombres largos)
     & > *:not(::before) {
       min-width: 0;
       word-break: break-word;
     }
 
-    // Fila del ID — centrada, sin etiqueta
     &:first-child {
       background: linear-gradient(135deg, $navy, #0353a4);
       font-weight: bold;
@@ -526,7 +523,6 @@ $border-color: #e9ecef;
       }
     }
 
-    // Fila de acciones — flex, sin etiqueta
     &.acciones-cell {
       display: flex;
       flex-direction: column;
@@ -547,7 +543,16 @@ $border-color: #e9ecef;
     }
   }
 
-  // ✅ Contenedores de valores — alineados a la derecha, con posibilidad de romper
+  // ✅ FIX: loading y empty ocupan todo el ancho
+  .loading-row td,
+  .empty-row td {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
   .table-custom tbody td > div,
   .table-custom tbody td > span {
     justify-self: end;
@@ -558,29 +563,25 @@ $border-color: #e9ecef;
 
   .table-custom tbody td.text-center { text-align: right !important; }
 
-  // ✅ Multi-item (clientes y lotes) — se apilan bien en móvil
   .multi-item-container {
     width: 100%;
     div {
       width: 100%;
       text-align: right;
-      white-space: normal;      // permite partir en dos líneas si el nombre es largo
+      white-space: normal;
       word-break: break-word;
       font-size: 0.8rem;
     }
   }
 
-  // Estado alineado a la derecha en móvil
   .estado-cell { justify-content: flex-end; }
 
-  // Badge de estado más compacto en móvil
   .estado-badge {
     font-size: 0.7rem;
     padding: 3px 8px;
     gap: 4px;
   }
 
-  // Botones de acción más grandes para facilitar el toque
   .btn-action {
     width: 36px !important;
     height: 36px !important;

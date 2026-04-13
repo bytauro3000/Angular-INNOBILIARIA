@@ -24,7 +24,7 @@
       <span>Agregar</span>
     </button>
   </div>
-  
+
   <div class="tabla-wrapper">
     <table class="table-custom">
       <thead>
@@ -40,36 +40,49 @@
           <th class="text-center" style="width: 140px;">ACCIONES</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let cliente of paginatedClientes">
-          <td class="text-center" data-label="ID">{{ cliente.idCliente }}</td>
-          <td data-label="Nombre">{{ (cliente.nombre || '-') | uppercase }}</td>
-          <td data-label="Apellidos">{{ (cliente.apellidos || '-') | uppercase }}</td>
-          <td class="text-center" data-label="Tipo">{{ cliente.tipoCliente }}</td>
-          <td class="text-center" data-label="Documento">{{ cliente.numDoc || '-' }}</td>
-          <td class="text-center" data-label="Celular">{{ cliente.celular }}</td>
-          <td data-label="Correo">{{ cliente.email || '-' }}</td>
-          <td class="text-center" data-label="Estado">{{ cliente.estado }}</td>
-          <td class="acciones-cell" data-label="Acciones">
-            <div class="acciones-container">
-              <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]"
-                class="btn-action btn-view" title="Ver cliente">
-                <i class="bi bi-eye"></i>
-              </button>
-              <button (click)="editarModal.abrirModal(cliente.idCliente)"
-                class="btn-action btn-edit" title="Editar cliente">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn-action btn-delete" (click)="eliminarCliente(cliente.idCliente)"
-                title="Eliminar cliente">
-                <i class="bi bi-trash"></i>
-              </button>
+      <tbody #tableBody>
+        <tr *ngIf="isCargando" class="loading-row">
+          <td colspan="9">
+            <div class="loading-dots-wrapper-inline">
+              <div class="loading-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <p class="loading-text">Cargando clientes...</p>
             </div>
           </td>
         </tr>
-        <tr *ngIf="paginatedClientes.length === 0">
-          <td colspan="9" class="no-data">No se encontraron clientes que coincidan con la búsqueda.</td>
-        </tr>
+
+        <ng-container *ngIf="!isCargando">
+          <tr *ngFor="let cliente of paginatedClientes">
+            <td class="text-center" data-label="ID">{{ cliente.idCliente }}</td>
+            <td data-label="Nombre">{{ (cliente.nombre || '-') | uppercase }}</td>
+            <td data-label="Apellidos">{{ (cliente.apellidos || '-') | uppercase }}</td>
+            <td class="text-center" data-label="Tipo">{{ cliente.tipoCliente }}</td>
+            <td class="text-center" data-label="Documento">{{ cliente.numDoc || '-' }}</td>
+            <td class="text-center" data-label="Celular">{{ cliente.celular }}</td>
+            <td data-label="Correo">{{ cliente.email || '-' }}</td>
+            <td class="text-center" data-label="Estado">{{ cliente.estado }}</td>
+            <td class="acciones-cell" data-label="Acciones">
+              <div class="acciones-container">
+                <button [routerLink]="['/secretaria-menu/clientes/ver', cliente.idCliente]" class="btn-action btn-view"
+                  title="Ver cliente">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button (click)="editarModal.abrirModal(cliente.idCliente)" class="btn-action btn-edit"
+                  title="Editar cliente">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" (click)="eliminarCliente(cliente.idCliente)"
+                  title="Eliminar cliente">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="paginatedClientes.length === 0">
+            <td colspan="9" class="no-data">No se encontraron clientes que coincidan con la búsqueda.</td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

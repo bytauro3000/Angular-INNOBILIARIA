@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, AfterViewInit, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -28,7 +28,7 @@ import Swal from 'sweetalert2';
   templateUrl: './contrato-listar.html',
   styleUrls: ['./contrato-listar.scss'],
 })
-export class ContratoListarComponent implements OnInit, OnDestroy {
+export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('modalInscripcion') modalInscripcion!: InscripcionServiciosInsertarComponent;
 
@@ -52,9 +52,13 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
   nombreClienteBusqueda: string = '';
   buscandoCliente: boolean = false;
 
-  pageSize: number = 5;
+   pageSize: number = 6;
   currentPage: number = 1;
   totalPages: number = 0;
+
+  @ViewChild('tableBody') tableBody!: ElementRef<HTMLElement>;
+  private readonly ROW_HEIGHT_PX = 60;
+  private readonly PAGINATION_RESERVE_PX = 80;
 
   TipoContrato = TipoContrato;
   EstadoContrato = EstadoContrato;
@@ -315,10 +319,29 @@ export class ContratoListarComponent implements OnInit, OnDestroy {
     this.dropdownEstadoAbierto = idContrato;
   }
 
+ // ✅ DESPUÉS
+  ngAfterViewInit(): void {
+    setTimeout(() => this.calcularPageSize(), 0);
+  }
+
   @HostListener('window:scroll')
   @HostListener('window:resize')
-  onWindowEvent(): void { this.dropdownEstadoAbierto = null; }
+  onWindowEvent(): void {
+    this.dropdownEstadoAbierto = null;
+    this.calcularPageSize();
+  }
 
+  calcularPageSize(): void {
+    if (!this.tableBody?.nativeElement) return;
+    const tbodyTop = this.tableBody.nativeElement.getBoundingClientRect().top;
+    const available = window.innerHeight - tbodyTop - this.PAGINATION_RESERVE_PX;
+    const nuevaPageSize = Math.max(3, Math.floor(available / this.ROW_HEIGHT_PX));
+    if (nuevaPageSize !== this.pageSize) {
+      this.pageSize = nuevaPageSize;
+      this.currentPage = 1;
+      this.aplicarPaginacion();
+    }
+  }
   cerrarDropdowns(): void { this.dropdownEstadoAbierto = null; }
 
   ejecutarTransicion(contrato: ContratoResponseDTO, accion: EstadoContrato | string): void {
