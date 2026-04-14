@@ -38,7 +38,7 @@ export class LetracambioInsertarComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private contratoService: ContratoService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.obtenerIdContratoDesdeRuta();
@@ -67,21 +67,29 @@ export class LetracambioInsertarComponent implements OnInit {
 
   cargarMonedaContrato(): void {
     this.contratoService.obtenerContratoPorId(this.idContrato).subscribe({
-      next: (contrato) => { this.monedaContrato = contrato.moneda || 'USD'; },
+      next: (contrato) => {
+        this.monedaContrato = contrato.moneda || 'USD';
+
+        // Usar la fecha del contrato como fecha de giro (emisión)
+        if (contrato.fechaContrato) {
+          const fechaStr = String(contrato.fechaContrato).substring(0, 10);
+          this.generarLetrasRequest.fechaGiro = fechaStr;
+        }
+      },
       error: () => { this.monedaContrato = 'USD'; }
     });
   }
 
   verificarLetrasExistentes(): void {
-  this.letrasService.existenLetrasBatch([this.idContrato]).subscribe({
-    next: (resultado) => {
-      this.tieneLetras = resultado[this.idContrato] ?? false;
-    },
-    error: () => {
-      this.tieneLetras = false;
-    }
-  });
-}
+    this.letrasService.existenLetrasBatch([this.idContrato]).subscribe({
+      next: (resultado) => {
+        this.tieneLetras = resultado[this.idContrato] ?? false;
+      },
+      error: () => {
+        this.tieneLetras = false;
+      }
+    });
+  }
 
   cargarDistritos(): void {
     this.distritoService.listarDistritos().subscribe({
