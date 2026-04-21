@@ -1,165 +1,494 @@
-.generar-letras-container {
-  padding: 2rem;
-  max-width: 1000px;
+@use "sass:color";
+
+// ============================================
+// VARIABLES (mismas que contrato-insertar)
+// ============================================
+$navy:           #023e8a;
+$navy-mid:       #0353a4;
+$navy-light:     #0466c8;
+$green:          #27ae60;
+$green-dark:     #219150;
+$text-dark:      #1e293b;
+$text-mid:       #334155;
+$text-soft:      #64748b;
+$border:         #e2e8f0;
+$input-bg:       #f8fafc;
+$white:          #ffffff;
+$finance-bg:     #f0f5ff;
+$finance-border: #c7d7f7;
+$error:          #e74c3c;
+$error-bg:       #fff5f5;
+
+// ============================================
+// CONTENEDOR
+// ============================================
+.letras-container {
+  padding: 1rem;
+  max-width: 980px;
   margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// ============================================
+// CABECERA
+// ============================================
+.page-header {
+  background: linear-gradient(135deg, $navy, $navy-mid);
+  border-radius: 12px 12px 0 0;
+  padding: 0.75rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .header-icon { font-size: 1.4rem; color: $green; }
 
   h2 {
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    font-size: 1.4rem;
-    font-weight: 600;
-    padding: 1rem 1.5rem;
-    text-align: center;
-    border-radius: 8px 8px 0 0;
-    margin-bottom: 0;
-    border-bottom: 2px solid #2ecc71;
+    color: $white;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
   }
 
-  .form-wrapper {
-    background-color: #34495e;
-    padding: 2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    border-radius: 0 0 8px 8px;
-    box-sizing: border-box;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .form-2-col {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-
-    // Solo el label directo del form-group (el título del campo)
-    > label {
-      font-weight: 500;
-      color: #ecf0f1;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      text-align: left;
-    }
-
-    input, select {
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-      border: 1px solid #4a627a;
-      background-color: #2c3e50;
-      color: #ecf0f1;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
-    }
-  }
-
-  // Checkbox inline: check + texto en la misma línea, bien alineados
-  .check-inline-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.6rem;
-
-    input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      min-width: 16px;   // evita que el grid lo comprima
-      margin: 0;
-      padding: 0;
-      accent-color: #2ecc71;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-
-    label {
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #ecf0f1;
-      cursor: pointer;
-      user-select: none;
-      margin: 0;
-      line-height: 1.3;
-    }
-  }
-
-  .full-width {
-    width: 100%;
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-
-    .btn {
-      padding: 0.5rem 1.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      justify-content: center;
-      color: white;
-    }
-
-    .btn-primary { background-color: #2ecc71; &:hover:not(:disabled) { background-color: #27ad60; transform: translateY(-2px); } }
-    .btn-secondary { background-color: #e74c3c; &:hover { background-color: #c0392b; transform: translateY(-2px); } }
-    .btn-info { background-color: #3498db; &:hover { background-color: #2980b9; transform: translateY(-2px); } }
-
-    .btn:disabled, .btn.disabled {
-      background-color: #7f8c8d !important;
-      cursor: not-allowed;
-      opacity: 0.6;
-      pointer-events: none;
-    }
-  }
-
-  @media (max-width: 576px) {
-    padding: 1rem;
-    .form-wrapper { padding: 1.2rem; }
-    .form-actions {
-      flex-direction: column;
-      .btn { width: 100%; }
-    }
-    .empty-spacer { display: none; }
+  .header-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.78rem;
+    display: block;
   }
 }
 
+// ============================================
+// WRAPPER
+// ============================================
+.form-wrapper {
+  background: $white;
+  border: 1px solid $border;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 0 1.2rem 1.2rem;
+  box-shadow: 0 6px 24px rgba(2,62,138,0.08);
+}
+
+// ============================================
+// SECCIONES
+// ============================================
+.form-section {
+  border-top: 1px solid $border;
+  padding-top: 0.9rem;
+  margin-top: 0.9rem;
+
+  &:first-of-type { border-top: none; padding-top: 1rem; margin-top: 0; }
+
+  &.mode-card {
+    background: $finance-bg;
+    border: 1px solid $finance-border;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.9rem;
+  }
+}
+
+.section-title {
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: $navy-mid;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { font-size: 0.82rem; }
+}
+
+// ============================================
+// GRID
+// ============================================
+.form-row {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+  width: 100%;
+  &:last-child { margin-bottom: 0; }
+}
+.form-1-col { grid-template-columns: 1fr; }
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.form-3-col { grid-template-columns: repeat(3, 1fr); }
+
+// Importe fijo: campo importe angosto, importe-en-texto más ancho
+.form-importe-col { grid-template-columns: 1fr 2fr; }
+
+@media (max-width: 768px) { .form-3-col { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .form-row { grid-template-columns: 1fr !important; } }
+
+// ============================================
+// GRUPOS DE CAMPO
+// ============================================
 .form-group {
-  input:-webkit-autofill {
-    -webkit-text-fill-color: #ecf0f1;
-    -webkit-box-shadow: 0 0 0px 1000px #2c3e50 inset;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  label {
+    color: $text-mid;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    i { color: $navy-light; font-size: 0.75rem; }
   }
 
-  input.disabled-field {
-    background-color: #59819b !important;
-    color: #ffffff !important;
-    opacity: 0.7;
-    cursor: not-allowed;
+  input, select {
+    background: $input-bg;
+    border: 1.5px solid $border;
+    color: $text-dark;
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 0.85rem;
+    height: 36px;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      background: $white;
+      border-color: $navy-light;
+      box-shadow: 0 0 0 3px rgba($navy, 0.08);
+    }
+    &::placeholder { color: #a0aec0; font-size: 0.82rem; }
+    &:disabled, &.field-calculated {
+      background: #eef2f9;
+      color: $navy-mid;
+      font-weight: 600;
+      cursor: not-allowed;
+      border-color: $finance-border;
+    }
+  }
+}
+
+// ============================================
+// SELECTOR DE MODO (3 tarjetas en fila)
+// ============================================
+.modo-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.modo-opcion {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  background: $input-bg;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &.activo {
+    border-color: $navy-light;
+    background: $finance-bg;
+  }
+
+  input[type="radio"] {
+    margin-top: 3px;
+    accent-color: $navy;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    padding: 0;
+    border: none;
+    background: none;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    margin: 0;
+    gap: 1px;
+    // override las reglas globales de .form-group label
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: unset !important;
+    color: unset !important;
+
+    .modo-icono { font-size: 0.95rem; }
+
+    .modo-titulo {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: $text-dark;
+    }
+
+    .modo-desc {
+      font-size: 0.72rem;
+      color: $text-soft;
+      line-height: 1.3;
+    }
+  }
+}
+
+// ============================================
+// AVISO MODO AUTOMÁTICO
+// ============================================
+.aviso-automatico {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #f0faf4;
+  border: 1.5px solid #b2dfcc;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  color: $green-dark;
+  font-size: 0.82rem;
+  margin-top: 0.5rem;
+
+  span { font-size: 1rem; }
+}
+
+// ============================================
+// SECCIÓN GRUPOS
+// ============================================
+.seccion-grupos {
+  margin-top: 0.7rem;
+
+  .grupos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+
+    h3 {
+      color: $navy-mid;
+      font-size: 0.67rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .grupos-info {
+      color: $text-soft;
+      font-size: 0.78rem;
+      margin: 0;
+      strong { color: $green-dark; }
+    }
+  }
+
+  .grupos-tabla {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .grupos-tabla-header {
+    display: grid;
+    grid-template-columns: 28px 1fr 1fr 1fr 32px;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    background: $finance-bg;
+    border-radius: 6px;
+    border: 1px solid $finance-border;
+    color: $navy-mid;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .grupos-tabla-fila {
+    display: grid;
+    grid-template-columns: 28px 1fr 1fr 1fr 32px;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    background: $input-bg;
+    border-radius: 6px;
+    border: 1.5px solid $border;
+
+    .grupo-num {
+      color: $text-soft;
+      font-size: 0.78rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .grupo-field {
+      margin: 0;
+
+      .grupo-input {
+        padding: 5px 9px;
+        font-size: 0.82rem;
+        height: 32px;
+        background: $white;
+        border: 1.5px solid $border;
+        border-radius: 6px;
+        color: $text-dark;
+        width: 100%;
+        box-sizing: border-box;
+        outline: none;
+        transition: all 0.2s;
+
+        &:focus {
+          border-color: $navy-light;
+          box-shadow: 0 0 0 3px rgba($navy, 0.08);
+        }
+        &::placeholder { color: #a0aec0; font-size: 0.78rem; }
+      }
+    }
+
+    .grupo-subtotal {
+      color: $green-dark;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .btn-eliminar-grupo {
+      background: none;
+      border: 1.5px solid #fca5a5;
+      color: $error;
+      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+      padding: 0;
+
+      &:hover:not(:disabled) { background: $error; border-color: $error; color: $white; }
+      &:disabled { opacity: 0.3; cursor: not-allowed; }
+    }
+  }
+
+  .btn-agregar-grupo {
+    background: none;
+    border: 1.5px dashed $navy-light;
+    color: $navy-light;
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    margin-bottom: 0.7rem;
+
+    &:hover { background: $finance-bg; }
+  }
+
+  .grupos-resumen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    background: $finance-bg;
+    border: 1px solid $finance-border;
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+
+    .resumen-fila {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: $text-soft;
+
+      &.ok    { color: $green-dark; .resumen-icono { color: $green; } }
+      &.error { color: $error;      .resumen-icono { color: $error; } }
+
+      .resumen-icono { font-weight: 700; font-size: 0.9rem; width: 16px; text-align: center; }
+      strong { font-weight: 700; }
+      .diferencia { margin-left: 0.4rem; font-style: italic; font-size: 0.75rem; }
+    }
+  }
+}
+
+// ============================================
+// BOTONES DE ACCIÓN
+// ============================================
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid $border;
+
+  @media (max-width: 576px) { flex-direction: column; .btn { width: 100%; } }
+
+  .btn {
+    padding: 8px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+    min-width: 140px;
+    text-decoration: none;
+  }
+  .btn-save {
+    background: linear-gradient(135deg, $green, $green-dark);
+    color: $white;
+    box-shadow: 0 3px 10px rgba(39,174,96,0.3);
+    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(39,174,96,0.4); }
+    &:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+  }
+  .btn-cancel {
+    background: transparent;
+    color: $text-mid;
+    border: 1.5px solid $border !important;
+    &:hover { background: #f1f5f9; border-color: #cbd5e1 !important; }
+  }
+}
+
+.spinner-border-sm { width: 14px; height: 14px; border-width: 2px; }
+
+// ============================================
+// CHECKBOX INLINE
+// ============================================
+.check-inline-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    margin: 0;
+    accent-color: $navy;
+    cursor: pointer;
+  }
+
+  label {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: $text-mid !important;
+    cursor: pointer;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin: 0;
   }
 }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { GenerarLetrasRequest } from '../../dto/generarletra.dto';
+import { GrupoLetras } from '../../dto/grupo-letras.dto';
 import { DistritoService } from '../../services/distrito.service';
 import { Distrito } from '../../models/distrito.model';
 import { LetrasCambioService } from '../../services/letracambio.service';
@@ -25,6 +26,11 @@ export class LetracambioInsertarComponent implements OnInit {
 
   tieneLetras: boolean = false;
   monedaContrato: Moneda = 'USD';
+
+  /** Total de letras del contrato (usado para validar en modo grupos) */
+  cantidadLetrasContrato: number = 0;
+  /** Saldo del contrato (usado para mostrar diferencia en modo grupos) */
+  saldoContrato: number = 0;
 
   generarLetrasRequest: GenerarLetrasRequest = this.crearRequestConFechaLocal();
   distritos: Distrito[] = [];
@@ -56,32 +62,35 @@ export class LetracambioInsertarComponent implements OnInit {
       this.idContrato = id ? +id : 0;
 
       if (this.idContrato > 0) {
-        this.cargarMonedaContrato();
-        // Siempre consultamos al backend si ya existen letras reales generadas.
-        // NO usamos el queryParam 'cantidadLetras' del contrato porque ese campo
-        // representa las letras planificadas al crear el contrato, no las generadas.
+        this.cargarDatosContrato();
         this.verificarLetrasExistentes();
       }
     });
   }
 
-  cargarMonedaContrato(): void {
+  cargarDatosContrato(): void {
     this.contratoService.obtenerContratoPorId(this.idContrato).subscribe({
-      next: (contrato) => { this.monedaContrato = contrato.moneda || 'USD'; },
-      error: () => { this.monedaContrato = 'USD'; }
+      next: (contrato) => {
+        this.monedaContrato = contrato.moneda || 'USD';
+        this.cantidadLetrasContrato = contrato.cantidadLetras || 0;
+        this.saldoContrato = contrato.saldo || 0;
+      },
+      error: () => {
+        this.monedaContrato = 'USD';
+      }
     });
   }
 
   verificarLetrasExistentes(): void {
-  this.letrasService.existenLetrasBatch([this.idContrato]).subscribe({
-    next: (resultado) => {
-      this.tieneLetras = resultado[this.idContrato] ?? false;
-    },
-    error: () => {
-      this.tieneLetras = false;
-    }
-  });
-}
+    this.letrasService.existenLetrasBatch([this.idContrato]).subscribe({
+      next: (resultado) => {
+        this.tieneLetras = resultado[this.idContrato] ?? false;
+      },
+      error: () => {
+        this.tieneLetras = false;
+      }
+    });
+  }
 
   cargarDistritos(): void {
     this.distritoService.listarDistritos().subscribe({
@@ -104,28 +113,103 @@ export class LetracambioInsertarComponent implements OnInit {
       importe: '',
       importeLetras: '',
       modoAutomatico: true,
+      modoGrupos: false,
+      grupos: [],
       usarUltimoDiaMes: false,
     };
   }
 
-  /** Día numérico de la fecha de vencimiento inicial (para mostrar en el hint) */
+  // ── Lógica de selección de modo ────────────────────────────────────────────
+
+  /** Activa modo automático y desactiva los demás */
+  activarModoAutomatico(): void {
+    this.generarLetrasRequest.modoAutomatico = true;
+    this.generarLetrasRequest.modoGrupos = false;
+    this.generarLetrasRequest.importe = '';
+    this.generarLetrasRequest.importeLetras = '';
+    this.generarLetrasRequest.grupos = [];
+  }
+
+  /** Activa modo manual (importe fijo) y desactiva los demás */
+  activarModoManual(): void {
+    this.generarLetrasRequest.modoAutomatico = false;
+    this.generarLetrasRequest.modoGrupos = false;
+    this.generarLetrasRequest.grupos = [];
+  }
+
+  /** Activa modo grupos y desactiva los demás */
+  activarModoGrupos(): void {
+    this.generarLetrasRequest.modoAutomatico = false;
+    this.generarLetrasRequest.modoGrupos = true;
+    this.generarLetrasRequest.importe = '';
+    this.generarLetrasRequest.importeLetras = '';
+    if (this.generarLetrasRequest.grupos.length === 0) {
+      this.agregarGrupo();
+    }
+  }
+
+  // ── Gestión de grupos ──────────────────────────────────────────────────────
+
+  agregarGrupo(): void {
+    this.generarLetrasRequest.grupos.push({ cantidad: 0, importe: '' });
+  }
+
+  eliminarGrupo(index: number): void {
+    this.generarLetrasRequest.grupos.splice(index, 1);
+  }
+
+  /**
+   * Calcula el subtotal de un grupo (cantidad × importe).
+   * Se usa desde el template para evitar regex en expresiones Angular.
+   */
+  calcularSubtotalGrupo(grupo: GrupoLetras): number {
+    const imp = parseFloat(String(grupo.importe).replace(/[^0-9.]/g, '')) || 0;
+    return (grupo.cantidad || 0) * imp;
+  }
+
+  /** Suma de las cantidades ingresadas en todos los grupos */
+  get totalLetrasGrupos(): number {
+    return this.generarLetrasRequest.grupos.reduce(
+      (sum, g) => sum + (g.cantidad || 0), 0
+    );
+  }
+
+  /** Suma total de (cantidad × importe) de todos los grupos */
+  get totalMontoGrupos(): number {
+    return this.generarLetrasRequest.grupos.reduce((sum, g) => {
+      const imp = parseFloat(String(g.importe).replace(/[^0-9.]/g, '')) || 0;
+      return sum + imp * (g.cantidad || 0);
+    }, 0);
+  }
+
+  /** Diferencia entre la suma de grupos y el saldo del contrato */
+  get diferenciaSaldo(): number {
+    return parseFloat((this.totalMontoGrupos - this.saldoContrato).toFixed(2));
+  }
+
+  /** ¿Coincide la suma de cantidades con las del contrato? */
+  get cantidadGruposOk(): boolean {
+    return this.cantidadLetrasContrato > 0 &&
+           this.totalLetrasGrupos === this.cantidadLetrasContrato;
+  }
+
+  /** ¿Coincide el monto total de grupos con el saldo del contrato? */
+  get montoGruposOk(): boolean {
+    return this.saldoContrato > 0 && this.diferenciaSaldo === 0;
+  }
+
+  // ── Helpers del formulario ─────────────────────────────────────────────────
+
   get diaDeFechaVencimiento(): number {
     const fechaStr = this.generarLetrasRequest.fechaVencimientoInicial;
     if (!fechaStr) return 0;
     return new Date(fechaStr + 'T00:00:00').getDate();
   }
 
-  /** Símbolo de moneda según el contrato, para la directiva de formato */
   get simboloMoneda(): string {
     return this.monedaContrato === 'PEN' ? 'S/ ' : '$ ';
   }
 
-  /**
-   * Muestra el checkbox solo cuando la fecha inicial ES el último día
-   * de un mes con 30 días o menos (ej: 30/04, 28/02, 29/02).
-   * Cuando el mes tiene 31 días y se elige el 31, el checkbox NO aparece
-   * porque siempre se generará el último día de cada mes sin ambigüedad.
-   */
   get mostrarCheckUltimoDia(): boolean {
     const fechaStr = this.generarLetrasRequest.fechaVencimientoInicial;
     if (!fechaStr) return false;
@@ -134,7 +218,6 @@ export class LetracambioInsertarComponent implements OnInit {
     return fecha.getDate() === diasDelMes && diasDelMes <= 30;
   }
 
-  /** Al cambiar la fecha, resetea el checkbox si ya no aplica */
   onFechaVencimientoChange(): void {
     if (!this.mostrarCheckUltimoDia) {
       this.generarLetrasRequest.usarUltimoDiaMes = false;
@@ -147,11 +230,31 @@ export class LetracambioInsertarComponent implements OnInit {
       return;
     }
 
+    if (this.generarLetrasRequest.modoGrupos) {
+      if (this.generarLetrasRequest.grupos.length === 0) {
+        this.toastr.error('Debe agregar al menos un grupo de letras.', 'Error');
+        return;
+      }
+      if (!this.cantidadGruposOk) {
+        this.toastr.error(
+          `La suma de letras en los grupos (${this.totalLetrasGrupos}) debe ser igual a la cantidad del contrato (${this.cantidadLetrasContrato}).`,
+          'Error de cantidad'
+        );
+        return;
+      }
+      if (!this.montoGruposOk) {
+        this.toastr.error(
+          `El monto total de los grupos (${this.simboloMoneda}${this.totalMontoGrupos.toLocaleString('es-PE', {minimumFractionDigits: 2})}) debe ser igual al saldo del contrato (${this.simboloMoneda}${this.saldoContrato.toLocaleString('es-PE', {minimumFractionDigits: 2})}).`,
+          'Error de monto'
+        );
+        return;
+      }
+    }
+
     this.cargando = true;
     this.success = null;
 
-    if (!this.generarLetrasRequest.modoAutomatico) {
-      // La directiva guarda el valor numérico en el ngModel; lo limpiamos por si acaso
+    if (!this.generarLetrasRequest.modoAutomatico && !this.generarLetrasRequest.modoGrupos) {
       const raw = String(this.generarLetrasRequest.importe).replace(/[^0-9.]/g, '');
       this.generarLetrasRequest.importe = raw;
     }
@@ -162,33 +265,17 @@ export class LetracambioInsertarComponent implements OnInit {
         this.cargando = false;
         this.tieneLetras = true;
         this.letrasGeneradas.emit();
-
-        if (this.generarLetrasRequest.modoAutomatico) {
-          this.letrasService.listarPorContrato(this.idContrato).subscribe({
-            next: (letras) => {
-              if (letras.length > 0) {
-                const importe = letras[0].importe as unknown as number;
-                this.generarLetrasRequest.importe = String(importe);
-                this.onImporteChange(parseFloat(String(importe)));
-              }
-            },
-            error: (err) => {
-              console.error('Error al obtener letras generadas', err);
-            }
-          });
-        }
-
         this.router.navigate(['/secretaria-menu/letras/listar', this.idContrato]);
       },
       error: (err) => {
-        this.toastr.error('Error al generar letras. Revise los datos.', 'Error');
+        const mensajeBackend = err?.error?.message || err?.error || 'Revise los datos ingresados.';
+        this.toastr.error(mensajeBackend, 'Error al generar letras');
         this.cargando = false;
         console.error(err);
       },
     });
   }
 
-  /** Convierte el importe numérico a texto (llamado desde onImporteChange) */
   onImporteChange(valor: number | null): void {
     if (this.generarLetrasRequest.modoAutomatico || valor == null || isNaN(valor)) {
       this.generarLetrasRequest.importeLetras = '';
@@ -222,11 +309,7 @@ export class LetracambioInsertarComponent implements OnInit {
 
     if (num >= 1000) {
       const miles = Math.floor(num / 1000);
-      if (miles === 1) {
-        letras += "mil";
-      } else {
-        letras += this.numeroALetras(miles) + " mil";
-      }
+      letras += miles === 1 ? "mil" : this.numeroALetras(miles) + " mil";
       num %= 1000;
       if (num > 0) letras += " ";
     }

@@ -1,112 +1,258 @@
-<div class="generar-letras-container">
-  <h2>Generar Nuevas Letras de Cambio</h2>
+<div class="letras-container">
+
+  <!-- ══ CABECERA ══ -->
+  <div class="page-header">
+    <i class="bi bi-file-earmark-text header-icon"></i>
+    <div>
+      <h2>Generar Letras de Cambio</h2>
+      
+    </div>
+  </div>
 
   <div class="form-wrapper">
     <form (ngSubmit)="onGenerarLetras()">
 
-      <div class="form-row form-2-col">
-        <div class="form-group">
-          <label for="idDistrito">Distrito de Giro</label>
-          <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required>
-            <option value="0" disabled>-- Seleccione un distrito --</option>
-            <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">
-              {{ distrito.nombre }}
-            </option>
-          </select>
+      <!-- ══ SECCIÓN 1: MODO DE GENERACIÓN ══ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-sliders"></i> Modo de generación de importes
         </div>
 
-        <div class="form-group">
-          <label for="fechaGiro">Fecha de Giro</label>
-          <input
-            type="date"
-            id="fechaGiro"
-            [(ngModel)]="generarLetrasRequest.fechaGiro"
-            name="fechaGiro"
-            required
-          >
+        <div class="modo-selector">
+
+          <div class="modo-opcion" [class.activo]="generarLetrasRequest.modoAutomatico">
+            <input
+              type="radio" id="modoAuto" name="modoGeneracion"
+              [checked]="generarLetrasRequest.modoAutomatico"
+              (change)="activarModoAutomatico()"
+            >
+            <label for="modoAuto">
+              <span class="modo-icono">⚡</span>
+              <span class="modo-titulo">Automático</span>
+              <span class="modo-desc">El sistema divide el saldo entre la cantidad de letras</span>
+            </label>
+          </div>
+
+          <div class="modo-opcion" [class.activo]="!generarLetrasRequest.modoAutomatico && !generarLetrasRequest.modoGrupos">
+            <input
+              type="radio" id="modoManual" name="modoGeneracion"
+              [checked]="!generarLetrasRequest.modoAutomatico && !generarLetrasRequest.modoGrupos"
+              (change)="activarModoManual()"
+            >
+            <label for="modoManual">
+              <span class="modo-icono">✏️</span>
+              <span class="modo-titulo">Importe fijo</span>
+              <span class="modo-desc">Todas las letras con el mismo importe, la última ajusta el residuo</span>
+            </label>
+          </div>
+
+          <div class="modo-opcion" [class.activo]="generarLetrasRequest.modoGrupos">
+            <input
+              type="radio" id="modoGrupos" name="modoGeneracion"
+              [checked]="generarLetrasRequest.modoGrupos"
+              (change)="activarModoGrupos()"
+            >
+            <label for="modoGrupos">
+              <span class="modo-icono">📦</span>
+              <span class="modo-titulo">Por grupos</span>
+              <span class="modo-desc">Distintos importes por tramos, la suma debe igualar el saldo</span>
+            </label>
+          </div>
+
         </div>
       </div>
 
-      <div class="form-row form-2-col">
-        <div class="form-group">
-          <label for="fechaVencimientoInicial">Fecha Vencimiento Inicial</label>
-          <input
-            type="date"
-            id="fechaVencimientoInicial"
-            [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial"
-            name="fechaVencimientoInicial"
-            (change)="onFechaVencimientoChange()"
-            required
-          >
-          <!-- Checkbox: solo si la fecha es el último día de un mes con ≤30 días -->
-          <div class="check-inline-group" *ngIf="mostrarCheckUltimoDia">
+      <!-- ══ SECCIÓN 2: DATOS GENERALES ══ -->
+      <div class="form-section">
+        <div class="section-title">
+          <i class="bi bi-calendar3"></i> Datos Generales
+        </div>
+
+        <!-- Distrito de Giro · Fecha de Giro · Fecha Vencimiento → misma fila -->
+        <div class="form-row form-3-col">
+
+          <div class="form-group">
+            <label for="idDistrito"><i class="bi bi-geo-alt"></i> Distrito de Giro</label>
+            <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required>
+              <option value="0" disabled>-- Seleccione un distrito --</option>
+              <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">
+                {{ distrito.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fechaGiro"><i class="bi bi-calendar-event"></i> Fecha de Giro</label>
             <input
-              type="checkbox"
-              id="usarUltimoDiaMes"
-              [(ngModel)]="generarLetrasRequest.usarUltimoDiaMes"
-              name="usarUltimoDiaMes"
+              type="date" id="fechaGiro"
+              [(ngModel)]="generarLetrasRequest.fechaGiro"
+              name="fechaGiro" required
             >
-            <label for="usarUltimoDiaMes">Generar siguientes letras con el último día de cada mes</label>
+          </div>
+
+          <div class="form-group">
+            <label for="fechaVencimientoInicial"><i class="bi bi-calendar-check"></i> Fecha Vencimiento Inicial</label>
+            <input
+              type="date" id="fechaVencimientoInicial"
+              [(ngModel)]="generarLetrasRequest.fechaVencimientoInicial"
+              name="fechaVencimientoInicial"
+              (change)="onFechaVencimientoChange()" required
+            >
+            <div class="check-inline-group" *ngIf="mostrarCheckUltimoDia">
+              <input
+                type="checkbox" id="usarUltimoDiaMes"
+                [(ngModel)]="generarLetrasRequest.usarUltimoDiaMes"
+                name="usarUltimoDiaMes"
+              >
+              <label for="usarUltimoDiaMes">Usar último día de cada mes</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ SECCIÓN 3: DETALLE SEGÚN MODO ══ -->
+
+      <!-- Aviso modo automático -->
+      <div class="aviso-automatico" *ngIf="generarLetrasRequest.modoAutomatico">
+        <span>⚡</span>
+        El importe se calculará dividiendo el saldo del contrato entre la cantidad de letras.
+        La última letra absorberá el residuo del redondeo.
+      </div>
+
+      <!-- Modo importe fijo -->
+      <div class="form-section" *ngIf="!generarLetrasRequest.modoAutomatico && !generarLetrasRequest.modoGrupos">
+        <div class="section-title"><i class="bi bi-cash"></i> Importe</div>
+        <!-- 1fr importe + 2fr importe-en-texto para que sean proporcionales -->
+        <div class="form-row form-importe-col">
+          <div class="form-group">
+            <label for="importe"><i class="bi bi-currency-dollar"></i> Importe por letra</label>
+            <input
+              type="text" id="importe"
+              [(ngModel)]="generarLetrasRequest.importe"
+              name="importe"
+              appCurrencyFormatter
+              [currencySymbol]="simboloMoneda"
+              (ngModelChange)="onImporteModelChange($event)"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label for="importeLetras"><i class="bi bi-card-text"></i> Importe en texto</label>
+            <input
+              type="text" id="importeLetras"
+              [(ngModel)]="generarLetrasRequest.importeLetras"
+              name="importeLetras"
+              readonly class="field-calculated"
+            >
           </div>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="importe">Importe</label>
-          <input
-            type="text"
-            id="importe"
-            [(ngModel)]="generarLetrasRequest.importe"
-            name="importe"
-            appCurrencyFormatter
-            [currencySymbol]="simboloMoneda"
-            (ngModelChange)="onImporteModelChange($event)"
-            [disabled]="generarLetrasRequest.modoAutomatico"
-            [class.disabled-field]="generarLetrasRequest.modoAutomatico"
-            required
-          >
-          <div class="check-inline-group">
-            <input
-              type="checkbox"
-              id="modoAutomatico"
-              [(ngModel)]="generarLetrasRequest.modoAutomatico"
-              name="modoAutomatico"
+      <!-- Modo grupos -->
+      <div class="form-section" *ngIf="generarLetrasRequest.modoGrupos">
+        <div class="section-title"><i class="bi bi-table"></i> Grupos de letras</div>
+
+        <div class="seccion-grupos">
+          <div class="grupos-header">
+            <h3>Definición de tramos</h3>
+            <p class="grupos-info">
+              Contrato: <strong>{{ cantidadLetrasContrato }} letras</strong> —
+              Saldo: <strong>{{ simboloMoneda }}{{ saldoContrato | number:'1.2-2' }}</strong>
+            </p>
+          </div>
+
+          <div class="grupos-tabla">
+            <div class="grupos-tabla-header">
+              <span>#</span>
+              <span>Cantidad</span>
+              <span>Importe por letra</span>
+              <span>Subtotal</span>
+              <span></span>
+            </div>
+
+            <div
+              class="grupos-tabla-fila"
+              *ngFor="let grupo of generarLetrasRequest.grupos; let i = index"
             >
-            <label for="modoAutomatico">Calcular automáticamente el importe de la Letra</label>
+              <span class="grupo-num">{{ i + 1 }}</span>
+
+              <div class="form-group grupo-field">
+                <input
+                  type="number" min="1"
+                  [(ngModel)]="grupo.cantidad"
+                  [name]="'grupoCantidad' + i"
+                  placeholder="Ej: 100"
+                  class="grupo-input"
+                >
+              </div>
+
+              <div class="form-group grupo-field">
+                <input
+                  type="text"
+                  [(ngModel)]="grupo.importe"
+                  [name]="'grupoImporte' + i"
+                  appCurrencyFormatter
+                  [currencySymbol]="simboloMoneda"
+                  placeholder="Ej: 500.00"
+                  class="grupo-input"
+                >
+              </div>
+
+              <span class="grupo-subtotal">
+                {{ simboloMoneda }}{{ calcularSubtotalGrupo(grupo) | number:'1.2-2' }}
+              </span>
+
+              <button
+                type="button" class="btn-eliminar-grupo"
+                (click)="eliminarGrupo(i)" title="Eliminar grupo"
+                [disabled]="generarLetrasRequest.grupos.length === 1"
+              >✕</button>
+            </div>
+          </div>
+
+          <button type="button" class="btn-agregar-grupo" (click)="agregarGrupo()">
+            + Agregar grupo
+          </button>
+
+          <div class="grupos-resumen">
+            <div class="resumen-fila" [class.ok]="cantidadGruposOk" [class.error]="!cantidadGruposOk">
+              <span class="resumen-icono">{{ cantidadGruposOk ? '✔' : '✘' }}</span>
+              <span>
+                Total letras: <strong>{{ totalLetrasGrupos }}</strong> /
+                <strong>{{ cantidadLetrasContrato }}</strong>
+              </span>
+            </div>
+            <div class="resumen-fila" [class.ok]="montoGruposOk" [class.error]="!montoGruposOk">
+              <span class="resumen-icono">{{ montoGruposOk ? '✔' : '✘' }}</span>
+              <span>
+                Total monto: <strong>{{ simboloMoneda }}{{ totalMontoGrupos | number:'1.2-2' }}</strong>
+                / Saldo: <strong>{{ simboloMoneda }}{{ saldoContrato | number:'1.2-2' }}</strong>
+                <span *ngIf="!montoGruposOk" class="diferencia">
+                  (diferencia: {{ simboloMoneda }}{{ diferenciaSaldo | number:'1.2-2' }})
+                </span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group full-width">
-          <label for="importeLetras">Importe en texto</label>
-          <input
-            type="text"
-            id="importeLetras"
-            [(ngModel)]="generarLetrasRequest.importeLetras"
-            name="importeLetras"
-            readonly
-            [disabled]="generarLetrasRequest.modoAutomatico"
-            [class.disabled-field]="generarLetrasRequest.modoAutomatico"
-          >
-        </div>
-      </div>
-
+      <!-- ══ ACCIONES ══ -->
       <div class="form-actions">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="cargando || tieneLetras"
-        >
-          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
-          Generar Letras
-        </button>
-
-        <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-secondary">
+        <a [routerLink]="['/secretaria-menu/contratos']" class="btn btn-cancel">
           Cancelar
         </a>
+        <button
+          type="submit"
+          class="btn btn-save"
+          [disabled]="cargando || tieneLetras || (generarLetrasRequest.modoGrupos && (!cantidadGruposOk || !montoGruposOk))"
+        >
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+          <i *ngIf="!cargando" class="bi bi-check-circle"></i>
+          Generar Letras
+        </button>
       </div>
 
-      <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
     </form>
   </div>
 </div>
