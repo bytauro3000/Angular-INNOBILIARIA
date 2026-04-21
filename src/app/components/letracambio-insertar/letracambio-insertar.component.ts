@@ -44,7 +44,7 @@ export class LetracambioInsertarComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private contratoService: ContratoService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.obtenerIdContratoDesdeRuta();
@@ -74,6 +74,12 @@ export class LetracambioInsertarComponent implements OnInit {
         this.monedaContrato = contrato.moneda || 'USD';
         this.cantidadLetrasContrato = contrato.cantidadLetras || 0;
         this.saldoContrato = contrato.saldo || 0;
+
+        // Usar la fecha del contrato como fecha de giro (emisión)
+        if (contrato.fechaContrato) {
+          const fechaStr = String(contrato.fechaContrato).substring(0, 10);
+          this.generarLetrasRequest.fechaGiro = fechaStr;
+        }
       },
       error: () => {
         this.monedaContrato = 'USD';
@@ -190,7 +196,7 @@ export class LetracambioInsertarComponent implements OnInit {
   /** ¿Coincide la suma de cantidades con las del contrato? */
   get cantidadGruposOk(): boolean {
     return this.cantidadLetrasContrato > 0 &&
-           this.totalLetrasGrupos === this.cantidadLetrasContrato;
+      this.totalLetrasGrupos === this.cantidadLetrasContrato;
   }
 
   /** ¿Coincide el monto total de grupos con el saldo del contrato? */
@@ -244,7 +250,7 @@ export class LetracambioInsertarComponent implements OnInit {
       }
       if (!this.montoGruposOk) {
         this.toastr.error(
-          `El monto total de los grupos (${this.simboloMoneda}${this.totalMontoGrupos.toLocaleString('es-PE', {minimumFractionDigits: 2})}) debe ser igual al saldo del contrato (${this.simboloMoneda}${this.saldoContrato.toLocaleString('es-PE', {minimumFractionDigits: 2})}).`,
+          `El monto total de los grupos (${this.simboloMoneda}${this.totalMontoGrupos.toLocaleString('es-PE', { minimumFractionDigits: 2 })}) debe ser igual al saldo del contrato (${this.simboloMoneda}${this.saldoContrato.toLocaleString('es-PE', { minimumFractionDigits: 2 })}).`,
           'Error de monto'
         );
         return;
