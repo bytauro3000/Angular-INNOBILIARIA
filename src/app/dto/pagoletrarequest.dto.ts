@@ -5,9 +5,9 @@ export interface PagoLetraRequest {
   idLetra: number;
   importePagado: number;
   medioPago: MedioPago;
-  numeroOperacion?: string;     
-  fechaOperacion?: string;       
+  numeroOperacion?: string;
+  fechaOperacion?: string;
   tipoComprobante?: TipoComprobante;
-  numeroComprobante?: string;
+  numeroComprobantePersonalizado?: string;
   observaciones?: string;
 }

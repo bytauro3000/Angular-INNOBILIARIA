@@ -35,7 +35,7 @@
                   <input type="text" id="numDoc" formControlName="numDoc"
                     [placeholder]="esCarnetExtranjeria ? 'Número C.E.' : 'Número de documento'"
                     required
-                    [maxlength]="esCarnetExtranjeria ? 12 : (clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11)"
+                    [maxlength]="esCarnetExtranjeria ? 9 : (clienteForm.get('tipoCliente')?.value === 'NATURAL' ? 8 : 11)"
                     (input)="limpiarNoNumericos('numDoc'); onDniInput()"
                     [attr.title]="getErrorMessage('numDoc')"
                     [ngClass]="{'is-invalid': clienteForm.get('numDoc')?.invalid && clienteForm.get('numDoc')?.touched}"

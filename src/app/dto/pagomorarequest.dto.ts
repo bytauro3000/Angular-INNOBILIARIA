@@ -1,6 +1,6 @@
 import { MedioPago } from '../enums/mediopago.enum';
 import { TipoComprobante } from '../enums/tipocomprobante';
-
+ 
 export interface PagoMoraRequest {
   idMora: number;
   montoPagado: number;
@@ -8,6 +8,6 @@ export interface PagoMoraRequest {
   medioPago: MedioPago;
   numeroOperacion?: string;
   tipoComprobante?: TipoComprobante;
-  numeroComprobante?: string;
+  numeroComprobantePersonalizado?: string;
   observaciones?: string;
 }

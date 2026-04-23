@@ -64,32 +64,37 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Modificado para aceptar undefined
   getNumeroLetraLimpio(numeroLetra: string | undefined): string {
     return numeroLetra ? numeroLetra.split('/')[0] : '';
+  }
+
+  /**
+   * Lee el número de comprobante desde el objeto comprobante anidado.
+   * El campo plano pago.numeroComprobante se mantiene en el DTO por
+   * compatibilidad, pero la fuente de verdad es pago.comprobante?.numeroCompleto.
+   */
+  getNumeroComprobante(pago: PagoLetraResponse): string | undefined {
+    return (pago as any).comprobante?.numeroCompleto ?? pago.numeroComprobante;
   }
 
   eliminarPago(idPago: number): void {
     if (this.eliminando) return;
 
-    // Buscar el pago seleccionado
     const pago = this.pagos.find(p => p.idPago === idPago);
-    const numeroComprobante = pago?.numeroComprobante;
+    const numeroComprobante = this.getNumeroComprobante(pago!);
 
-    // Detectar si es un pago múltiple (mismo número de comprobante en más de 1 pago)
+    // Agrupar pagos del mismo comprobante usando la función helper
     const pagosDelMismoComprobante = numeroComprobante
-      ? this.pagos.filter(p => p.numeroComprobante === numeroComprobante)
+      ? this.pagos.filter(p => this.getNumeroComprobante(p) === numeroComprobante)
       : [];
     const esMultiple = pagosDelMismoComprobante.length > 1;
 
-    // Obtener números de letra limpios (ej: "4", "5", "6")
     const numerosLetra = esMultiple
       ? pagosDelMismoComprobante
           .map(p => p.numeroLetra ? p.numeroLetra.split('/')[0].trim() : '?')
           .sort((a, b) => parseInt(a) - parseInt(b))
       : [pago?.numeroLetra ? pago.numeroLetra.split('/')[0].trim() : '?'];
 
-    // Armar texto de letras: "4, 5 y 6" o simplemente "4"
     let letrasTexto: string;
     if (numerosLetra.length === 1) {
       letrasTexto = `la Letra N° <strong>${numerosLetra[0]}</strong>`;
@@ -99,10 +104,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
       letrasTexto = `las Letras N° <strong>${anteriores} y ${ultimas}</strong>`;
     }
 
-    const titulo = esMultiple
-      ? '¿Eliminar pago múltiple?'
-      : '¿Eliminar comprobante?';
-
+    const titulo = esMultiple ? '¿Eliminar pago múltiple?' : '¿Eliminar comprobante?';
     const texto = esMultiple
       ? `El comprobante <strong>${numeroComprobante}</strong> agrupa ${letrasTexto}. Se eliminarán los ${pagosDelMismoComprobante.length} pagos. ¡Esta acción no se puede revertir!`
       : `Se eliminará el comprobante <strong>${numeroComprobante}</strong> correspondiente a ${letrasTexto}. ¡Esta acción no se puede revertir!`;
@@ -119,13 +121,9 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.eliminando = true;
-
-        // IDs a eliminar: si es múltiple, todos del mismo comprobante; si no, solo este
         const idsAEliminar = esMultiple
           ? pagosDelMismoComprobante.map(p => p.idPago)
           : [idPago];
-
-        // Eliminar secuencialmente
         this.eliminarSecuencial(idsAEliminar, 0);
       }
     });

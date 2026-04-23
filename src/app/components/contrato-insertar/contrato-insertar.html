@@ -214,6 +214,58 @@
         </div>
       </div>
 
+      <div class="form-section" *ngIf="mostrarComprobanteInicial">
+        <div class="section-title">
+          <i class="bi bi-receipt"></i> Comprobante del Pago de Inicial
+        </div>
+        <p class="section-hint text-muted" style="font-size:0.85rem; margin-bottom:12px;">
+          El contrato es financiado y tiene una inicial de
+          <strong>{{ formatearMoneda(inicialNum) }}</strong>.
+          Selecciona el tipo de comprobante que se emitirá por este pago.
+        </p>
+        <div class="form-row form-2-col">
+ 
+          <div class="form-group">
+            <label for="tipoComprobanteInicial">
+              <i class="bi bi-file-earmark-text"></i>
+              Tipo de Comprobante <span class="required">*</span>
+            </label>
+            <select id="tipoComprobanteInicial" class="form-select"
+                    [(ngModel)]="tipoComprobanteInicial"
+                    [ngModelOptions]="{standalone: true}"
+                    (change)="onTipoComprobanteInicialChange()">
+              <option [ngValue]="undefined">-- Seleccione --</option>
+              <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
+            </select>
+          </div>
+ 
+          <!-- N° Comprobante: solo preview readonly, el backend asigna el número real -->
+          <div class="form-group">
+            <label>
+              <i class="bi bi-hash"></i>
+              N° Comprobante
+              <small class="text-muted">(asignado automáticamente)</small>
+            </label>
+            <div class="input-group">
+              <input type="text" class="form-control"
+                     [value]="cargandoPreviewInicial ? 'Calculando...' : (numeroComprobanteInicialPreview || '—')"
+                     readonly
+                     style="background-color: #f8f9fa; color: #6c757d; cursor: default;">
+              <span class="input-group-text" *ngIf="cargandoPreviewInicial">
+                <span class="spinner-border spinner-border-sm"></span>
+              </span>
+              <span class="input-group-text" *ngIf="!cargandoPreviewInicial && numeroComprobanteInicialPreview">
+                <i class="bi bi-check-circle-fill text-success"></i>
+              </span>
+            </div>
+            <small class="form-text text-muted" *ngIf="!tipoComprobanteInicial">
+              Seleccione el tipo de comprobante para ver el número siguiente.
+            </small>
+          </div>
+ 
+        </div>
+      </div>
+ 
       <!-- ── SECCIÓN 4: OBSERVACIONES ── -->
       <div class="form-section">
         <div class="section-title"><i class="bi bi-chat-left-text"></i> Observaciones</div>

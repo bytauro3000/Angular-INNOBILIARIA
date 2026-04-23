@@ -35,9 +35,17 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     numeroOperacion: '',
     fechaOperacion: '',
     tipoComprobante: undefined as TipoComprobante | undefined,
-    numeroComprobante: '',
     observaciones: ''
+    // numeroComprobante eliminado: el backend lo genera automáticamente
   };
+
+  // Preview readonly del número que se emitirá (informativo)
+  numeroComprobantePreview: string = '';
+  cargandoPreview: boolean = false;
+
+  // Modo manual: permite ingresar un número personalizado
+  modoManualComprobante: boolean = false;
+  numeroComprobanteManual: string = '';
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
@@ -109,15 +117,52 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     this.datosComunes.observaciones = `Pago de letras N° ${listaNumeros} de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
   }
 
+  /**
+   * Al seleccionar tipo de comprobante, consulta el siguiente número disponible
+   * y lo muestra como preview readonly (el backend asigna el número real al guardar).
+   */
   onTipoComprobanteChange(): void {
+    this.numeroComprobantePreview = '';
+    this.modoManualComprobante = false;
+    this.numeroComprobanteManual = '';
     if (this.datosComunes.tipoComprobante) {
-      this.pagoService.sugerirNumeroComprobante(this.datosComunes.tipoComprobante).subscribe({
-        next: (res) => {
-          this.datosComunes.numeroComprobante = res.numeroSugerido;
+      this.cargandoPreview = true;
+      this.pagoService.previewSiguienteNumeroComprobante(this.datosComunes.tipoComprobante).subscribe({
+        next: (numero) => {
+          this.numeroComprobantePreview = numero;
+          this.cargandoPreview = false;
         },
-        error: (err) => console.error('Error al obtener sugerencia', err)
+        error: () => { this.cargandoPreview = false; }
       });
     }
+  }
+
+  /** Alterna entre modo automático y modo manual para el N° comprobante */
+  private get seriePrefix(): string {
+    const idx = this.numeroComprobantePreview.indexOf('-');
+    return idx >= 0 ? this.numeroComprobantePreview.substring(0, idx + 1) : '';
+  }
+
+  toggleModoManual(): void {
+    if (this.cargandoPreview) return;
+    this.modoManualComprobante = !this.modoManualComprobante;
+    if (this.modoManualComprobante) {
+      this.numeroComprobanteManual = this.seriePrefix;
+    } else {
+      this.numeroComprobanteManual = '';
+    }
+  }
+
+  /** Captura el valor ingresado manualmente, protegiendo el prefijo de serie */
+  onNumeroManualChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const prefijo = this.seriePrefix;
+    let valor = input.value;
+    if (prefijo && !valor.startsWith(prefijo)) {
+      valor = prefijo;
+      input.value = valor;
+    }
+    this.numeroComprobanteManual = valor;
   }
 
   guardar(): void {
@@ -141,10 +186,12 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       this.toastr.warning('Ingrese fecha de operación', 'Validación');
       return;
     }
-    if (!this.datosComunes.numeroComprobante?.trim()) {
-      this.toastr.warning('Ingrese número de comprobante', 'Validación');
+
+    if (!this.datosComunes.tipoComprobante) {
+      this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
       return;
     }
+    // Eliminada la validación de numeroComprobante: el backend lo genera
 
     const requests: PagoLetraRequest[] = this.letras.map(letra => ({
       idLetra: letra.idLetra,
@@ -153,23 +200,24 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       numeroOperacion: this.datosComunes.numeroOperacion,
       fechaOperacion: this.datosComunes.fechaOperacion,
       tipoComprobante: this.datosComunes.tipoComprobante,
-      numeroComprobante: this.datosComunes.numeroComprobante,
+      numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual.trim()
+        ? this.numeroComprobanteManual.trim()
+        : undefined,
       observaciones: this.datosComunes.observaciones
+      // numeroComprobante eliminado del request
     }));
 
     this.enviando = true;
     this.pagoService.registrarPagosMultiples(requests, this.voucherFiles).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.toastr.success('Pagos registrados correctamente', 'Éxito');
         this.enviando = false;
-        // Abrir comprobante consolidado automáticamente
-        if (this.datosComunes.numeroComprobante) {
-          this.pagoService.descargarComprobanteMultiple(this.datosComunes.numeroComprobante).subscribe({
-            next: (blob) => {
-              const url = URL.createObjectURL(blob);
-              window.open(url, '_blank');
-            },
-            error: () => {} // Si falla no interrumpir el flujo
+        // Descargar comprobante consolidado usando el numeroCompleto que devuelve el backend
+        const numeroComprobante = res?.numeroComprobanteGenerado || res?.numeroCompleto;
+        if (numeroComprobante) {
+          this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
+            next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
+            error: () => {}
           });
         }
         this.cerrarModal();

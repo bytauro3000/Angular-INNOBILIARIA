@@ -31,21 +31,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   @Input() letra!: LetraCambio;
   @Input() contrato!: any;
 
-  /**
-   * Si viene con valor, la letra está vencida y existe cálculo de mora.
-   * El operador puede decidir si pagar la mora ahora o dejarla pendiente.
-   * Si viene NULL aquí, puede significar:
-   *   a) La letra no está vencida (sin mora), O
-   *   b) La mora YA FUE PAGADA antes de abrir este modal (flujo: Pagar Mora → Pagar Letra)
-   * En ambos casos NO se debe volver a crear ni cobrar mora.
-   */
   @Input() calculoMora: CalculoMoraDTO | null = null;
-
-  /**
-   * NUEVO: bandera que indica explícitamente que la mora ya fue pagada
-   * en el paso anterior (desde mora-alerta). Se usa para no mostrar
-   * el aviso de mora ni intentar registrarla de nuevo.
-   */
   @Input() moraPreviamentePagada: boolean = false;
 
   @Output() onClose = new EventEmitter<void>();
@@ -61,19 +47,24 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     numeroOperacion: '',
     fechaOperacion: '',
     tipoComprobante: undefined,
-    numeroComprobante: '',
+    numeroComprobantePersonalizado: undefined,
     observaciones: ''
+    // numeroComprobante eliminado: el backend lo genera automáticamente
   };
+
+  // Número de comprobante sugerido: solo para mostrar al cajero (readonly por defecto)
+  numeroComprobantePreview: string = '';
+  cargandoPreview: boolean = false;
+
+  // Modo manual: permite al usuario ingresar un número personalizado
+  modoManualComprobante: boolean = false;
+  numeroComprobanteManual: string = '';
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
 
-  // ── Lógica de mora ────────────────────────────────────────────────────────
-  // true  = el operador marcó "quiero pagar mora ahora"
   pagarMoraTambien: boolean = false;
-  // true  = el operador ya interactuó con el checkbox (oculta la sección alerta inicial)
   moraDecisionTomada: boolean = false;
-  // true  = spinner mientras se llama al endpoint de pago de mora
   pagandoMora: boolean = false;
 
   constructor(
@@ -88,11 +79,9 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     this.pagoRequest.fechaOperacion = new Date().toISOString().split('T')[0];
     this.generarObservaciones();
 
-    // Si la mora ya fue pagada previamente, ocultamos el aviso de mora
-    // y marcamos la decisión como ya tomada para no mostrar el checkbox.
     if (this.moraPreviamentePagada) {
       this.pagarMoraTambien = false;
-      this.moraDecisionTomada = true; // oculta la sección de alerta de mora
+      this.moraDecisionTomada = true;
     } else {
       this.pagarMoraTambien = false;
       this.moraDecisionTomada = false;
@@ -109,8 +98,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     setTimeout(() => this.onClose.emit(), 300);
   }
 
-  // ── Computed getters ──────────────────────────────────────────────────────
-
   get numeroLetraLimpio(): string {
     return this.letra?.numeroLetra ? this.letra.numeroLetra.split('/')[0] : '';
   }
@@ -126,14 +113,10 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     return this.letra.importe;
   }
 
-  // ── Toggle del checkbox de mora ───────────────────────────────────────────
-
   togglePagarMora(): void {
     this.pagarMoraTambien = !this.pagarMoraTambien;
     this.moraDecisionTomada = true;
   }
-
-  // ── Helpers privados ──────────────────────────────────────────────────────
 
   private generarObservaciones(): void {
     if (!this.contrato || !this.contrato.lotes || this.contrato.lotes.length === 0) {
@@ -160,25 +143,60 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * CORRECCIÓN: El autoincremento del número de comprobante ahora consulta
-   * al servicio de mora (endpoint /api/moras/sugerir-numero), el cual en
-   * el backend compara los registros de pago_mora Y pago_letra, toma el
-   * valor más alto de los dos y le añade 1 para el siguiente número.
-   * Esto garantiza que el número sea único y correlativo entre ambas tablas.
+   * Al seleccionar el tipo de comprobante, consulta al backend el siguiente
+   * número que se emitirá y lo muestra como preview readonly.
+   * El campo es solo informativo: el backend genera el número real al guardar.
    */
   onTipoComprobanteChange(): void {
+    this.numeroComprobantePreview = '';
+    this.modoManualComprobante = false;
+    this.numeroComprobanteManual = '';
     if (this.pagoRequest.tipoComprobante) {
-      this.moraService.sugerirNumeroComprobante(this.pagoRequest.tipoComprobante).subscribe({
-        next: (res) => { this.pagoRequest.numeroComprobante = res.numeroSugerido; },
-        error: (err) => { console.error('Error al obtener sugerencia de número', err); }
+      this.cargandoPreview = true;
+      this.pagoService.previewSiguienteNumeroComprobante(this.pagoRequest.tipoComprobante).subscribe({
+        next: (numero) => {
+          this.numeroComprobantePreview = numero;
+          this.cargandoPreview = false;
+        },
+        error: () => { this.cargandoPreview = false; }
       });
     }
   }
 
-  // ── Guardar pago ──────────────────────────────────────────────────────────
+  /** Alterna entre modo automático y modo manual para el N° comprobante */
+  private get seriePrefix(): string {
+    const idx = this.numeroComprobantePreview.indexOf('-');
+    return idx >= 0 ? this.numeroComprobantePreview.substring(0, idx + 1) : '';
+  }
+
+  toggleModoManual(): void {
+    if (this.cargandoPreview) return;
+    this.modoManualComprobante = !this.modoManualComprobante;
+    if (this.modoManualComprobante) {
+      // Pre-llenar con el prefijo de serie (ej: "RB01-")
+      this.numeroComprobanteManual = this.seriePrefix;
+      this.pagoRequest.numeroComprobantePersonalizado = undefined;
+    } else {
+      this.numeroComprobanteManual = '';
+      this.pagoRequest.numeroComprobantePersonalizado = undefined;
+    }
+  }
+
+  /** Captura el valor ingresado manualmente, protegiendo el prefijo de serie */
+  onNumeroManualChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const prefijo = this.seriePrefix;
+    let valor = input.value;
+    if (prefijo && !valor.startsWith(prefijo)) {
+      valor = prefijo;
+      input.value = valor;
+    }
+    this.numeroComprobanteManual = valor;
+    const soloDigitos = valor.substring(prefijo.length).trim();
+    this.pagoRequest.numeroComprobantePersonalizado = soloDigitos ? valor.trim() : undefined;
+  }
 
   guardarPago(): void {
-    // ── Validaciones básicas
     if (!this.pagoRequest.importePagado || this.pagoRequest.importePagado <= 0) {
       this.toastr.warning('El importe pagado debe ser mayor a cero', 'Validación');
       return;
@@ -191,10 +209,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
       this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
       return;
     }
-    if (!this.pagoRequest.numeroComprobante?.trim()) {
-      this.toastr.warning('Debe ingresar el número de comprobante', 'Validación');
-      return;
-    }
+    // Ya no se valida numeroComprobante: lo genera el backend
     if (this.pagoRequest.medioPago !== MedioPago.EFECTIVO) {
       if (!this.pagoRequest.numeroOperacion?.trim()) {
         this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
@@ -210,17 +225,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
 
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFiles).subscribe({
       next: (response) => {
-        /**
-         * CORRECCIÓN PRINCIPAL:
-         * Solo intentamos registrar la mora si se cumplen las 3 condiciones:
-         *   1. El operador eligió pagar la mora también (checkbox activo)
-         *   2. Existe un cálculo de mora (la letra está vencida)
-         *   3. La mora NO fue pagada previamente en el paso anterior
-         *
-         * Si moraPreviamentePagada = true, significa que el operador ya pagó
-         * la mora desde el modal de mora-alerta, por lo tanto NO se debe
-         * volver a buscar ni registrar una mora PENDIENTE para esta letra.
-         */
         if (this.pagarMoraTambien && this.calculoMora && !this.moraPreviamentePagada) {
           this.registrarPagoMoraTrasLetra(response.idPago);
         } else {
@@ -235,11 +239,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     });
   }
 
-  /**
-   * Después de registrar el pago de la letra, el backend ya creó la mora
-   * en estado PENDIENTE. Ahora la consultamos por idLetra y la pagamos.
-   * Este método SOLO se llama cuando pagarMoraTambien=true Y moraPreviamentePagada=false.
-   */
   private registrarPagoMoraTrasLetra(idPagoLetra: number): void {
     this.pagandoMora = true;
 
@@ -260,21 +259,20 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
           this.pagoRequest.fechaOperacion || new Date().toISOString().split('T')[0];
 
         const pagoMora: PagoMoraRequest = {
-          idMora:            moraPendiente.idMora,
-          montoPagado:       moraPendiente.montoMoraTotal,
-          fechaPago:         fechaPago,
-          medioPago:         this.pagoRequest.medioPago,
-          numeroOperacion:   this.pagoRequest.numeroOperacion,
-          tipoComprobante:   this.pagoRequest.tipoComprobante,
-          numeroComprobante: this.pagoRequest.numeroComprobante,
-          observaciones:     `Mora pagada junto con la letra N° ${this.numeroLetraLimpio}`
+          idMora:          moraPendiente.idMora,
+          montoPagado:     moraPendiente.montoMoraTotal,
+          fechaPago:       fechaPago,
+          medioPago:       this.pagoRequest.medioPago,
+          numeroOperacion: this.pagoRequest.numeroOperacion,
+          tipoComprobante: this.pagoRequest.tipoComprobante,
+          // numeroComprobante eliminado: el backend asigna el siguiente en secuencia
+          observaciones:   `Mora pagada junto con la letra N° ${this.numeroLetraLimpio}`
         };
 
         this.moraService.pagarMora(pagoMora).subscribe({
           next: (pagoMoraRes) => {
             this.toastr.success('Letra y mora pagadas correctamente', 'Éxito');
             this.pagandoMora = false;
-            // Abrir comprobante de mora también
             this.abrirComprobanteMora(pagoMoraRes.idPagoMora);
             this.finalizarPago(idPagoLetra);
           },
@@ -306,7 +304,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     this.cerrarModal();
     this.onPagoExitoso.emit();
 
-    // Abrir comprobante de letra en nueva pestaña
     this.pagoService.descargarComprobante(idPago).subscribe({
       next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
       error: () => {
@@ -321,7 +318,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   private abrirComprobanteMora(idPagoMora: number): void {
     this.moraService.descargarComprobante(idPagoMora).subscribe({
       next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
-      error: () => { /* silencioso — el operador puede descargarlo desde el listado */ }
+      error: () => {}
     });
   }
 }

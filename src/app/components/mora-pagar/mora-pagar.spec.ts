@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MoraPagar } from './mora-pagar.component';
+import { MoraPagarComponent } from './mora-pagar.component';
 
 describe('MoraPagar', () => {
-  let component: MoraPagar;
-  let fixture: ComponentFixture<MoraPagar>;
+  let component: MoraPagarComponent;
+  let fixture: ComponentFixture<MoraPagarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MoraPagar]
+      imports: [MoraPagarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MoraPagar);
+    fixture = TestBed.createComponent(MoraPagarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

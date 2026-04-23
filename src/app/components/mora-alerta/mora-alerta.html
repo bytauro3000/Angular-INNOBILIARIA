@@ -74,16 +74,6 @@
                     <i class="bi bi-x-lg"></i> Cancelar
                 </button>
 
-                <!--
-                    BOTÓN AMARILLO: Pagar Mora
-                    ─────────────────────────────────────────────────────────────
-                    DESHABILITADO si:
-                      · moraYaPagada   = true  → la mora YA FUE COBRADA (PAGADO en BD)
-                      · creandoMora    = true  → se está creando la mora (spinner)
-                    HABILITADO si:
-                      · moraEsPendiente = true  → abre formulario con la mora existente, sin crear otra
-                      · sin mora         = true  → crea la mora y abre el formulario
-                -->
                 <button class="btn-pagar-mora"
                     (click)="abrirFormPagarMora()"
                     [disabled]="moraYaPagada || creandoMora"
@@ -102,15 +92,6 @@
                     <ng-container *ngIf="creandoMora">Registrando mora...</ng-container>
                 </button>
 
-                <!--
-                    BOTÓN VERDE: Pagar Letra
-                    ─────────────────────────────────────────────────────────────
-                    SIEMPRE habilitado (la letra siempre se puede pagar).
-                    El mensaje/comportamiento varía:
-                      · moraYaPagada   = true  → pagar letra directo, sin SweetAlert (mora ya cobrada)
-                      · moraEsPendiente = true  → pagar letra directo, sin SweetAlert (mora ya registrada)
-                      · sin mora         = true  → SweetAlert avisando que se creará mora PENDIENTE
-                -->
                 <button class="btn-pagar-letra"
                     (click)="confirmarPagarSoloLetra()"
                     [title]="moraYaPagada
@@ -203,12 +184,32 @@
                             <option *ngFor="let op of tipoComprobanteOptions" [value]="op">{{ op }}</option>
                         </select>
                     </div>
+                    <!-- N° Comprobante: editable opcionalmente -->
                     <div class="form-group">
-                        <label>N° Comprobante <span class="required">*</span></label>
-                        <input type="text" class="form-control" [(ngModel)]="request.numeroComprobante"
-                            name="numeroComprobante"
-                            [placeholder]="sugerindoNumero ? 'Generando...' : 'Ej: EB01-0001'"
-                            [readonly]="sugerindoNumero">
+                        <label>
+                            N° Comprobante
+                            <span class="badge-manual" *ngIf="modoManualComprobante">Manual</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                [value]="cargandoPreview ? 'Calculando...' : (modoManualComprobante ? numeroComprobanteManual : (numeroComprobantePreview || '—'))"
+                                [readonly]="!modoManualComprobante || cargandoPreview"
+                                [class.input-manual]="modoManualComprobante"
+                                (input)="onNumeroManualChange($event)"
+                                [placeholder]="modoManualComprobante ? 'Ingrese N° comprobante' : '—'"
+                                [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
+                                [style.color]="modoManualComprobante ? '#1e293b' : '#6c757d'"
+                                [style.cursor]="modoManualComprobante ? 'text' : 'default'">
+                            <span class="input-group-text btn-toggle-manual"
+                                  (click)="toggleModoManual()"
+                                  [title]="modoManualComprobante ? 'Volver al número automático' : 'Ingresar número manualmente'"
+                                  [class.active]="modoManualComprobante">
+                                <span *ngIf="cargandoPreview" class="spinner-border spinner-border-sm text-secondary"></span>
+                                <i *ngIf="!cargandoPreview && modoManualComprobante" class="bi bi-pencil-fill text-primary"></i>
+                                <i *ngIf="!cargandoPreview && !modoManualComprobante" class="bi bi-pencil text-secondary"></i>
+                            </span>
+                        </div>
+
                     </div>
                 </div>
 

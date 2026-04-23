@@ -2,7 +2,6 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg">
 
-            <!-- ── Header ──────────────────────────────────────────────────── -->
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="bi bi-cash-coin"></i>
@@ -11,10 +10,8 @@
                 <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
             </div>
 
-            <!-- ── Body ────────────────────────────────────────────────────── -->
             <div class="modal-body">
 
-                <!-- Resumen de la mora -->
                 <div class="mora-resumen">
                     <div class="resumen-row">
                         <span>Importe de la letra</span>
@@ -34,12 +31,10 @@
                     </div>
                     <div class="resumen-row total-row">
                         <span>TOTAL A PAGAR</span>
-                        <strong class="text-danger">{{ simboloMoneda }} {{ mora.montoMoraTotal | number:'1.2-2'
-                            }}</strong>
+                        <strong class="text-danger">{{ simboloMoneda }} {{ mora.montoMoraTotal | number:'1.2-2' }}</strong>
                     </div>
                 </div>
 
-                <!-- Formulario -->
                 <form #pagoForm="ngForm">
 
                     <div class="form-row form-2-col">
@@ -50,16 +45,16 @@
                         </div>
                         <div class="form-group">
                             <label for="fechaPago">Fecha de Pago <span class="required">*</span></label>
-                            <input type="date" id="fechaPago" class="form-control" [(ngModel)]="request.fechaPago"
-                                name="fechaPago">
+                            <input type="date" id="fechaPago" class="form-control"
+                                [(ngModel)]="request.fechaPago" name="fechaPago">
                         </div>
                     </div>
 
                     <div class="form-row form-2-col">
                         <div class="form-group">
                             <label for="medioPago">Medio de Pago <span class="required">*</span></label>
-                            <select id="medioPago" class="form-select" [(ngModel)]="request.medioPago" name="medioPago"
-                                (change)="onMedioPagoChange()">
+                            <select id="medioPago" class="form-select" [(ngModel)]="request.medioPago"
+                                name="medioPago" (change)="onMedioPagoChange()">
                                 <option *ngFor="let op of medioPagoOptions" [value]="op">{{ op }}</option>
                             </select>
                         </div>
@@ -85,11 +80,30 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="numeroComprobante">N° Comprobante <span class="required">*</span></label>
-                            <input type="text" id="numeroComprobante" class="form-control"
-                                [(ngModel)]="request.numeroComprobante" name="numeroComprobante"
-                                [placeholder]="sugerindoNumero ? 'Generando...' : 'Ej: EB01-0001'"
-                                [readonly]="sugerindoNumero">
+                            <label for="numeroComprobantePreview">
+                                N° Comprobante
+                                <span class="badge-manual" *ngIf="modoManualComprobante">Manual</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" id="numeroComprobantePreview" class="form-control"
+                                    [value]="cargandoPreview ? 'Generando...' : (modoManualComprobante ? numeroComprobanteManual : (numeroComprobantePreview || ''))"
+                                    [readonly]="!modoManualComprobante || cargandoPreview"
+                                    [class.input-manual]="modoManualComprobante"
+                                    (input)="onNumeroManualChange($event)"
+                                    [placeholder]="modoManualComprobante ? 'Ingrese N° comprobante' : (request.tipoComprobante ? 'Se asigna al guardar' : 'Se asigna al guardar')"
+                                    [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
+                                    [style.color]="modoManualComprobante ? '#1e293b' : '#6c757d'"
+                                    [style.cursor]="modoManualComprobante ? 'text' : 'default'">
+                                <span class="input-group-text btn-toggle-manual"
+                                      (click)="toggleModoManual()"
+                                      [title]="modoManualComprobante ? 'Volver al número automático' : 'Ingresar número manualmente'"
+                                      [class.active]="modoManualComprobante">
+                                    <span *ngIf="cargandoPreview" class="spinner-border spinner-border-sm text-secondary"></span>
+                                    <i *ngIf="!cargandoPreview && modoManualComprobante" class="bi bi-pencil-fill text-primary"></i>
+                                    <i *ngIf="!cargandoPreview && !modoManualComprobante" class="bi bi-pencil text-secondary"></i>
+                                </span>
+                            </div>
+
                         </div>
                     </div>
 
@@ -102,9 +116,8 @@
                     </div>
 
                 </form>
-            </div><!-- /modal-body -->
+            </div>
 
-            <!-- ── Footer ──────────────────────────────────────────────────── -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">
                     Cancelar

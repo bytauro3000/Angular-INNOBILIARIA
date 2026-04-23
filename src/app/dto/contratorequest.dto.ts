@@ -1,4 +1,6 @@
-import { Moneda } from "./moneda.enum";
+import { Moneda } from './moneda.enum';
+import { TipoComprobante } from '../enums/tipocomprobante';
+
 export interface ContratoRequestDTO {
   fechaContrato: string;
   tipoContrato: string;
@@ -13,4 +15,5 @@ export interface ContratoRequestDTO {
   idClientes: number[];
   idLotes: number[];
   moneda: Moneda;
+  tipoComprobanteInicial?: TipoComprobante;
 }

@@ -24,6 +24,8 @@ import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-edi
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { Moneda } from '../../dto/moneda.enum';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
+import { TipoComprobante } from '../../enums/tipocomprobante';
+import { PagoLetraService } from '../../services/pagoletra.service';
 
 @Component({
   selector: 'app-contrato-insertar',
@@ -58,6 +60,8 @@ export class ContratoInsertarComponent implements OnInit {
 
   modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
+  tipoComprobanteOptions = Object.values(TipoComprobante);
+
   terminoBusquedaSeparacion: string = '';
   showSeparacionList: boolean = false;
   faPlus = faPlus;
@@ -84,12 +88,22 @@ export class ContratoInsertarComponent implements OnInit {
   filtroLote: string = '';
   mostrarLotes: boolean = false;
 
+  // ── Comprobante de inicial ─────────────────────────────────────────────
+  tipoComprobanteInicial: TipoComprobante | undefined = undefined;
+  numeroComprobanteInicialPreview: string = '';
+  cargandoPreviewInicial: boolean = false;
+
   get esDirecto(): boolean { return this.contratoForm?.get('modalidadContrato')?.value === 'DIRECTO'; }
   get esFinanciado(): boolean { return this.contratoForm?.get('tipoContrato')?.value !== 'CONTADO'; }
   get montoTotalNum(): number { return Number(this.contratoForm?.get('montoTotal')?.value) || 0; }
   get inicialNum(): number { return Number(this.contratoForm?.get('inicial')?.value) || 0; }
   get saldoNum(): number { return Number(this.contratoForm?.get('saldo')?.value) || 0; }
   get cantidadLetrasNum(): number { return Number(this.contratoForm?.get('cantidadLetras')?.value) || 0; }
+
+  /** Mostrar la sección de comprobante de inicial solo cuando aplica */
+  get mostrarComprobanteInicial(): boolean {
+    return this.esFinanciado && this.inicialNum > 0;
+  }
 
   get cuotaMensual(): number {
     const s = this.saldoNum, l = this.cantidadLetrasNum;
@@ -102,7 +116,6 @@ export class ContratoInsertarComponent implements OnInit {
   }
   get tieneResiduo(): boolean { return this.ultimaLetra !== this.cuotaMensual; }
 
-  // Flag para mostrar banner de transferencia en el formulario
   esTransferencia = false;
   idContratoOrigen: number | null = null;
 
@@ -117,7 +130,8 @@ export class ContratoInsertarComponent implements OnInit {
     public router: Router,
     private route: ActivatedRoute,
     private toastr: ToastrService,
-    private tipoCambioService: TipoCambioService
+    private tipoCambioService: TipoCambioService,
+    private pagoLetraService: PagoLetraService
   ) {}
 
   @HostListener('document:click', ['$event'])
@@ -145,14 +159,28 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   onMonedaChange(): void {
-    // Recalcular el monto total de los lotes según la nueva moneda
     this.calcularMontoTotalLotes();
     this.saldoDisplay = this.formatearMoneda(this.saldoNum);
   }
 
   /**
-   * Si venimos de una transferencia, pre-llena los campos con los datos calculados.
+   * Al seleccionar el tipo de comprobante para la inicial,
+   * consulta el número siguiente disponible y lo muestra como preview readonly.
    */
+  onTipoComprobanteInicialChange(): void {
+    this.numeroComprobanteInicialPreview = '';
+    if (this.tipoComprobanteInicial) {
+      this.cargandoPreviewInicial = true;
+      this.pagoLetraService.previewSiguienteNumeroComprobante(this.tipoComprobanteInicial).subscribe({
+        next: (numero) => {
+          this.numeroComprobanteInicialPreview = numero;
+          this.cargandoPreviewInicial = false;
+        },
+        error: () => { this.cargandoPreviewInicial = false; }
+      });
+    }
+  }
+
   private cargarDatosTransferencia(): void {
     this.route.queryParams.subscribe(params => {
       if (params['transferencia'] !== '1') return;
@@ -160,7 +188,6 @@ export class ContratoInsertarComponent implements OnInit {
       this.esTransferencia = true;
       this.idContratoOrigen = +params['idContratoOrigen'];
 
-      // Pre-llenar montos
       const montoTotal    = +params['montoTotal'];
       const inicial       = +params['inicial'];
       const saldo         = +params['saldo'];
@@ -173,11 +200,9 @@ export class ContratoInsertarComponent implements OnInit {
         cantidadLetras:  cantidadLetras
       });
 
-      // Forzar saldo (campo disabled no lo recibe con patchValue)
       this.contratoForm.get('saldo')?.setValue(saldo, { emitEvent: false });
       this.saldoDisplay = this.formatearMoneda(saldo);
 
-      // Pre-seleccionar vendedor
       if (params['idVendedor']) {
         const idVendedor = +params['idVendedor'];
         this.vendedorService.listarVendedores().subscribe(vendedores => {
@@ -189,7 +214,6 @@ export class ContratoInsertarComponent implements OnInit {
         });
       }
 
-      // Pre-seleccionar lotes
       if (params['idLotes']) {
         const ids: number[] = params['idLotes'].split(',').map(Number);
         ids.forEach(idLote => {
@@ -198,7 +222,6 @@ export class ContratoInsertarComponent implements OnInit {
               if (lote && !this.lotesSeleccionados.some(l => l.idLote === lote.idLote)) {
                 this.lotesSeleccionados.push(lote);
                 this.actualizarIdsLotes();
-                // Pre-llenar programa desde el primer lote
                 if (this.lotesSeleccionados.length === 1 && lote.programa) {
                   this.contratoForm.get('idPrograma')?.setValue(lote.programa.idPrograma);
                   this.filtroPrograma = lote.programa.nombrePrograma;
@@ -242,13 +265,23 @@ export class ContratoInsertarComponent implements OnInit {
 
   private handleFormChanges() {
     this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
-    this.contratoForm.get('inicial')?.valueChanges.subscribe(() => this.actualizarSaldo());
+    this.contratoForm.get('inicial')?.valueChanges.subscribe(() => {
+      this.actualizarSaldo();
+      // Si la inicial cambia a 0, limpiar la selección de comprobante
+      if (this.inicialNum <= 0) {
+        this.tipoComprobanteInicial = undefined;
+        this.numeroComprobanteInicialPreview = '';
+      }
+    });
 
     this.contratoForm.get('tipoContrato')?.valueChanges.subscribe(tipo => {
       if (tipo === 'CONTADO') {
         this.contratoForm.get('inicial')?.setValue(this.montoTotalNum, { emitEvent: false });
         this.contratoForm.get('cantidadLetras')?.setValue(0, { emitEvent: false });
         this.actualizarSaldo();
+        // Contado no necesita comprobante de inicial
+        this.tipoComprobanteInicial = undefined;
+        this.numeroComprobanteInicialPreview = '';
       }
       this.actualizarObservacion();
     });
@@ -286,7 +319,6 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   getLoteCostoUSD(lote: Lote): number {
-    // Precio base siempre en USD (area * precioM2)
     return Math.round((Number(lote.area) || 0) * (Number(lote.precioM2) || 0));
   }
 
@@ -294,7 +326,6 @@ export class ContratoInsertarComponent implements OnInit {
     const costoUSD = this.getLoteCostoUSD(lote);
     const moneda = this.contratoForm?.get('moneda')?.value || 'USD';
     if (moneda === 'PEN' && this.tipoCambioEmpresa > 0) {
-      // Convertir a soles y redondear al entero más cercano
       return Math.round(costoUSD * this.tipoCambioEmpresa);
     }
     return costoUSD;
@@ -336,7 +367,6 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   abrirListaClientes() {
-    // Al hacer focus sin texto: cargar lista completa menos los ya seleccionados
     if (this.filtroCliente.trim().length < 2) {
       this.clienteService.listarClientes().subscribe(data => {
         this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
@@ -347,7 +377,6 @@ export class ContratoInsertarComponent implements OnInit {
     }
   }
 
-  // Genera la observación automática en tiempo real
   private generarObservacion(): string {
     const tipo = this.contratoForm.get('tipoContrato')?.value || '';
     const manzanas = this.lotesSeleccionados.map(l => `Mz. ${l.manzana} Lt. ${l.numeroLote}`);
@@ -446,6 +475,14 @@ export class ContratoInsertarComponent implements OnInit {
       this.toastr.warning('Por favor completa todos los campos requeridos', 'Formulario incompleto');
       return;
     }
+    // Validar que se haya elegido tipo de comprobante si hay inicial > 0 en contrato financiado
+    if (this.mostrarComprobanteInicial && !this.tipoComprobanteInicial) {
+      this.toastr.warning(
+        'Debe seleccionar el tipo de comprobante para el pago de la inicial',
+        'Validación'
+      );
+      return;
+    }
     this.mostrarModalConfirmacion = true;
   }
 
@@ -465,10 +502,20 @@ export class ContratoInsertarComponent implements OnInit {
       idSeparacion: v.idSeparacion,
       idClientes: v.idClientes,
       idLotes: v.idLotes,
-      moneda: v.moneda
+      moneda: v.moneda,
+      // Solo se envía si aplica (contrato financiado con inicial > 0)
+      tipoComprobanteInicial: this.mostrarComprobanteInicial ? this.tipoComprobanteInicial : undefined
     };
     this.contratoService.guardarContrato(request).subscribe({
-      next: () => { this.isGuardando = false; this.toastr.success('Contrato guardado con éxito'); this.router.navigate(['/secretaria-menu/contratos']); },
+      next: (res: any) => {
+        this.isGuardando = false;
+        this.toastr.success('Contrato guardado con éxito');
+        // Si se emitió comprobante de inicial, mostrar número al usuario
+        if (res?.numeroComprobanteInicial) {
+          this.toastr.info(`Comprobante de inicial emitido: ${res.numeroComprobanteInicial}`, 'Comprobante');
+        }
+        this.router.navigate(['/secretaria-menu/contratos']);
+      },
       error: (err) => { this.isGuardando = false; this.toastr.error(err.error?.message || 'Error al guardar el contrato'); }
     });
   }
@@ -483,6 +530,7 @@ export class ContratoInsertarComponent implements OnInit {
     this.lotes = []; this.lotesFiltrados = []; this.showSeparacionList = false;
     this.terminoBusquedaSeparacion = ''; this.saldoDisplay = '$ 0.00';
     this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0;
+    this.tipoComprobanteInicial = undefined; this.numeroComprobanteInicialPreview = '';
   }
 
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }

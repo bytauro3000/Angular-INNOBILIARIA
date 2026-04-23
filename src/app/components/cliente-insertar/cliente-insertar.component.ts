@@ -166,30 +166,39 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   private updateNumDocValidators(tipo: TipoCliente): void {
-    const control = this.clienteForm.get('numDoc');
-    if (!control) return;
-    if (tipo === TipoCliente.CE) {
-      // CE puede tener entre 9 y 12 caracteres alfanumericos
-      control.setValidators([Validators.required, Validators.minLength(9), Validators.maxLength(12)]);
-    } else {
-      const length = tipo === TipoCliente.NATURAL ? 8 : 11;
-      control.setValidators([Validators.required, Validators.minLength(length), Validators.maxLength(length)]);
-    }
-    control.updateValueAndValidity();
+  const control = this.clienteForm.get('numDoc');
+  if (!control) return;
+
+  if (tipo === TipoCliente.CE) {
+    // C.E. peruano = exactamente 9 dígitos numéricos
+    control.setValidators([
+      Validators.required,
+      Validators.minLength(9),
+      Validators.maxLength(9)
+    ]);
+  } else {
+    const length = tipo === TipoCliente.NATURAL ? 8 : 11;
+    control.setValidators([
+      Validators.required,
+      Validators.minLength(length),
+      Validators.maxLength(length)
+    ]);
   }
+  control.updateValueAndValidity();
+}
 
   public getErrorMessage(controlName: string): string {
-    const control = this.clienteForm.get(controlName);
-    if (!control?.errors) return '';
-    if (control.errors['required']) return 'Obligatorio.';
-    if (controlName === 'email' && control.errors['pattern']) return 'Email inválido.';
-    if (controlName === 'numDoc' && (control.errors['minlength'] || control.errors['maxlength'])) {
-      const tipo = this.clienteForm.get('tipoCliente')?.value;
-      if (tipo === TipoCliente.CE) return 'El C.E. debe tener entre 9 y 12 caracteres.';
-      return `Debe tener ${tipo === TipoCliente.NATURAL ? 8 : 11} dígitos.`;
-    }
-    return 'Error.';
+  const control = this.clienteForm.get(controlName);
+  if (!control?.errors) return '';
+  if (control.errors['required']) return 'Obligatorio.';
+  if (controlName === 'email' && control.errors['pattern']) return 'Email inválido.';
+  if (controlName === 'numDoc' && (control.errors['minlength'] || control.errors['maxlength'])) {
+    const tipo = this.clienteForm.get('tipoCliente')?.value;
+    if (tipo === TipoCliente.CE) return 'El C.E. debe tener exactamente 9 dígitos.'; // ← actualizado
+    return `Debe tener ${tipo === TipoCliente.NATURAL ? 8 : 11} dígitos.`;
   }
+  return 'Error.';
+}
 
   // Al cambiar el pais en el select, calcula la nacionalidad segun genero actual
   @HostListener('document:click', ['$event'])

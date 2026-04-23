@@ -61,9 +61,30 @@
 
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="numeroComprobante">N° Comprobante *</label>
-              <input type="text" id="numeroComprobante" class="form-control"
-                     [(ngModel)]="datosComunes.numeroComprobante" name="numeroComprobante" required>
+              <label for="numeroComprobantePreview">
+                N° Comprobante
+                <span class="badge-manual" *ngIf="modoManualComprobante">Manual</span>
+              </label>
+              <div class="input-group">
+                <input type="text" id="numeroComprobantePreview" class="form-control"
+                       [value]="cargandoPreview ? 'Generando...' : (modoManualComprobante ? numeroComprobanteManual : (numeroComprobantePreview || ''))"
+                       [readonly]="!modoManualComprobante || cargandoPreview"
+                       [class.input-manual]="modoManualComprobante"
+                       (input)="onNumeroManualChange($event)"
+                       [placeholder]="modoManualComprobante ? 'Ingrese N° comprobante' : (datosComunes.tipoComprobante ? 'Seleccione tipo primero' : 'Se asigna al guardar')"
+                       [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
+                       [style.color]="modoManualComprobante ? '#1e293b' : '#6c757d'"
+                       [style.cursor]="modoManualComprobante ? 'text' : 'default'">
+                <span class="input-group-text btn-toggle-manual"
+                      (click)="toggleModoManual()"
+                      [title]="modoManualComprobante ? 'Volver al número automático' : 'Ingresar número manualmente'"
+                      [class.active]="modoManualComprobante">
+                  <span *ngIf="cargandoPreview" class="spinner-border spinner-border-sm text-secondary"></span>
+                  <i *ngIf="!cargandoPreview && modoManualComprobante" class="bi bi-pencil-fill text-primary"></i>
+                  <i *ngIf="!cargandoPreview && !modoManualComprobante" class="bi bi-pencil text-secondary"></i>
+                </span>
+              </div>
+
             </div>
           </div>
 

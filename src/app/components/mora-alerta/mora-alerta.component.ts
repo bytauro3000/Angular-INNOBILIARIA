@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { MoraService } from '../../services/mora.service';
+import { PagoLetraService } from '../../services/pagoletra.service';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 import { MoraResponse } from '../../dto/moraresponse.dto';
 import { PagoMoraRequest } from '../../dto/pagomorarequest.dto';
@@ -32,25 +33,22 @@ export class MoraAlertaComponent implements OnInit {
 
   mostrarFormPagarMora = false;
   enviandoMora  = false;
-  sugerindoNumero = false;
   creandoMora   = false;
 
   medioPagoOptions       = Object.values(MedioPago);
   tipoComprobanteOptions = Object.values(TipoComprobante);
 
-  // ── Estado real de la mora en BD ──────────────────────────────────────────
-  /**
-   * Todas las moras de esta letra (PENDIENTE, PAGADO, ANULADO).
-   * Se consulta en ngOnInit para saber exactamente en qué estado está la mora.
-   *
-   * Reglas de negocio:
-   *   - moraPagada    (PAGADO)   → botón "Pagar Mora" DESHABILITADO, botón "Pagar Letra" HABILITADO sin aviso
-   *   - moraPendiente (PENDIENTE)→ botón "Pagar Mora" abre formulario (sin crear nueva), botón "Pagar Letra" va directo
-   *   - sin mora (null)          → botón "Pagar Mora" crea mora y abre formulario, botón "Pagar Letra" muestra aviso
-   */
-  moraPendiente: MoraResponse | null = null;  // mora en estado PENDIENTE
-  moraPagada:    MoraResponse | null = null;  // mora en estado PAGADO
+  moraPendiente: MoraResponse | null = null;
+  moraPagada:    MoraResponse | null = null;
   cargandoEstadoMora = true;
+
+  // Preview readonly del número de comprobante (el backend asigna el real)
+  numeroComprobantePreview: string = '';
+  cargandoPreview: boolean = false;
+
+  // Modo manual: permite ingresar un número personalizado
+  modoManualComprobante: boolean = false;
+  numeroComprobanteManual: string = '';
 
   request: PagoMoraRequest = {
     idMora: 0,
@@ -59,12 +57,14 @@ export class MoraAlertaComponent implements OnInit {
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
     tipoComprobante: undefined,
-    numeroComprobante: '',
+    numeroComprobantePersonalizado: undefined,
+    // numeroComprobante eliminado: el backend lo genera automáticamente
     observaciones: ''
   };
 
   constructor(
     private moraService: MoraService,
+    private pagoLetraService: PagoLetraService,
     private toastr: ToastrService
   ) {}
 
@@ -76,8 +76,6 @@ export class MoraAlertaComponent implements OnInit {
 
     this.cargarEstadoMora();
   }
-
-  // ── Consulta estado actual de la mora en BD ───────────────────────────────
 
   private cargarEstadoMora(): void {
     this.cargandoEstadoMora = true;
@@ -95,26 +93,14 @@ export class MoraAlertaComponent implements OnInit {
     });
   }
 
-  // ── Getters de estado para el template ───────────────────────────────────
+  get moraYaPagada(): boolean { return this.moraPagada !== null; }
+  get moraEsPendiente(): boolean { return this.moraPendiente !== null; }
 
-  /** La mora YA fue cobrada (PAGADO) → botón "Pagar Mora" debe estar DESHABILITADO */
-  get moraYaPagada(): boolean {
-    return this.moraPagada !== null;
-  }
-
-  /** Existe mora PENDIENTE en BD (registrada pero no cobrada aún) */
-  get moraEsPendiente(): boolean {
-    return this.moraPendiente !== null;
-  }
-
-  /** El idMora a usar al pagar: primero la pendiente, luego la que viene del cálculo */
   get idMoraParaPago(): number | null {
     if (this.moraPendiente) return this.moraPendiente.idMora;
     if (this.calculo?.tieneMoraPrevia && this.calculo.idMoraPrevia) return this.calculo.idMoraPrevia;
     return null;
   }
-
-  // ── Botón AMARILLO: Pagar Mora ────────────────────────────────────────────
 
   abrirFormPagarMora(): void {
     if (!this.calculo || this.creandoMora || this.moraYaPagada) return;
@@ -124,17 +110,19 @@ export class MoraAlertaComponent implements OnInit {
     this.request.medioPago         = MedioPago.EFECTIVO;
     this.request.numeroOperacion   = '';
     this.request.tipoComprobante   = undefined;
-    this.request.numeroComprobante = '';
     this.request.observaciones     = `Pago de mora - Letra N° ${this.calculo.numeroLetra}`;
+    // Limpiar preview y modo manual al abrir el formulario
+    this.numeroComprobantePreview      = '';
+    this.modoManualComprobante         = false;
+    this.numeroComprobanteManual       = '';
+    this.request.numeroComprobantePersonalizado = undefined;
 
     const idMora = this.idMoraParaPago;
 
     if (idMora) {
-      // Mora PENDIENTE ya existe → NO crear otra, abrir formulario con la existente
       this.request.idMora = idMora;
       this.mostrarFormPagarMora = true;
     } else {
-      // No existe mora → crear por primera vez
       this.creandoMora = true;
       this.moraService.crearMoraPendiente(this.idLetra).subscribe({
         next: (mora) => {
@@ -182,17 +170,55 @@ export class MoraAlertaComponent implements OnInit {
     }
   }
 
-  /** Usa /api/moras/sugerir-numero que compara pago_mora y pago_letra → devuelve el más alto + 1 */
+  /**
+   * Al seleccionar tipo de comprobante, consulta el siguiente número disponible
+   * desde el endpoint centralizado y lo muestra como preview readonly.
+   * El backend asigna el número real y correlativo al guardar.
+   */
   onTipoComprobanteChange(): void {
+    this.numeroComprobantePreview = '';
+    this.modoManualComprobante = false;
+    this.numeroComprobanteManual = '';
+    this.request.numeroComprobantePersonalizado = undefined;
     if (this.request.tipoComprobante) {
-      this.sugerindoNumero = true;
-      this.moraService.sugerirNumeroComprobante(this.request.tipoComprobante).subscribe({
-        next:  (res) => { this.request.numeroComprobante = res.numeroSugerido; this.sugerindoNumero = false; },
-        error: ()    => { this.sugerindoNumero = false; }
+      this.cargandoPreview = true;
+      this.pagoLetraService.previewSiguienteNumeroComprobante(this.request.tipoComprobante).subscribe({
+        next:  (numero) => { this.numeroComprobantePreview = numero; this.cargandoPreview = false; },
+        error: ()       => { this.cargandoPreview = false; }
       });
-    } else {
-      this.request.numeroComprobante = '';
     }
+  }
+
+  /** Alterna entre modo automático y modo manual para el N° comprobante */
+  private get seriePrefix(): string {
+    const idx = this.numeroComprobantePreview.indexOf('-');
+    return idx >= 0 ? this.numeroComprobantePreview.substring(0, idx + 1) : '';
+  }
+
+  toggleModoManual(): void {
+    if (this.cargandoPreview) return;
+    this.modoManualComprobante = !this.modoManualComprobante;
+    if (this.modoManualComprobante) {
+      this.numeroComprobanteManual = this.seriePrefix;
+      this.request.numeroComprobantePersonalizado = undefined;
+    } else {
+      this.numeroComprobanteManual = '';
+      this.request.numeroComprobantePersonalizado = undefined;
+    }
+  }
+
+  /** Captura el valor ingresado manualmente, protegiendo el prefijo de serie */
+  onNumeroManualChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const prefijo = this.seriePrefix;
+    let valor = input.value;
+    if (prefijo && !valor.startsWith(prefijo)) {
+      valor = prefijo;
+      input.value = valor;
+    }
+    this.numeroComprobanteManual = valor;
+    const soloDigitos = valor.substring(prefijo.length).trim();
+    this.request.numeroComprobantePersonalizado = soloDigitos ? valor.trim() : undefined;
   }
 
   registrarPagoMora(): void {
@@ -205,9 +231,7 @@ export class MoraAlertaComponent implements OnInit {
     if (!this.request.tipoComprobante) {
       this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación'); return;
     }
-    if (!this.request.numeroComprobante?.trim()) {
-      this.toastr.warning('Debe ingresar el número de comprobante', 'Validación'); return;
-    }
+    // Eliminada la validación de numeroComprobante: el backend lo genera
 
     const idMora = this.request.idMora || this.idMoraParaPago;
     if (!idMora) {
@@ -223,7 +247,6 @@ export class MoraAlertaComponent implements OnInit {
       next: (res) => {
         this.enviandoMora = false;
         this.mostrarFormPagarMora = false;
-        // Actualizar estado local: ya no hay mora pendiente, ahora está pagada
         this.moraPagada    = { ...this.moraPendiente!, estadoMora: 'PAGADO' } as MoraResponse;
         this.moraPendiente = null;
 
@@ -256,15 +279,7 @@ export class MoraAlertaComponent implements OnInit {
     });
   }
 
-  // ── Botón VERDE: Pagar Letra ──────────────────────────────────────────────
-
   confirmarPagarSoloLetra(): void {
-    /**
-     * Casos:
-     *  A) moraYaPagada = true  → mora PAGADA → pagar letra directo, SIN aviso de mora
-     *  B) moraEsPendiente = true → mora PENDIENTE registrada → pagar letra directo, ya sabe que hay mora pendiente
-     *  C) sin mora → avisar que se creará como PENDIENTE
-     */
     if (this.moraYaPagada || this.moraEsPendiente) {
       if (this.calculo) {
         this.onConfirmarSinPagarMora.emit(this.calculo);

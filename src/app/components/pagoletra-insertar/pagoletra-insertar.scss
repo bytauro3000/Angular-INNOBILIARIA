@@ -253,6 +253,34 @@ $white:        #ffffff;
  
     span { color: $red; margin-left: 2px; }
   }
+
+  .input-group {
+    display: flex;
+    flex-direction: row !important;
+    align-items: stretch;
+    width: 100%;
+
+    input.form-control {
+      width: auto !important;
+      flex: 1 1 auto;
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      border-right: none !important;
+    }
+
+    .input-group-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      background-color: $input-bg;
+      border: 1.5px solid $border;
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+      min-width: 38px;
+      height: 38px;
+    }
+  }
 }
  
 .width-100 { grid-column: 1 / -1; }
@@ -369,4 +397,40 @@ textarea {
   .modal-dialog { width: 100%; border-radius: 0; }
   .form-2-col   { grid-template-columns: 1fr; }
   .info-letra.form-2-col { grid-template-columns: 1fr 1fr; }
+}
+// ─── N° Comprobante editable ───────────────────────────────────────────
+.btn-toggle-manual {
+  cursor: pointer;
+  user-select: none;
+  min-width: 38px;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover { background-color: #e9ecef; }
+
+  &.active {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #2563eb;
+  }
+}
+
+.badge-manual {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.input-manual {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
