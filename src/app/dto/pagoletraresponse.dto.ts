@@ -5,13 +5,13 @@ export interface PagoLetraResponse {
   idPago: number;
   idLetra?: number;
   numeroLetra?: string;
-  fechaPago?: Date;
+  fechaPago?: string;
   importePagado?: number;
   medioPago?: string;
   numeroOperacion?: string;
-  fechaOperacion?: Date;
   tipoComprobante?: string;
   numeroComprobante?: string;
+  idComprobante?: number;
   observaciones?: string;
-  urlsVoucher: string[];  // 👈 nuevo
+  urlsVoucher: string[];
 }

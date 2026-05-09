@@ -1,5 +1,5 @@
 import { Moneda } from './moneda.enum';
-import { TipoComprobante } from '../enums/tipocomprobante';
+import { PagoInicialRequestDTO } from './pagoinicialrequest.dto';
 
 export interface ContratoRequestDTO {
   fechaContrato: string;
@@ -15,5 +15,6 @@ export interface ContratoRequestDTO {
   idClientes: number[];
   idLotes: number[];
   moneda: Moneda;
-  tipoComprobanteInicial?: TipoComprobante;
+  /** Solo cuando hay inicial > 0 en contrato financiado */
+  pagoInicial?: PagoInicialRequestDTO | null;
 }

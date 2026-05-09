@@ -115,6 +115,22 @@
                         </div>
                     </div>
 
+                    <!-- ── VOUCHER ── -->
+                    <div class="form-row">
+                        <div class="form-group width-100">
+                            <label>
+                                Voucher / Comprobante
+                                <span class="required" *ngIf="request.medioPago !== 'EFECTIVO'">*</span>
+                                <span class="text-muted small ms-1" *ngIf="request.medioPago === 'EFECTIVO'">(Opcional)</span>
+                            </label>
+                            <app-voucher-preview
+                                [(ngModel)]="voucherFiles"
+                                name="vouchers"
+                                [disabled]="enviando">
+                            </app-voucher-preview>
+                        </div>
+                    </div>
+
                 </form>
             </div>
 

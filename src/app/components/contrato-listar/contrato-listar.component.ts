@@ -481,7 +481,26 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
 
   previousPage(): void { if (this.currentPage > 1) this.goToPage(this.currentPage - 1); }
   nextPage(): void { if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1); }
-  getPagesArray(): number[] { return Array.from({ length: this.totalPages }, (_, i) => i + 1); }
+  getPagesArray(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (current > 3) pages.push('...');
+      let start = Math.max(2, current - 1);
+      let end   = Math.min(total - 1, current + 1);
+      if (current <= 3)          end   = 4;
+      if (current >= total - 2)  start = total - 3;
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (current < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  }
 
   // ─── MODAL / ELIMINAR ────────────────────────────────────────────────
   abrirModalInscripcion(id: number): void { this.modalInscripcion.abrirModal(id); }

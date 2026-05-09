@@ -6,7 +6,6 @@ import { TransferenciaResponseDTO } from '../dto/Transferenciaresponse.dto';
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 import { environment } from '../../environments/environment';
 
-// ✅ NUEVO: respuesta del endpoint /impacto-edicion
 export interface ImpactoEdicionDTO {
   tieneLetras:    boolean;
   tienePagos:     boolean;
@@ -77,8 +76,17 @@ export class ContratoService {
     return this.http.patch<TransferenciaResponseDTO>(`${this.apiUrl}/${id}/transferencia`, null);
   }
 
-  //consulta previa al editar — informa si hay letras/pagos en riesgo
   consultarImpactoEdicion(id: number): Observable<ImpactoEdicionDTO> {
     return this.http.get<ImpactoEdicionDTO>(`${this.apiUrl}/${id}/impacto-edicion`);
+  }
+
+ 
+  subirVoucherInicial(idContrato: number, voucher: File): Observable<ContratoResponseDTO> {
+    const formData = new FormData();
+    formData.append('voucher', voucher);
+    return this.http.post<ContratoResponseDTO>(
+      `${this.apiUrl}/${idContrato}/voucher-inicial`,
+      formData
+    );
   }
 }

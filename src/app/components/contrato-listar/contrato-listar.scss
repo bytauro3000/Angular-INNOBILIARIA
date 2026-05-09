@@ -381,13 +381,32 @@ $border-color: #e9ecef;
   flex-wrap: wrap;
 
   .btn-paginacion {
-    background: white; border: 1px solid $border-color; border-radius: 30px;
-    padding: 8px 16px; font-size: 0.9rem; font-weight: 500; color: $text-dark;
-    cursor: pointer; transition: all 0.2s; min-width: 40px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $text-dark;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
     &:hover:not(:disabled) { background: $navy; color: white; border-color: $navy; }
     &:disabled { opacity: 0.5; cursor: not-allowed; }
     &.active { background: $navy; color: white; border-color: $navy; }
+  }
+
+  .ellipsis-spacer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-weight: bold;
+    min-width: 35px;
+    height: 38px;
+    user-select: none;
   }
 }
 

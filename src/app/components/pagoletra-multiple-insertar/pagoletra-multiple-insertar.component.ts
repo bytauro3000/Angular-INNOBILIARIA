@@ -33,7 +33,7 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
   datosComunes = {
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
-    fechaOperacion: '',
+    fechaPago: '',
     tipoComprobante: undefined as TipoComprobante | undefined,
     observaciones: ''
     // numeroComprobante eliminado: el backend lo genera automáticamente
@@ -56,7 +56,7 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
   ) { }
 
   ngOnInit(): void {
-    this.datosComunes.fechaOperacion = new Date().toISOString().split('T')[0];
+    this.datosComunes.fechaPago = new Date().toISOString().split('T')[0];
     this.generarObservaciones();
   }
 
@@ -182,7 +182,7 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       }
     }
 
-    if (!this.datosComunes.fechaOperacion) {
+    if (!this.datosComunes.fechaPago) {
       this.toastr.warning('Ingrese fecha de operación', 'Validación');
       return;
     }
@@ -198,7 +198,7 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       importePagado: letra.importe,
       medioPago: this.datosComunes.medioPago,
       numeroOperacion: this.datosComunes.numeroOperacion,
-      fechaOperacion: this.datosComunes.fechaOperacion,
+      fechaPago: this.datosComunes.fechaPago,
       tipoComprobante: this.datosComunes.tipoComprobante,
       numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual.trim()
         ? this.numeroComprobanteManual.trim()

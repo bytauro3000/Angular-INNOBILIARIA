@@ -8,15 +8,9 @@ $text-dark:   #1e293b;
 $text-light:  #475569;
 $border:      #e2e8f0;
 $input-bg:    #f8fafc;
- 
-// ─── Modal ─────────────────────────────────────────────────────────────
-.modal-content {
-  background: white !important;
-  border-radius: 18px;
-  border: 1px solid $border !important;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
-}
- 
+$white:       #ffffff;
+
+// ─── Modal base ────────────────────────────────────────────────────────
 .modal-dialog {
   max-width: 520px;
   width: 95%;
@@ -25,13 +19,25 @@ $input-bg:    #f8fafc;
   align-items: center;
   min-height: 100vh;
 }
- 
+
+.modal-content {
+  background: $white;
+  border-radius: 18px;
+  border: 1px solid $border;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 // ─── Header ────────────────────────────────────────────────────────────
 .modal-header {
   padding: 1rem 1.4rem;
   border-bottom: 1px solid $border;
   background: linear-gradient(135deg, #fef2f2, #fff5f5);
- 
+  flex-shrink: 0;
+
   .modal-title {
     font-weight: 700;
     font-size: 1.05rem;
@@ -41,12 +47,17 @@ $input-bg:    #f8fafc;
     gap: 10px;
     i { color: $red; font-size: 1.25rem; }
   }
- 
+
   .btn-close { opacity: 0.5; &:hover { opacity: 1; } }
 }
- 
-.modal-body { padding: 1rem 1.4rem; }
- 
+
+// ─── Body (scrollable) ─────────────────────────────────────────────────
+.modal-body {
+  padding: 1rem 1.4rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
 // ─── Resumen mora ──────────────────────────────────────────────────────
 .mora-resumen {
   background: linear-gradient(135deg, #fef2f2, #fff5f5);
@@ -54,7 +65,7 @@ $input-bg:    #f8fafc;
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 18px;
- 
+
   .resumen-row {
     display: flex;
     justify-content: space-between;
@@ -63,13 +74,13 @@ $input-bg:    #f8fafc;
     font-size: 0.875rem;
     color: $text-light;
     border-bottom: 1px dashed #fee2e2;
- 
+
     &:last-child { border-bottom: none; }
- 
+
     strong { color: $text-dark; }
     .text-warning { color: $orange; font-weight: 700; }
     .text-danger  { color: $red; }
- 
+
     &.total-row {
       margin-top: 6px;
       padding-top: 10px;
@@ -81,22 +92,32 @@ $input-bg:    #f8fafc;
     }
   }
 }
- 
+
 // ─── Formulario ────────────────────────────────────────────────────────
+.form-row {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+  width: 100%;
+}
+
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
   width: 100%;
- 
+
   label {
     color: $text-light;
     font-size: 0.62rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
- 
+
     .required { color: $red; margin-left: 2px; }
+    span { color: $red; margin-left: 2px; }
   }
 
   .input-group {
@@ -127,12 +148,12 @@ $input-bg:    #f8fafc;
     }
   }
 }
- 
-.width-100  { grid-column: 1 / -1; }
-.form-row   { display: grid; gap: 0.75rem; margin-bottom: 0.65rem; width: 100%; }
-.form-2-col { grid-template-columns: repeat(2, 1fr); }
- 
-input, select, textarea {
+
+.width-100 { grid-column: 1 / -1; }
+
+input,
+select,
+textarea {
   background-color: $input-bg !important;
   border: 1.5px solid $border !important;
   color: $text-dark !important;
@@ -142,75 +163,78 @@ input, select, textarea {
   height: 38px !important;
   width: 100% !important;
   transition: border-color 0.15s, box-shadow 0.15s;
- 
+
   &:focus {
     outline: none !important;
     border-color: $navy-light !important;
     box-shadow: 0 0 0 3px rgba($navy, 0.1) !important;
-    background-color: white !important;
+    background-color: $white !important;
   }
- 
+
   &:disabled { opacity: 0.6; cursor: not-allowed; }
   &[readonly] { background-color: #f1f5f9 !important; cursor: default; }
 }
- 
+
 textarea {
   height: auto !important;
   min-height: 54px !important;
   resize: vertical;
 }
- 
+
 // ─── Footer ────────────────────────────────────────────────────────────
 .modal-footer {
-  padding: 0.85rem 1.4rem;
   border-top: 1px solid $border;
+  padding: 0.85rem 1.4rem;
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
   background: #f8fafc;
-}
- 
-.btn-cancel {
-  background: transparent;
-  color: $text-light;
-  border: 1.5px solid $border !important;
-  border-radius: 40px;
-  padding: 9px 22px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
- 
-  &:hover:not(:disabled) { background: #f1f5f9; }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
-}
- 
-.btn-save {
-  background: linear-gradient(135deg, $red 0%, #b91c1c 100%);
-  color: white;
-  border: none;
-  border-radius: 40px;
-  padding: 9px 22px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba($red, 0.3);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
- 
-  &:hover:not(:disabled) {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba($red, 0.4);
+
+  .btn {
+    padding: 9px 24px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
   }
-  &:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+  .btn-save {
+    background: linear-gradient(135deg, $red 0%, #b91c1c 100%);
+    color: $white;
+    box-shadow: 0 4px 12px rgba($red, 0.3);
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba($red, 0.4);
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: $text-light;
+    border: 1.5px solid $border !important;
+
+    &:hover:not(:disabled) { background: #f1f5f9; }
+  }
 }
- 
+
+// ─── Responsive ────────────────────────────────────────────────────────
 @media (max-width: 480px) {
   .form-2-col { grid-template-columns: 1fr; }
 }
+
 // ─── N° Comprobante editable ───────────────────────────────────────────
 .btn-toggle-manual {
   cursor: pointer;

@@ -13,6 +13,7 @@ import { Programa } from '../../models/programa.model';
 import { Vendedor } from '../../models/vendedor.model';
 import { SeparacionDTO } from '../../dto/separacion.dto';
 import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
+import { PagoInicialRequestDTO } from '../../dto/pagoinicialrequest.dto';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -25,6 +26,7 @@ import { CurrencyFormatterDirective } from '../../directives/currency-formatter'
 import { Moneda } from '../../dto/moneda.enum';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
 import { TipoComprobante } from '../../enums/tipocomprobante';
+import { MedioPago } from '../../enums/mediopago.enum';
 import { PagoLetraService } from '../../services/pagoletra.service';
 
 @Component({
@@ -61,6 +63,7 @@ export class ContratoInsertarComponent implements OnInit {
   modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
   tipoComprobanteOptions = Object.values(TipoComprobante);
+  medioPagoOptions = Object.values(MedioPago);
 
   terminoBusquedaSeparacion: string = '';
   showSeparacionList: boolean = false;
@@ -88,10 +91,25 @@ export class ContratoInsertarComponent implements OnInit {
   filtroLote: string = '';
   mostrarLotes: boolean = false;
 
-  // ── Comprobante de inicial ─────────────────────────────────────────────
-  tipoComprobanteInicial: TipoComprobante | undefined = undefined;
-  numeroComprobanteInicialPreview: string = '';
+  // ── Modal Pago Inicial ────────────────────────────────────────────────
+  mostrarModalPagoInicial: boolean = false;
+  pagoInicialRequest: PagoInicialRequestDTO = this.resetPagoInicial();
+
+  // Comprobante dentro del modal
   cargandoPreviewInicial: boolean = false;
+  numeroComprobanteInicialPreview: string = '';
+  modoManualComprobanteInicial: boolean = false;
+  numeroComprobanteInicialManual: string = '';
+
+  // Voucher dentro del modal
+  voucherInicialFile: File | null = null;
+  voucherInicialPreviewUrl: string | null = null;
+
+  // Estado del guardado (para el flujo de 2 pasos: guardar contrato → subir voucher)
+  idContratoGuardado: number | null = null;
+
+  esTransferencia = false;
+  idContratoOrigen: number | null = null;
 
   get esDirecto(): boolean { return this.contratoForm?.get('modalidadContrato')?.value === 'DIRECTO'; }
   get esFinanciado(): boolean { return this.contratoForm?.get('tipoContrato')?.value !== 'CONTADO'; }
@@ -100,9 +118,14 @@ export class ContratoInsertarComponent implements OnInit {
   get saldoNum(): number { return Number(this.contratoForm?.get('saldo')?.value) || 0; }
   get cantidadLetrasNum(): number { return Number(this.contratoForm?.get('cantidadLetras')?.value) || 0; }
 
-  /** Mostrar la sección de comprobante de inicial solo cuando aplica */
-  get mostrarComprobanteInicial(): boolean {
+  /** Mostrar botón "Pago de Inicial" solo cuando aplica */
+  get mostrarBotonPagoInicial(): boolean {
     return this.esFinanciado && this.inicialNum > 0;
+  }
+
+  /** ¿Ya está configurado el pago inicial? */
+  get pagoInicialConfigurado(): boolean {
+    return !!(this.pagoInicialRequest.tipoComprobante);
   }
 
   get cuotaMensual(): number {
@@ -116,8 +139,17 @@ export class ContratoInsertarComponent implements OnInit {
   }
   get tieneResiduo(): boolean { return this.ultimaLetra !== this.cuotaMensual; }
 
-  esTransferencia = false;
-  idContratoOrigen: number | null = null;
+  /** ¿Se requiere N° de operación? (todo excepto efectivo) */
+  get requiereNumeroOperacion(): boolean {
+    return this.pagoInicialRequest.medioPago !== MedioPago.EFECTIVO;
+  }
+
+  /** ¿Se requiere voucher? */
+  get requiereVoucher(): boolean {
+    return this.pagoInicialRequest.medioPago !== MedioPago.EFECTIVO &&
+           this.pagoInicialRequest.medioPago !== null &&
+           this.pagoInicialRequest.medioPago !== undefined;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -163,15 +195,48 @@ export class ContratoInsertarComponent implements OnInit {
     this.saldoDisplay = this.formatearMoneda(this.saldoNum);
   }
 
-  /**
-   * Al seleccionar el tipo de comprobante para la inicial,
-   * consulta el número siguiente disponible y lo muestra como preview readonly.
-   */
+  // ── MODAL PAGO INICIAL ────────────────────────────────────────────────
+
+  private resetPagoInicial(): PagoInicialRequestDTO {
+    return {
+      importePagado: 0,
+      fechaPago: new Date().toISOString().split('T')[0],
+      medioPago: null,
+      numeroOperacion: null,
+      observaciones: null,
+      tipoComprobante: null,
+      numeroComprobantePersonalizado: null,
+    };
+  }
+
+  abrirModalPagoInicial(): void {
+    // Prellenar con datos del formulario
+    this.pagoInicialRequest.importePagado = this.inicialNum;
+    this.pagoInicialRequest.fechaPago = new Date().toISOString().split('T')[0];
+
+    // Autogenerar observación
+    const loteStr = this.lotesSeleccionados.length > 0
+      ? this.lotesSeleccionados.map(l => `Mz. ${l.manzana} Lt. ${l.numeroLote}`).join(', ')
+      : 'Mz. ___ Lt. ___';
+    const programa = this.filtroPrograma || '___';
+    this.pagoInicialRequest.observaciones = `Pago de Inicial de la ${loteStr} del Programa ${programa}`;
+
+    this.mostrarModalPagoInicial = true;
+  }
+
+  cerrarModalPagoInicial(): void {
+    this.mostrarModalPagoInicial = false;
+  }
+
   onTipoComprobanteInicialChange(): void {
     this.numeroComprobanteInicialPreview = '';
-    if (this.tipoComprobanteInicial) {
+    this.modoManualComprobanteInicial = false;
+    this.numeroComprobanteInicialManual = '';
+    this.pagoInicialRequest.numeroComprobantePersonalizado = null;
+
+    if (this.pagoInicialRequest.tipoComprobante) {
       this.cargandoPreviewInicial = true;
-      this.pagoLetraService.previewSiguienteNumeroComprobante(this.tipoComprobanteInicial).subscribe({
+      this.pagoLetraService.previewSiguienteNumeroComprobante(this.pagoInicialRequest.tipoComprobante).subscribe({
         next: (numero) => {
           this.numeroComprobanteInicialPreview = numero;
           this.cargandoPreviewInicial = false;
@@ -180,6 +245,68 @@ export class ContratoInsertarComponent implements OnInit {
       });
     }
   }
+
+  toggleModoManualInicial(): void {
+    this.modoManualComprobanteInicial = !this.modoManualComprobanteInicial;
+    if (!this.modoManualComprobanteInicial) {
+      // Volver a automático
+      this.numeroComprobanteInicialManual = '';
+      this.pagoInicialRequest.numeroComprobantePersonalizado = null;
+    }
+  }
+
+  onNumeroManualInicialChange(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.numeroComprobanteInicialManual = val;
+    this.pagoInicialRequest.numeroComprobantePersonalizado = val || null;
+  }
+
+  onMedioPagoInicialChange(): void {
+    if (this.pagoInicialRequest.medioPago === MedioPago.EFECTIVO) {
+      this.pagoInicialRequest.numeroOperacion = null;
+      this.voucherInicialFile = null;
+      this.voucherInicialPreviewUrl = null;
+    }
+  }
+
+  onVoucherInicialSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.voucherInicialFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.voucherInicialPreviewUrl = e.target?.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  eliminarVoucherInicial(): void {
+    this.voucherInicialFile = null;
+    this.voucherInicialPreviewUrl = null;
+  }
+
+  confirmarPagoInicial(): void {
+    // Validaciones básicas del modal
+    if (!this.pagoInicialRequest.tipoComprobante) {
+      this.toastr.warning('Seleccione el tipo de comprobante', 'Validación');
+      return;
+    }
+    if (!this.pagoInicialRequest.medioPago) {
+      this.toastr.warning('Seleccione el medio de pago', 'Validación');
+      return;
+    }
+    if (!this.pagoInicialRequest.fechaPago) {
+      this.toastr.warning('Ingrese la fecha de pago', 'Validación');
+      return;
+    }
+    if (this.requiereNumeroOperacion && !this.pagoInicialRequest.numeroOperacion) {
+      this.toastr.warning('Ingrese el N° de operación', 'Validación');
+      return;
+    }
+    this.cerrarModalPagoInicial();
+    this.toastr.success('Datos del pago de inicial registrados', 'Listo');
+  }
+
+  // ── GUARDADO PRINCIPAL ─────────────────────────────────────────────────
 
   private cargarDatosTransferencia(): void {
     this.route.queryParams.subscribe(params => {
@@ -267,10 +394,10 @@ export class ContratoInsertarComponent implements OnInit {
     this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
     this.contratoForm.get('inicial')?.valueChanges.subscribe(() => {
       this.actualizarSaldo();
-      // Si la inicial cambia a 0, limpiar la selección de comprobante
       if (this.inicialNum <= 0) {
-        this.tipoComprobanteInicial = undefined;
-        this.numeroComprobanteInicialPreview = '';
+        this.pagoInicialRequest = this.resetPagoInicial();
+        this.voucherInicialFile = null;
+        this.voucherInicialPreviewUrl = null;
       }
     });
 
@@ -279,9 +406,9 @@ export class ContratoInsertarComponent implements OnInit {
         this.contratoForm.get('inicial')?.setValue(this.montoTotalNum, { emitEvent: false });
         this.contratoForm.get('cantidadLetras')?.setValue(0, { emitEvent: false });
         this.actualizarSaldo();
-        // Contado no necesita comprobante de inicial
-        this.tipoComprobanteInicial = undefined;
-        this.numeroComprobanteInicialPreview = '';
+        this.pagoInicialRequest = this.resetPagoInicial();
+        this.voucherInicialFile = null;
+        this.voucherInicialPreviewUrl = null;
       }
       this.actualizarObservacion();
     });
@@ -475,12 +602,9 @@ export class ContratoInsertarComponent implements OnInit {
       this.toastr.warning('Por favor completa todos los campos requeridos', 'Formulario incompleto');
       return;
     }
-    // Validar que se haya elegido tipo de comprobante si hay inicial > 0 en contrato financiado
-    if (this.mostrarComprobanteInicial && !this.tipoComprobanteInicial) {
-      this.toastr.warning(
-        'Debe seleccionar el tipo de comprobante para el pago de la inicial',
-        'Validación'
-      );
+    // Si hay inicial > 0 en financiado, abrir el modal de pago en lugar del de confirmación
+    if (this.mostrarBotonPagoInicial && !this.pagoInicialConfigurado) {
+      this.abrirModalPagoInicial();
       return;
     }
     this.mostrarModalConfirmacion = true;
@@ -490,6 +614,7 @@ export class ContratoInsertarComponent implements OnInit {
     this.mostrarModalConfirmacion = false;
     this.isGuardando = true;
     const v = this.contratoForm.getRawValue();
+
     const request: ContratoRequestDTO = {
       fechaContrato: v.fechaContrato,
       tipoContrato: v.tipoContrato,
@@ -503,21 +628,45 @@ export class ContratoInsertarComponent implements OnInit {
       idClientes: v.idClientes,
       idLotes: v.idLotes,
       moneda: v.moneda,
-      // Solo se envía si aplica (contrato financiado con inicial > 0)
-      tipoComprobanteInicial: this.mostrarComprobanteInicial ? this.tipoComprobanteInicial : undefined
+      pagoInicial: this.mostrarBotonPagoInicial && this.pagoInicialConfigurado
+        ? { ...this.pagoInicialRequest }
+        : null
     };
+
     this.contratoService.guardarContrato(request).subscribe({
       next: (res: any) => {
-        this.isGuardando = false;
-        this.toastr.success('Contrato guardado con éxito');
-        // Si se emitió comprobante de inicial, mostrar número al usuario
-        if (res?.numeroComprobanteInicial) {
-          this.toastr.info(`Comprobante de inicial emitido: ${res.numeroComprobanteInicial}`, 'Comprobante');
+        this.idContratoGuardado = res?.idContrato ?? null;
+        // Si hay voucher pendiente, subirlo
+        if (this.voucherInicialFile && this.idContratoGuardado) {
+          this.contratoService.subirVoucherInicial(this.idContratoGuardado, this.voucherInicialFile).subscribe({
+            next: () => { this.finalizarGuardado(res); },
+            error: () => {
+              // El contrato se guardó bien; el voucher falló → aviso pero navegar igual
+              this.toastr.warning('Contrato guardado. No se pudo subir el voucher, intenta luego.', 'Voucher');
+              this.finalizarGuardado(res);
+            }
+          });
+        } else {
+          this.finalizarGuardado(res);
         }
-        this.router.navigate(['/secretaria-menu/contratos']);
       },
-      error: (err) => { this.isGuardando = false; this.toastr.error(err.error?.message || 'Error al guardar el contrato'); }
+      error: (err) => {
+        this.isGuardando = false;
+        this.toastr.error(err.error?.message || 'Error al guardar el contrato');
+      }
     });
+  }
+
+  private finalizarGuardado(res: any): void {
+    this.isGuardando = false;
+    this.toastr.success('Contrato guardado con éxito');
+    if (res?.pagoInicial?.numeroComprobante) {
+      this.toastr.info(
+        `Comprobante de inicial emitido: ${res.pagoInicial.numeroComprobante}`,
+        'Comprobante'
+      );
+    }
+    this.router.navigate(['/secretaria-menu/contratos']);
   }
 
   cancelarConfirmacion() { this.mostrarModalConfirmacion = false; }
@@ -530,7 +679,9 @@ export class ContratoInsertarComponent implements OnInit {
     this.lotes = []; this.lotesFiltrados = []; this.showSeparacionList = false;
     this.terminoBusquedaSeparacion = ''; this.saldoDisplay = '$ 0.00';
     this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0;
-    this.tipoComprobanteInicial = undefined; this.numeroComprobanteInicialPreview = '';
+    this.pagoInicialRequest = this.resetPagoInicial();
+    this.voucherInicialFile = null;
+    this.voucherInicialPreviewUrl = null;
   }
 
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }

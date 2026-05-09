@@ -1,6 +1,6 @@
 <div class="contratos-container">
 
-  <!-- ══ BANNER DE TRANSFERENCIA (solo cuando viene desde listar) ══ -->
+  <!-- ══ BANNER DE TRANSFERENCIA ══ -->
   <div class="banner-transferencia" *ngIf="esTransferencia">
     <i class="bi bi-arrow-left-right"></i>
     <div>
@@ -136,7 +136,6 @@
       <div class="form-section finance-card">
         <div class="section-title"><i class="bi bi-currency-dollar"></i> Información Financiera</div>
 
-        <!-- Selector de moneda + tipo de cambio de referencia -->
         <div class="form-row form-2-col" style="margin-bottom: 12px;">
           <div class="form-group">
             <label><i class="bi bi-coin"></i> Moneda del Contrato</label>
@@ -214,58 +213,41 @@
         </div>
       </div>
 
-      <div class="form-section" *ngIf="mostrarComprobanteInicial">
-        <div class="section-title">
-          <i class="bi bi-receipt"></i> Comprobante del Pago de Inicial
+      <!-- ── SECCIÓN: PAGO DE INICIAL (botón / estado) ── -->
+      <div class="form-section" *ngIf="mostrarBotonPagoInicial">
+        <div class="section-title"><i class="bi bi-receipt"></i> Pago de Inicial</div>
+
+        <!-- Estado: no configurado -->
+        <div class="pago-inicial-placeholder" *ngIf="!pagoInicialConfigurado">
+          <i class="bi bi-info-circle"></i>
+          <span>
+            El contrato tiene una inicial de <strong>{{ formatearMoneda(inicialNum) }}</strong>.
+            Completa los datos del pago antes de guardar.
+          </span>
+          <button type="button" class="btn-abrir-pago-inicial" (click)="abrirModalPagoInicial()">
+            <i class="bi bi-plus-circle"></i> Configurar pago de inicial
+          </button>
         </div>
-        <p class="section-hint text-muted" style="font-size:0.85rem; margin-bottom:12px;">
-          El contrato es financiado y tiene una inicial de
-          <strong>{{ formatearMoneda(inicialNum) }}</strong>.
-          Selecciona el tipo de comprobante que se emitirá por este pago.
-        </p>
-        <div class="form-row form-2-col">
- 
-          <div class="form-group">
-            <label for="tipoComprobanteInicial">
-              <i class="bi bi-file-earmark-text"></i>
-              Tipo de Comprobante <span class="required">*</span>
-            </label>
-            <select id="tipoComprobanteInicial" class="form-select"
-                    [(ngModel)]="tipoComprobanteInicial"
-                    [ngModelOptions]="{standalone: true}"
-                    (change)="onTipoComprobanteInicialChange()">
-              <option [ngValue]="undefined">-- Seleccione --</option>
-              <option *ngFor="let opcion of tipoComprobanteOptions" [value]="opcion">{{ opcion }}</option>
-            </select>
+
+        <!-- Estado: configurado -->
+        <div class="pago-inicial-resumen" *ngIf="pagoInicialConfigurado">
+          <div class="pago-inicial-resumen-header">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <span>Pago de inicial configurado</span>
+            <button type="button" class="btn-editar-pago-inicial" (click)="abrirModalPagoInicial()">
+              <i class="bi bi-pencil"></i> Editar
+            </button>
           </div>
- 
-          <!-- N° Comprobante: solo preview readonly, el backend asigna el número real -->
-          <div class="form-group">
-            <label>
-              <i class="bi bi-hash"></i>
-              N° Comprobante
-              <small class="text-muted">(asignado automáticamente)</small>
-            </label>
-            <div class="input-group">
-              <input type="text" class="form-control"
-                     [value]="cargandoPreviewInicial ? 'Calculando...' : (numeroComprobanteInicialPreview || '—')"
-                     readonly
-                     style="background-color: #f8f9fa; color: #6c757d; cursor: default;">
-              <span class="input-group-text" *ngIf="cargandoPreviewInicial">
-                <span class="spinner-border spinner-border-sm"></span>
-              </span>
-              <span class="input-group-text" *ngIf="!cargandoPreviewInicial && numeroComprobanteInicialPreview">
-                <i class="bi bi-check-circle-fill text-success"></i>
-              </span>
-            </div>
-            <small class="form-text text-muted" *ngIf="!tipoComprobanteInicial">
-              Seleccione el tipo de comprobante para ver el número siguiente.
-            </small>
+          <div class="pago-inicial-resumen-datos">
+            <span><strong>Tipo:</strong> {{ pagoInicialRequest.tipoComprobante }}</span>
+            <span><strong>Medio:</strong> {{ pagoInicialRequest.medioPago }}</span>
+            <span><strong>Importe:</strong> {{ formatearMoneda(pagoInicialRequest.importePagado) }}</span>
+            <span *ngIf="pagoInicialRequest.numeroOperacion"><strong>N° Op.:</strong> {{ pagoInicialRequest.numeroOperacion }}</span>
+            <span *ngIf="voucherInicialFile"><i class="bi bi-paperclip"></i> {{ voucherInicialFile.name }}</span>
           </div>
- 
         </div>
       </div>
- 
+
       <!-- ── SECCIÓN 4: OBSERVACIONES ── -->
       <div class="form-section">
         <div class="section-title"><i class="bi bi-chat-left-text"></i> Observaciones</div>
@@ -394,6 +376,10 @@
           <ng-container *ngIf="!tieneResiduo">{{ cantidadLetrasNum }} × {{ formatearMoneda(cuotaMensual) }}</ng-container>
         </strong>
       </div>
+      <div class="confirm-item" *ngIf="pagoInicialConfigurado">
+        <span>Comprobante Inicial</span>
+        <strong>{{ pagoInicialRequest.tipoComprobante }} · {{ pagoInicialRequest.medioPago }}</strong>
+      </div>
       <div class="confirm-item" *ngIf="clientesSeleccionados.length > 0">
         <span>Clientes</span>
         <strong>{{ clientesSeleccionados.length }} registrado(s)</strong>
@@ -409,6 +395,161 @@
       </button>
       <button class="btn btn-cancel" (click)="cancelarConfirmacion()">Cancelar</button>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ MODAL PAGO DE INICIAL ══════════════════════ -->
+<div class="confirm-overlay" *ngIf="mostrarModalPagoInicial" (click)="cerrarModalPagoInicial()">
+  <div class="pago-inicial-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="pago-inicial-modal-header">
+      <div class="pago-inicial-modal-icon">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+      <div>
+        <h3>Pago de Inicial</h3>
+        <p>Inicial: <strong>{{ formatearMoneda(inicialNum) }}</strong></p>
+      </div>
+      <button type="button" class="btn-close-modal" (click)="cerrarModalPagoInicial()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="pago-inicial-modal-body">
+
+      <!-- Fila 1: Importe + Fecha de Pago -->
+      <div class="pi-form-row">
+        <div class="pi-form-group">
+          <label><i class="bi bi-currency-dollar"></i> Importe Pagado <span class="req">*</span></label>
+          <input type="number" step="0.01"
+                 [(ngModel)]="pagoInicialRequest.importePagado"
+                 class="pi-input" />
+        </div>
+        <div class="pi-form-group">
+          <label><i class="bi bi-calendar-event"></i> Fecha de Pago <span class="req">*</span></label>
+          <input type="date"
+                 [(ngModel)]="pagoInicialRequest.fechaPago"
+                 class="pi-input" />
+        </div>
+      </div>
+
+      <!-- Fila 2: Medio de Pago + N° Operación -->
+      <div class="pi-form-row">
+        <div class="pi-form-group">
+          <label><i class="bi bi-credit-card"></i> Medio de Pago <span class="req">*</span></label>
+          <select [(ngModel)]="pagoInicialRequest.medioPago"
+                  (change)="onMedioPagoInicialChange()"
+                  class="pi-input">
+            <option [ngValue]="null">-- Seleccione --</option>
+            <option *ngFor="let op of medioPagoOptions" [value]="op">{{ op }}</option>
+          </select>
+        </div>
+        <div class="pi-form-group">
+          <label>
+            <i class="bi bi-hash"></i> N° Operación
+            <span class="req" *ngIf="requiereNumeroOperacion">*</span>
+          </label>
+          <input type="text"
+                 [(ngModel)]="pagoInicialRequest.numeroOperacion"
+                 [disabled]="!requiereNumeroOperacion"
+                 [placeholder]="requiereNumeroOperacion ? 'Ingrese N° operación' : 'N/A — Efectivo'"
+                 class="pi-input" />
+        </div>
+      </div>
+
+      <!-- Fila 3: Tipo Comprobante + N° Comprobante -->
+      <div class="pi-form-row">
+        <div class="pi-form-group">
+          <label><i class="bi bi-file-earmark-text"></i> Tipo Comprobante <span class="req">*</span></label>
+          <select [(ngModel)]="pagoInicialRequest.tipoComprobante"
+                  (change)="onTipoComprobanteInicialChange()"
+                  class="pi-input">
+            <option [ngValue]="null">-- Seleccione --</option>
+            <option *ngFor="let op of tipoComprobanteOptions" [value]="op">{{ op }}</option>
+          </select>
+        </div>
+        <div class="pi-form-group">
+          <label>
+            <i class="bi bi-hash"></i> N° Comprobante
+            <span class="badge-manual-pi" *ngIf="modoManualComprobanteInicial">Manual</span>
+          </label>
+          <div class="pi-input-group">
+            <input type="text"
+                   [value]="cargandoPreviewInicial ? 'Calculando...' : (modoManualComprobanteInicial ? numeroComprobanteInicialManual : (numeroComprobanteInicialPreview || '—'))"
+                   [readonly]="!modoManualComprobanteInicial || cargandoPreviewInicial"
+                   (input)="onNumeroManualInicialChange($event)"
+                   [placeholder]="modoManualComprobanteInicial ? 'Ingrese N° comprobante' : '—'"
+                   [style.background-color]="modoManualComprobanteInicial ? 'white' : '#f8f9fa'"
+                   [style.color]="modoManualComprobanteInicial ? '#1e293b' : '#6c757d'"
+                   class="pi-input" />
+            <button type="button" class="btn-toggle-pencil"
+                    (click)="toggleModoManualInicial()"
+                    [class.active]="modoManualComprobanteInicial"
+                    [title]="modoManualComprobanteInicial ? 'Volver al número automático' : 'Ingresar número manualmente'">
+              <span *ngIf="cargandoPreviewInicial" class="spinner-border spinner-border-sm"></span>
+              <i *ngIf="!cargandoPreviewInicial && modoManualComprobanteInicial" class="bi bi-pencil-fill text-primary"></i>
+              <i *ngIf="!cargandoPreviewInicial && !modoManualComprobanteInicial" class="bi bi-pencil text-secondary"></i>
+            </button>
+          </div>
+          <small class="pi-hint" *ngIf="modoManualComprobanteInicial">
+            Número manual activo — se usará exactamente este valor.
+          </small>
+        </div>
+      </div>
+
+      <!-- Fila 5: Detalle / Observaciones -->
+      <div class="pi-form-row">
+        <div class="pi-form-group full-width">
+          <label><i class="bi bi-chat-left-text"></i> Detalle <span class="label-auto-pi">· autogenerado</span></label>
+          <textarea [(ngModel)]="pagoInicialRequest.observaciones"
+                    rows="2"
+                    class="pi-textarea"
+                    placeholder="Ej: Pago de Inicial de la Mz. A Lt. 1 del Programa X"></textarea>
+        </div>
+      </div>
+
+      <!-- Fila 6: Voucher -->
+      <div class="pi-form-row">
+        <div class="pi-form-group full-width">
+          <label>
+            <i class="bi bi-image"></i> Voucher (imagen)
+            <span class="req" *ngIf="requiereVoucher">*</span>
+          </label>
+
+          <!-- Sin voucher cargado -->
+          <div *ngIf="!voucherInicialPreviewUrl" class="voucher-drop-zone" [class.disabled]="!requiereVoucher">
+            <label class="voucher-drop-label" [class.disabled]="!requiereVoucher">
+              <input type="file" accept="image/*" (change)="onVoucherInicialSeleccionado($event)"
+                     [disabled]="!requiereVoucher" style="display:none" />
+              <i class="bi bi-cloud-upload"></i>
+              <span>{{ requiereVoucher ? 'Haz clic para subir imagen' : 'No aplica para efectivo' }}</span>
+            </label>
+          </div>
+
+          <!-- Con voucher cargado -->
+          <div *ngIf="voucherInicialPreviewUrl" class="voucher-preview-pi">
+            <img [src]="voucherInicialPreviewUrl" alt="Voucher" />
+            <button type="button" class="btn-remove-voucher" (click)="eliminarVoucherInicial()">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="pago-inicial-modal-footer">
+      <button type="button" class="btn btn-cancel" (click)="cerrarModalPagoInicial()">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </button>
+      <button type="button" class="btn btn-save" (click)="confirmarPagoInicial()">
+        <i class="bi bi-check-lg"></i> Confirmar pago de inicial
+      </button>
+    </div>
+
   </div>
 </div>
 

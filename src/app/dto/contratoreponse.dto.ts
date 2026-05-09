@@ -4,6 +4,7 @@ import { LetraResponseDTO } from './letra-response.dto';
 import { EstadoContrato } from '../enums/Estadocontrato.enum';
 import { VendedorResponseDTO } from './vendedorreponse.dto';
 import { Moneda } from './moneda.enum';
+import { PagoInicialResponseDTO } from './pagoinicialresponse.dto';
 
 export interface ContratoResponseDTO {
   idContrato: number;
@@ -22,6 +23,8 @@ export interface ContratoResponseDTO {
   vendedor?: VendedorResponseDTO;
   tieneLuz: boolean;
   tieneAgua: boolean;
+  pagoInicial?: PagoInicialResponseDTO;
+  // Campos legacy por compatibilidad
   idComprobanteInicial?: number;
   tipoComprobanteInicial?: string;
   numeroComprobanteInicial?: string;

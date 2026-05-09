@@ -35,8 +35,13 @@ export class MoraService {
     return this.http.get<MoraResumenContratoDTO>(`${this.apiUrl}/contrato/${idContrato}/resumen`);
   }
 
-  pagarMora(request: PagoMoraRequest): Observable<PagoMoraResponse> {
-    return this.http.post<PagoMoraResponse>(`${this.apiUrl}/pagar`, request);
+  pagarMora(request: PagoMoraRequest, vouchers?: File[]): Observable<PagoMoraResponse> {
+    const formData = new FormData();
+    formData.append('pago', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+    if (vouchers && vouchers.length > 0) {
+      vouchers.forEach(v => formData.append('vouchers', v));
+    }
+    return this.http.post<PagoMoraResponse>(`${this.apiUrl}/pagar`, formData);
   }
 
   anularMora(idMora: number, motivo: string = ''): Observable<MoraResponse> {
@@ -47,21 +52,12 @@ export class MoraService {
     );
   }
 
-  /**
-   * Consulta al backend el siguiente número de comprobante disponible.
-   * El backend considera TANTO pago_letras como pago_mora, por lo que
-   * la secuencia de BOLETA / RECIBO / FACTURA es siempre continua.
-   */
   sugerirNumeroComprobante(tipoComprobante: string): Observable<{ numeroSugerido: string }> {
     return this.http.get<{ numeroSugerido: string }>(
       `${this.apiUrl}/sugerir-numero?tipoComprobante=${tipoComprobante}`
     );
   }
 
-  /**
-   * Descarga el comprobante PDF de un pago de mora específico.
-   * GET /api/moras/pago/{idPagoMora}/comprobante-pdf
-   */
   descargarComprobante(idPagoMora: number): Observable<Blob> {
     return this.http.get(
       `${this.apiUrl}/pago/${idPagoMora}/comprobante-pdf`,

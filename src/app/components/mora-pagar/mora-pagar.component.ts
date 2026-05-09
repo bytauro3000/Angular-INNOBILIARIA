@@ -12,11 +12,12 @@ import { PagoMoraRequest } from '../../dto/pagomorarequest.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 
 @Component({
   selector: 'app-mora-pagar',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VoucherPreviewComponent],
   templateUrl: './mora-pagar.html',
   styleUrls: ['./mora-pagar.scss']
 })
@@ -33,6 +34,9 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   medioPagoOptions    = Object.values(MedioPago);
   tipoComprobanteOptions = Object.values(TipoComprobante);
   enviando = false;
+
+  // Archivos de voucher seleccionados
+  voucherFiles: File[] = [];
 
   // Preview readonly del número que se emitirá
   numeroComprobantePreview: string = '';
@@ -146,17 +150,21 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
       this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
       return;
     }
+    if (this.request.medioPago !== MedioPago.EFECTIVO && this.voucherFiles.length === 0) {
+      this.toastr.warning('Debe adjuntar al menos un voucher para este medio de pago', 'Validación');
+      return;
+    }
     if (!this.request.tipoComprobante) {
       this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
       return;
     }
-    // Eliminada la validación de numeroComprobante: el backend lo genera
 
     this.enviando = true;
-    this.moraService.pagarMora(this.request).subscribe({
+    this.moraService.pagarMora(this.request, this.voucherFiles).subscribe({
       next: (res) => {
         this.toastr.success('Mora pagada correctamente', 'Éxito');
         this.enviando = false;
+        this.voucherFiles = [];
         this.cerrarModal();
         this.onPagoExitoso.emit(res.idPagoMora);
       },

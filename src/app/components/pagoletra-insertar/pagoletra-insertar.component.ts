@@ -45,11 +45,10 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     importePagado: 0,
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
-    fechaOperacion: '',
+    fechaPago: '',
     tipoComprobante: undefined,
     numeroComprobantePersonalizado: undefined,
     observaciones: ''
-    // numeroComprobante eliminado: el backend lo genera automáticamente
   };
 
   // Número de comprobante sugerido: solo para mostrar al cajero (readonly por defecto)
@@ -76,7 +75,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
     this.pagoRequest.importePagado = this.letra.importe;
-    this.pagoRequest.fechaOperacion = new Date().toISOString().split('T')[0];
+    this.pagoRequest.fechaPago = new Date().toISOString().split('T')[0];
     this.generarObservaciones();
 
     if (this.moraPreviamentePagada) {
@@ -256,7 +255,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
         }
 
         const fechaPago: string =
-          this.pagoRequest.fechaOperacion || new Date().toISOString().split('T')[0];
+          this.pagoRequest.fechaPago || new Date().toISOString().split('T')[0];
 
         const pagoMora: PagoMoraRequest = {
           idMora:          moraPendiente.idMora,
