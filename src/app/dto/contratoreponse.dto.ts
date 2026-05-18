@@ -21,8 +21,6 @@ export interface ContratoResponseDTO {
   lotes: LoteResponseDTO[];
   letras: LetraResponseDTO[];
   vendedor?: VendedorResponseDTO;
-  tieneLuz: boolean;
-  tieneAgua: boolean;
   pagoInicial?: PagoInicialResponseDTO;
   // Campos legacy por compatibilidad
   idComprobanteInicial?: number;

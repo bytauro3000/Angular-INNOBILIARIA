@@ -11,7 +11,6 @@ import { Programa } from '../../models/programa.model';
 import { TipoContrato } from '../../enums/tipocontrato.enum';
 import { EstadoContrato } from '../../enums/Estadocontrato.enum';
 import { ToastrService } from 'ngx-toastr';
-import { InscripcionServiciosInsertarComponent } from '../inscripcion-servicios-insertar/inscripcion-servicios-insertar.component';
 import { LetrasCambioService } from '../../services/letracambio.service';
 import Swal from 'sweetalert2';
 
@@ -23,14 +22,11 @@ import Swal from 'sweetalert2';
     FormsModule,
     RouterModule,
     DatePipe,
-    InscripcionServiciosInsertarComponent
   ],
   templateUrl: './contrato-listar.html',
   styleUrls: ['./contrato-listar.scss'],
 })
 export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit {
-
-  @ViewChild('modalInscripcion') modalInscripcion!: InscripcionServiciosInsertarComponent;
 
   contratos: ContratoResponseDTO[] = [];
   contratosFiltrados: ContratoResponseDTO[] = [];
@@ -502,10 +498,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     return pages;
   }
 
-  // ─── MODAL / ELIMINAR ────────────────────────────────────────────────
-  abrirModalInscripcion(id: number): void { this.modalInscripcion.abrirModal(id); }
-  onInscripcionExitosa(): void { this.cargarContratos(); }
-
+  // ─── ELIMINAR ────────────────────────────────────────────────────────
   eliminarContrato(id: number): void {
     Swal.fire({
       title: '¿Estás seguro?', text: '¡No podrás revertir esto!', icon: 'warning',

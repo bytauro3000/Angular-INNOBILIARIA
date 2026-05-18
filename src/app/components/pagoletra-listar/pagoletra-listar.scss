@@ -3,16 +3,16 @@
 // ============================================
 // VARIABLES
 // ============================================
-$navy: #023e8a;
-$blue: #2980b9;
-$green: #27ae60;
-$yellow: #f1c40f;
-$orange: #f39c12;
-$light-blue: #3498db;
-$gray: #ecf0f1;
-$light-bg: #f5f7fa;
-$text-dark: #1e293b;
-$text-light: #334155;
+$navy:         #023e8a;
+$blue:         #2980b9;
+$green:        #27ae60;
+$yellow:       #f1c40f;
+$orange:       #f39c12;
+$light-blue:   #3498db;
+$gray:         #ecf0f1;
+$light-bg:     #f5f7fa;
+$text-dark:    #1e293b;
+$text-light:   #334155;
 $border-color: #e9ecef;
 
 // ============================================
@@ -32,7 +32,6 @@ $border-color: #e9ecef;
     font-size: 1.3rem;
     margin-bottom: 24px;
     padding-left: 20px;
-    border-left: none;
 
     &::before {
       content: '';
@@ -47,16 +46,10 @@ $border-color: #e9ecef;
       border-left: 8px solid $navy;
     }
   }
-
-  h3 {
-    font-size: 1.1rem;
-    color: $text-light;
-    margin: 0;
-  }
 }
 
 // ============================================
-// FILTROS
+// FILTROS DE BÚSQUEDA (programa/manzana/lote)
 // ============================================
 .filtros {
   display: flex;
@@ -117,10 +110,6 @@ $border-color: #e9ecef;
     align-items: center;
     gap: 8px;
 
-    i {
-      font-size: 1rem;
-    }
-
     &.btn-buscar {
       background-color: $navy;
       color: white;
@@ -172,39 +161,31 @@ $border-color: #e9ecef;
 
   .info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    // 5 columnas fijas: cliente | lote | fecha | total | saldo — todos en la misma fila
+    grid-template-columns: 2fr 1.5fr 1.2fr 1fr 1fr;
     gap: 12px;
+    align-items: center;
     font-size: 0.95rem;
 
-    strong {
-      color: $text-light;
-      font-weight: 600;
+    strong { color: $text-light; font-weight: 600; }
+
+    // En pantallas medianas colapsa a 3 columnas
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    // En móvil una columna
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
     }
   }
 
-  .total-saldo-row {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-
-    span {
-      font-size: 0.95rem;
-      color: $text-dark;
-    }
-
-    .total-label {
-      color: $navy;
-    }
-
-    .saldo-label {
-      color: $green;
-    }
-  }
+  .total-label { color: $navy;  font-size: 0.95rem; }
+  .saldo-label  { color: $green; font-size: 0.95rem; }
 }
 
 // ============================================
-// TABLA
+// WRAPPER DE LA TABLA
 // ============================================
 .tabla-wrapper {
   background: white;
@@ -212,28 +193,299 @@ $border-color: #e9ecef;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   overflow: auto;
   margin-top: 20px;
-  padding: 0;
   border: 1px solid $border-color;
+}
 
-  .tabla-header {
-    display: flex;
-    justify-content: space-between;
+// ============================================
+// TOOLBAR SUPERIOR: tabs + buscador de letra
+// ============================================
+.tabla-toolbar-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid $border-color;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+// Agrupa el contador + input del buscador, empujado al extremo derecho
+.filtro-letra-derecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+// ============================================
+// TOOLBAR INFERIOR: acciones secundarias + paginación
+// ============================================
+.tabla-toolbar-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid $border-color;
+  background: $light-bg;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// ============================================
+// INTERRUPTOR TIPO PESTAÑAS (con contadores)
+// ============================================
+.toggle-container {
+  display: flex;
+  background: white;
+  border-radius: 30px;
+  padding: 4px;
+  border: 1px solid $border-color;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+
+  .toggle-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: $text-light;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
     align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid $border-color;
+    gap: 7px;
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+    &.active {
+      background: $navy;
+      color: white;
+      box-shadow: 0 2px 8px rgba($navy, 0.3);
+
+      .tab-count {
+        background: rgba(255,255,255,0.25);
+        color: white;
+      }
+    }
+
+    &:hover:not(.active) {
+      background: color.adjust($light-bg, $lightness: -4%, $space: hsl);
+    }
+  }
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  background: $border-color;
+  color: $text-light;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: background 0.2s, color 0.2s;
+
+  &.pagadas-count {
+    background: #dcfce7;
+    color: #166534;
+  }
+}
+
+// ============================================
+// BUSCADOR DE LETRA (dentro de toolbar top)
+// ============================================
+.filtro-letra-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .filtro-letra-icon {
+    position: absolute;
+    left: 10px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    pointer-events: none;
+  }
+
+  .filtro-letra-input {
+    padding: 7px 30px 7px 28px;
+    border: 1px solid $border-color;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    color: $text-dark;
+    background: $light-bg;
+    width: 180px;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+    &::placeholder { color: #b0bec5; }
+
+    &:focus {
+      outline: none;
+      background: white;
+      border-color: $blue;
+      box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.12);
+      width: 210px;
     }
   }
 
-  .cargando {
-    padding-left: 60px;
-    text-align: center;
+  .filtro-letra-clear {
+    position: absolute;
+    right: 9px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    padding: 2px 4px;
+    line-height: 1;
+    transition: color 0.15s;
+
+    &:hover { color: #e74c3c; }
   }
+}
+
+.filtro-letra-count {
+  font-size: 0.78rem;
+  color: $blue;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+// ============================================
+// ACCIONES SECUNDARIAS (toolbar inferior)
+// ============================================
+.acciones-secundarias {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+// Botones discretos tipo "link con ícono"
+.btn-accion-secundaria {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid $border-color;
+  background: white;
+  color: $text-light;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+
+  i { font-size: 0.9rem; }
+
+  &:hover {
+    border-color: $blue;
+    color: $blue;
+    background: #f0f7ff;
+  }
+
+  // variante moras
+  &.mora {
+    position: relative;
+    &:hover {
+      border-color: #f87171;
+      color: #b91c1c;
+      background: #fff5f5;
+    }
+  }
+}
+
+// ============================================
+// BOTÓN PAGO MÚLTIPLE (aparece al seleccionar)
+// ============================================
+.btn-pagar-multiple {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(135deg, $green, #219150);
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 3px 8px rgba($green, 0.3);
+
+  i { font-size: 1rem; }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba($green, 0.35);
+    filter: brightness(1.05);
+  }
+
+  &:active { transform: scale(0.96); }
+}
+
+// ============================================
+// PAGINACIÓN
+// ============================================
+.paginacion-superior {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .btn-paginacion {
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 30px;
+    padding: 5px 11px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: $text-dark;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    &:hover:not(:disabled) {
+      background: $navy;
+      color: white;
+      border-color: $navy;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background: $navy;
+      color: white;
+      border-color: $navy;
+    }
+  }
+
+  .ellipsis-spacer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-weight: bold;
+    min-width: 24px;
+    height: 30px;
+    user-select: none;
+  }
+}
+
+// ============================================
+// TABLA
+// ============================================
+.cargando {
+  padding: 40px;
+  text-align: center;
+  color: $text-light;
 }
 
 .tabla-custom {
@@ -266,27 +518,18 @@ $border-color: #e9ecef;
   th:nth-child(1),
   th:nth-child(2),
   th:nth-child(3),
-  th:nth-child(5) {
-    text-align: center;
-  }
+  th:nth-child(5) { text-align: center; }
 
   td:nth-child(1),
   td:nth-child(2),
   td:nth-child(3),
-  td:nth-child(5) {
-    text-align: center;
-  }
+  td:nth-child(5) { text-align: center; }
 
   tbody tr {
     transition: background 0.2s;
 
-    &:hover td {
-      background-color: #f1f5f9;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
+    &:hover td { background-color: #f1f5f9; }
+    &:last-child td { border-bottom: none; }
 
     &.vencida td {
       background-color: #fee2e2;
@@ -294,6 +537,7 @@ $border-color: #e9ecef;
     }
   }
 
+  // Badges de estado
   .estado-badge {
     display: inline-flex;
     align-items: center;
@@ -305,20 +549,12 @@ $border-color: #e9ecef;
     border-radius: 20px;
     font-weight: 600;
 
-    &.estado-pendiente {
-      color: #b45309;
-      background-color: #fffbeb;
-    }
-    &.estado-vencido {
-      color: #b91c1c;
-      background-color: #fef2f2;
-    }
-    &.estado-pagado {
-      color: #047857;
-      background-color: #ecfdf5;
-    }
+    &.estado-pendiente { color: #b45309; background-color: #fffbeb; }
+    &.estado-vencido   { color: #b91c1c; background-color: #fef2f2; }
+    &.estado-pagado    { color: #047857; background-color: #ecfdf5; }
   }
 
+  // Botones de acciones dentro de la tabla
   .acciones-container {
     display: flex;
     justify-content: center;
@@ -341,9 +577,7 @@ $border-color: #e9ecef;
     transition: all 0.2s;
     font-size: 1rem;
 
-    i {
-      font-size: 1.1rem;
-    }
+    i { font-size: 1.1rem; }
 
     &:hover {
       background: $green;
@@ -364,7 +598,6 @@ $border-color: #e9ecef;
     color: #154378;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 1rem;
 
     i { font-size: 1.1rem; }
 
@@ -388,7 +621,6 @@ $border-color: #e9ecef;
     color: #7c3aed;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 1rem;
 
     i { font-size: 1.1rem; }
 
@@ -406,7 +638,6 @@ $border-color: #e9ecef;
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1;
     }
 
     &:hover {
@@ -414,186 +645,94 @@ $border-color: #e9ecef;
       color: white;
       transform: scale(1.05);
 
-      .badge-multiple {
-        background: white;
-        color: #7c3aed;
-      }
+      .badge-multiple { background: white; color: #7c3aed; }
     }
   }
 }
 
 // ============================================
-// BOTONES GLOBALES (fuera de la tabla)
-// ============================================
-.btn-ver-pagos {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 30px;
-  border: 1px solid $light-blue;
-  background: linear-gradient(135deg, $light-blue, #1e6f9f);
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 8px rgba($light-blue, 0.2);
-  height: 38px;
-
-  i {
-    font-size: 1.1rem;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba($light-blue, 0.3);
-    filter: brightness(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-.btn-pagar-multiple {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 30px;
-  border: 1px solid $green;
-  background: linear-gradient(135deg, $green, #219150);
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 8px rgba($green, 0.2);
-  height: 38px;
-
-  i {
-    font-size: 1.1rem;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba($green, 0.3);
-    filter: brightness(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-// ============================================
-// MENSAJE SIN RESULTADOS (fuera de la tabla)
+// MENSAJE SIN RESULTADOS
 // ============================================
 .sin-resultados {
   text-align: center;
   padding: 40px;
   color: $text-light;
-  font-size: 1.1rem;
+  font-size: 1rem;
   width: 100%;
   display: block;
   box-sizing: border-box;
 }
 
 // ============================================
-// INTERRUPTOR TIPO PESTAÑAS
+// MORA — banner y botón
 // ============================================
-.toggle-container {
+.mora-banner {
   display: flex;
-  background: $light-bg;
-  border-radius: 30px;
-  padding: 4px;
-  border: 1px solid $border-color;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: #fff1f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
 
-  .toggle-btn {
-    background: transparent;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: $text-light;
-    cursor: pointer;
-    transition: all 0.2s;
+  &:hover { background: #fee2e2; }
+  i { font-size: 1.1rem; color: #dc2626; }
 
-    &.active {
-      background: $navy;
-      color: white;
-      box-shadow: 0 2px 8px rgba($navy, 0.3);
-    }
-
-    &:hover:not(.active) {
-      background: color.adjust($light-bg, $lightness: -5%, $space: hsl);
-    }
+  .mora-banner-link {
+    margin-left: auto;
+    font-weight: 600;
+    text-decoration: underline;
+    white-space: nowrap;
   }
 }
 
-// ============================================
-// PAGINACIÓN SUPERIOR
-// ============================================
-.paginacion-superior {
-  display: flex;
+.mora-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #dc2626;
+  color: white;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
 
-  .btn-paginacion {
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 30px;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: $text-dark;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 35px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+// ============================================
+// ESTADO VENCIDA en botón de tabla
+// ============================================
+.btn-pagar-vencida {
+  background: #fff7ed !important;
+  border-color: #f97316 !important;
+  color: #c2410c !important;
 
-    &:hover:not(:disabled) {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
+  &:hover { background: #ffedd5 !important; }
+}
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &.active {
-      background: $navy;
-      color: white;
-      border-color: $navy;
-    }
-  }
-
-  .ellipsis-spacer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8;
-    font-weight: bold;
-    min-width: 30px;
-    height: 32px;
-    user-select: none;
-  }
+.vencida-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  background: #dc2626;
+  border-radius: 50%;
 }
 
 // ============================================
 // RESPONSIVE: MÓVILES
 // ============================================
 @media screen and (max-width: 767px) {
-  .tabla-custom thead {
-    display: none;
-  }
+
+  .tabla-custom thead { display: none; }
 
   .tabla-custom tbody tr {
     display: block;
@@ -622,30 +761,18 @@ $border-color: #e9ecef;
 
     &:not(:first-child):not(.acciones-cell) {
       text-align: right !important;
-      > *:not(::before) {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-end !important;
-        text-align: right !important;
-      }
     }
 
     &:first-child {
       background: #f8f8fa;
       border-bottom: 2px solid $green;
       justify-content: center !important;
-      &::before {
-        display: none !important;
-      }
+      &::before { display: none !important; }
     }
 
-    // ===== CENTRAR BOTÓN DE PAGO =====
     &.acciones-cell {
       justify-content: center !important;
-      &::before {
-        display: none !important;
-      }
+      &::before { display: none !important; }
       .acciones-container {
         justify-content: center !important;
         width: 100% !important;
@@ -653,22 +780,17 @@ $border-color: #e9ecef;
     }
   }
 
-  // Ajuste para botones Buscar/Limpiar
   .filtros {
     flex-direction: column;
     align-items: stretch;
 
-    .form-group,
-    button {
-      width: 100%;
-    }
+    .form-group, button { width: 100%; }
 
     button {
       position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 0;
 
       i {
         position: absolute;
@@ -680,112 +802,27 @@ $border-color: #e9ecef;
     }
   }
 
-  // ===== CENTRAR SWITCH DE PESTAÑAS =====
-  .tabla-wrapper .tabla-header {
+  .tabla-toolbar-top,
+  .tabla-toolbar-bottom {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-
-    .paginacion-superior {
-      width: 100%;
-      justify-content: center;
-    }
+    gap: 10px;
   }
 
-  // ===== CENTRAR MENSAJE SIN RESULTADOS EN MÓVIL =====
+  .acciones-secundarias { justify-content: center; }
+
+  .paginacion-superior { justify-content: center; }
+
+  .filtro-letra-input-group .filtro-letra-input {
+    width: 220px;
+  }
+
   .sin-resultados {
     text-align: center !important;
     width: 100%;
-    box-sizing: border-box;
   }
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-// ── MORA ──────────────────────────────────────────────────────────────────────
-
-/* Banner rojo en la info del contrato cuando hay moras */
-.mora-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 10px 16px;
-  background: #fff1f2;
-  border: 1px solid #fca5a5;
-  border-radius: 8px;
-  color: #991b1b;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover { background: #fee2e2; }
-
-  i { font-size: 1.1rem; color: #dc2626; }
-
-  .mora-banner-link {
-    margin-left: auto;
-    font-weight: 600;
-    text-decoration: underline;
-    white-space: nowrap;
-  }
-}
-
-/* Botón "Ver Moras" en la barra de la tabla */
-.btn-ver-moras {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: #fff1f2;
-  color: #b91c1c;
-  border: 1px solid #fca5a5;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-
-  &:hover { background: #fee2e2; border-color: #f87171; }
-}
-
-/* Badge numérico sobre el botón Ver Moras */
-.mora-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  background: #dc2626;
-  color: white;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Botón pagar con estado vencido */
-.btn-pagar-vencida {
-  background: #fff7ed !important;
-  border-color: #f97316 !important;
-  color: #c2410c !important;
-
-  &:hover { background: #ffedd5 !important; }
-}
-
-/* Punto rojo indicador sobre el botón de letra vencida */
-.vencida-dot {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 7px;
-  height: 7px;
-  background: #dc2626;
-  border-radius: 50%;
+  to { transform: rotate(360deg); }
 }

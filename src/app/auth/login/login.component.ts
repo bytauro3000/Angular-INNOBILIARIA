@@ -6,6 +6,7 @@ import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from '../token.service';
 import { ToastrService } from 'ngx-toastr';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +27,9 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private router: Router,
     private tokenService: TokenService,
-    private toastr: ToastrService
-  ) { }
+    private toastr: ToastrService,
+    private titleService: Title
+  ) {this.titleService.setTitle('Iniciar Sesión | Inmobiliaria Ivan');  }
 
   ngOnInit(): void {
     const correoGuardado = localStorage.getItem('remembered_email');

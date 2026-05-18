@@ -59,6 +59,9 @@ export class PagoletraListarComponent implements OnInit {
   letraSeleccionada: LetraCambio | null = null;
   tipoLista: 'pendientes' | 'pagadas' = 'pendientes';
 
+  /** Tercer cambio: filtro frontend sobre el número de letra */
+  filtroNumeroLetra: string = '';
+
   pageSize: number = 5;
   currentPage: number = 1;
   totalPages: number = 0;
@@ -84,6 +87,13 @@ export class PagoletraListarComponent implements OnInit {
    * ni intentará crear/registrar la mora nuevamente.
    */
   moraPreviamentePagada: boolean = false;
+
+  /**
+   * Cambio 2: número de la letra recién pagada.
+   * Se guarda antes de cerrar el modal para que cargarLetrasPendientes
+   * navegue automáticamente a la página de la SIGUIENTE letra.
+   */
+  private ultimaLetraPagadaNum: number = 0;
 
   constructor(
     private contratoService: ContratoService,
@@ -140,7 +150,38 @@ export class PagoletraListarComponent implements OnInit {
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
         this.seleccionadasMap.clear();
-        this.currentPage = 1;
+        this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al cargar contrato
+        // PRIORIDAD 1 — Si hay letras pagadas: ir a la página de la letra
+        //              siguiente a la más alta pagada (maxPagado + 1).
+        // PRIORIDAD 2 — Si no hay pagadas: ir a la página de la última
+        //              letra VENCIDA (la más atrasada sin registrar).
+        // FALLBACK    — Sin pagadas ni vencidas: quedarse en página 1.
+        const maxPagadoNum = this.letrasPagadas.length > 0
+          ? Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)))
+          : 0;
+
+        let paginaDestino = 1;
+
+        if (maxPagadoNum > 0) {
+          // Buscar la letra siguiente a la más alta pagada
+          const indiceSiguiente = this.letrasPendientes
+            .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= maxPagadoNum + 1);
+          if (indiceSiguiente >= 0) {
+            paginaDestino = Math.floor(indiceSiguiente / this.pageSize) + 1;
+          }
+        } else {
+          // Sin pagadas: ir a la página de la última letra VENCIDA
+          const indiceUltimaVencida = this.letrasPendientes
+            .map((l, i) => l.estadoLetra === 'VENCIDO' ? i : -1)
+            .filter(i => i >= 0)
+            .pop() ?? -1;
+          if (indiceUltimaVencida >= 0) {
+            paginaDestino = Math.floor(indiceUltimaVencida / this.pageSize) + 1;
+          }
+        }
+
+        this.currentPage = paginaDestino;
+
         this.aplicarPaginacion();
         this.cargandoLetras = false;
         this.cdr.markForCheck();
@@ -153,6 +194,48 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   // ── MORA ────────────────────────────────────────────────────────────────────
+
+  /**
+   * Cambio 2: igual que cargarLetrasPendientes pero, al terminar,
+   * navega automáticamente a la página donde está la letra SIGUIENTE
+   * a la última pagada (ultimaLetraPagadaNum + 1).
+   * Si no hay letra siguiente (contrato terminado) queda en página 1.
+   */
+  cargarLetrasPendientesConNavegacion(idContrato: number): void {
+    this.cargandoLetras = true;
+    this.letrasService.listarPorContrato(idContrato).subscribe({
+      next: (letras) => {
+        this.letrasPendientes = letras
+          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
+          .map(l => ({ ...l, seleccionada: false }));
+        this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
+        this.seleccionadasMap.clear();
+        this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al recargar después de pago
+
+        // Calcular la página donde está la siguiente letra a pagar
+        const siguienteNum = this.ultimaLetraPagadaNum + 1;
+        const indiceSiguiente = this.letrasPendientes
+          .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= siguienteNum);
+
+        if (indiceSiguiente >= 0) {
+          // Navegar a la página donde está esa letra
+          this.currentPage = Math.floor(indiceSiguiente / this.pageSize) + 1;
+        } else {
+          // No hay siguiente letra pendiente (contrato al día o terminado)
+          this.currentPage = 1;
+        }
+
+        this.ultimaLetraPagadaNum = 0; // resetear para próxima vez
+        this.aplicarPaginacion();
+        this.cargandoLetras = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.toastr.error('Error al cargar las letras', 'Error');
+        this.cargandoLetras = false;
+      }
+    });
+  }
 
   cargarResumenMora(idContrato: number): void {
     this.moraService.obtenerResumenPorContrato(idContrato).subscribe({
@@ -274,6 +357,7 @@ export class PagoletraListarComponent implements OnInit {
     this.moraResumen = null;
     this.calculoMoraParaPago = null;
     this.moraPreviamentePagada = false;
+    this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al limpiar búsqueda
   }
 
   private extraerNumeroLetra(numeroLetra: string): number {
@@ -402,9 +486,13 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   onPagoRegistrado(): void {
+    // Guardar el número de la letra recién pagada ANTES de limpiar letraSeleccionada
+    this.ultimaLetraPagadaNum = this.letraSeleccionada
+      ? this.extraerNumeroLetra(this.letraSeleccionada.numeroLetra)
+      : 0;
     this.cerrarModalPago();
     if (this.contratoEncontrado) {
-      this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.cargarLetrasPendientesConNavegacion(this.contratoEncontrado.idContrato);
       this.cargarResumenMora(this.contratoEncontrado.idContrato);
       this.refrescarContrato();
     }
@@ -425,6 +513,7 @@ export class PagoletraListarComponent implements OnInit {
   cambiarTipoLista(tipo: 'pendientes' | 'pagadas'): void {
     if (this.tipoLista !== tipo) {
       this.tipoLista = tipo;
+      this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al cambiar pestaña
       this.currentPage = 1;
       this.aplicarPaginacion();
       this.seleccionadasMap.clear();
@@ -435,8 +524,45 @@ export class PagoletraListarComponent implements OnInit {
     return this.tipoLista === 'pendientes' ? 'Letras Pendientes de Pago' : 'Letras Pagadas';
   }
 
+  /**
+   * Tercer cambio: lista activa filtrada por el texto de búsqueda.
+   * El filtro opera 100% en el frontend sobre los datos ya cargados.
+   * Compara contra el campo `numeroLetra` ignorando mayúsculas/minúsculas
+   * y recortando espacios, de modo que "3", "03", "3/24" o "3 / 24"
+   * funcionan por igual.
+   */
+  get listaFiltrada(): LetraCambioConSeleccion[] {
+    const lista = (this.tipoLista === 'pendientes'
+      ? this.letrasPendientes
+      : this.letrasPagadas) as LetraCambioConSeleccion[];
+    const termino = this.filtroNumeroLetra.trim();
+    if (!termino) return lista;
+
+    // Comparación exacta contra la parte numérica antes del "/".
+    // Ej: numeroLetra = "5/120"  → parteNum = "5"
+    //     usuario escribe "5"    → coincide SOLO con letra 5, no con 15, 25, 35…
+    // También soporta entrada con cero inicial: "05" == "5".
+    const terminoNum = parseInt(termino, 10);
+    return lista.filter(l => {
+      const raw = (l.numeroLetra ?? '').split('/')[0].trim();
+      const num = parseInt(raw, 10);
+      // Si ambos son números enteros válidos → comparar por valor numérico
+      if (!isNaN(terminoNum) && !isNaN(num)) {
+        return num === terminoNum;
+      }
+      // Fallback (formato no numérico): igualdad exacta ignorando mayúsculas
+      return raw.toLowerCase() === termino.toLowerCase();
+    });
+  }
+
+  /** Tercer cambio: llamado desde el input del filtro para resetear paginación. */
+  onFiltroChange(): void {
+    this.currentPage = 1;
+    this.aplicarPaginacion();
+  }
+
   aplicarPaginacion(): void {
-    const listaActual = this.tipoLista === 'pendientes' ? this.letrasPendientes : this.letrasPagadas;
+    const listaActual = this.listaFiltrada;
     this.totalPages = Math.ceil(listaActual.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
     this.paginatedLetras = listaActual.slice(start, start + this.pageSize) as LetraCambioConSeleccion[];

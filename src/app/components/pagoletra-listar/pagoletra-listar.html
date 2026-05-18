@@ -1,6 +1,7 @@
 <div class="pagos-container">
   <h2>REGISTRO DE PAGOS DE LETRAS</h2>
 
+  <!-- ── BUSCADOR DE CONTRATO ─────────────────────────────────────────────── -->
   <div class="filtros">
     <div class="form-group">
       <label>Programa</label>
@@ -32,7 +33,7 @@
     </button>
   </div>
 
-  <!-- Info del contrato -->
+  <!-- ── INFO DEL CONTRATO ─────────────────────────────────────────────────── -->
   <div *ngIf="contratoEncontrado" class="contrato-info-card">
     <h4>Contrato #{{ contratoEncontrado.idContrato }}</h4>
     <div class="info-grid">
@@ -52,14 +53,16 @@
         <strong>Fecha contrato:</strong>
         {{ contratoEncontrado.fechaContrato | date:'dd/MM/yyyy' }}
       </div>
-      <div class="total-saldo-row">
+      <div>
+        <strong>Total:</strong>
         <span class="total-label">
-          <strong>Total:</strong>
           {{contratoEncontrado.moneda === 'PEN' ? 'S/.' : '$'}}
           {{contratoEncontrado.montoTotal | number:'1.2-2'}}
         </span>
+      </div>
+      <div>
+        <strong>Saldo:</strong>
         <span class="saldo-label">
-          <strong>Saldo:</strong>
           {{contratoEncontrado.moneda === 'PEN' ? 'S/.' : '$'}}
           {{contratoEncontrado.saldo | number:'1.2-2'}}
         </span>
@@ -83,34 +86,72 @@
     </div>
   </div>
 
+  <!-- ── TABLA DE LETRAS ───────────────────────────────────────────────────── -->
   <div *ngIf="contratoEncontrado" class="tabla-wrapper">
-    <div class="tabla-header">
-      <div class="header-left">
-        <div class="toggle-container">
-          <button class="toggle-btn"
-                  [class.active]="tipoLista === 'pendientes'"
-                  (click)="cambiarTipoLista('pendientes')">Pendientes</button>
-          <button class="toggle-btn"
-                  [class.active]="tipoLista === 'pagadas'"
-                  (click)="cambiarTipoLista('pagadas')">Pagadas</button>
-        </div>
 
-        <button *ngIf="contratoEncontrado" class="btn-ver-pagos" (click)="abrirListaPagos()">
-          <i class="bi bi-list-ul"></i> Ver Pagos
+    <!-- FILA 1: tabs izquierda + buscador extremo derecho -->
+    <div class="tabla-toolbar-top">
+      <div class="toggle-container">
+        <button class="toggle-btn"
+                [class.active]="tipoLista === 'pendientes'"
+                (click)="cambiarTipoLista('pendientes')">
+          Pendientes
+          <span class="tab-count">{{ letrasPendientes.length }}</span>
+        </button>
+        <button class="toggle-btn"
+                [class.active]="tipoLista === 'pagadas'"
+                (click)="cambiarTipoLista('pagadas')">
+          Pagadas
+          <span class="tab-count pagadas-count">{{ letrasPagadas.length }}</span>
+        </button>
+      </div>
+
+      <div class="filtro-letra-derecha">
+        <span *ngIf="filtroNumeroLetra" class="filtro-letra-count">
+          {{ listaFiltrada.length }} resultado{{ listaFiltrada.length !== 1 ? 's' : '' }}
+        </span>
+        <div class="filtro-letra-input-group">
+          <i class="bi bi-search filtro-letra-icon"></i>
+          <input
+            type="text"
+            class="filtro-letra-input"
+            placeholder="Ir a letra N°…"
+            [(ngModel)]="filtroNumeroLetra"
+            (ngModelChange)="onFiltroChange()"
+          />
+          <button
+            *ngIf="filtroNumeroLetra"
+            class="filtro-letra-clear"
+            (click)="filtroNumeroLetra = ''; onFiltroChange()"
+            title="Limpiar">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILA 2: acciones secundarias izquierda + paginación derecha -->
+    <div class="tabla-toolbar-bottom">
+      <div class="acciones-secundarias">
+        <button class="btn-accion-secundaria" (click)="abrirListaPagos()" title="Ver historial de pagos">
+          <i class="bi bi-list-ul"></i>
+          <span>Ver Pagos</span>
         </button>
 
-        <button *ngIf="contratoEncontrado" class="btn-ver-moras" (click)="abrirMoraListar()">
-          <i class="bi bi-clock-history"></i> Ver Moras
+        <button class="btn-accion-secundaria mora" (click)="abrirMoraListar()" title="Ver historial de moras">
+          <i class="bi bi-clock-history"></i>
+          <span>Ver Moras</span>
           <span *ngIf="moraResumen && moraResumen.cantidadMorasPendientes > 0"
                 class="mora-badge">
             {{ moraResumen.cantidadMorasPendientes }}
           </span>
         </button>
 
-        <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 0"
+        <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 1"
                 class="btn-pagar-multiple"
                 (click)="abrirModalPagoMultiple()">
-          <i class="bi bi-cash-stack"></i> Pagar {{ cantidadSeleccionadas }} letras
+          <i class="bi bi-cash-stack"></i>
+          Pagar {{ cantidadSeleccionadas }} {{ cantidadSeleccionadas === 1 ? 'letra' : 'letras' }}
         </button>
       </div>
 
@@ -207,12 +248,18 @@
     </table>
 
     <div *ngIf="!cargandoLetras && paginatedLetras.length === 0" class="sin-resultados">
-      No hay letras {{ tipoLista === 'pendientes' ? 'pendientes' : 'pagadas' }} para este contrato.
+      <ng-container *ngIf="filtroNumeroLetra; else sinLetrasFiltro">
+        No hay letras que coincidan con "<strong>{{ filtroNumeroLetra }}</strong>".
+      </ng-container>
+      <ng-template #sinLetrasFiltro>
+        No hay letras {{ tipoLista === 'pendientes' ? 'pendientes' : 'pagadas' }} para este contrato.
+      </ng-template>
     </div>
+
   </div>
 </div>
 
-<!-- Modal individual de pago — recibe calculoMora cuando aplica -->
+<!-- Modal individual de pago -->
 <app-pago-letra-form
   *ngIf="letraSeleccionada && letraSeleccionada.idLetra"
   [letra]="letraSeleccionada"

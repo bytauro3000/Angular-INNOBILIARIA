@@ -61,13 +61,25 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
   }
 
   ngAfterViewInit(): void {
-    this.modal = new bootstrap.Modal(this.modalElement.nativeElement);
+    this.modal = new bootstrap.Modal(this.modalElement.nativeElement, {
+      backdrop: 'static',
+      keyboard: false
+    });
     this.modal.show();
   }
 
   cerrarModal(): void {
     this.modal?.hide();
-    setTimeout(() => this.onClose.emit(), 300);
+    setTimeout(() => {
+      this.modal?.dispose();
+      // Restaurar el scroll del body que Bootstrap bloquea al abrir el modal
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      // Eliminar el backdrop residual si quedara alguno
+      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+      this.onClose.emit();
+    }, 300);
   }
 
   onMedioPagoChange(): void {

@@ -85,7 +85,7 @@
           <th class="text-end">INICIAL</th>
           <th class="text-end">SALDO</th>
           <th class="text-center" style="width:70px;">LETRAS</th>
-          <th class="text-center" style="width:180px;">ACCIONES</th>
+          <th class="text-center" style="width:150px;">ACCIONES</th>
         </tr>
       </thead>
 
@@ -104,15 +104,9 @@
         <ng-container *ngIf="!isCargando">
           <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
 
-            <!-- ID + servicios -->
+            <!-- ID -->
             <td class="text-center" data-label="ID">
-              <div class="id-service-wrapper">
-                <span class="id-number">{{ contrato.idContrato }}</span>
-                <div class="service-indicators" *ngIf="contrato.tieneLuz || contrato.tieneAgua">
-                  <i *ngIf="contrato.tieneLuz" class="bi bi-lightning-charge-fill"></i>
-                  <i *ngIf="contrato.tieneAgua" class="bi bi-droplet-fill"></i>
-                </div>
-              </div>
+              <span class="id-number">{{ contrato.idContrato }}</span>
             </td>
 
             <!-- Clientes -->
@@ -190,17 +184,6 @@
                   <i class="bi bi-trash"></i>
                 </button>
 
-                <button (click)="abrirModalInscripcion(contrato.idContrato!)" class="btn-action btn-inscripcion"
-                  [ngClass]="{'btn-success-active': contrato.tieneLuz && contrato.tieneAgua}"
-                  [disabled]="contrato.tieneLuz && contrato.tieneAgua"
-                  [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'">
-                  <i class="bi" [ngClass]="{
-                  'bi-lightning-charge': !contrato.tieneLuz,
-                  'bi-droplet': contrato.tieneLuz && !contrato.tieneAgua,
-                  'bi-check-circle-fill': contrato.tieneLuz && contrato.tieneAgua
-                }"></i>
-                </button>
-
                 <button (click)="imprimirContrato(contrato)" class="btn-action btn-print" title="Imprimir contrato">
                   <i class="bi bi-file-earmark-richtext"></i>
                 </button>
@@ -248,6 +231,3 @@
     <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">Siguiente</button>
   </div>
 </div>
-
-<app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">
-</app-inscripcion-servicios-insertar>

@@ -241,8 +241,8 @@ $border-color: #e9ecef;
     .id-number { font-weight: 600; color: $navy; }
     .service-indicators {
       display: flex; gap: 6px; font-size: 0.9rem;
-      i.bi-lightning-charge-fill { color: $orange; }
-      i.bi-droplet-fill { color: $light-blue; }
+      i.bi-lightning-charge-fill { color: $yellow; }
+      i.bi-droplet-fill { color: #29b6f6; }
     }
   }
 
@@ -536,8 +536,8 @@ $border-color: #e9ecef;
         }
 
         .service-indicators {
-          i.bi-lightning-charge-fill { color: #ffd166; }
-          i.bi-droplet-fill          { color: #90e0ef; }
+          i.bi-lightning-charge-fill { color: #f1c40f; }
+          i.bi-droplet-fill          { color: #29b6f6; }
         }
       }
     }

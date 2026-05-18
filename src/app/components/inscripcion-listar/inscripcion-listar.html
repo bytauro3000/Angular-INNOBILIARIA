@@ -1,0 +1,120 @@
+<div class="inscripcion-listar-container">
+  <h2>INSCRIPCIONES DE SERVICIOS BÁSICOS</h2>
+
+  <!-- ══════════════════ FILTROS ══════════════════ -->
+  <div class="filtros-header">
+
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        (input)="aplicarFiltros()"
+        placeholder="Buscar por ID o nombre del cliente..."
+      />
+      <button class="btn-clear-inline" (click)="limpiarFiltros()" [class.active]="terminoBusqueda || filtroServicio !== 'TODOS'" title="Limpiar">
+        <i class="bi bi-x-circle-fill"></i>
+      </button>
+    </div>
+
+    <div class="filtro-chips">
+      <button class="chip" [class.active]="filtroServicio === 'TODOS'"        (click)="filtroServicio = 'TODOS';        aplicarFiltros()">Todos</button>
+      <button class="chip sin"      [class.active]="filtroServicio === 'SIN_SERVICIO'" (click)="filtroServicio = 'SIN_SERVICIO'; aplicarFiltros()">Sin servicio</button>
+      <button class="chip parcial"  [class.active]="filtroServicio === 'PARCIAL'"      (click)="filtroServicio = 'PARCIAL';      aplicarFiltros()">Parcial</button>
+      <button class="chip completo" [class.active]="filtroServicio === 'COMPLETO'"     (click)="filtroServicio = 'COMPLETO';     aplicarFiltros()">Completo</button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════ TABLA ══════════════════ -->
+  <div class="tabla-wrapper">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th class="text-center" style="width:60px;">ID</th>
+          <th>CLIENTE(S)</th>
+          <th class="text-center">MZ Y LT</th>
+          <th class="text-center">LUZ</th>
+          <th class="text-center">AGUA</th>
+          <th class="text-center">ESTADO</th>
+          <th class="text-center" style="width:100px;">ACCIÓN</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Cargando -->
+        <tr *ngIf="isCargando">
+          <td colspan="7">
+            <div class="loading-dots-wrapper-inline">
+              <div class="loading-dots"><span></span><span></span><span></span></div>
+              <p class="loading-text">Cargando contratos...</p>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Filas -->
+        <ng-container *ngIf="!isCargando">
+          <tr *ngFor="let contrato of contratosFiltrados" [ngClass]="'fila-' + getEstadoServicio(contrato)">
+            <td class="text-center">
+              <span class="id-number">{{ contrato.idContrato }}</span>
+            </td>
+            <td>{{ getClientesTexto(contrato) }}</td>
+            <td class="text-center">{{ getLotesTexto(contrato) }}</td>
+
+            <!-- Luz -->
+            <td class="text-center">
+              <i class="bi servicio-icon"
+                [ngClass]="contrato.tieneLuz ? 'bi-lightning-charge-fill icon-luz' : 'bi-lightning-charge icon-apagado'"
+                [title]="contrato.tieneLuz ? 'Luz inscrita' : 'Sin luz'">
+              </i>
+            </td>
+
+            <!-- Agua -->
+            <td class="text-center">
+              <i class="bi servicio-icon"
+                [ngClass]="contrato.tieneAgua ? 'bi-droplet-fill icon-agua' : 'bi-droplet icon-apagado'"
+                [title]="contrato.tieneAgua ? 'Agua inscrita' : 'Sin agua'">
+              </i>
+            </td>
+
+            <!-- Estado badge -->
+            <td class="text-center">
+              <span class="estado-badge" [ngClass]="'badge-' + getEstadoServicio(contrato)">
+                <ng-container [ngSwitch]="getEstadoServicio(contrato)">
+                  <span *ngSwitchCase="'completo'"><i class="bi bi-check-circle-fill"></i> Completo</span>
+                  <span *ngSwitchCase="'parcial'"><i class="bi bi-exclamation-circle-fill"></i> Parcial</span>
+                  <span *ngSwitchCase="'ninguno'"><i class="bi bi-dash-circle"></i> Ninguno</span>
+                </ng-container>
+              </span>
+            </td>
+
+            <!-- Acción -->
+            <td class="text-center">
+              <button
+                class="btn-action btn-inscribir"
+                [disabled]="contrato.tieneLuz && contrato.tieneAgua"
+                [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'"
+                (click)="abrirModalInscripcion(contrato.idContrato)">
+                <i class="bi" [ngClass]="(contrato.tieneLuz && contrato.tieneAgua) ? 'bi-check-circle-fill' : 'bi-plus-circle'"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- Sin resultados -->
+        <tr *ngIf="!isCargando && contratosFiltrados.length === 0">
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="bi bi-search"></i>
+              <p class="empty-title">Sin resultados</p>
+              <p class="empty-subtitle">No se encontraron contratos con ese criterio</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">
+</app-inscripcion-servicios-insertar>

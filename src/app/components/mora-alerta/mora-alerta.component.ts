@@ -127,6 +127,11 @@ export class MoraAlertaComponent implements OnInit {
   /** Llamado por (onClose) de mora-pagar: el usuario cerró sin pagar */
   cerrarModalPago(): void {
     this.moraParaPagar = null;
+    // mora-pagar usa bootstrap.Modal con dispose(), que a veces no limpia el body
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
 
   /**

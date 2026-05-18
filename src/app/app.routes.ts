@@ -36,6 +36,7 @@ import { SeparacionInsertEdit } from './components/separacion-insert-edit/separa
 // Servicios Básicos
 import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
 import { RecibosListarComponent } from './components/recibos-listar/recibos-listar.component';
+import { InscripcionListarComponent } from './components/inscripcion-listar/inscripcion-lista-component';
 
 // Otros componentes
 import { ParceleroListarComponent } from './components/parcelero-listar/parcelero-listar.component';
@@ -96,6 +97,7 @@ export const routes: Routes = [
       { path: 'parceleros', component: ParceleroListarComponent },
 
       // Servicios Básicos
+      { path: 'servicios-basicos/inscripciones', component: InscripcionListarComponent },
       { path: 'servicios-basicos', component: LecturaPlanillaComponent },
       { path: 'servicios-basicos/listar', component: RecibosListarComponent },
 
