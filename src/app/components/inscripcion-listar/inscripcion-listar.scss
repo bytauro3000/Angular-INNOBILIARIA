@@ -111,9 +111,9 @@ $light-bg:    #f5f7fa;
   &:hover { border-color: $navy; color: $navy; }
   &.active { background: $navy; border-color: $navy; color: #fff; }
 
-  &.sin.active    { background: #dc3545; border-color: #dc3545; }
-  &.parcial.active { background: #f39c12; border-color: #f39c12; }
-  &.completo.active { background: $green; border-color: $green; }
+  &.sin.active     { background: #dc3545; border-color: #dc3545; }
+  &.parcial.active  { background: #f39c12; border-color: #f39c12; }
+  &.completo.active { background: $green;  border-color: $green; }
 }
 
 // ============================================

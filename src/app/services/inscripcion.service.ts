@@ -25,15 +25,29 @@ export interface InscripcionConPagoResponse {
   idContrato:        number;
 }
 
+// ── NUEVO: DTO que devuelve el endpoint /api/gateway/inscripciones/resumen ──
+export interface InscripcionResumenDTO {
+  idContrato:     number;
+  nombreCliente:  string;
+  manzana:        string;
+  numeroLote:     string;
+  tieneLuz:       boolean;
+  tieneAgua:      boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class InscripcionService {
 
-  private readonly URL_GATEWAY    = `${environment.apiUrl}/api/gateway/inscripciones`;
+  private readonly URL_GATEWAY = `${environment.apiUrl}/api/gateway/inscripciones`;
   private readonly URL_COMPROBANTE = `${environment.apiUrl}/api/comprobantes`;
 
   constructor(private http: HttpClient) { }
+
+  listarResumen(): Observable<InscripcionResumenDTO[]> {
+    return this.http.get<InscripcionResumenDTO[]>(`${this.URL_GATEWAY}/resumen`);
+  }
 
   // ── Endpoint original ────────────────────────────────────────────────────
 
@@ -49,7 +63,7 @@ export class InscripcionService {
     return this.http.get<number[]>(`${this.URL_GATEWAY}/contratos-activos`, { params });
   }
 
-  // ── Nuevos métodos para inscripción con comprobante ──────────────────────
+  // ── Métodos para inscripción con comprobante ─────────────────────────────
 
   /**
    * Registra la inscripción de servicio Y genera el comprobante en el monolito.
@@ -74,8 +88,7 @@ export class InscripcionService {
   }
 
   /**
-   * Consulta al backend el siguiente número de comprobante disponible
-   * (mismo endpoint genérico que usa pagoletra-insertar).
+   * Consulta al backend el siguiente número de comprobante disponible.
    */
   previewSiguienteNumeroComprobante(tipo: TipoComprobante): Observable<string> {
     return this.http.get(

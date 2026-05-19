@@ -1,18 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ContratoService } from '../../services/contrato.service';
+import { InscripcionService, InscripcionResumenDTO } from '../../services/inscripcion.service';
 import { InscripcionServiciosInsertarComponent } from '../inscripcion-servicios-insertar/inscripcion-servicios-insertar.component';
-import { ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-
-interface ContratoConServicios {
-  idContrato: number;
-  clientes: { nombre: string; apellidos: string; numDoc: string }[];
-  lotes: { manzana: string; numeroLote: string }[];
-  tieneLuz: boolean;
-  tieneAgua: boolean;
-}
 
 @Component({
   selector: 'app-inscripcion-listar',
@@ -25,14 +16,14 @@ export class InscripcionListarComponent implements OnInit {
 
   @ViewChild('modalInscripcion') modalInscripcion!: InscripcionServiciosInsertarComponent;
 
-  contratos: ContratoConServicios[] = [];
-  contratosFiltrados: ContratoConServicios[] = [];
+  contratos: InscripcionResumenDTO[] = [];
+  contratosFiltrados: InscripcionResumenDTO[] = [];
   terminoBusqueda: string = '';
   filtroServicio: 'TODOS' | 'SIN_SERVICIO' | 'PARCIAL' | 'COMPLETO' = 'TODOS';
   isCargando: boolean = false;
 
   constructor(
-    private contratoService: ContratoService,
+    private inscripcionService: InscripcionService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -43,15 +34,10 @@ export class InscripcionListarComponent implements OnInit {
 
   cargarContratos(): void {
     this.isCargando = true;
-    this.contratoService.listarContrato().subscribe({
-      next: (data: any[]) => {
-        this.contratos = data.map(c => ({
-          idContrato: c.idContrato,
-          clientes: c.clientes ?? [],
-          lotes: c.lotes ?? [],
-          tieneLuz: !!c.tieneLuz,
-          tieneAgua: !!c.tieneAgua
-        }));
+    // Llama a GET /api/gateway/inscripciones/resumen (endpoint optimizado)
+    this.inscripcionService.listarResumen().subscribe({
+      next: (data: InscripcionResumenDTO[]) => {
+        this.contratos = data;
         this.aplicarFiltros();
         this.isCargando = false;
         this.cdr.markForCheck();
@@ -70,7 +56,7 @@ export class InscripcionListarComponent implements OnInit {
       const t = this.terminoBusqueda.toLowerCase();
       resultado = resultado.filter(c =>
         c.idContrato.toString().includes(t) ||
-        c.clientes.some(cl => `${cl.nombre} ${cl.apellidos}`.toLowerCase().includes(t))
+        c.nombreCliente.toLowerCase().includes(t)
       );
     }
 
@@ -97,17 +83,19 @@ export class InscripcionListarComponent implements OnInit {
     this.cargarContratos();
   }
 
-  getEstadoServicio(c: ContratoConServicios): 'completo' | 'parcial' | 'ninguno' {
+  getEstadoServicio(c: InscripcionResumenDTO): 'completo' | 'parcial' | 'ninguno' {
     if (c.tieneLuz && c.tieneAgua) return 'completo';
     if (c.tieneLuz || c.tieneAgua) return 'parcial';
     return 'ninguno';
   }
 
-  getLotesTexto(c: ContratoConServicios): string {
-    return c.lotes.map(l => `Mz. ${l.manzana} - Lt. ${l.numeroLote}`).join(', ') || '—';
+  // El DTO del resumen ya trae nombreCliente y manzana/numeroLote como strings directos
+  getLotesTexto(c: InscripcionResumenDTO): string {
+    if (!c.manzana && !c.numeroLote) return '—';
+    return `Mz. ${c.manzana} - Lt. ${c.numeroLote}`;
   }
 
-  getClientesTexto(c: ContratoConServicios): string {
-    return c.clientes.map(cl => `${cl.nombre} ${cl.apellidos}`).join(' / ') || '—';
+  getClientesTexto(c: InscripcionResumenDTO): string {
+    return c.nombreCliente || '—';
   }
 }
