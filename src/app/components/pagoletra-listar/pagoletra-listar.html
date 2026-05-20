@@ -390,7 +390,7 @@
   [letras]="letrasSeleccionadasTemp"
   [contrato]="contratoEncontrado"
   (onClose)="cerrarModalPagoMultiple()"
-  (onPagoExitoso)="onPagoMultipleRegistrado()">
+  (onPagoExitoso)="onPagoMultipleRegistrado($event)">
 </app-pago-multiple-form>
 
 <!-- Modal lista de pagos -->

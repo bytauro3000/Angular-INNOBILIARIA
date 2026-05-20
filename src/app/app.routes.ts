@@ -51,6 +51,9 @@ import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-s
 import { LetracambioListarComponent } from './components/letracambio-listar/letracambios-listar.component';
 import { LetracambioInsertarComponent } from './components/letracambio-insertar/letracambio-insertar.component';
 
+// Reporte Mora
+import { ReporteMoraComponent } from './components/reporte-mora/reporte-mora.component';
+
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -83,6 +86,7 @@ export const routes: Routes = [
       { path: 'contratos', component: ContratoListarComponent },
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
       { path: 'contratos/editar/:id', component: ContratoEditarComponent },
+      { path: 'contratos/reporte-mora', component: ReporteMoraComponent },
 
       // Pago Letras
       { path: 'pagoletras', component: PagoletraListarComponent },

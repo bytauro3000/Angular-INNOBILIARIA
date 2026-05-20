@@ -30,7 +30,8 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   @Input() contrato!: any;
 
   @Output() onClose = new EventEmitter<void>();
-  @Output() onPagoExitoso = new EventEmitter<void>();
+  /** Emite el número de comprobante generado (ej: "EB01-0001") al padre para abrir el PDF. */
+  @Output() onPagoExitoso = new EventEmitter<string | null>();
 
   medioPagoOptions = Object.values(MedioPago);
   tipoComprobanteOptions = Object.values(TipoComprobante);
@@ -62,6 +63,8 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   // ── Control de cierre limpio ───────────────────────────────────────────────
   private hiddenListener?: () => void;
   private pagoExitosoAlCerrar: boolean = false;
+  /** Número de comprobante generado por el backend; se emite al padre al cerrar. */
+  private numeroComprobanteGenerado: string | null = null;
 
   get subtotalLetras(): number {
     return this.letras.reduce((acc, l) => acc + l.importe, 0);
@@ -109,7 +112,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
         // Volvemos a zona Angular para emitir el output y disparar change detection.
         this.ngZone.run(() => {
           if (this.pagoExitosoAlCerrar) {
-            this.onPagoExitoso.emit();
+            this.onPagoExitoso.emit(this.numeroComprobanteGenerado);
           } else {
             this.onClose.emit();
           }
@@ -141,7 +144,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       // Modal ya oculto (caso borde): emitimos directamente.
       this.limpiarBackdropResidual();
       if (this.pagoExitosoAlCerrar) {
-        this.onPagoExitoso.emit();
+        this.onPagoExitoso.emit(this.numeroComprobanteGenerado);
       } else {
         this.onClose.emit();
       }
@@ -316,7 +319,9 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
     this.enviando = true;
     this.pagoService.registrarPagosMultiples(request, this.voucherFiles).subscribe({
-      next: () => {
+      next: (res) => {
+        // Guardar el número de comprobante para abrirlo automáticamente al cerrar
+        this.numeroComprobanteGenerado = res?.numeroComprobanteGenerado ?? null;
         this.toastr.success('Pagos múltiples registrados correctamente', 'Éxito');
         this.enviando = false;
         this.pagoExitosoAlCerrar = true;

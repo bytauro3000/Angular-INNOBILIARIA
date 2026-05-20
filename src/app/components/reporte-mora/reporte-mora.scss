@@ -1,0 +1,327 @@
+// ── Variables ─────────────────────────────────────────────────────────────
+$navy:       #023e8a;
+$blue:       #2980b9;
+$green:      #27ae60;
+$red:        #dc2626;
+$orange:     #d97706;
+$yellow:     #f1c40f;
+$text-dark:  #1e293b;
+$text-light: #475569;
+$border:     #e2e8f0;
+$bg-page:    #f5f7fa;
+$bg-white:   #ffffff;
+
+// ── Contenedor principal ───────────────────────────────────────────────────
+.reporte-mora-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// ── Encabezado ─────────────────────────────────────────────────────────────
+.reporte-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.reporte-title-block {
+  h2 {
+    position: relative;
+    color: $text-dark;
+    font-weight: 600;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 1.3rem;
+    margin: 0 0 4px;
+    padding-left: 20px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-left: 8px solid $navy;
+    }
+  }
+}
+
+.reporte-subtitle {
+  color: $text-light;
+  font-size: 0.82rem;
+  margin: 0 0 0 20px;
+}
+
+.reporte-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+// ── Botones de acción ──────────────────────────────────────────────────────
+.btn-actualizar,
+.btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-actualizar {
+  background: $navy;
+  color: #fff;
+  &:hover:not(:disabled) { background: #012d63; } // antes: darken($navy, 8%)
+}
+
+.btn-pdf {
+  background: $red;
+  color: #fff;
+  &:hover:not(:disabled) { background: #b91c1c; } // antes: darken($red, 8%)
+}
+
+// ── Resumen cards ──────────────────────────────────────────────────────────
+.resumen-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.resumen-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: $bg-white;
+  border-radius: 12px;
+  padding: 14px 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid $border;
+  min-width: 180px;
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-dark;
+    line-height: 1;
+  }
+
+  .card-label {
+    font-size: 0.75rem;
+    color: $text-light;
+    margin-top: 2px;
+  }
+
+  &.card-programas .card-icon { background: $navy; }
+  &.card-clientes  .card-icon { background: $red; }
+}
+
+// ── Estados carga / vacío ──────────────────────────────────────────────────
+.estado-cargando,
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: $text-light;
+  gap: 14px;
+  background: $bg-white;
+  border-radius: 12px;
+  border: 1px solid $border;
+
+  p { margin: 0; font-size: 0.95rem; }
+}
+
+.estado-vacio i {
+  font-size: 3rem;
+  color: $green;
+}
+
+// Spinner ring animado
+.spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 4px solid $border;
+  border-top-color: $navy;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Bloque por programa ────────────────────────────────────────────────────
+.programa-bloque {
+  background: $bg-white;
+  border-radius: 12px;
+  border: 1px solid $border;
+  margin-bottom: 24px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.programa-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $navy;
+  color: #fff;
+  padding: 12px 20px;
+
+  i { font-size: 1rem; opacity: 0.85; }
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    flex: 1;
+  }
+}
+
+.programa-badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+// ── Tabla ─────────────────────────────────────────────────────────────────
+.tabla-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-mora {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+
+  thead tr {
+    background: #f1f5f9;
+  }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: $text-light;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid $border;
+    white-space: nowrap;
+
+    &.text-center { text-align: center; }
+    &.text-right  { text-align: right; }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $border;
+    transition: background 0.15s;
+
+    &:hover { background: #f8fafc; }
+    &:last-child { border-bottom: none; }
+
+    // filas con 3+ letras atrasadas → fondo rojo suave
+    &.fila-critica {
+      background: #fff5f5;
+      &:hover { background: #fee2e2; }
+    }
+  }
+
+  td {
+    padding: 10px 14px;
+    color: $text-dark;
+    vertical-align: middle;
+
+    &.text-center { text-align: center; }
+    &.text-right  { text-align: right; }
+  }
+}
+
+// ── Celdas especiales ─────────────────────────────────────────────────────
+.td-num { color: $text-light; font-size: 0.78rem; width: 36px; }
+.td-cliente { font-weight: 500; min-width: 200px; }
+.td-mz, .td-lt { font-weight: 600; color: $navy; }
+.td-importe { font-weight: 700; color: $text-dark; white-space: nowrap; }
+.td-celular { font-family: monospace; font-size: 0.82rem; }
+
+// Badge cantidad de letras
+.badge-letras {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+
+  &.badge-bajo  { background: $orange; }
+  &.badge-medio { background: #b45309; } // antes: darken($orange, 10%)
+  &.badge-alto  { background: $red; }
+}
+
+// Chip de rango de letras
+.rango-chip {
+  display: inline-block;
+  background: #eff6ff;
+  color: $navy;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #bfdbfe;
+  white-space: nowrap;
+}
+
+.sin-celular { color: $text-light; font-style: italic; }
+
+// ── Responsive ────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .reporte-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .reporte-actions {
+    justify-content: flex-end;
+  }
+  .resumen-cards {
+    flex-direction: column;
+  }
+}

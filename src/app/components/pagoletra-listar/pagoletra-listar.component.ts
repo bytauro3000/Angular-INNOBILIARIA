@@ -441,7 +441,7 @@ export class PagoletraListarComponent implements OnInit {
     this.letrasSeleccionadasTemp = [];
   }
 
-  onPagoMultipleRegistrado(): void {
+  onPagoMultipleRegistrado(numeroComprobante: string | null): void {
     this.cerrarModalPagoMultiple();
     this.seleccionadasMap.clear();
     if (this.contratoEncontrado) {
@@ -450,6 +450,14 @@ export class PagoletraListarComponent implements OnInit {
       this.refrescarContrato();
     }
     this.toastr.success('Pago múltiple registrado correctamente', 'Éxito');
+
+    // Abrir el comprobante PDF automáticamente si el backend lo generó
+    if (numeroComprobante) {
+      this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
+        next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
+        error: () => this.toastr.warning('El pago se registró pero no se pudo abrir el comprobante', 'Aviso')
+      });
+    }
   }
 
   abrirModalPago(letra: LetraCambio): void {

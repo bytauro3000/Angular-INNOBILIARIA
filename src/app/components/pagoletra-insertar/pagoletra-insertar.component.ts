@@ -340,7 +340,11 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
         this.moraService.pagarMora(pagoMora).subscribe({
           next: (pagoMoraRes) => {
-            this.toastr.success('Letra y mora pagadas correctamente', 'Éxito');
+            this.toastr.success(
+              `Letra N° ${this.numeroLetraLimpio} y mora pagadas correctamente`,
+              'Pago registrado',
+              { timeOut: 5000 }
+            );
             this.pagandoMora = false;
             this.abrirComprobanteMora(pagoMoraRes.idPagoMora);
             this.finalizarPago(idPagoLetra);
@@ -370,6 +374,22 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   private finalizarPago(idPago: number): void {
     this.enviando = false;
+
+    // ── Mensaje de éxito con número de letra y tipo de pago ───────────────
+    if (this.modoPagoAcuenta) {
+      this.toastr.success(
+        `Pago a cuenta registrado correctamente para la Letra N° ${this.numeroLetraLimpio}`,
+        'Pago registrado',
+        { timeOut: 5000 }
+      );
+    } else {
+      this.toastr.success(
+        `Letra N° ${this.numeroLetraLimpio} pagada correctamente`,
+        'Pago registrado',
+        { timeOut: 5000 }
+      );
+    }
+
     this.onPagoExitoso.emit();
     this.cerrarModal(); // Bootstrap animará cierre → hidden.bs.modal → onClose
 
