@@ -1,0 +1,172 @@
+<div class="pago-inscripcion-container">
+  <h2>PAGOS DE INSCRIPCIONES</h2>
+
+  <!-- ══════════════════ FILTROS ══════════════════ -->
+  <div class="filtros-header">
+
+    <!-- Selector de programa -->
+    <div class="selector-programa">
+      <label for="progSelect">Programa:</label>
+      <select id="progSelect" class="form-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
+        <option [ngValue]="null">Todos los programas</option>
+        <option *ngFor="let prog of programas" [ngValue]="prog.idPrograma">{{ prog.nombrePrograma }}</option>
+      </select>
+    </div>
+
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        (input)="aplicarFiltros()"
+        placeholder="Buscar por Mz, Lt o comprobante..."
+      />
+      <button class="btn-clear-inline" (click)="limpiarFiltros()"
+        [class.active]="terminoBusqueda || filtroServicio !== 'TODOS'" title="Limpiar">
+        <i class="bi bi-x-circle-fill"></i>
+      </button>
+    </div>
+
+    <div class="filtro-chips">
+      <button class="chip"      [class.active]="filtroServicio === 'TODOS'" (click)="filtroServicio = 'TODOS'; aplicarFiltros()">
+        Todos <span class="chip-count">{{ getTotalPorPrograma() }}</span>
+      </button>
+      <button class="chip luz"  [class.active]="filtroServicio === 'LUZ'"   (click)="filtroServicio = 'LUZ';   aplicarFiltros()">
+        ⚡ Luz <span class="chip-count">{{ getTotalLuz() }}</span>
+      </button>
+      <button class="chip agua" [class.active]="filtroServicio === 'AGUA'"  (click)="filtroServicio = 'AGUA';  aplicarFiltros()">
+        💧 Agua <span class="chip-count">{{ getTotalAgua() }}</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════ TABLA ══════════════════ -->
+  <div class="tabla-wrapper">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th class="text-center" style="width:70px;">ID PAGO</th>
+          <th class="text-center">LOTE</th>
+          <th class="text-center">SERVICIO</th>
+          <th class="text-right">MONTO</th>
+          <th class="text-center">FECHA PAGO</th>
+          <th class="text-center">MEDIO DE PAGO</th>
+          <th class="text-center">COMPROBANTE</th>
+          <th class="text-center" style="width:90px;">ACCIONES</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Cargando -->
+        <tr *ngIf="isCargando" class="loading-row">
+          <td colspan="8">
+            <div class="loading-dots-wrapper-inline">
+              <div class="loading-dots"><span></span><span></span><span></span></div>
+              <p class="loading-text">Cargando pagos...</p>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Filas -->
+        <ng-container *ngIf="!isCargando">
+          <tr *ngFor="let pago of pagosPagina">
+
+            <td class="text-center" data-label="ID Pago">
+              <span class="id-number">{{ pago.idPagoInicial }}</span>
+            </td>
+
+            <td class="text-center" data-label="Lote">
+              <span class="mz-lt-badge">{{ getMzLt(pago) }}</span>
+            </td>
+
+            <td class="text-center" data-label="Servicio">
+              <span class="servicio-badge" [ngClass]="pago.tipoServicio === 'LUZ' ? 'badge-luz' : 'badge-agua'">
+                <span *ngIf="pago.tipoServicio === 'LUZ'">⚡ Luz</span>
+                <span *ngIf="pago.tipoServicio === 'AGUA'">💧 Agua</span>
+                <span *ngIf="pago.tipoServicio !== 'LUZ' && pago.tipoServicio !== 'AGUA'">{{ pago.tipoServicio }}</span>
+              </span>
+            </td>
+
+            <td class="text-right" data-label="Monto">
+              <span class="monto">S/ {{ pago.importePagado | number:'1.2-2' }}</span>
+            </td>
+
+            <td class="text-center" data-label="Fecha Pago">
+              {{ pago.fechaPago | date:'dd/MM/yyyy' }}
+            </td>
+
+            <td class="text-center" data-label="Medio de Pago">
+              <span class="medio-pago-badge">{{ getMedioPagoLabel(pago.medioPago) }}</span>
+            </td>
+
+            <td class="text-center" data-label="Comprobante">
+              <div class="comprobante-info" *ngIf="pago.numeroComprobante; else sinComprobante">
+                <span class="tipo-comprobante">{{ getTipoComprobanteLabel(pago.tipoComprobante) }}</span>
+                <span class="numero-comprobante">{{ pago.numeroComprobante }}</span>
+              </div>
+              <ng-template #sinComprobante>
+                <span class="sin-dato">—</span>
+              </ng-template>
+            </td>
+
+            <!-- Acciones -->
+            <td class="text-center" data-label="Acciones">
+              <button
+                class="btn-action btn-pdf"
+                [class.loading]="descargando === pago.idPagoInicial"
+                [disabled]="descargando === pago.idPagoInicial || !pago.numeroComprobante"
+                title="Ver comprobante PDF"
+                (click)="verComprobantePdf(pago)">
+                <i class="bi" [ngClass]="descargando === pago.idPagoInicial ? 'bi-hourglass-split' : 'bi-file-earmark-pdf'"></i>
+              </button>
+            </td>
+
+          </tr>
+        </ng-container>
+
+        <!-- Sin resultados -->
+        <tr *ngIf="!isCargando && pagosFiltrados.length === 0" class="empty-row">
+          <td colspan="8">
+            <div class="empty-state">
+              <i class="bi bi-receipt"></i>
+              <p class="empty-title">Sin pagos registrados</p>
+              <p class="empty-subtitle">No se encontraron pagos de inscripción con ese criterio</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════ PAGINACIÓN ══════════════════ -->
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">
+      Anterior
+    </button>
+
+    <ng-container *ngFor="let page of getPagesArray()">
+      <button *ngIf="page !== '...'"
+              (click)="goToPage($any(page))"
+              [class.active]="currentPage === page"
+              class="btn pagina-numero-btn">
+        {{ page }}
+      </button>
+      <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+    </ng-container>
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">
+      Siguiente
+    </button>
+  </div>
+
+  <!-- Contador de resultados -->
+  <div class="resultado-contador" *ngIf="!isCargando && pagosFiltrados.length > 0">
+    Mostrando <strong>{{ getPrimerRegistro() }}–{{ getUltimoRegistro() }}</strong>
+    de <strong>{{ pagosFiltrados.length }}</strong> registros
+    <span *ngIf="idProgramaSeleccionado !== null" class="programa-label">
+      — {{ getNombrePrograma() }}
+    </span>
+  </div>
+
+</div>

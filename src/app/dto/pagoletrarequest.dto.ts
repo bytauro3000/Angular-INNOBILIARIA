@@ -6,8 +6,10 @@ export interface PagoLetraRequest {
   importePagado: number;
   medioPago: MedioPago;
   numeroOperacion?: string;
-  fechaPago: string;   
+  fechaPago: string;
   tipoComprobante?: TipoComprobante;
   numeroComprobantePersonalizado?: string;
   observaciones?: string;
+  /** true = pago a cuenta (parcial); false/omitido = pago total */
+  esPagoAcuenta?: boolean;
 }

@@ -69,20 +69,36 @@
       </div>
     </div>
 
-    <!-- Banner de moras pendientes -->
-    <div *ngIf="moraResumen && moraResumen.cantidadMorasPendientes > 0"
-         class="mora-banner"
-         (click)="abrirMoraListar()">
-      <i class="bi bi-exclamation-triangle-fill"></i>
-      <span>
-        {{ moraResumen.cantidadMorasPendientes }}
-        mora{{ moraResumen.cantidadMorasPendientes > 1 ? 's' : '' }}
-        pendiente{{ moraResumen.cantidadMorasPendientes > 1 ? 's' : '' }}
-        — Total:
-        {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
-        {{ moraResumen.totalMoraPendiente | number:'1.2-2' }}
-      </span>
-      <span class="mora-banner-link">Ver detalle →</span>
+    <!-- Fila de alertas: mora + parcial en la misma línea -->
+    <div class="alertas-row" *ngIf="(moraResumen && moraResumen.cantidadMorasPendientes > 0) || cantidadParciales > 0">
+      <!-- Banner de moras pendientes -->
+      <div *ngIf="moraResumen && moraResumen.cantidadMorasPendientes > 0"
+           class="mora-banner"
+           (click)="abrirMoraListar()">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>
+          {{ moraResumen.cantidadMorasPendientes }}
+          mora{{ moraResumen.cantidadMorasPendientes > 1 ? 's' : '' }}
+          pendiente{{ moraResumen.cantidadMorasPendientes > 1 ? 's' : '' }}
+          — Total:
+          {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
+          {{ moraResumen.totalMoraPendiente | number:'1.2-2' }}
+        </span>
+        <span class="mora-banner-link">Ver detalle →</span>
+      </div>
+
+      <!-- Banner informativo de pagos a cuenta (letras PARCIAL) -->
+      <div *ngIf="cantidadParciales > 0" class="parcial-banner"
+           (click)="cambiarTipoLista('parciales')"
+           title="Ver letras con pago a cuenta">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>
+          {{ cantidadParciales }}
+          letra{{ cantidadParciales > 1 ? 's' : '' }}
+          con pago a cuenta
+        </span>
+        <span class="parcial-banner-link">Ver parciales →</span>
+      </div>
     </div>
   </div>
 
@@ -97,6 +113,13 @@
                 (click)="cambiarTipoLista('pendientes')">
           Pendientes
           <span class="tab-count">{{ letrasPendientes.length }}</span>
+        </button>
+        <button class="toggle-btn tab-parciales"
+                [class.active]="tipoLista === 'parciales'"
+                (click)="cambiarTipoLista('parciales')"
+                *ngIf="cantidadParciales > 0">
+          Parciales
+          <span class="tab-count tab-count-parcial">{{ cantidadParciales }}</span>
         </button>
         <button class="toggle-btn"
                 [class.active]="tipoLista === 'pagadas'"
@@ -174,7 +197,86 @@
 
     <div *ngIf="cargandoLetras" class="cargando">Cargando...</div>
 
-    <table *ngIf="!cargandoLetras && paginatedLetras.length > 0" class="tabla-custom">
+    <!-- ── VISTA PARCIALES: abonos agrupados por letra ─────────────────────── -->
+    <ng-container *ngIf="!cargandoLetras && tipoLista === 'parciales'">
+      <div *ngIf="letrasParciales.length === 0" class="sin-resultados">
+        No hay letras con pagos a cuenta para este contrato.
+      </div>
+
+      <div *ngFor="let letra of letrasParciales" class="parcial-grupo">
+        <!-- Cabecera de la letra -->
+        <div class="parcial-grupo-header">
+          <div class="parcial-grupo-info">
+            <span class="parcial-grupo-numero">
+              <i class="bi bi-file-text"></i> Letra N° {{ letra.numeroLetra }}
+            </span>
+            <span class="parcial-grupo-vencimiento">
+              <i class="bi bi-calendar3"></i>
+              Vence: {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}
+            </span>
+            <span class="parcial-grupo-importe">
+              Importe: {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
+              {{ letra.importe | number:'1.2-2' }}
+            </span>
+            <span class="parcial-grupo-saldo">
+              Saldo pendiente: {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
+              {{ letra.saldoPendiente | number:'1.2-2' }}
+            </span>
+          </div>
+          <span class="estado-badge estado-parcial">PARCIAL</span>
+        </div>
+
+        <!-- Tabla de abonos de esa letra -->
+        <div class="parcial-abonos-wrapper">
+          <div *ngIf="cargandoAbonosPorLetra[letra.idLetra]" class="cargando-abonos">
+            <i class="bi bi-hourglass-split"></i> Cargando abonos…
+          </div>
+
+          <table *ngIf="!cargandoAbonosPorLetra[letra.idLetra] && tieneAbonosCargados(letra.idLetra) && getAbonosPorLetra(letra.idLetra).length > 0"
+                 class="tabla-abonos">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Fecha de pago</th>
+                <th>Importe pagado</th>
+                <th>Medio de pago</th>
+                <th>N° Comprobante</th>
+                <th>N° Operación</th>
+                <th class="text-center">Comprobante</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let abono of getAbonosPorLetra(letra.idLetra); let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ abono.fechaPago | date:'dd/MM/yyyy' }}</td>
+                <td class="abono-importe">
+                  {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
+                  {{ abono.importePagado | number:'1.2-2' }}
+                </td>
+                <td>{{ abono.medioPago || '—' }}</td>
+                <td>{{ abono.numeroComprobante || '—' }}</td>
+                <td>{{ abono.numeroOperacion || '—' }}</td>
+                <td class="text-center">
+                  <button class="btn-imprimir"
+                          (click)="imprimirComprobanteAbono(abono)"
+                          title="Reimprimir comprobante">
+                    <i class="bi bi-printer"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="!cargandoAbonosPorLetra[letra.idLetra] && tieneAbonosCargados(letra.idLetra) && getAbonosPorLetra(letra.idLetra).length === 0"
+               class="sin-abonos">
+            Sin registros de abono.
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── TABLA NORMAL (pendientes / pagadas) ───────────────────────────────── -->
+    <table *ngIf="!cargandoLetras && tipoLista !== 'parciales' && paginatedLetras.length > 0" class="tabla-custom">
       <thead>
         <tr>
           <th *ngIf="tipoLista === 'pendientes'" style="width: 40px;">
@@ -192,7 +294,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let letra of paginatedLetras"
-            [class.vencida]="letra.estadoLetra === 'VENCIDO'">
+            [class.vencida]="letra.estadoLetra === 'VENCIDO'"
+            [class.parcial]="letra.estadoLetra === 'PARCIAL'">
           <td *ngIf="tipoLista === 'pendientes'" data-label="Seleccionar">
             <input type="checkbox"
                    [checked]="isSeleccionada(letra.idLetra)"
@@ -203,15 +306,25 @@
             {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}
           </td>
           <td data-label="Importe">
-            {{contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$'}}
-            {{letra.importe | number:'1.2-2'}}
+            <div class="importe-cell">
+              <span>
+                {{contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$'}}
+                {{letra.importe | number:'1.2-2'}}
+              </span>
+              <span *ngIf="letra.estadoLetra === 'PARCIAL'" class="saldo-parcial-inline">
+                <i class="bi bi-arrow-return-right"></i>
+                Saldo: {{contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$'}}
+                {{letra.saldoPendiente | number:'1.2-2'}}
+              </span>
+            </div>
           </td>
           <td data-label="Importe en texto">{{ letra.importeLetras || '-' }}</td>
           <td data-label="Estado">
             <span class="estado-badge" [ngClass]="{
               'estado-pendiente': letra.estadoLetra === 'PENDIENTE',
               'estado-vencido':   letra.estadoLetra === 'VENCIDO',
-              'estado-pagado':    letra.estadoLetra === 'PAGADO'
+              'estado-pagado':    letra.estadoLetra === 'PAGADO',
+              'estado-parcial':   letra.estadoLetra === 'PARCIAL'
             }">{{ letra.estadoLetra }}</span>
           </td>
           <td class="acciones-cell" data-label="Acciones">
@@ -219,14 +332,15 @@
               <button *ngIf="tipoLista === 'pendientes'"
                       class="btn-pagar"
                       [class.btn-pagar-vencida]="letra.estadoLetra === 'VENCIDO'"
+                      [class.btn-pagar-parcial]="letra.estadoLetra === 'PARCIAL'"
                       (click)="abrirModalPago(letra)"
-                      [title]="letra.estadoLetra === 'VENCIDO'
-                               ? 'Letra vencida — se calculará mora'
-                               : 'Registrar pago'">
+                      [title]="getTitleBotonPagar(letra)">
                 <i class="bi"
                    [ngClass]="letra.estadoLetra === 'VENCIDO'
-            ? 'bi-exclamation-triangle-fill'
-            : 'bi-cash-stack'"></i>
+                    ? 'bi-exclamation-triangle-fill'
+                    : letra.estadoLetra === 'PARCIAL'
+                    ? 'bi-hourglass-split'
+                    : 'bi-cash-stack'"></i>
                 <span *ngIf="letra.estadoLetra === 'VENCIDO'"
                       class="vencida-dot" title="Tiene mora"></span>
               </button>
@@ -247,7 +361,7 @@
       </tbody>
     </table>
 
-    <div *ngIf="!cargandoLetras && paginatedLetras.length === 0" class="sin-resultados">
+    <div *ngIf="!cargandoLetras && tipoLista !== 'parciales' && paginatedLetras.length === 0" class="sin-resultados">
       <ng-container *ngIf="filtroNumeroLetra; else sinLetrasFiltro">
         No hay letras que coincidan con "<strong>{{ filtroNumeroLetra }}</strong>".
       </ng-container>

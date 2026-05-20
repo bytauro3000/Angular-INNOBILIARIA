@@ -12,16 +12,17 @@
         (input)="aplicarFiltros()"
         placeholder="Buscar por ID o nombre del cliente..."
       />
-      <button class="btn-clear-inline" (click)="limpiarFiltros()" [class.active]="terminoBusqueda || filtroServicio !== 'TODOS'" title="Limpiar">
+      <button class="btn-clear-inline" (click)="limpiarFiltros()"
+        [class.active]="terminoBusqueda || filtroServicio !== 'TODOS'" title="Limpiar">
         <i class="bi bi-x-circle-fill"></i>
       </button>
     </div>
 
     <div class="filtro-chips">
-      <button class="chip"         [class.active]="filtroServicio === 'TODOS'"        (click)="filtroServicio = 'TODOS';        aplicarFiltros()">Todos</button>
-      <button class="chip sin"     [class.active]="filtroServicio === 'SIN_SERVICIO'" (click)="filtroServicio = 'SIN_SERVICIO'; aplicarFiltros()">Sin servicio</button>
-      <button class="chip parcial" [class.active]="filtroServicio === 'PARCIAL'"      (click)="filtroServicio = 'PARCIAL';      aplicarFiltros()">Parcial</button>
-      <button class="chip completo"[class.active]="filtroServicio === 'COMPLETO'"     (click)="filtroServicio = 'COMPLETO';     aplicarFiltros()">Completo</button>
+      <button class="chip"          [class.active]="filtroServicio === 'TODOS'"        (click)="filtroServicio = 'TODOS';        aplicarFiltros()">Todos</button>
+      <button class="chip sin"      [class.active]="filtroServicio === 'SIN_SERVICIO'" (click)="filtroServicio = 'SIN_SERVICIO'; aplicarFiltros()">Sin servicio</button>
+      <button class="chip parcial"  [class.active]="filtroServicio === 'PARCIAL'"      (click)="filtroServicio = 'PARCIAL';      aplicarFiltros()">Parcial</button>
+      <button class="chip completo" [class.active]="filtroServicio === 'COMPLETO'"     (click)="filtroServicio = 'COMPLETO';     aplicarFiltros()">Completo</button>
     </div>
 
   </div>
@@ -32,18 +33,18 @@
       <thead>
         <tr>
           <th class="text-center" style="width:60px;">ID</th>
-          <th>CLIENTE(S)</th>
+          <th>CLIENTE</th>
           <th class="text-center">MZ Y LT</th>
           <th class="text-center">LUZ</th>
           <th class="text-center">AGUA</th>
           <th class="text-center">ESTADO</th>
-          <th class="text-center" style="width:100px;">ACCIÓN</th>
+          <th class="text-center" style="width:120px;">ACCIONES</th>
         </tr>
       </thead>
 
-      <tbody>
+      <tbody #tableBody>
         <!-- Cargando -->
-        <tr *ngIf="isCargando">
+        <tr *ngIf="isCargando" class="loading-row">
           <td colspan="7">
             <div class="loading-dots-wrapper-inline">
               <div class="loading-dots"><span></span><span></span><span></span></div>
@@ -54,31 +55,31 @@
 
         <!-- Filas -->
         <ng-container *ngIf="!isCargando">
-          <tr *ngFor="let contrato of contratosFiltrados" [ngClass]="'fila-' + getEstadoServicio(contrato)">
-            <td class="text-center">
+          <tr *ngFor="let contrato of contratosPagina" [ngClass]="'fila-' + getEstadoServicio(contrato)">
+
+            <td class="text-center" data-label="ID">
               <span class="id-number">{{ contrato.idContrato }}</span>
             </td>
-            <td>{{ getClientesTexto(contrato) }}</td>
-            <td class="text-center">{{ getLotesTexto(contrato) }}</td>
 
-            <!-- Luz -->
-            <td class="text-center">
+            <td data-label="Cliente">{{ getClientesTexto(contrato) }}</td>
+
+            <td class="text-center" data-label="Mz y Lt">{{ getLotesTexto(contrato) }}</td>
+
+            <td class="text-center" data-label="Luz">
               <i class="bi servicio-icon"
                 [ngClass]="contrato.tieneLuz ? 'bi-lightning-charge-fill icon-luz' : 'bi-lightning-charge icon-apagado'"
                 [title]="contrato.tieneLuz ? 'Luz inscrita' : 'Sin luz'">
               </i>
             </td>
 
-            <!-- Agua -->
-            <td class="text-center">
+            <td class="text-center" data-label="Agua">
               <i class="bi servicio-icon"
                 [ngClass]="contrato.tieneAgua ? 'bi-droplet-fill icon-agua' : 'bi-droplet icon-apagado'"
                 [title]="contrato.tieneAgua ? 'Agua inscrita' : 'Sin agua'">
               </i>
             </td>
 
-            <!-- Estado badge -->
-            <td class="text-center">
+            <td class="text-center" data-label="Estado">
               <span class="estado-badge" [ngClass]="'badge-' + getEstadoServicio(contrato)">
                 <ng-container [ngSwitch]="getEstadoServicio(contrato)">
                   <span *ngSwitchCase="'completo'"><i class="bi bi-check-circle-fill"></i> Completo</span>
@@ -88,21 +89,31 @@
               </span>
             </td>
 
-            <!-- Acción -->
-            <td class="text-center">
-              <button
-                class="btn-action btn-inscribir"
-                [disabled]="contrato.tieneLuz && contrato.tieneAgua"
-                [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'"
-                (click)="abrirModalInscripcion(contrato.idContrato)">
-                <i class="bi" [ngClass]="(contrato.tieneLuz && contrato.tieneAgua) ? 'bi-check-circle-fill' : 'bi-plus-circle'"></i>
-              </button>
+            <td class="text-center" data-label="Acciones">
+              <div class="acciones-container">
+                <button
+                  class="btn-action btn-inscribir"
+                  [disabled]="contrato.tieneLuz && contrato.tieneAgua"
+                  [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'"
+                  (click)="abrirModalInscripcion(contrato.idContrato)">
+                  <i class="bi" [ngClass]="(contrato.tieneLuz && contrato.tieneAgua) ? 'bi-check-circle-fill' : 'bi-plus-circle'"></i>
+                </button>
+
+                <button
+                  *ngIf="contrato.tieneLuz || contrato.tieneAgua"
+                  class="btn-action btn-delete"
+                  title="Eliminar inscripción"
+                  (click)="eliminarInscripcion(contrato)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </td>
+
           </tr>
         </ng-container>
 
         <!-- Sin resultados -->
-        <tr *ngIf="!isCargando && contratosFiltrados.length === 0">
+        <tr *ngIf="!isCargando && contratosFiltrados.length === 0" class="empty-row">
           <td colspan="7">
             <div class="empty-state">
               <i class="bi bi-search"></i>
@@ -114,6 +125,24 @@
       </tbody>
     </table>
   </div>
+
+  <!-- ══════════════════ PAGINACIÓN ══════════════════ -->
+  <div *ngIf="totalPages > 1" class="paginacion-controles">
+    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
+      Anterior
+    </button>
+    <ng-container *ngFor="let page of getPagesArray()">
+      <button *ngIf="page !== '...'" (click)="goToPage($any(page))" class="btn-paginacion"
+        [class.active]="page === currentPage">
+        {{ page }}
+      </button>
+      <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+    </ng-container>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
+      Siguiente
+    </button>
+  </div>
+
 </div>
 
 <app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">

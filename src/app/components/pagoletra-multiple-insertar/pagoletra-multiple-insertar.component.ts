@@ -1,4 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component, EventEmitter, Input, OnInit, Output,
+  ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -6,6 +9,7 @@ import * as bootstrap from 'bootstrap';
 
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { PagosMultiplesRequest } from '../../dto/pagosmultiplesrequest.dto';
 import { PagoLetraRequest } from '../../dto/pagoletrarequest.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
@@ -18,12 +22,13 @@ import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.comp
   templateUrl: './pagoletra-multiple-insertar.html',
   styleUrls: ['./pagoletra-multiple-insertar.scss']
 })
-export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit {
+export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
   private modal?: bootstrap.Modal;
 
   @Input() letras: LetraCambio[] = [];
   @Input() contrato!: any;
+
   @Output() onClose = new EventEmitter<void>();
   @Output() onPagoExitoso = new EventEmitter<void>();
 
@@ -36,24 +41,51 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     fechaPago: '',
     tipoComprobante: undefined as TipoComprobante | undefined,
     observaciones: ''
-    // numeroComprobante eliminado: el backend lo genera automáticamente
   };
 
-  // Preview readonly del número que se emitirá (informativo)
+  aplicarDescuento: boolean = false;
+  descuentoNegociado: number = 0;
+  motivoDescuento: string = '';
+
+  aplicarLetraGratis: boolean = false;
+  idLetraGratis: number | null = null;
+  motivoLetraGratis: string = '';
+
   numeroComprobantePreview: string = '';
   cargandoPreview: boolean = false;
-
-  // Modo manual: permite ingresar un número personalizado
   modoManualComprobante: boolean = false;
   numeroComprobanteManual: string = '';
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
 
+  // ── Control de cierre limpio ───────────────────────────────────────────────
+  private hiddenListener?: () => void;
+  private pagoExitosoAlCerrar: boolean = false;
+
+  get subtotalLetras(): number {
+    return this.letras.reduce((acc, l) => acc + l.importe, 0);
+  }
+
+  get importeTotal(): number {
+    const total = this.subtotalLetras;
+    const desc = this.aplicarDescuento ? (this.descuentoNegociado || 0) : 0;
+    return Math.max(0, total - desc);
+  }
+
+  get simboloMoneda(): string {
+    return this.contrato?.moneda === 'PEN' ? 'S/.' : '$';
+  }
+
+  get letraGratisSeleccionada(): LetraCambio | undefined {
+    return this.letras.find(l => l.idLetra === this.idLetraGratis);
+  }
+
   constructor(
     private pagoService: PagoLetraService,
-    private toastr: ToastrService
-  ) { }
+    private toastr: ToastrService,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
     this.datosComunes.fechaPago = new Date().toISOString().split('T')[0];
@@ -65,21 +97,86 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
       backdrop: 'static',
       keyboard: false
     });
+
+    // El evento 'hidden.bs.modal' se dispara cuando Bootstrap TERMINA su animación
+    // de cierre y ya restauró todos los estilos del body (_resetAdjustments incluido).
+    // Usamos requestAnimationFrame para asegurarnos de que el ciclo de render de
+    // Bootstrap haya completado antes de que Angular destruya el componente vía *ngIf.
+    this.hiddenListener = () => {
+      // Bootstrap ya terminó: podemos limpiar el backdrop residual con seguridad.
+      requestAnimationFrame(() => {
+        this.limpiarBackdropResidual();
+        // Volvemos a zona Angular para emitir el output y disparar change detection.
+        this.ngZone.run(() => {
+          if (this.pagoExitosoAlCerrar) {
+            this.onPagoExitoso.emit();
+          } else {
+            this.onClose.emit();
+          }
+        });
+      });
+    };
+
+    this.modalElement.nativeElement.addEventListener('hidden.bs.modal', this.hiddenListener);
     this.modal.show();
   }
 
-  cerrarModal(): void {
-    this.modal?.hide();
-    setTimeout(() => {
+  ngOnDestroy(): void {
+    if (this.hiddenListener) {
+      this.modalElement?.nativeElement?.removeEventListener('hidden.bs.modal', this.hiddenListener);
+    }
+    // dispose() solo si el modal ya está oculto para no interrumpir animaciones en curso.
+    const el = this.modalElement?.nativeElement;
+    if (el && !el.classList.contains('show')) {
       this.modal?.dispose();
-      // Restaurar el scroll del body que Bootstrap bloquea al abrir el modal
+    }
+  }
+
+  cerrarModal(): void {
+    const el = this.modalElement?.nativeElement;
+    if (el && el.classList.contains('show')) {
+      // Bootstrap cierra con animación → hiddenListener se encarga del resto.
+      this.modal?.hide();
+    } else {
+      // Modal ya oculto (caso borde): emitimos directamente.
+      this.limpiarBackdropResidual();
+      if (this.pagoExitosoAlCerrar) {
+        this.onPagoExitoso.emit();
+      } else {
+        this.onClose.emit();
+      }
+    }
+  }
+
+  /**
+   * Solo elimina backdrops huérfanos que Bootstrap no haya limpiado.
+   * NO toca body.style: Bootstrap lo gestiona internamente con _resetAdjustments.
+   * Tocarlo mientras Bootstrap corre causa el TypeError de 'style'.
+   */
+  private limpiarBackdropResidual(): void {
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    // Quitar modal-open solo si no hay otros modales abiertos
+    if (!document.querySelector('.modal.show')) {
       document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
-      // Eliminar el backdrop residual si quedara alguno
-      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-      this.onClose.emit();
-    }, 300);
+    }
+  }
+
+  getNumeroLetraLimpio(numeroLetra: string): string {
+    return numeroLetra ? numeroLetra.split('/')[0] : '';
+  }
+
+  private generarObservaciones(): void {
+    if (!this.contrato || !this.contrato.lotes || this.contrato.lotes.length === 0) return;
+    const primerLote = this.contrato.lotes[0];
+    const mz = primerLote.manzana || '';
+    const lt = primerLote.numeroLote || '';
+    const programa: string =
+      primerLote.programa?.nombrePrograma
+      || primerLote.nombrePrograma
+      || this.contrato.programa?.nombrePrograma
+      || '';
+    this.datosComunes.observaciones =
+      `Pago múltiple de ${this.letras.length} letras de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
   }
 
   onMedioPagoChange(): void {
@@ -89,50 +186,6 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     }
   }
 
-  getNumeroLetraLimpio(numeroLetra: string): string {
-    return numeroLetra ? numeroLetra.split('/')[0] : '';
-  }
-
-  get importeTotal(): number {
-    return this.letras.reduce((sum, l) => sum + l.importe, 0);
-  }
-
-  private generarObservaciones(): void {
-    if (!this.contrato || !this.contrato.lotes || this.contrato.lotes.length === 0) {
-      this.datosComunes.observaciones = '';
-      return;
-    }
-
-    const primerLote = this.contrato.lotes[0];
-    const mz = primerLote.manzana || '';
-    const lt = primerLote.numeroLote || '';
-
-    let programa = '';
-    if (primerLote.programa?.nombrePrograma) {
-      programa = primerLote.programa.nombrePrograma;
-    } else if (primerLote.nombrePrograma) {
-      programa = primerLote.nombrePrograma;
-    } else if (this.contrato.programa?.nombrePrograma) {
-      programa = this.contrato.programa.nombrePrograma;
-    }
-
-    const numeros = this.letras.map(l => this.getNumeroLetraLimpio(l.numeroLetra));
-
-    let listaNumeros = '';
-    if (numeros.length === 1) {
-      listaNumeros = numeros[0];
-    } else {
-      const primeros = numeros.slice(0, -1).join(', ');
-      listaNumeros = `${primeros} y ${numeros[numeros.length - 1]}`;
-    }
-
-    this.datosComunes.observaciones = `Pago de letras N° ${listaNumeros} de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
-  }
-
-  /**
-   * Al seleccionar tipo de comprobante, consulta el siguiente número disponible
-   * y lo muestra como preview readonly (el backend asigna el número real al guardar).
-   */
   onTipoComprobanteChange(): void {
     this.numeroComprobantePreview = '';
     this.modoManualComprobante = false;
@@ -149,7 +202,6 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     }
   }
 
-  /** Alterna entre modo automático y modo manual para el N° comprobante */
   private get seriePrefix(): string {
     const idx = this.numeroComprobantePreview.indexOf('-');
     return idx >= 0 ? this.numeroComprobantePreview.substring(0, idx + 1) : '';
@@ -165,7 +217,6 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     }
   }
 
-  /** Captura el valor ingresado manualmente, protegiendo el prefijo de serie */
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const prefijo = this.seriePrefix;
@@ -177,12 +228,35 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
     this.numeroComprobanteManual = valor;
   }
 
+  toggleDescuento(): void {
+    this.aplicarDescuento = !this.aplicarDescuento;
+    if (!this.aplicarDescuento) {
+      this.descuentoNegociado = 0;
+      this.motivoDescuento = '';
+    }
+  }
+
+  toggleLetraGratis(): void {
+    this.aplicarLetraGratis = !this.aplicarLetraGratis;
+    if (!this.aplicarLetraGratis) {
+      this.idLetraGratis = null;
+      this.motivoLetraGratis = '';
+    }
+  }
+
   guardar(): void {
-    if (!this.datosComunes.medioPago) {
-      this.toastr.warning('Seleccione medio de pago', 'Validación');
+    if (this.letras.length === 0) {
+      this.toastr.warning('No hay letras seleccionadas', 'Validación');
       return;
     }
-
+    if (!this.datosComunes.medioPago) {
+      this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
+      return;
+    }
+    if (!this.datosComunes.tipoComprobante) {
+      this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
+      return;
+    }
     if (this.datosComunes.medioPago !== MedioPago.EFECTIVO) {
       if (!this.datosComunes.numeroOperacion?.trim()) {
         this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
@@ -193,50 +267,62 @@ export class PagoLetraMultipleInsertarComponent implements OnInit, AfterViewInit
         return;
       }
     }
-
-    if (!this.datosComunes.fechaPago) {
-      this.toastr.warning('Ingrese fecha de operación', 'Validación');
-      return;
+    if (this.aplicarDescuento) {
+      if (!this.descuentoNegociado || this.descuentoNegociado <= 0) {
+        this.toastr.warning('Ingrese un monto de descuento válido', 'Validación');
+        return;
+      }
+      if (!this.motivoDescuento?.trim()) {
+        this.toastr.warning('Debe indicar el motivo del descuento', 'Validación');
+        return;
+      }
+    }
+    if (this.aplicarLetraGratis) {
+      if (!this.idLetraGratis) {
+        this.toastr.warning('Debe seleccionar la letra que se otorgará como gratis', 'Validación');
+        return;
+      }
+      if (!this.motivoLetraGratis?.trim()) {
+        this.toastr.warning('Debe indicar el motivo de la letra gratis', 'Validación');
+        return;
+      }
     }
 
-    if (!this.datosComunes.tipoComprobante) {
-      this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
-      return;
-    }
-    // Eliminada la validación de numeroComprobante: el backend lo genera
-
-    const requests: PagoLetraRequest[] = this.letras.map(letra => ({
-      idLetra: letra.idLetra,
-      importePagado: letra.importe,
+    // Excluir la letra gratis del lote de pagos normales (se procesa aparte en el backend)
+    const letrasAPagar = this.letras.filter(l => l.idLetra !== this.idLetraGratis);
+    const pagos: PagoLetraRequest[] = letrasAPagar.map(l => ({
+      idLetra: l.idLetra,
+      // Usar saldoPendiente si existe y es > 0 (letras con pagos parciales previos),
+      // de lo contrario usar el importe original de la letra.
+      importePagado: (l.saldoPendiente != null && l.saldoPendiente > 0) ? l.saldoPendiente : l.importe,
       medioPago: this.datosComunes.medioPago,
-      numeroOperacion: this.datosComunes.numeroOperacion,
+      numeroOperacion: this.datosComunes.numeroOperacion || undefined,
       fechaPago: this.datosComunes.fechaPago,
       tipoComprobante: this.datosComunes.tipoComprobante,
-      numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual.trim()
-        ? this.numeroComprobanteManual.trim()
+      numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual
+        ? this.numeroComprobanteManual
         : undefined,
-      observaciones: this.datosComunes.observaciones
-      // numeroComprobante eliminado del request
+      observaciones: this.datosComunes.observaciones,
+      esPagoAcuenta: false
     }));
 
+    const request: PagosMultiplesRequest = {
+      pagos,
+      descuentoNegociado: this.aplicarDescuento ? this.descuentoNegociado : undefined,
+      motivoDescuento: this.aplicarDescuento ? this.motivoDescuento : undefined,
+      idLetraGratis: this.aplicarLetraGratis && this.idLetraGratis ? this.idLetraGratis : undefined,
+      motivoLetraGratis: this.aplicarLetraGratis ? this.motivoLetraGratis : undefined
+    };
+
     this.enviando = true;
-    this.pagoService.registrarPagosMultiples(requests, this.voucherFiles).subscribe({
-      next: (res: any) => {
-        this.toastr.success('Pagos registrados correctamente', 'Éxito');
+    this.pagoService.registrarPagosMultiples(request, this.voucherFiles).subscribe({
+      next: () => {
+        this.toastr.success('Pagos múltiples registrados correctamente', 'Éxito');
         this.enviando = false;
-        // Descargar comprobante consolidado usando el numeroCompleto que devuelve el backend
-        const numeroComprobante = res?.numeroComprobanteGenerado || res?.numeroCompleto;
-        if (numeroComprobante) {
-          this.pagoService.descargarComprobanteMultiple(numeroComprobante).subscribe({
-            next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
-            error: () => {}
-          });
-        }
+        this.pagoExitosoAlCerrar = true;
         this.cerrarModal();
-        this.onPagoExitoso.emit();
       },
       error: (err) => {
-        console.error('Error al registrar pagos múltiples:', err);
         const mensaje = err.error?.message || 'Error al registrar los pagos';
         this.toastr.error(mensaje, 'Error');
         this.enviando = false;

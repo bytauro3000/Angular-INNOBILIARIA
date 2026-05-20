@@ -16,7 +16,7 @@ import { MoraResumenContratoDTO } from '../../dto/moraresumencontrato.dto';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
-import { PagoLetraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
+import { PagoletraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
 import { PagoListaModalComponent } from '../pago-lista-modal/pago-lista-modal.component';
 import { MoraListarComponent } from '../mora-listar/mora-listar.component';
 import { MoraAlertaComponent } from '../mora-alerta/mora-alerta.component';
@@ -33,7 +33,7 @@ interface LetraCambioConSeleccion extends LetraCambio {
     FormsModule,
     RouterModule,
     PagoletraInsertarComponent,
-    PagoLetraMultipleInsertarComponent,
+    PagoletraMultipleInsertarComponent,
     PagoListaModalComponent,
     MoraListarComponent,
     MoraAlertaComponent,
@@ -51,15 +51,27 @@ export class PagoletraListarComponent implements OnInit {
   contratoEncontrado: any = null;
   letrasPendientes: LetraCambioConSeleccion[] = [];
   letrasPagadas: LetraCambio[] = [];
+  letrasParciales: LetraCambio[] = [];
+
+  /** Abonos (PagoLetraResponse) cargados por idLetra para la vista Parciales */
+  abonosPorLetra: { [key: number]: any[] } = {};
+  cargandoAbonosPorLetra: { [key: number]: boolean } = {};
+
+  getAbonosPorLetra(idLetra: number): any[] {
+    return this.abonosPorLetra[idLetra] ?? [];
+  }
+
+  tieneAbonosCargados(idLetra: number): boolean {
+    return Array.isArray(this.abonosPorLetra[idLetra]);
+  }
   cargandoLetras: boolean = false;
 
   mostrarListaPagos: boolean = false;
   idContratoParaLista: number | null = null;
 
   letraSeleccionada: LetraCambio | null = null;
-  tipoLista: 'pendientes' | 'pagadas' = 'pendientes';
+  tipoLista: 'pendientes' | 'parciales' | 'pagadas' = 'pendientes';
 
-  /** Tercer cambio: filtro frontend sobre el número de letra */
   filtroNumeroLetra: string = '';
 
   pageSize: number = 5;
@@ -77,22 +89,9 @@ export class PagoletraListarComponent implements OnInit {
   mostrarMoraListar: boolean = false;
   mostrarMoraAlerta: boolean = false;
   letraParaPagarConMora: LetraCambio | null = null;
-  /** Cálculo de mora a pasar al modal de pago (solo cuando elige pagar mora ahora) */
   calculoMoraParaPago: CalculoMoraDTO | null = null;
-
-  /**
-   * NUEVO: indica al modal de pago de letra que la mora ya fue cobrada
-   * en el paso anterior (desde mora-alerta → Pagar Mora).
-   * Cuando es true, el modal de pago NO mostrará el aviso de mora
-   * ni intentará crear/registrar la mora nuevamente.
-   */
   moraPreviamentePagada: boolean = false;
 
-  /**
-   * Cambio 2: número de la letra recién pagada.
-   * Se guarda antes de cerrar el modal para que cargarLetrasPendientes
-   * navegue automáticamente a la página de la SIGUIENTE letra.
-   */
   private ultimaLetraPagadaNum: number = 0;
 
   constructor(
@@ -136,6 +135,7 @@ export class PagoletraListarComponent implements OnInit {
         this.contratoEncontrado = null;
         this.letrasPendientes = [];
         this.letrasPagadas = [];
+        this.letrasParciales = [];
         this.moraResumen = null;
       }
     });
@@ -145,17 +145,15 @@ export class PagoletraListarComponent implements OnInit {
     this.cargandoLetras = true;
     this.letrasService.listarPorContrato(idContrato).subscribe({
       next: (letras) => {
+        // PARCIAL se incluye en pendientes para que no desaparezca de la lista
         this.letrasPendientes = letras
-          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
+          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO' || l.estadoLetra === 'PARCIAL')
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
+        this.letrasParciales = letras.filter(l => l.estadoLetra === 'PARCIAL');
         this.seleccionadasMap.clear();
-        this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al cargar contrato
-        // PRIORIDAD 1 — Si hay letras pagadas: ir a la página de la letra
-        //              siguiente a la más alta pagada (maxPagado + 1).
-        // PRIORIDAD 2 — Si no hay pagadas: ir a la página de la última
-        //              letra VENCIDA (la más atrasada sin registrar).
-        // FALLBACK    — Sin pagadas ni vencidas: quedarse en página 1.
+        this.filtroNumeroLetra = '';
+
         const maxPagadoNum = this.letrasPagadas.length > 0
           ? Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)))
           : 0;
@@ -163,14 +161,12 @@ export class PagoletraListarComponent implements OnInit {
         let paginaDestino = 1;
 
         if (maxPagadoNum > 0) {
-          // Buscar la letra siguiente a la más alta pagada
           const indiceSiguiente = this.letrasPendientes
             .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= maxPagadoNum + 1);
           if (indiceSiguiente >= 0) {
             paginaDestino = Math.floor(indiceSiguiente / this.pageSize) + 1;
           }
         } else {
-          // Sin pagadas: ir a la página de la última letra VENCIDA
           const indiceUltimaVencida = this.letrasPendientes
             .map((l, i) => l.estadoLetra === 'VENCIDO' ? i : -1)
             .filter(i => i >= 0)
@@ -181,7 +177,41 @@ export class PagoletraListarComponent implements OnInit {
         }
 
         this.currentPage = paginaDestino;
+        this.aplicarPaginacion();
+        this.cargandoLetras = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.toastr.error('Error al cargar las letras', 'Error');
+        this.cargandoLetras = false;
+      }
+    });
+  }
 
+  cargarLetrasPendientesConNavegacion(idContrato: number): void {
+    this.cargandoLetras = true;
+    this.letrasService.listarPorContrato(idContrato).subscribe({
+      next: (letras) => {
+        // PARCIAL se incluye en pendientes para que no desaparezca de la lista
+        this.letrasPendientes = letras
+          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO' || l.estadoLetra === 'PARCIAL')
+          .map(l => ({ ...l, seleccionada: false }));
+        this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
+        this.letrasParciales = letras.filter(l => l.estadoLetra === 'PARCIAL');
+        this.seleccionadasMap.clear();
+        this.filtroNumeroLetra = '';
+
+        const siguienteNum = this.ultimaLetraPagadaNum + 1;
+        const indiceSiguiente = this.letrasPendientes
+          .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= siguienteNum);
+
+        if (indiceSiguiente >= 0) {
+          this.currentPage = Math.floor(indiceSiguiente / this.pageSize) + 1;
+        } else {
+          this.currentPage = 1;
+        }
+
+        this.ultimaLetraPagadaNum = 0;
         this.aplicarPaginacion();
         this.cargandoLetras = false;
         this.cdr.markForCheck();
@@ -194,48 +224,6 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   // ── MORA ────────────────────────────────────────────────────────────────────
-
-  /**
-   * Cambio 2: igual que cargarLetrasPendientes pero, al terminar,
-   * navega automáticamente a la página donde está la letra SIGUIENTE
-   * a la última pagada (ultimaLetraPagadaNum + 1).
-   * Si no hay letra siguiente (contrato terminado) queda en página 1.
-   */
-  cargarLetrasPendientesConNavegacion(idContrato: number): void {
-    this.cargandoLetras = true;
-    this.letrasService.listarPorContrato(idContrato).subscribe({
-      next: (letras) => {
-        this.letrasPendientes = letras
-          .filter(l => l.estadoLetra === 'PENDIENTE' || l.estadoLetra === 'VENCIDO')
-          .map(l => ({ ...l, seleccionada: false }));
-        this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
-        this.seleccionadasMap.clear();
-        this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al recargar después de pago
-
-        // Calcular la página donde está la siguiente letra a pagar
-        const siguienteNum = this.ultimaLetraPagadaNum + 1;
-        const indiceSiguiente = this.letrasPendientes
-          .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= siguienteNum);
-
-        if (indiceSiguiente >= 0) {
-          // Navegar a la página donde está esa letra
-          this.currentPage = Math.floor(indiceSiguiente / this.pageSize) + 1;
-        } else {
-          // No hay siguiente letra pendiente (contrato al día o terminado)
-          this.currentPage = 1;
-        }
-
-        this.ultimaLetraPagadaNum = 0; // resetear para próxima vez
-        this.aplicarPaginacion();
-        this.cargandoLetras = false;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.toastr.error('Error al cargar las letras', 'Error');
-        this.cargandoLetras = false;
-      }
-    });
-  }
 
   cargarResumenMora(idContrato: number): void {
     this.moraService.obtenerResumenPorContrato(idContrato).subscribe({
@@ -255,23 +243,10 @@ export class PagoletraListarComponent implements OnInit {
     }
   }
 
-  /**
-   * CORRECCIÓN PRINCIPAL — Flujo: Pagar Mora → Pagar Letra
-   *
-   * El operador pagó la mora desde mora-alerta y luego quiere cobrar la letra.
-   * En este caso:
-   *   - calculoMoraParaPago = NULL  (la mora ya fue pagada, no hay nada pendiente)
-   *   - moraPreviamentePagada = TRUE (le avisamos al modal de pago que no cree otra mora)
-   *
-   * Así, cuando el modal de pagoletra-insertar registre el pago de la letra,
-   * el backend puede crear la mora en PENDIENTE (comportamiento normal del backend)
-   * PERO el frontend NO intentará registrar un segundo pago de mora,
-   * porque moraPreviamentePagada = true bloquea ese camino.
-   */
   onMoraPagadaQuierePagarLetra(calculo: CalculoMoraDTO): void {
     this.mostrarMoraAlerta = false;
-    this.calculoMoraParaPago = null;      // mora ya pagada → no mostrar bloque de mora en el modal
-    this.moraPreviamentePagada = true;    // ← NUEVO: le dice al modal que NO registre mora de nuevo
+    this.calculoMoraParaPago = null;
+    this.moraPreviamentePagada = true;
     this.letraSeleccionada = this.letraParaPagarConMora;
     this.letraParaPagarConMora = null;
     if (this.contratoEncontrado) {
@@ -289,7 +264,6 @@ export class PagoletraListarComponent implements OnInit {
     }
   }
 
-  /** El operador hizo clic en "Pagar" sobre una letra VENCIDA → mostrar alerta de mora */
   iniciarFlujoPago(letra: LetraCambio): void {
     const errorOrden = this.validarLetraParaPago(letra);
     if (errorOrden) {
@@ -298,29 +272,29 @@ export class PagoletraListarComponent implements OnInit {
     }
 
     if (letra.estadoLetra === 'VENCIDO') {
+      // Letra vencida → mostrar alerta de mora primero
       this.letraParaPagarConMora = letra;
-      this.moraPreviamentePagada = false; // resetear al iniciar flujo nuevo
+      this.moraPreviamentePagada = false;
       this.mostrarMoraAlerta = true;
     } else {
+      // PENDIENTE o PARCIAL → ir directo al modal de pago sin pasar por mora-alerta
       this.calculoMoraParaPago = null;
       this.moraPreviamentePagada = false;
       this.letraSeleccionada = letra;
     }
   }
 
-  /** Operador eligió "Pagar letra + mora ahora" (desde el checkbox dentro del modal de pago) */
   onConfirmarConMora(calculo: CalculoMoraDTO): void {
     this.mostrarMoraAlerta = false;
-    this.calculoMoraParaPago = calculo;           // ← se pasa al modal de pago
+    this.calculoMoraParaPago = calculo;
     this.moraPreviamentePagada = false;
     this.letraSeleccionada = this.letraParaPagarConMora;
     this.letraParaPagarConMora = null;
   }
 
-  /** Operador eligió "Pagar solo la letra" → mora queda PENDIENTE en el backend */
   onConfirmarSinPagarMora(calculo: CalculoMoraDTO): void {
     this.mostrarMoraAlerta = false;
-    this.calculoMoraParaPago = null;              // sin mora — el backend la crea como PENDIENTE
+    this.calculoMoraParaPago = null;
     this.moraPreviamentePagada = false;
     this.letraSeleccionada = this.letraParaPagarConMora;
     this.letraParaPagarConMora = null;
@@ -353,11 +327,14 @@ export class PagoletraListarComponent implements OnInit {
     this.contratoEncontrado = null;
     this.letrasPendientes = [];
     this.letrasPagadas = [];
+    this.letrasParciales = [];
+    this.abonosPorLetra = {};
+    this.cargandoAbonosPorLetra = {};
     this.seleccionadasMap.clear();
     this.moraResumen = null;
     this.calculoMoraParaPago = null;
     this.moraPreviamentePagada = false;
-    this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al limpiar búsqueda
+    this.filtroNumeroLetra = '';
   }
 
   private extraerNumeroLetra(numeroLetra: string): number {
@@ -486,11 +463,12 @@ export class PagoletraListarComponent implements OnInit {
   }
 
   onPagoRegistrado(): void {
-    // Guardar el número de la letra recién pagada ANTES de limpiar letraSeleccionada
     this.ultimaLetraPagadaNum = this.letraSeleccionada
       ? this.extraerNumeroLetra(this.letraSeleccionada.numeroLetra)
       : 0;
     this.cerrarModalPago();
+    this.abonosPorLetra = {};        // invalidar caché para que Parciales recargue
+    this.cargandoAbonosPorLetra = {};
     if (this.contratoEncontrado) {
       this.cargarLetrasPendientesConNavegacion(this.contratoEncontrado.idContrato);
       this.cargarResumenMora(this.contratoEncontrado.idContrato);
@@ -510,52 +488,86 @@ export class PagoletraListarComponent implements OnInit {
     });
   }
 
-  cambiarTipoLista(tipo: 'pendientes' | 'pagadas'): void {
+  cambiarTipoLista(tipo: 'pendientes' | 'parciales' | 'pagadas'): void {
     if (this.tipoLista !== tipo) {
       this.tipoLista = tipo;
-      this.filtroNumeroLetra = ''; // Tercer cambio: limpiar filtro al cambiar pestaña
+      this.filtroNumeroLetra = '';
       this.currentPage = 1;
       this.aplicarPaginacion();
       this.seleccionadasMap.clear();
+      if (tipo === 'parciales') {
+        this.cargarAbonosDeParciales();
+      }
+    }
+  }
+
+  /** Carga los abonos de cada letra PARCIAL (solo una vez por letra) */
+  cargarAbonosDeParciales(): void {
+    for (const letra of this.letrasParciales) {
+      if (this.abonosPorLetra[letra.idLetra] !== undefined) continue; // ya cargado
+      this.cargandoAbonosPorLetra[letra.idLetra] = true;
+      this.pagoService.listarPorLetra(letra.idLetra).subscribe({
+        next: (pagos) => {
+          this.abonosPorLetra[letra.idLetra] = pagos || [];
+          this.cargandoAbonosPorLetra[letra.idLetra] = false;
+        },
+        error: () => {
+          this.abonosPorLetra[letra.idLetra] = [];
+          this.cargandoAbonosPorLetra[letra.idLetra] = false;
+        }
+      });
+    }
+  }
+
+  /** Reimprimir comprobante de un abono individual (desde la vista Parciales) */
+  imprimirComprobanteAbono(abono: any): void {
+    if (abono.numeroComprobante) {
+      this.pagoService.descargarComprobanteMultiple(abono.numeroComprobante).subscribe({
+        next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
+        error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
+      });
+    } else {
+      this.pagoService.descargarComprobante(abono.idPago).subscribe({
+        next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
+        error: () => this.toastr.error('No se pudo generar el comprobante', 'Error')
+      });
     }
   }
 
   get tituloLista(): string {
-    return this.tipoLista === 'pendientes' ? 'Letras Pendientes de Pago' : 'Letras Pagadas';
+    if (this.tipoLista === 'pendientes') return 'Letras Pendientes de Pago';
+    if (this.tipoLista === 'parciales') return 'Letras con Pago a Cuenta (PARCIAL)';
+    return 'Letras Pagadas';
   }
 
-  /**
-   * Tercer cambio: lista activa filtrada por el texto de búsqueda.
-   * El filtro opera 100% en el frontend sobre los datos ya cargados.
-   * Compara contra el campo `numeroLetra` ignorando mayúsculas/minúsculas
-   * y recortando espacios, de modo que "3", "03", "3/24" o "3 / 24"
-   * funcionan por igual.
-   */
+  // Contador de letras parciales para mostrar en la pestaña pendientes
+  get cantidadParciales(): number {
+    return this.letrasParciales.length;
+  }
+
   get listaFiltrada(): LetraCambioConSeleccion[] {
-    const lista = (this.tipoLista === 'pendientes'
-      ? this.letrasPendientes
-      : this.letrasPagadas) as LetraCambioConSeleccion[];
+    let lista: LetraCambioConSeleccion[];
+    if (this.tipoLista === 'pendientes') {
+      lista = this.letrasPendientes as LetraCambioConSeleccion[];
+    } else if (this.tipoLista === 'parciales') {
+      lista = this.letrasParciales as LetraCambioConSeleccion[];
+    } else {
+      lista = this.letrasPagadas as LetraCambioConSeleccion[];
+    }
     const termino = this.filtroNumeroLetra.trim();
     if (!termino) return lista;
 
-    // Comparación exacta contra la parte numérica antes del "/".
-    // Ej: numeroLetra = "5/120"  → parteNum = "5"
-    //     usuario escribe "5"    → coincide SOLO con letra 5, no con 15, 25, 35…
-    // También soporta entrada con cero inicial: "05" == "5".
     const terminoNum = parseInt(termino, 10);
     return lista.filter(l => {
       const raw = (l.numeroLetra ?? '').split('/')[0].trim();
       const num = parseInt(raw, 10);
-      // Si ambos son números enteros válidos → comparar por valor numérico
       if (!isNaN(terminoNum) && !isNaN(num)) {
         return num === terminoNum;
       }
-      // Fallback (formato no numérico): igualdad exacta ignorando mayúsculas
       return raw.toLowerCase() === termino.toLowerCase();
     });
   }
 
-  /** Tercer cambio: llamado desde el input del filtro para resetear paginación. */
   onFiltroChange(): void {
     this.currentPage = 1;
     this.aplicarPaginacion();
@@ -587,6 +599,20 @@ export class PagoletraListarComponent implements OnInit {
       pages.push(total);
     }
     return pages;
+  }
+
+  getTitleBotonPagar(letra: LetraCambio): string {
+    if (letra.estadoLetra === 'VENCIDO') {
+      return 'Letra vencida — se calculará mora';
+    }
+    if (letra.estadoLetra === 'PARCIAL') {
+      const simbolo = this.contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$';
+      const saldo = letra.saldoPendiente != null
+        ? Number(letra.saldoPendiente).toFixed(2)
+        : '0.00';
+      return `Completar pago — saldo pendiente: ${simbolo} ${saldo}`;
+    }
+    return 'Registrar pago';
   }
 
   imprimirComprobante(idLetra: number): void {

@@ -37,6 +37,7 @@ import { SeparacionInsertEdit } from './components/separacion-insert-edit/separa
 import { LecturaPlanillaComponent } from './components/lectura-plantilla/lectura-plantilla.component';
 import { RecibosListarComponent } from './components/recibos-listar/recibos-listar.component';
 import { InscripcionListarComponent } from './components/inscripcion-listar/inscripcion-lista-component';
+import { PagoInscripcionListarComponent } from './components/pago-inscripcion-listar/pago-inscripcion-listar.components';
 
 // Otros componentes
 import { ParceleroListarComponent } from './components/parcelero-listar/parcelero-listar.component';
@@ -55,8 +56,6 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
   // ── Secretaria ────────────────────────────────────────────────────────────
-  // authGuard: verifica que el token exista y no haya expirado
-  // roleGuard: verifica que el rol sea ROLE_SECRETARIA
   {
     path: 'secretaria-menu',
     component: SecretariaMenuComponent,
@@ -97,9 +96,10 @@ export const routes: Routes = [
       { path: 'parceleros', component: ParceleroListarComponent },
 
       // Servicios Básicos
-      { path: 'servicios-basicos/inscripciones', component: InscripcionListarComponent },
-      { path: 'servicios-basicos', component: LecturaPlanillaComponent },
-      { path: 'servicios-basicos/listar', component: RecibosListarComponent },
+      { path: 'servicios-basicos/inscripciones',        component: InscripcionListarComponent },
+      { path: 'servicios-basicos/inscripciones/pagos',  component: PagoInscripcionListarComponent },
+      { path: 'servicios-basicos',                       component: LecturaPlanillaComponent },
+      { path: 'servicios-basicos/listar',                component: RecibosListarComponent },
 
       // Mensajería
       { path: 'mensajeria', component: MensajeriaComponent }

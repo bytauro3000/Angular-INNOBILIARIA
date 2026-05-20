@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PagoLetraRequest } from '../dto/pagoletrarequest.dto';
 import { PagoLetraResponse } from '../dto/pagoletraresponse.dto';
+import { PagosMultiplesRequest } from '../dto/pagosmultiplesrequest.dto';
 import { environment } from '../../environments/environment';
 import { TipoComprobante } from '../enums/tipocomprobante';
 
@@ -27,6 +28,16 @@ export class PagoLetraService {
     return this.http.get<PagoLetraResponse>(`${this.apiUrl}/${idPago}`);
   }
 
+  /**
+   * Consulta el saldo pendiente de una letra en estado PARCIAL.
+   * Endpoint: GET /api/pagos/letra/{idLetra}/saldo
+   */
+  consultarSaldo(idLetra: number): Observable<{ idLetra: number; saldoPendiente: number }> {
+    return this.http.get<{ idLetra: number; saldoPendiente: number }>(
+      `${this.apiUrl}/letra/${idLetra}/saldo`
+    );
+  }
+
   registrarPago(pago: PagoLetraRequest, vouchers?: File[]): Observable<PagoLetraResponse> {
     const formData = new FormData();
     formData.append('pago', new Blob([JSON.stringify(pago)], { type: 'application/json' }));
@@ -36,9 +47,12 @@ export class PagoLetraService {
     return this.http.post<PagoLetraResponse>(`${this.apiUrl}/registrar`, formData);
   }
 
-  registrarPagosMultiples(pagos: PagoLetraRequest[], vouchers?: File[]): Observable<any> {
+  /**
+   * Registra múltiples pagos en una sola operación.
+   * Ahora acepta PagosMultiplesRequest que incluye descuento y letra gratis.
+   */
+  registrarPagosMultiples(request: PagosMultiplesRequest, vouchers?: File[]): Observable<any> {
     const formData = new FormData();
-    const request = { pagos: pagos };
     formData.append('pagos', new Blob([JSON.stringify(request)], { type: 'application/json' }));
     if (vouchers && vouchers.length > 0) {
       vouchers.forEach(v => formData.append('vouchers', v));

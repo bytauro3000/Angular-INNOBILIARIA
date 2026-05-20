@@ -1,6 +1,6 @@
 import {
   Component, EventEmitter, Input, OnInit, Output,
-  ViewChild, ElementRef, AfterViewInit
+  ViewChild, ElementRef, AfterViewInit, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,13 +24,12 @@ import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.comp
   templateUrl: './pagoletra-insertar.html',
   styleUrls: ['./pagoletra-insertar.scss']
 })
-export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
+export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
   private modal?: bootstrap.Modal;
 
   @Input() letra!: LetraCambio;
   @Input() contrato!: any;
-
   @Input() calculoMora: CalculoMoraDTO | null = null;
   @Input() moraPreviamentePagada: boolean = false;
 
@@ -48,14 +47,16 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     fechaPago: '',
     tipoComprobante: undefined,
     numeroComprobantePersonalizado: undefined,
-    observaciones: ''
+    observaciones: '',
+    esPagoAcuenta: false
   };
 
-  // Número de comprobante sugerido: solo para mostrar al cajero (readonly por defecto)
+  saldoActual: number = 0;
+  modoPagoAcuenta: boolean = false;
+  cargandoSaldo: boolean = false;
+
   numeroComprobantePreview: string = '';
   cargandoPreview: boolean = false;
-
-  // Modo manual: permite al usuario ingresar un número personalizado
   modoManualComprobante: boolean = false;
   numeroComprobanteManual: string = '';
 
@@ -66,6 +67,9 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   moraDecisionTomada: boolean = false;
   pagandoMora: boolean = false;
 
+  // ── Control de cierre sin race condition ──────────────────────────────────
+  private _hiddenHandler?: EventListener;
+
   constructor(
     private pagoService: PagoLetraService,
     private moraService: MoraService,
@@ -74,9 +78,27 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
-    this.pagoRequest.importePagado = this.letra.importe;
     this.pagoRequest.fechaPago = new Date().toISOString().split('T')[0];
     this.generarObservaciones();
+
+    if (this.letra.estadoLetra === 'PARCIAL') {
+      this.cargandoSaldo = true;
+      this.pagoService.consultarSaldo(this.letra.idLetra).subscribe({
+        next: (res) => {
+          this.saldoActual = res.saldoPendiente;
+          this.pagoRequest.importePagado = this.saldoActual;
+          this.cargandoSaldo = false;
+        },
+        error: () => {
+          this.saldoActual = this.letra.saldoPendiente ?? this.letra.importe;
+          this.pagoRequest.importePagado = this.saldoActual;
+          this.cargandoSaldo = false;
+        }
+      });
+    } else {
+      this.saldoActual = this.letra.importe;
+      this.pagoRequest.importePagado = this.saldoActual;
+    }
 
     if (this.moraPreviamentePagada) {
       this.pagarMoraTambien = false;
@@ -88,25 +110,44 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.modal = new bootstrap.Modal(this.modalElement.nativeElement, {
-      backdrop: 'static',
-      keyboard: false
-    });
+    const el = this.modalElement.nativeElement;
+
+    // ── SOLUCIÓN DEFINITIVA AL ERROR DE BOOTSTRAP ─────────────────────────
+    // El evento 'hidden.bs.modal' se dispara DESPUÉS de que Bootstrap termina
+    // su transición CSS de 300ms. Sólo entonces destruimos el componente via
+    // onClose.emit(). Esto elimina la race condition entre setTimeout(300ms) y
+    // Bootstrap internamente. Con setTimeout ambos corren en paralelo y a veces
+    // Bootstrap intenta acceder al DOM cuando Angular ya lo destruyó → crash.
+    this._hiddenHandler = () => {
+      this._limpiarDOM();
+      this.onClose.emit();
+    };
+    el.addEventListener('hidden.bs.modal', this._hiddenHandler);
+
+    this.modal = new bootstrap.Modal(el, { backdrop: 'static', keyboard: false });
     this.modal.show();
   }
 
+  ngOnDestroy(): void {
+    // Limpiar listener si el componente se destruye antes de que el modal cierre
+    if (this._hiddenHandler && this.modalElement?.nativeElement) {
+      this.modalElement.nativeElement.removeEventListener('hidden.bs.modal', this._hiddenHandler);
+    }
+    this._limpiarDOM();
+    // NO llamar dispose() aquí - puede causar errores si la animación sigue corriendo
+  }
+
   cerrarModal(): void {
+    // hide() inicia la animación de cierre de Bootstrap (300ms)
+    // Cuando termina, dispara 'hidden.bs.modal' → nuestro _hiddenHandler llama onClose
     this.modal?.hide();
-    setTimeout(() => {
-      this.modal?.dispose();
-      // Restaurar el scroll del body que Bootstrap bloquea al abrir el modal
-      document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
-      // Eliminar el backdrop residual si quedara alguno
-      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-      this.onClose.emit();
-    }, 300);
+  }
+
+  private _limpiarDOM(): void {
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
   }
 
   get numeroLetraLimpio(): string {
@@ -117,16 +158,28 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     return this.contrato?.moneda === 'PEN' ? 'S/.' : '$';
   }
 
+  get esParcial(): boolean {
+    return this.letra?.estadoLetra === 'PARCIAL';
+  }
+
   get totalConMora(): number {
     if (this.pagarMoraTambien && this.calculoMora) {
-      return this.letra.importe + this.calculoMora.montoMoraTotal;
+      return this.pagoRequest.importePagado + this.calculoMora.montoMoraTotal;
     }
-    return this.letra.importe;
+    return this.pagoRequest.importePagado;
   }
 
   togglePagarMora(): void {
     this.pagarMoraTambien = !this.pagarMoraTambien;
     this.moraDecisionTomada = true;
+  }
+
+  togglePagoAcuenta(): void {
+    this.modoPagoAcuenta = !this.modoPagoAcuenta;
+    this.pagoRequest.esPagoAcuenta = this.modoPagoAcuenta;
+    if (!this.modoPagoAcuenta) {
+      this.pagoRequest.importePagado = this.saldoActual;
+    }
   }
 
   private generarObservaciones(): void {
@@ -153,11 +206,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Al seleccionar el tipo de comprobante, consulta al backend el siguiente
-   * número que se emitirá y lo muestra como preview readonly.
-   * El campo es solo informativo: el backend genera el número real al guardar.
-   */
   onTipoComprobanteChange(): void {
     this.numeroComprobantePreview = '';
     this.modoManualComprobante = false;
@@ -174,7 +222,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /** Alterna entre modo automático y modo manual para el N° comprobante */
   private get seriePrefix(): string {
     const idx = this.numeroComprobantePreview.indexOf('-');
     return idx >= 0 ? this.numeroComprobantePreview.substring(0, idx + 1) : '';
@@ -184,7 +231,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     if (this.cargandoPreview) return;
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
-      // Pre-llenar con el prefijo de serie (ej: "RB01-")
       this.numeroComprobanteManual = this.seriePrefix;
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
     } else {
@@ -193,7 +239,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /** Captura el valor ingresado manualmente, protegiendo el prefijo de serie */
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const prefijo = this.seriePrefix;
@@ -212,6 +257,20 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
       this.toastr.warning('El importe pagado debe ser mayor a cero', 'Validación');
       return;
     }
+    if (this.pagoRequest.importePagado > this.saldoActual) {
+      this.toastr.warning(
+        `El importe no puede superar el saldo pendiente (${this.simboloMoneda} ${this.saldoActual.toFixed(2)})`,
+        'Validación'
+      );
+      return;
+    }
+    if (!this.modoPagoAcuenta && this.pagoRequest.importePagado < this.saldoActual) {
+      this.toastr.warning(
+        'Para pagar un monto menor al saldo, active la opción "Pago a cuenta"',
+        'Validación'
+      );
+      return;
+    }
     if (!this.pagoRequest.medioPago) {
       this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
       return;
@@ -220,7 +279,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
       this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
       return;
     }
-    // Ya no se valida numeroComprobante: lo genera el backend
     if (this.pagoRequest.medioPago !== MedioPago.EFECTIVO) {
       if (!this.pagoRequest.numeroOperacion?.trim()) {
         this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
@@ -232,6 +290,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
       }
     }
 
+    this.pagoRequest.esPagoAcuenta = this.modoPagoAcuenta;
     this.enviando = true;
 
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFiles).subscribe({
@@ -276,7 +335,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
           medioPago:       this.pagoRequest.medioPago,
           numeroOperacion: this.pagoRequest.numeroOperacion,
           tipoComprobante: this.pagoRequest.tipoComprobante,
-          // numeroComprobante eliminado: el backend asigna el siguiente en secuencia
           observaciones:   `Mora pagada junto con la letra N° ${this.numeroLetraLimpio}`
         };
 
@@ -312,8 +370,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit {
 
   private finalizarPago(idPago: number): void {
     this.enviando = false;
-    this.cerrarModal();
     this.onPagoExitoso.emit();
+    this.cerrarModal(); // Bootstrap animará cierre → hidden.bs.modal → onClose
 
     this.pagoService.descargarComprobante(idPago).subscribe({
       next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },

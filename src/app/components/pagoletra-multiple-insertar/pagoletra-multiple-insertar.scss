@@ -1,81 +1,424 @@
-// ============================================
-// VARIABLES (mismas que en el modal individual)
-// ============================================
-$navy: #023e8a;
-$green: #27ae60;
-$light-blue: #3498db;
-$text-dark: #1e293b;
-$text-light: #334155;
-$border-color: #e9ecef;
-$input-bg: #f9fafc;
+// ═══════════════════════════════════════════════════════════
+//  PAGO MÚLTIPLE — MODAL
+//  Paleta: navy profundo + verde + índigo para extras
+// ═══════════════════════════════════════════════════════════
+$navy:         #0a2540;
+$navy-mid:     #1e4db7;
+$navy-light:   #3b82f6;
+$green:        #059669;
+$green-pale:   #d1fae5;
+$indigo:       #4f46e5;
+$indigo-pale:  #eef2ff;
+$orange:       #d97706;
+$red:          #dc2626;
+$text-dark:    #0f172a;
+$text-mid:     #334155;
+$text-soft:    #64748b;
+$border:       #e2e8f0;
+$surface:      #f8fafc;
+$white:        #ffffff;
 
-// ============================================
-// MODAL PRINCIPAL
-// ============================================
-.modal-content {
-  background-color: white !important;
-  border-radius: 16px;
-  border: 1px solid $border-color !important;
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
-  max-height: 95vh;
-  display: flex;
-  flex-direction: column;
-}
-
+// ── Modal shell ─────────────────────────────────────────────
 .modal-dialog {
-  max-width: 600px;
+  max-width: 580px;
   width: 95%;
   margin: 0 auto;
   display: flex;
-  align-items: center; 
+  align-items: center;
   min-height: 100vh;
 }
 
-.modal-header {
-  padding: 0.8rem 1.2rem;
-  border-bottom: 1px solid $border-color;
+.modal-content {
+  background: $white;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow:
+    0 32px 64px rgba(10, 37, 64, 0.16),
+    0 8px 24px rgba(10, 37, 64, 0.08);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  .modal-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: $text-dark;
+// ── Header ──────────────────────────────────────────────────
+.modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border;
+  background: linear-gradient(135deg, #f0f9ff 0%, $surface 100%);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  .header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+  }
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, $navy-mid 0%, $navy 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 
     i {
-      color: $green;
-      font-size: 1.3rem;
+      color: $white;
+      font-size: 1.1rem;
     }
   }
 
-  .btn-close {
-    filter: none;
-    opacity: 0.6;
-    &:hover { opacity: 1; }
+  .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .header-subtitle {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $text-soft;
+    }
+  }
+
+  .modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  .btn-close-custom {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-soft;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+
+    i { font-size: 0.85rem; }
+
+    &:hover {
+      background: #f1f5f9;
+      color: $text-dark;
+    }
   }
 }
 
+// ── Body ────────────────────────────────────────────────────
 .modal-body {
-  padding: 0.8rem 1.2rem;
+  padding: 1rem 1.25rem;
   overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;        // ← evita que los hijos colapsen en el eje cruzado
+  color: $text-dark;
+  background: $white;
 }
 
-// ============================================
-// FORMULARIOS
-// ============================================
+// ── Panel de letras ──────────────────────────────────────────
+.letras-panel {
+  background: $surface;
+  border: 1.5px solid $border;
+  border-radius: 14px;
+  overflow: clip;          // 'clip' respeta border-radius sin crear BFC que colapsa height
+  min-height: fit-content; // fuerza que el flex item tenga la altura de su contenido
+  flex-shrink: 0;          // impide que el contenedor flex lo comprima a 0
+}
+
+.letras-panel-header {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #f0f4ff 0%, $surface 100%);
+  border-bottom: 1px solid $border;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.6px;
+  color: $navy-mid !important;
+
+  i { font-size: 0.9rem; }
+}
+
+.letras-list {
+  padding: 0.4rem 0.75rem;
+  color: $text-dark;
+}
+
+.letra-item {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px dashed $border;
+  color: $text-dark !important;
+
+  &:last-child { border-bottom: none; }
+
+  &.letra-gratis {
+    background: rgba($indigo, 0.05);
+    border-radius: 8px;
+    margin: 2px 0;
+    padding: 0.45rem 0.5rem;
+  }
+}
+
+.letra-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.letra-num {
+  display: inline-block !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: $text-dark !important;
+
+  &::before {
+    content: 'N° ';
+    font-weight: 500;
+    color: $text-soft;
+  }
+}
+
+.letra-gratis-chip {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.58rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  color: $indigo !important;
+  background: $indigo-pale !important;
+  border: 1px solid rgba($indigo, 0.25);
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+
+.letra-importe {
+  display: inline-block !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: $text-dark !important;
+
+  &.tachado {
+    text-decoration: line-through !important;
+    color: $text-soft !important;
+    font-weight: 500 !important;
+  }
+}
+
+// Barra de total
+.letras-total-bar {
+  border-top: 1.5px solid $border;
+  padding: 0.6rem 1rem;
+  background: #f0fdf4;
+  color: $text-mid;
+}
+
+.total-row {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem !important;
+  color: $text-mid !important;
+  padding: 2px 0;
+
+  &.descuento-row { color: $green !important; }
+
+  &.total-final {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: $text-dark !important;
+    padding-top: 6px;
+    border-top: 1px solid $border;
+    margin-top: 4px;
+
+    strong {
+      font-size: 1rem !important;
+      color: $green !important;
+    }
+  }
+}
+
+.text-green { color: $green !important; font-weight: 700; }
+
+// ── Secciones extra ──────────────────────────────────────────
+.extra-section {
+  border: 1.5px solid $border;
+  border-radius: 14px;
+  overflow: clip;          // mismo fix que .letras-panel
+  min-height: fit-content;
+  flex-shrink: 0;
+
+  &.section-active { border-color: #6ee7b7; }
+  &.section-active.section-gift { border-color: rgba($indigo, 0.35); }
+}
+
+.extra-section-header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  background: $surface;
+
+  &:hover { background: #f1f5f9; }
+}
+
+.extra-section-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.extra-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+
+  &.descuento-icon {
+    background: $green-pale;
+    color: $green !important;
+    border: 1px solid rgba($green, 0.2);
+  }
+
+  &.gift-icon {
+    background: $indigo-pale;
+    color: $indigo !important;
+    border: 1px solid rgba($indigo, 0.2);
+  }
+}
+
+.extra-section-title {
+  display: block !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: $text-dark !important;
+}
+
+.extra-section-sub {
+  display: block !important;
+  font-size: 0.68rem !important;
+  color: $text-soft !important;
+}
+
+.extra-section-body {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid $border;
+  background: $white;
+}
+
+// ── Toggle switch ────────────────────────────────────────────
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+  padding: 0;
+  pointer-events: none; // el click lo maneja el header
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: left 0.25s ease;
+  }
+
+  &.active {
+    background: $green;
+    .toggle-knob { left: 23px; }
+  }
+
+  &.toggle-blue.active {
+    background: $indigo;
+  }
+}
+
+// ── Separador sección pago ───────────────────────────────────
+.form-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.25rem 0 0;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border;
+  }
+
+  span {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: $text-soft;
+    white-space: nowrap;
+  }
+}
+
+// ── Formulario ───────────────────────────────────────────────
+.form-row {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.55rem;
+  width: 100%;
+}
+
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.width-100  { grid-column: 1 / -1; }
+
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   width: 100%;
 
   label {
-    color: $text-light;
-    font-size: 0.65rem;
-    font-weight: 700;
+    color: $text-soft;
+    font-size: 0.6rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.6px;
+
+    span { color: $red; margin-left: 2px; }
   }
 
   .input-group {
@@ -97,229 +440,133 @@ $input-bg: #f9fafc;
       align-items: center;
       justify-content: center;
       padding: 0 10px;
-      background-color: $input-bg;
-      border: 1px solid $border-color;
+      background-color: $surface;
+      border: 1.5px solid $border;
       border-left: none;
       border-radius: 0 10px 10px 0;
-      min-width: 36px;
-      height: 36px;
+      min-width: 38px;
+      height: 38px;
     }
   }
 }
 
-.width-100 { grid-column: 1 / -1; }
-
-.form-row {
-  display: grid;
-  gap: 0.7rem;
-  margin-bottom: 0.6rem;
-  width: 100%;
-}
-
-.form-2-col { grid-template-columns: repeat(2, 1fr); }
-
 input, select, textarea {
-  background-color: $input-bg !important;
-  border: 1px solid $border-color !important;
+  background-color: $surface !important;
+  border: 1.5px solid $border !important;
   color: $text-dark !important;
   border-radius: 10px !important;
-  padding: 6px 12px !important;
-  font-size: 0.85rem !important;
-  height: 36px !important;
+  padding: 7px 12px !important;
+  font-size: 0.875rem !important;
+  height: 38px !important;
   width: 100% !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
 
-  &:disabled {
-    background-color: #cbd5e1 !important;
-    border-color: #94a3b8 !important;
-    color: #0f172a !important;
+  &:focus {
+    outline: none !important;
+    border-color: $navy-light !important;
+    box-shadow: 0 0 0 3px rgba($navy-mid, 0.1) !important;
+    background-color: $white !important;
+  }
+
+  &:disabled, &[disabled] {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+    color: #64748b !important;
     opacity: 1;
+    cursor: not-allowed;
   }
 }
 
 textarea {
-  min-height: 50px !important;
-  resize: none;
+  height: auto !important;
+  min-height: 54px !important;
+  resize: vertical;
 }
 
-// ============================================
-// ESTILO PARA EL INPUT FILE
-// ============================================
-.custom-file-upload {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 38px;
-  background-color: $input-bg;
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-  transition: all 0.3s ease;
-
-  &:hover:not(.disabled) {
-    border-color: $light-blue;
-    background-color: #f0f7ff;
-  }
-  
-  &.disabled {
-    background-color: #cbd5e1;
-    border-style: solid;
-    cursor: not-allowed;
-  }
-
-  .file-browse {
-    background-color: $navy;
-    color: white;
-    height: 100%;
-    padding: 0 15px;
-    display: flex;
-    align-items: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .file-name {
-    padding: 0 12px;
-    font-size: 0.8rem;
-    color: #64748b;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  input[type="file"] {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-  }
+// ── Badges ──────────────────────────────────────────────────
+.badge-manual {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: $navy-mid;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
 }
 
-// ============================================
-// ESTILO PARA LA LISTA DE LETRAS
-// ============================================
-.info-letra {
-  background-color: #f8fafc;
-  padding: 0.6rem 1rem;
-  border-radius: 12px;
-  margin-bottom: 0.8rem;
-
-  .info-item {
-    label {
-      color: $navy;
-      font-size: 0.65rem;
-      font-weight: 700;
-      margin-bottom: 0;
-      display: block;
-    }
-    .info-value {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: $text-dark;
-      margin: 0;
-    }
-  }
-
-  .lista-letras {
-    margin: 0;
-    padding-left: 1.2rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-
-    li {
-      margin-bottom: 2px;
-      color: $text-dark;
-    }
-  }
-
-  .total-importe {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: $green;
-  }
-}
-
-// ============================================
-// BOTONES DEL MODAL
-// ============================================
-.modal-footer {
-  border-top: 1px solid $border-color;
-  padding: 0.8rem 1.2rem;
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-
-  .btn {
-    padding: 8px 22px;
-    border-radius: 40px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
-  .btn-save {
-    background: linear-gradient(135deg, #27ae60, #219150);
-    color: white;
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba($green, 0.3);
-    }
-  }
-
-  .btn-cancel {
-    background: transparent;
-    color: $text-light;
-    border: 1px solid $border-color !important;
-
-    &:hover:not(:disabled) {
-      background: #f1f5f9;
-    }
-  }
-}
-// ─── N° Comprobante editable ───────────────────────────────────────────
 .btn-toggle-manual {
   cursor: pointer;
   user-select: none;
   min-width: 38px;
   justify-content: center;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s;
 
   &:hover { background-color: #e9ecef; }
 
   &.active {
     background-color: #eff6ff;
-    border-color: #3b82f6;
-    color: #2563eb;
+    border-color: $navy-light;
+    color: $navy-mid;
   }
 }
 
-.badge-manual {
-  display: inline-block;
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: #2563eb;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 4px;
-  padding: 1px 5px;
-  margin-left: 5px;
-  vertical-align: middle;
+.input-manual {
+  border-color: $navy-light !important;
+  box-shadow: 0 0 0 2px rgba($navy-mid, 0.15) !important;
 }
 
-.input-manual {
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+// ── Footer ──────────────────────────────────────────────────
+.modal-footer {
+  border-top: 1px solid $border;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  background: $surface;
+
+  .btn {
+    padding: 9px 22px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.83rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+
+    &:disabled { opacity: 0.65; cursor: not-allowed; }
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, $navy-mid 0%, $navy 100%);
+    color: $white;
+    box-shadow: 0 4px 12px rgba($navy-mid, 0.3);
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba($navy-mid, 0.35);
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: $text-mid;
+    border: 1.5px solid $border !important;
+
+    &:hover:not(:disabled) { background: #f1f5f9; }
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────
+@media (max-width: 520px) {
+  .modal-dialog { width: 100%; }
+  .form-2-col   { grid-template-columns: 1fr; }
 }

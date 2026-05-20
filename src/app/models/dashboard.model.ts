@@ -4,7 +4,7 @@ export interface DashboardData {
   vendedores: number;
   programas: number;
   clientes: number;
-  
+ 
   graficoLotes: {
     [nombrePrograma: string]: {
       Disponible?: number;
@@ -12,7 +12,7 @@ export interface DashboardData {
       Vendido?: number;
     }
   };
-
+ 
   graficoContratos: {
     [nombrePrograma: string]: {
       CONTADO?: number;

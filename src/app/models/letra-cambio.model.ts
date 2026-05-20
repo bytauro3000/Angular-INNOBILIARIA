@@ -1,12 +1,12 @@
 // src/app/models/letra-cambio.model.ts
-
+ 
 import { Contrato } from './contrato.model';
 import { Moneda } from '../dto/moneda.enum';
 import { EstadoLetra } from '../enums/estadoletra';
 import { TipoComprobante } from '../enums/tipocomprobante';
 import { Distrito } from './distrito.model';
-
-
+ 
+ 
 export interface LetraCambio {
   idLetra: number;
   contrato: Contrato;
@@ -23,4 +23,7 @@ export interface LetraCambio {
   observaciones?: string;
   monedaContrato?: Moneda;
   esMultiple?: boolean;
+  /** Saldo aún por pagar cuando la letra está en estado PARCIAL */
+  saldoPendiente?: number;
 }
+ 

@@ -210,6 +210,13 @@ $light-bg:    #f5f7fa;
 // ============================================
 // BOTÓN ACCIÓN
 // ============================================
+.acciones-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
 .btn-action {
   width: 34px; height: 34px;
   border-radius: 8px;
@@ -221,6 +228,12 @@ $light-bg:    #f5f7fa;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1.1rem;
+
+  &.btn-delete {
+    color: #dc3545;
+    border-color: #dc3545;
+    &:hover { background: #dc3545; color: #fff; }
+  }
 
   &.btn-inscribir {
     color: #2980b9;
@@ -277,9 +290,57 @@ $light-bg:    #f5f7fa;
 }
 
 // ============================================
+// PAGINACIÓN — idéntica a cliente-listar
+// ============================================
+.paginacion-controles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+
+  .btn-paginacion {
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $text-dark;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    &:hover:not(:disabled) { background: $navy; color: white; border-color: $navy; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &.active { background: $navy; color: white; border-color: $navy; }
+  }
+
+  .ellipsis-spacer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-weight: bold;
+    min-width: 35px;
+    height: 38px;
+    user-select: none;
+  }
+}
+
+// ============================================
 // RESPONSIVE
 // ============================================
 @media (max-width: 640px) {
   .inscripcion-listar-container { padding: 16px; }
   .filtros-header { flex-direction: column; align-items: stretch; }
+
+  .paginacion-controles {
+    .btn-paginacion {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  }
 }

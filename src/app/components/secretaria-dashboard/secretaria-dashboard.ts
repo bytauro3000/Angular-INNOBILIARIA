@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
-import { DashboardData } from '../../models/dashboard.model';
+import { DashboardData} from '../../models/dashboard.model';
+import { IngresoDiarioDTO } from '../../dto/ingresodiario.dto';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
@@ -15,17 +16,28 @@ import { TipoCambioService } from '../../services/tipo-cambio.service';
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
+
+  // ── Totales generales ──────────────────────────────────────────────────────
   totalLotes: number = 0;
   totalParceleros: number = 0;
   totalVendedores: number = 0;
   totalProgramas: number = 0;
   totalClientes: number = 0;
 
+  // ── Tipo de cambio ─────────────────────────────────────────────────────────
   tcCompra: number = 0;
   tcVenta: number = 0;
   tcCargando: boolean = true;
-  mostrarModalTC: boolean = false; // ✅ controla la ventanita
+  mostrarModalTC: boolean = false;
 
+  today: Date = new Date();
+
+  // ── Ingresos diarios ───────────────────────────────────────────────────────
+  ingresos: IngresoDiarioDTO | null = null;
+  ingresosCargando: boolean = true;
+  ingresosError: boolean = false;
+
+  // ── Gráficos ───────────────────────────────────────────────────────────────
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -80,7 +92,10 @@ export class SecretariaDashboard implements OnInit {
   ngOnInit(): void {
     this.cargarDatos();
     this.cargarTipoCambio();
+    this.cargarIngresosDiarios();
   }
+
+  // ── Tipo de cambio ─────────────────────────────────────────────────────────
 
   cargarTipoCambio(): void {
     this.tcCargando = true;
@@ -101,9 +116,36 @@ export class SecretariaDashboard implements OnInit {
   abrirModalTC(): void  { this.mostrarModalTC = true; }
   cerrarModalTC(): void { this.mostrarModalTC = false; }
 
+  // ── Ingresos diarios ───────────────────────────────────────────────────────
+
+  cargarIngresosDiarios(): void {
+    this.ingresosCargando = true;
+    this.ingresosError    = false;
+    this.dashboardService.getIngresosDiarios().subscribe({
+      next: (data) => {
+        this.ingresos         = data;
+        this.ingresosCargando = false;
+      },
+      error: () => {
+        this.ingresosError    = true;
+        this.ingresosCargando = false;
+      }
+    });
+  }
+
+  /** Formatea un número como moneda USD con 2 decimales */
+  formatearDolares(valor: number | undefined | null): string {
+    if (valor == null) return '$ 0.00';
+    return '$ ' + valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // ── Navegación ─────────────────────────────────────────────────────────────
+
   irARuta(ruta: string): void {
     this.router.navigate([ruta]);
   }
+
+  // ── Dashboard totales ──────────────────────────────────────────────────────
 
   private limpiarNombrePrograma(nombre: string): string {
     if (!nombre) return '';

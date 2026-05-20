@@ -1,6 +1,4 @@
-// src/app/app.config.ts
-
-import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core'; // 🟢 Agregamos importProvidersFrom
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -15,8 +13,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([AuthInterceptor])),
-    importProvidersFrom(FormsModule), 
+    importProvidersFrom(FormsModule),
     provideCharts(withDefaultRegisterables()),
+
+    // Locale global: todos los pipes (date, number, currency) usarán español por defecto
+    { provide: LOCALE_ID, useValue: 'es' },
 
     // Mensajes con Toastr
     provideToastr({
@@ -24,7 +25,7 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
-    
+
     provideAnimations(),
   ]
 };

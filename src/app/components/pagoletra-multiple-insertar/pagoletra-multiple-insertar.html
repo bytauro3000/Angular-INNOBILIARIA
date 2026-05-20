@@ -1,56 +1,170 @@
 <div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content shadow-lg">
+    <div class="modal-content">
+
+      <!-- ── Header ── -->
       <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-cash-stack"></i> Pagar {{ letras.length }} letras
-        </h5>
-        <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
+        <div class="header-left">
+          <div class="header-icon">
+            <i class="bi bi-layers-fill"></i>
+          </div>
+          <div class="header-info">
+            <span class="header-subtitle">Pago múltiple</span>
+            <h5 class="modal-title">
+              {{ letras.length }} letra{{ letras.length !== 1 ? 's' : '' }} seleccionada{{ letras.length !== 1 ? 's' : '' }}
+            </h5>
+          </div>
+        </div>
+        <button type="button" class="btn-close-custom" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
 
+      <!-- ── Body ── -->
       <div class="modal-body">
-        <div class="info-letra" *ngIf="letras.length > 0">
-          <div class="info-item" style="grid-column: 1 / -1;">
-            <label>Letras a pagar:</label>
-            <div class="info-value">
-              <ul class="lista-letras">
-                <li *ngFor="let l of letras">
-                  {{ getNumeroLetraLimpio(l.numeroLetra) }} - {{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{l.importe | number:'1.2-2'}}
-                </li>
-              </ul>
+
+        <!-- Panel de letras seleccionadas -->
+        <div class="letras-panel" *ngIf="letras.length > 0">
+          <div class="letras-panel-header">
+            <i class="bi bi-list-check"></i>
+            <span>Letras a pagar</span>
+          </div>
+          <div class="letras-list">
+            <div class="letra-item"
+                 *ngFor="let l of letras"
+                 [class.letra-gratis]="l.idLetra === idLetraGratis">
+              <div class="letra-item-left">
+                <span class="letra-num">{{ getNumeroLetraLimpio(l.numeroLetra) }}</span>
+                <span class="letra-gratis-chip" *ngIf="l.idLetra === idLetraGratis">
+                  <i class="bi bi-gift-fill"></i> GRATIS
+                </span>
+              </div>
+              <span class="letra-importe" [class.tachado]="l.idLetra === idLetraGratis">
+                {{ simboloMoneda }} {{ l.importe | number:'1.2-2' }}
+              </span>
             </div>
           </div>
-          <div class="info-item" style="grid-column: 1 / -1; margin-top: 8px;">
-            <label>Importe Total</label>
-            <p class="info-value total-importe">{{contrato?.moneda === 'PEN' ? 'S/.' : '$'}} {{importeTotal | number:'1.2-2'}}</p>
+          <div class="letras-total-bar">
+            <div class="total-row">
+              <span>Subtotal letras</span>
+              <span>{{ simboloMoneda }} {{ subtotalLetras | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row descuento-row" *ngIf="aplicarDescuento && descuentoNegociado > 0">
+              <span><i class="bi bi-scissors"></i> Descuento negociado</span>
+              <span class="text-green">- {{ simboloMoneda }} {{ descuentoNegociado | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row total-final">
+              <span>TOTAL A PAGAR</span>
+              <strong>{{ simboloMoneda }} {{ importeTotal | number:'1.2-2' }}</strong>
+            </div>
           </div>
         </div>
 
+        <!-- ── Sección descuento negociado ── -->
+        <div class="extra-section" [class.section-active]="aplicarDescuento">
+          <div class="extra-section-header" (click)="toggleDescuento()">
+            <div class="extra-section-left">
+              <div class="extra-icon descuento-icon">
+                <i class="bi bi-scissors"></i>
+              </div>
+              <div class="extra-section-text">
+                <span class="extra-section-title">Descuento negociado</span>
+                <span class="extra-section-sub">Aplicar rebaja sobre el total de letras</span>
+              </div>
+            </div>
+            <button type="button" class="toggle-switch" [class.active]="aplicarDescuento">
+              <span class="toggle-knob"></span>
+            </button>
+          </div>
+          <div class="extra-section-body" *ngIf="aplicarDescuento">
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label for="descuentoNegociado">Monto a descontar <span>*</span></label>
+                <input type="number" step="0.01" id="descuentoNegociado" class="form-control"
+                       [(ngModel)]="descuentoNegociado" name="descuentoNegociado" min="0.01">
+              </div>
+              <div class="form-group">
+                <label for="motivoDescuento">Motivo del descuento <span>*</span></label>
+                <input type="text" id="motivoDescuento" class="form-control"
+                       [(ngModel)]="motivoDescuento" name="motivoDescuento"
+                       placeholder="Ej: Acuerdo gerencial">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Sección letra gratis ── -->
+        <div class="extra-section" [class.section-active]="aplicarLetraGratis" [class.section-gift]="true">
+          <div class="extra-section-header" (click)="toggleLetraGratis()">
+            <div class="extra-section-left">
+              <div class="extra-icon gift-icon">
+                <i class="bi bi-gift-fill"></i>
+              </div>
+              <div class="extra-section-text">
+                <span class="extra-section-title">Otorgar letra gratis</span>
+                <span class="extra-section-sub">Perdonar el importe de una letra</span>
+              </div>
+            </div>
+            <button type="button" class="toggle-switch toggle-blue" [class.active]="aplicarLetraGratis">
+              <span class="toggle-knob"></span>
+            </button>
+          </div>
+          <div class="extra-section-body" *ngIf="aplicarLetraGratis">
+            <div class="form-row form-2-col">
+              <div class="form-group">
+                <label for="idLetraGratis">Seleccione la letra <span>*</span></label>
+                <select id="idLetraGratis" class="form-select" [(ngModel)]="idLetraGratis" name="idLetraGratis">
+                  <option [ngValue]="null">-- Seleccione --</option>
+                  <option *ngFor="let l of letras" [ngValue]="l.idLetra">
+                    Letra {{ getNumeroLetraLimpio(l.numeroLetra) }} ({{ simboloMoneda }} {{ l.importe | number:'1.2-2' }})
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="motivoLetraGratis">Motivo de gratuidad <span>*</span></label>
+                <input type="text" id="motivoLetraGratis" class="form-control"
+                       [(ngModel)]="motivoLetraGratis" name="motivoLetraGratis"
+                       placeholder="Ej: Promoción especial">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Formulario pago ── -->
+        <div class="form-separator">
+          <span>Datos del pago</span>
+        </div>
+
         <form #form="ngForm">
+
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="medioPago">Medio de Pago *</label>
+              <label for="medioPago">Medio de Pago <span>*</span></label>
               <select id="medioPago" class="form-select" [(ngModel)]="datosComunes.medioPago"
                       name="medioPago" required (change)="onMedioPagoChange()">
                 <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="numeroOperacion">N° Operación <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span></label>
+              <label for="numeroOperacion">
+                N° Operación
+                <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span>
+              </label>
               <input type="text" id="numeroOperacion" class="form-control"
                      [(ngModel)]="datosComunes.numeroOperacion" name="numeroOperacion"
-                     [disabled]="datosComunes.medioPago === 'EFECTIVO'">
+                     [disabled]="datosComunes.medioPago === 'EFECTIVO'"
+                     [placeholder]="datosComunes.medioPago === 'EFECTIVO' ? 'N/A' : 'Ingrese N° operación'">
             </div>
           </div>
 
           <div class="form-row form-2-col">
             <div class="form-group">
-              <label for="fechaPago">Fecha Operación *</label>
+              <label for="fechaPago">Fecha Operación <span>*</span></label>
               <input type="date" id="fechaPago" class="form-control"
                      [(ngModel)]="datosComunes.fechaPago" name="fechaPago" required>
             </div>
             <div class="form-group">
-              <label for="tipoComprobante">Tipo Comprobante *</label>
+              <label for="tipoComprobante">Tipo Comprobante <span>*</span></label>
               <select id="tipoComprobante" class="form-select" [(ngModel)]="datosComunes.tipoComprobante"
                       name="tipoComprobante" (change)="onTipoComprobanteChange()" required>
                 <option [ngValue]="undefined">-- Seleccione --</option>
@@ -71,20 +185,19 @@
                        [readonly]="!modoManualComprobante || cargandoPreview"
                        [class.input-manual]="modoManualComprobante"
                        (input)="onNumeroManualChange($event)"
-                       [placeholder]="modoManualComprobante ? 'Ingrese N° comprobante' : (datosComunes.tipoComprobante ? 'Seleccione tipo primero' : 'Se asigna al guardar')"
+                       [placeholder]="modoManualComprobante ? 'Ingrese N°' : (datosComunes.tipoComprobante ? 'Calculando...' : 'Se asigna al guardar')"
                        [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
-                       [style.color]="modoManualComprobante ? '#1e293b' : '#6c757d'"
+                       [style.color]="modoManualComprobante ? '#0f172a' : '#64748b'"
                        [style.cursor]="modoManualComprobante ? 'text' : 'default'">
                 <span class="input-group-text btn-toggle-manual"
                       (click)="toggleModoManual()"
-                      [title]="modoManualComprobante ? 'Volver al número automático' : 'Ingresar número manualmente'"
+                      [title]="modoManualComprobante ? 'Volver al automático' : 'Ingresar manualmente'"
                       [class.active]="modoManualComprobante">
                   <span *ngIf="cargandoPreview" class="spinner-border spinner-border-sm text-secondary"></span>
                   <i *ngIf="!cargandoPreview && modoManualComprobante" class="bi bi-pencil-fill text-primary"></i>
                   <i *ngIf="!cargandoPreview && !modoManualComprobante" class="bi bi-pencil text-secondary"></i>
                 </span>
               </div>
-
             </div>
           </div>
 
@@ -98,7 +211,10 @@
 
           <div class="form-row mb-0">
             <div class="form-group width-100">
-              <label>Voucher (imagen) <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span></label>
+              <label>
+                Voucher (imagen)
+                <span *ngIf="datosComunes.medioPago !== 'EFECTIVO'">*</span>
+              </label>
               <app-voucher-preview
                 [(ngModel)]="voucherFiles"
                 [disabled]="datosComunes.medioPago === 'EFECTIVO'"
@@ -107,15 +223,24 @@
             </div>
           </div>
         </form>
-      </div>
 
+      </div><!-- /modal-body -->
+
+      <!-- ── Footer ── -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">Cancelar</button>
+        <button type="button" class="btn btn-cancel" (click)="cerrarModal()" [disabled]="enviando">
+          Cancelar
+        </button>
         <button type="submit" class="btn btn-save" (click)="guardar()" [disabled]="enviando">
-          <span *ngIf="enviando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ enviando ? 'Procesando...' : 'Pagar letras' }}
+          <span *ngIf="enviando" class="spinner-border spinner-border-sm"></span>
+          <ng-container *ngIf="!enviando">
+            <i class="bi bi-layers-fill"></i>
+            Pagar {{ letras.length }} letra{{ letras.length !== 1 ? 's' : '' }}
+          </ng-container>
+          <ng-container *ngIf="enviando">Procesando...</ng-container>
         </button>
       </div>
+
     </div>
   </div>
 </div>
