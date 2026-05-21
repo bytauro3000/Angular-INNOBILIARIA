@@ -309,16 +309,16 @@ export class PagoletraListarComponent implements OnInit {
 
   // ── MÉTODOS EXISTENTES ───────────────────────────────────────────────────────
 
-  formatearNumeroLote(): void {
-    const soloNumeros = this.numeroLoteBusqueda.replace(/\D/g, '');
-    const procesado = soloNumeros.length > 2 ? soloNumeros.slice(-2) : soloNumeros;
-    if (procesado.length === 1) {
-      const num = parseInt(procesado, 10);
-      this.numeroLoteBusqueda = (num >= 1 && num <= 9) ? '0' + num : procesado;
-    } else {
-      this.numeroLoteBusqueda = procesado;
-    }
+formatearNumeroLote(): void {
+  const soloNumeros = this.numeroLoteBusqueda.replace(/\D/g, ''); // ← ELIMINA la "B"
+  const procesado = soloNumeros.length > 2 ? soloNumeros.slice(-2) : soloNumeros;
+  if (procesado.length === 1) {
+    const num = parseInt(procesado, 10);
+    this.numeroLoteBusqueda = (num >= 1 && num <= 9) ? '0' + num : procesado;
+  } else {
+    this.numeroLoteBusqueda = procesado; // ← guarda "24" en lugar de "24B"
   }
+}
 
   limpiarBusqueda(): void {
     this.programaSeleccionado = null;
