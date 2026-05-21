@@ -14,6 +14,7 @@ import { Programa } from '../../models/programa.model';
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { MoraResumenContratoDTO } from '../../dto/moraresumencontrato.dto';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
+import { ContratoResponseDTO } from '../../dto/contratoreponse.dto';
 
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
 import { PagoletraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
@@ -93,6 +94,14 @@ export class PagoletraListarComponent implements OnInit {
   moraPreviamentePagada: boolean = false;
 
   private ultimaLetraPagadaNum: number = 0;
+
+  // ── MODAL BÚSQUEDA DE CONTRATO ───────────────────────────────────────────────
+  mostrarModalBusqueda: boolean = false;
+  terminoBusquedaModal: string = '';      // búsqueda por nombre/apellido
+  idContratoModal: string = '';           // búsqueda por ID de contrato
+  resultadosModal: ContratoResponseDTO[] = [];
+  buscandoModal: boolean = false;
+  modosBusquedaModal: 'nombre' | 'id' = 'nombre';
 
   constructor(
     private contratoService: ContratoService,
@@ -657,5 +666,117 @@ formatearNumeroLote(): void {
       },
       error: () => this.toastr.error('Error al buscar el pago de la letra', 'Error')
     });
+  }
+
+  // ── MODAL BÚSQUEDA ALTERNATIVA DE CONTRATOS ──────────────────────────────────
+
+  /** Abre el modal y resetea su estado */
+  abrirModalBusqueda(): void {
+    this.mostrarModalBusqueda = true;
+    this.terminoBusquedaModal = '';
+    this.idContratoModal = '';
+    this.resultadosModal = [];
+    this.buscandoModal = false;
+    this.modosBusquedaModal = 'nombre';
+  }
+
+  /** Cierra el modal */
+  cerrarModalBusqueda(): void {
+    this.mostrarModalBusqueda = false;
+    this.terminoBusquedaModal = '';
+    this.idContratoModal = '';
+    this.resultadosModal = [];
+  }
+
+  /** Ejecuta la búsqueda según el modo activo (nombre o ID) */
+  buscarEnModal(): void {
+    if (this.modosBusquedaModal === 'nombre') {
+      const termino = this.terminoBusquedaModal.trim();
+      if (!termino || termino.length < 2) {
+        this.toastr.warning('Ingrese al menos 2 caracteres para buscar', 'Atención');
+        return;
+      }
+      this.buscandoModal = true;
+      this.resultadosModal = [];
+      this.contratoService.buscarPorNombreCliente(termino).subscribe({
+        next: (contratos) => {
+          this.resultadosModal = contratos;
+          this.buscandoModal = false;
+          if (contratos.length === 0) {
+            this.toastr.info('No se encontraron contratos con ese nombre', 'Sin resultados');
+          }
+        },
+        error: () => {
+          this.toastr.error('Error al buscar contratos', 'Error');
+          this.buscandoModal = false;
+        }
+      });
+    } else {
+      const id = parseInt(this.idContratoModal.trim(), 10);
+      if (!id || isNaN(id)) {
+        this.toastr.warning('Ingrese un ID de contrato válido', 'Atención');
+        return;
+      }
+      this.buscandoModal = true;
+      this.resultadosModal = [];
+      this.contratoService.obtenerContratoPorId(id).subscribe({
+        next: (contrato) => {
+          this.resultadosModal = contrato ? [contrato] : [];
+          this.buscandoModal = false;
+          if (!contrato) {
+            this.toastr.info('No se encontró ningún contrato con ese ID', 'Sin resultados');
+          }
+        },
+        error: () => {
+          this.toastr.info('No se encontró ningún contrato con ese ID', 'Sin resultados');
+          this.buscandoModal = false;
+        }
+      });
+    }
+  }
+
+  /** Selecciona un contrato del modal, rellena los campos del formulario y ejecuta la búsqueda */
+  seleccionarContratoDesdeModal(contrato: ContratoResponseDTO): void {
+    const lote = contrato.lotes?.[0];
+    if (!lote) {
+      this.toastr.warning('El contrato no tiene lote asociado', 'Aviso');
+      return;
+    }
+
+    // Buscar el programa por nombre en la lista cargada
+    const programa = this.programas.find(p => p.nombrePrograma === lote.nombrePrograma);
+    if (!programa || !programa.idPrograma) {
+      this.toastr.warning('No se pudo identificar el programa del contrato', 'Aviso');
+      return;
+    }
+
+    // Rellenar los campos del formulario principal
+    this.programaSeleccionado = programa.idPrograma;
+    this.manzanaBusqueda = lote.manzana;
+    this.numeroLoteBusqueda = lote.numeroLote;
+
+    // Cerrar modal y ejecutar búsqueda automáticamente
+    this.cerrarModalBusqueda();
+    this.buscarContrato();
+  }
+
+  /** Devuelve el nombre completo del cliente principal del contrato */
+  getNombreCliente(contrato: ContratoResponseDTO): string {
+    if (!contrato.clientes || contrato.clientes.length === 0) return '—';
+    const c = contrato.clientes[0];
+    return `${c.nombre} ${c.apellidos}`;
+  }
+
+  /** Devuelve área del lote del contrato */
+  getAreaLote(contrato: ContratoResponseDTO): string {
+    const lote = contrato.lotes?.[0];
+    return lote?.area != null ? `${lote.area} m²` : '—';
+  }
+
+  /** Permite buscar con Enter en los inputs del modal */
+  onKeyEnterModal(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.buscarEnModal();
+    }
   }
 }

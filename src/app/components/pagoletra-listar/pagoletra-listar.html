@@ -31,6 +31,16 @@
     <button class="btn-limpiar" (click)="limpiarBusqueda()">
       <i class="bi bi-x-circle"></i> Limpiar
     </button>
+
+    <div class="btn-lupa-wrapper">
+      <button class="btn-lupa-circular" (click)="abrirModalBusqueda()">
+        <i class="bi bi-search"></i>
+      </button>
+      <div class="btn-lupa-tooltip">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Buscar por nombre o ID</span>
+      </div>
+    </div>
   </div>
 
   <!-- ── INFO DEL CONTRATO ─────────────────────────────────────────────────── -->
@@ -370,6 +380,124 @@
       </ng-template>
     </div>
 
+  </div>
+</div>
+
+
+<!-- ── MODAL BÚSQUEDA ALTERNATIVA DE CONTRATOS ────────────────────────────── -->
+<div class="modal-overlay" *ngIf="mostrarModalBusqueda" (click)="cerrarModalBusqueda()">
+  <div class="modal-busqueda-container" (click)="$event.stopPropagation()">
+
+    <!-- Cabecera -->
+    <div class="modal-busqueda-header">
+      <div class="modal-busqueda-titulo">
+        <i class="bi bi-search"></i>
+        <span>Buscar Contrato</span>
+      </div>
+      <button class="modal-busqueda-close" (click)="cerrarModalBusqueda()" title="Cerrar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Tabs de modo de búsqueda -->
+    <div class="modal-busqueda-tabs">
+      <button class="modal-tab" [class.active]="modosBusquedaModal === 'nombre'"
+              (click)="modosBusquedaModal = 'nombre'; resultadosModal = []">
+        <i class="bi bi-person-fill"></i> Por nombre / apellido
+      </button>
+      <button class="modal-tab" [class.active]="modosBusquedaModal === 'id'"
+              (click)="modosBusquedaModal = 'id'; resultadosModal = []">
+        <i class="bi bi-hash"></i> Por ID de contrato
+      </button>
+    </div>
+
+    <!-- Cuerpo -->
+    <div class="modal-busqueda-body">
+
+      <!-- Input por nombre -->
+      <div *ngIf="modosBusquedaModal === 'nombre'" class="modal-busqueda-input-row">
+        <div class="modal-busqueda-input-group">
+          <i class="bi bi-person-fill modal-input-icon"></i>
+          <input
+            type="text"
+            class="modal-busqueda-input"
+            placeholder="Ingrese nombre o apellido del cliente..."
+            [(ngModel)]="terminoBusquedaModal"
+            (keydown)="onKeyEnterModal($event)"
+            autofocus
+          />
+        </div>
+        <button class="modal-busqueda-btn" (click)="buscarEnModal()" [disabled]="buscandoModal">
+          <i class="bi" [ngClass]="buscandoModal ? 'bi-hourglass-split' : 'bi-search'"></i>
+          {{ buscandoModal ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+
+      <!-- Input por ID -->
+      <div *ngIf="modosBusquedaModal === 'id'" class="modal-busqueda-input-row">
+        <div class="modal-busqueda-input-group">
+          <i class="bi bi-hash modal-input-icon"></i>
+          <input
+            type="number"
+            class="modal-busqueda-input"
+            placeholder="Ingrese el ID del contrato..."
+            [(ngModel)]="idContratoModal"
+            (keydown)="onKeyEnterModal($event)"
+            autofocus
+          />
+        </div>
+        <button class="modal-busqueda-btn" (click)="buscarEnModal()" [disabled]="buscandoModal">
+          <i class="bi" [ngClass]="buscandoModal ? 'bi-hourglass-split' : 'bi-search'"></i>
+          {{ buscandoModal ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+
+      <!-- Resultados -->
+      <div *ngIf="resultadosModal.length > 0" class="modal-busqueda-resultados">
+        <div class="modal-resultados-header">
+          <span class="modal-resultados-count">
+            {{ resultadosModal.length }} contrato{{ resultadosModal.length !== 1 ? 's' : '' }} encontrado{{ resultadosModal.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+        <div class="modal-tabla-wrapper">
+          <table class="modal-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre y Apellido</th>
+                <th>MZ</th>
+                <th>LT</th>
+                <th>Área</th>
+                <th>Programa</th>
+                <th class="text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let contrato of resultadosModal">
+                <td><span class="id-badge">{{ contrato.idContrato }}</span></td>
+                <td>{{ getNombreCliente(contrato) }}</td>
+                <td>{{ contrato.lotes?.[0]?.manzana || '—' }}</td>
+                <td>{{ contrato.lotes?.[0]?.numeroLote || '—' }}</td>
+                <td>{{ getAreaLote(contrato) }}</td>
+                <td>{{ contrato.lotes?.[0]?.nombrePrograma || '—' }}</td>
+                <td class="text-center">
+                  <button class="btn-seleccionar" (click)="seleccionarContratoDesdeModal(contrato)">
+                    <i class="bi bi-check2-circle"></i> Seleccionar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sin resultados -->
+      <div *ngIf="!buscandoModal && resultadosModal.length === 0 && (terminoBusquedaModal || idContratoModal)" class="modal-sin-resultados">
+        <i class="bi bi-inbox"></i>
+        <span>Realice una búsqueda para ver resultados</span>
+      </div>
+
+    </div>
   </div>
 </div>
 
