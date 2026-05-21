@@ -312,19 +312,22 @@ export class PagoletraListarComponent implements OnInit {
 formatearNumeroLote(): void {
   const valor = this.numeroLoteBusqueda;
 
-  // Separar la parte numérica del sufijo alfabético (ej: "24B" → num="24", sufijo="B")
-  const match = valor.match(/^(\d+)([A-Za-z]*)$/);
-  if (!match) {
-    // Si no tiene formato válido, no modificar
+  // Extraer dígitos y sufijo (ej: "24B" → digits="24", sufijo="B")
+  const soloDigitos = valor.replace(/[^0-9]/g, '');
+  const sufijo = valor.replace(/[0-9]/g, '').toUpperCase();
+
+  // Sin dígitos → vaciar
+  if (!soloDigitos) {
+    this.numeroLoteBusqueda = '';
     return;
   }
 
-  const parteNumerica = match[1];
-  const sufijo = match[2].toUpperCase();
-
-  // Aplicar formateo solo a los dígitos
-  const num = parseInt(parteNumerica, 10);
-  const numFormateado = (num >= 1 && num <= 9) ? '0' + num : parteNumerica;
+  // Aplicar la misma lógica original: máx 2 dígitos, cero a la izquierda si es 1 dígito
+  const procesado = soloDigitos.length > 2 ? soloDigitos.slice(-2) : soloDigitos;
+  const num = parseInt(procesado, 10);
+  const numFormateado = procesado.length === 1 && num >= 1 && num <= 9
+    ? '0' + num
+    : procesado;
 
   this.numeroLoteBusqueda = numFormateado + sufijo;
 }
