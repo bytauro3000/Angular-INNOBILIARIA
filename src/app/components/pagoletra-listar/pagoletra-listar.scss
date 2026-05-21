@@ -1369,7 +1369,7 @@ $border-color: #e9ecef;
   white-space: nowrap;
   transition: background 0.2s, transform 0.15s;
 
-  &:hover:not(:disabled) { background: darken($navy, 8%); }
+  &:hover:not(:disabled) { background: color.adjust($navy, $lightness: -8%, $space: hsl); }
   &:active:not(:disabled) { transform: scale(0.97); }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
@@ -1459,7 +1459,7 @@ $border-color: #e9ecef;
 
     i { font-size: 0.9rem; }
 
-    &:hover { background: darken($green, 7%); transform: scale(1.03); }
+    &:hover { background: color.adjust($green, $lightness: -7%, $space: hsl); transform: scale(1.03); }
     &:active { transform: scale(0.97); }
   }
 }

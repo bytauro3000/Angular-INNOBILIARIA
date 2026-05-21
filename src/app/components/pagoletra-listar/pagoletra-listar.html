@@ -476,10 +476,10 @@
               <tr *ngFor="let contrato of resultadosModal">
                 <td><span class="id-badge">{{ contrato.idContrato }}</span></td>
                 <td>{{ getNombreCliente(contrato) }}</td>
-                <td>{{ contrato.lotes?.[0]?.manzana || '—' }}</td>
-                <td>{{ contrato.lotes?.[0]?.numeroLote || '—' }}</td>
+                <td>{{ contrato.lotes[0]?.manzana || '—' }}</td>
+                <td>{{ contrato.lotes[0]?.numeroLote || '—' }}</td>
                 <td>{{ getAreaLote(contrato) }}</td>
-                <td>{{ contrato.lotes?.[0]?.nombrePrograma || '—' }}</td>
+                <td>{{ contrato.lotes[0]?.nombrePrograma || '—' }}</td>
                 <td class="text-center">
                   <button class="btn-seleccionar" (click)="seleccionarContratoDesdeModal(contrato)">
                     <i class="bi bi-check2-circle"></i> Seleccionar
