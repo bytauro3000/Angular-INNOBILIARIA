@@ -19,6 +19,16 @@ export class MoraService {
     return this.http.get<CalculoMoraDTO>(`${this.apiUrl}/calcular/${idLetra}`);
   }
 
+  /**
+   * Calcula la mora usando una fecha de referencia específica.
+   * Se usa cuando el usuario registra un pago con fecha de operación retroactiva,
+   * para que el monto de mora refleje los días reales hasta esa fecha y no hasta hoy.
+   */
+  calcularMoraConFecha(idLetra: number, fecha: string): Observable<CalculoMoraDTO> {
+    const params = new HttpParams().set('fecha', fecha);
+    return this.http.get<CalculoMoraDTO>(`${this.apiUrl}/calcular/${idLetra}`, { params });
+  }
+
   listarPorContrato(idContrato: number): Observable<MoraResponse[]> {
     return this.http.get<MoraResponse[]>(`${this.apiUrl}/contrato/${idContrato}`);
   }

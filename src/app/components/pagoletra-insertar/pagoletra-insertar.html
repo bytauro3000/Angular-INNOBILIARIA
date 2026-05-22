@@ -150,7 +150,8 @@
             <div class="form-group">
               <label for="fechaPago">Fecha Operación <span>*</span></label>
               <input type="date" id="fechaPago" class="form-control"
-                     [(ngModel)]="pagoRequest.fechaPago" name="fechaPago">
+                     [(ngModel)]="pagoRequest.fechaPago" name="fechaPago"
+                     (change)="onFechaPagoChange()">
             </div>
           </div>
 

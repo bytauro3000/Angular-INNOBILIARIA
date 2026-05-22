@@ -62,6 +62,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
+  recalculandoMora: boolean = false;
 
   pagarMoraTambien: boolean = false;
   moraDecisionTomada: boolean = false;
@@ -76,9 +77,14 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     private toastr: ToastrService
   ) {}
 
+  // Fecha con la que se calculó la mora originalmente (para detectar si cambió)
+  private fechaCalculoMora: string = '';
+
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
     this.pagoRequest.fechaPago = new Date().toISOString().split('T')[0];
+    // Guardamos la fecha con que se calculó la mora (la fecha actual al abrir el modal)
+    this.fechaCalculoMora = this.pagoRequest.fechaPago;
     this.generarObservaciones();
 
     if (this.letra.estadoLetra === 'PARCIAL') {
@@ -204,6 +210,35 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
       this.pagoRequest.numeroOperacion = '';
       this.voucherFiles = [];
     }
+  }
+
+  /**
+   * Se llama cuando el usuario cambia la fecha de operación.
+   * Si la letra está vencida y la nueva fecha difiere de la fecha con que se
+   * calculó la mora originalmente, recalcula la mora con la fecha de operación
+   * para que el monto sea correcto al momento del pago retroactivo.
+   */
+  onFechaPagoChange(): void {
+    const fechaActual = this.pagoRequest.fechaPago;
+    if (!fechaActual) return;
+
+    const esVencida = this.letra.estadoLetra === 'VENCIDO';
+    const fechaCambio = fechaActual !== this.fechaCalculoMora;
+
+    if (!esVencida || !fechaCambio || !this.calculoMora) return;
+
+    this.recalculandoMora = true;
+    this.moraService.calcularMoraConFecha(this.letra.idLetra, fechaActual).subscribe({
+      next: (nuevoCalculo) => {
+        this.calculoMora = nuevoCalculo;
+        this.fechaCalculoMora = fechaActual;
+        this.recalculandoMora = false;
+      },
+      error: () => {
+        // Si falla (ej: fecha anterior al vencimiento), simplemente no actualiza
+        this.recalculandoMora = false;
+      }
+    });
   }
 
   onTipoComprobanteChange(): void {
