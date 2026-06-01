@@ -67,7 +67,7 @@ export class PagoInscripcionListarComponent implements OnInit {
     this.isCargando = true;
     this.inscripcionService.listarPagos().subscribe({
       next: (data) => {
-        this.pagos = data.sort((a, b) => b.idPagoInicial - a.idPagoInicial);
+        this.pagos = data.sort((a, b) => b.idPagoInscripcionComprobante - a.idPagoInscripcionComprobante);
         this.currentPage = 1;
         this.aplicarFiltros();
         this.isCargando = false;
@@ -94,7 +94,7 @@ export class PagoInscripcionListarComponent implements OnInit {
     if (this.terminoBusqueda.trim()) {
       const t = this.terminoBusqueda.toLowerCase();
       resultado = resultado.filter(p =>
-        p.idPagoInicial.toString().includes(t) ||
+        p.idPagoInscripcionComprobante.toString().includes(t) ||
         (p.manzana    && p.manzana.toLowerCase().includes(t))    ||
         (p.numeroLote && p.numeroLote.toLowerCase().includes(t)) ||
         (p.numeroComprobante && p.numeroComprobante.toLowerCase().includes(t))
@@ -163,8 +163,8 @@ export class PagoInscripcionListarComponent implements OnInit {
   }
 
   verComprobantePdf(pago: PagoInscripcionDTO): void {
-    this.descargando = pago.idPagoInicial;
-    this.inscripcionService.descargarComprobante(pago.idPagoInicial).subscribe({
+    this.descargando = pago.idPagoInscripcionComprobante;
+    this.inscripcionService.descargarComprobante(pago.idPagoInscripcionComprobante).subscribe({
       next: (blob) => {
         window.open(URL.createObjectURL(blob), '_blank');
         this.descargando = null;

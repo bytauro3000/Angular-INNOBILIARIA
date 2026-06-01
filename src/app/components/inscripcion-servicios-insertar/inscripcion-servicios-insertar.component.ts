@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InscripcionService, InscripcionConPagoRequest } from '../../services/inscripcion.service';
+import { InscripcionService, SaldoInscripcionDTO } from '../../services/inscripcion.service';
+import { AbonoInscripcionRequest } from '../../dto/AbonoInscripcionRequest.dto';
+import { InscripcionServicioDTO } from '../../dto/InscripcionServicio.dto';
 import { TipoServicios } from '../../enums/tiposervicio';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
@@ -16,36 +18,46 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class InscripcionServiciosInsertarComponent {
   @Output() inscripcionExitosa = new EventEmitter<void>();
+  /** Se emite cuando la inscripción (Paso 1) se registra con éxito,
+   *  ANTES de que el usuario complete el pago. Permite al padre refrescar
+   *  la lista para que si el modal se cierra accidentalmente, al reabrirlo
+   *  detecte el pendiente y vaya directo al Paso 2. */
+  @Output() inscripcionCreada  = new EventEmitter<void>();
 
-  // ── Control de apertura ──────────────────────────────────────────────────
   estaAbierto: boolean = false;
   idContrato!: number;
 
-  // ── Datos de la inscripción ──────────────────────────────────────────────
+  /** 1 = seleccionar servicio | 2 = registrar abono */
+  paso: 1 | 2 = 1;
+
   tipoServicio: TipoServicios = TipoServicios.LUZ;
 
-  /** Monto por defecto: $150. Es editable para pagos parciales. */
-  montoPagado: number = 150;
+  /** Servicios que ya tienen inscripción completamente pagada — se bloquean en el Paso 1 */
+  luzInscrita:  boolean = false;
+  aguaInscrita: boolean = false;
 
-  // ── Datos del pago ───────────────────────────────────────────────────────
-  medioPago: MedioPago                = MedioPago.EFECTIVO;
+  idInscripcion!: number;
+  montoTotal: number = 0;
+  montoAcumulado: number = 0;
+  saldoPendiente: number = 0;
+  montoAbono: number = 0;
+
+  medioPago: MedioPago               = MedioPago.EFECTIVO;
   tipoComprobante?: TipoComprobante;
-  fechaPago: string                   = new Date().toISOString().split('T')[0];
-  numeroOperacion: string             = '';
-  observaciones: string               = '';
+  fechaPago: string                  = new Date().toISOString().split('T')[0];
+  numeroOperacion: string            = '';
+  observaciones: string              = '';
 
-  // ── Comprobante (preview automático / modo manual) ───────────────────────
-  numeroComprobantePreview: string    = '';
-  cargandoPreview: boolean            = false;
-  modoManualComprobante: boolean      = false;
-  numeroComprobanteManual: string     = '';
+  numeroComprobantePreview: string   = '';
+  cargandoPreview: boolean           = false;
+  modoManualComprobante: boolean     = false;
+  numeroComprobanteManual: string    = '';
 
-  // ── Estado de envío ──────────────────────────────────────────────────────
   loading: boolean = false;
 
-  // ── Opciones de enums para los selects ──────────────────────────────────
-  TipoServicios      = TipoServicios;
-  medioPagoOptions   = Object.values(MedioPago);
+  TipoServicios          = TipoServicios;
+  MedioPago              = MedioPago;
+  medioPagoOptions       = Object.values(MedioPago);
   tipoComprobanteOptions = Object.values(TipoComprobante);
 
   constructor(
@@ -53,37 +65,104 @@ export class InscripcionServiciosInsertarComponent {
     private toastr: ToastrService
   ) {}
 
-  // ── Apertura y cierre del modal ──────────────────────────────────────────
+  /**
+   * Abre el modal.
+   *
+   * Si se pasa inscripcionPendiente (idInscripcion + montoTotal + montoAcumulado
+   * + tipoServicio), va directo al Paso 2 para registrar el abono pendiente.
+   * De lo contrario, inicia en el Paso 1 para crear una nueva inscripción.
+   */
+  abrirModal(
+    idContrato: number,
+    inscripcionPendiente?: { idInscripcion: number; tipoServicio: TipoServicios; montoTotal: number; montoAcumulado: number },
+    serviciosInscritos?: { tieneLuz: boolean; tieneAgua: boolean }
+  ): void {
+    this.idContrato    = idContrato;
+    this.loading       = false;
+    this.estaAbierto   = true;
+    this.luzInscrita   = serviciosInscritos?.tieneLuz  ?? false;
+    this.aguaInscrita  = serviciosInscritos?.tieneAgua ?? false;
+    this.resetearPaso2();
 
-  abrirModal(idContrato: number): void {
-    this.idContrato           = idContrato;
-    this.tipoServicio         = TipoServicios.LUZ;
-    this.montoPagado          = 150;
-    this.medioPago            = MedioPago.EFECTIVO;
-    this.tipoComprobante      = undefined;
-    this.fechaPago            = new Date().toISOString().split('T')[0];
-    this.numeroOperacion      = '';
-    this.observaciones        = '';
-    this.numeroComprobantePreview  = '';
-    this.modoManualComprobante     = false;
-    this.numeroComprobanteManual   = '';
-    this.loading              = false;
-    this.estaAbierto          = true;
+    if (inscripcionPendiente) {
+      this.tipoServicio   = inscripcionPendiente.tipoServicio;
+      this.idInscripcion  = inscripcionPendiente.idInscripcion;
+      this.montoTotal     = inscripcionPendiente.montoTotal;
+      this.montoAcumulado = inscripcionPendiente.montoAcumulado;
+      this.saldoPendiente = inscripcionPendiente.montoTotal - inscripcionPendiente.montoAcumulado;
+      this.montoAbono     = this.saldoPendiente;
+      this.paso           = 2;
+    } else {
+      // Auto-seleccionar el único servicio disponible si el otro ya está inscrito
+      if (!this.luzInscrita && !this.aguaInscrita) {
+        this.tipoServicio = TipoServicios.LUZ;
+      } else if (this.luzInscrita && !this.aguaInscrita) {
+        this.tipoServicio = TipoServicios.AGUA;
+      } else if (!this.luzInscrita && this.aguaInscrita) {
+        this.tipoServicio = TipoServicios.LUZ;
+      }
+      this.paso = 1;
+    }
   }
 
   cerrarModal(): void {
     this.estaAbierto = false;
   }
 
-  // ── Lógica de medio de pago ──────────────────────────────────────────────
+  private resetearPaso2(): void {
+    this.idInscripcion            = 0;
+    this.montoTotal               = 0;
+    this.montoAcumulado           = 0;
+    this.saldoPendiente           = 0;
+    this.montoAbono               = 0;
+    this.medioPago                = MedioPago.EFECTIVO;
+    this.tipoComprobante          = undefined;
+    this.fechaPago                = new Date().toISOString().split('T')[0];
+    this.numeroOperacion          = '';
+    this.observaciones            = '';
+    this.numeroComprobantePreview = '';
+    this.modoManualComprobante    = false;
+    this.numeroComprobanteManual  = '';
+  }
+
+  confirmarTipoServicio(): void {
+    this.loading = true;
+
+    this.inscripcionService.registrarInscripcion(this.idContrato, this.tipoServicio).subscribe({
+      next: (inscripcion: InscripcionServicioDTO) => {
+        this.loading        = false;
+        this.idInscripcion  = inscripcion.idInscripcion!;
+        this.montoTotal     = inscripcion.montoTotal!;
+        this.montoAcumulado = inscripcion.montoAcumulado ?? 0;
+        this.saldoPendiente = inscripcion.montoTotal! - (inscripcion.montoAcumulado ?? 0);
+        this.montoAbono     = this.saldoPendiente;
+        this.paso           = 2;
+
+        // Notificar al padre para que refresque la lista.
+        // Si el usuario cierra el modal antes de pagar, al reabrirlo
+        // el sistema detectará el pendiente y abrirá directo el Paso 2.
+        this.inscripcionCreada.emit();
+
+        this.toastr.info(
+          `Inscripción de ${this.tipoServicio} creada. Monto total: $${this.montoTotal.toFixed(2)}`,
+          'Paso 2: Registrar abono'
+        );
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toastr.error(
+          err.error?.message || err.error || 'Error al crear la inscripción.',
+          'Error'
+        );
+      }
+    });
+  }
 
   onMedioPagoChange(): void {
     if (this.medioPago === MedioPago.EFECTIVO) {
       this.numeroOperacion = '';
     }
   }
-
-  // ── Lógica de comprobante (preview automático + modo manual) ─────────────
 
   onTipoComprobanteChange(): void {
     this.numeroComprobantePreview = '';
@@ -95,7 +174,7 @@ export class InscripcionServiciosInsertarComponent {
       this.inscripcionService.previewSiguienteNumeroComprobante(this.tipoComprobante).subscribe({
         next: (numero) => {
           this.numeroComprobantePreview = numero;
-          this.cargandoPreview = false;
+          this.cargandoPreview          = false;
         },
         error: () => { this.cargandoPreview = false; }
       });
@@ -109,12 +188,8 @@ export class InscripcionServiciosInsertarComponent {
 
   toggleModoManual(): void {
     if (this.cargandoPreview) return;
-    this.modoManualComprobante = !this.modoManualComprobante;
-    if (this.modoManualComprobante) {
-      this.numeroComprobanteManual = this.seriePrefix;
-    } else {
-      this.numeroComprobanteManual = '';
-    }
+    this.modoManualComprobante   = !this.modoManualComprobante;
+    this.numeroComprobanteManual = this.modoManualComprobante ? this.seriePrefix : '';
   }
 
   onNumeroManualChange(event: Event): void {
@@ -122,7 +197,7 @@ export class InscripcionServiciosInsertarComponent {
     const prefijo = this.seriePrefix;
     let valor     = input.value;
     if (prefijo && !valor.startsWith(prefijo)) {
-      valor = prefijo;
+      valor       = prefijo;
       input.value = valor;
     }
     this.numeroComprobanteManual = valor;
@@ -130,16 +205,21 @@ export class InscripcionServiciosInsertarComponent {
 
   get numeroComprobantePersonalizado(): string | undefined {
     if (!this.modoManualComprobante) return undefined;
-    const prefijo    = this.seriePrefix;
+    const prefijo     = this.seriePrefix;
     const soloDigitos = this.numeroComprobanteManual.substring(prefijo.length).trim();
     return soloDigitos ? this.numeroComprobanteManual.trim() : undefined;
   }
 
-  // ── Validación y envío ───────────────────────────────────────────────────
-
-  confirmarInscripcion(): void {
-    if (!this.montoPagado || this.montoPagado <= 0) {
+  confirmarAbono(): void {
+    if (!this.montoAbono || this.montoAbono <= 0) {
       this.toastr.warning('El monto debe ser mayor a cero.', 'Validación');
+      return;
+    }
+    if (this.montoAbono > this.saldoPendiente) {
+      this.toastr.warning(
+        `El monto no puede superar el saldo pendiente de $${this.saldoPendiente.toFixed(2)}.`,
+        'Validación'
+      );
       return;
     }
     if (!this.medioPago) {
@@ -151,41 +231,49 @@ export class InscripcionServiciosInsertarComponent {
       return;
     }
     if (this.medioPago !== MedioPago.EFECTIVO && !this.numeroOperacion.trim()) {
-      this.toastr.warning('El número de operación es obligatorio para este medio de pago.', 'Validación');
+      this.toastr.warning(
+        'El número de operación es obligatorio para este medio de pago.',
+        'Validación'
+      );
       return;
     }
 
-    const request: InscripcionConPagoRequest = {
-      idContrato:                    this.idContrato,
-      tipoServicio:                  this.tipoServicio,
-      montoPagado:                   this.montoPagado,
-      fechaPago:                     this.fechaPago,
-      medioPago:                     this.medioPago,
-      numeroOperacion:               this.numeroOperacion || undefined,
-      observaciones:                 this.observaciones
-                                       || `Inscripción de servicio de ${this.tipoServicio} - Contrato #${this.idContrato}`,
-      tipoComprobante:               this.tipoComprobante,
+    const request: AbonoInscripcionRequest = {
+      idInscripcion:                  this.idInscripcion,
+      idContrato:                     this.idContrato,
+      tipoServicio:                   this.tipoServicio,
+      montoPagado:                    this.montoAbono,
+      fechaPago:                      this.fechaPago,
+      medioPago:                      this.medioPago,
+      numeroOperacion:                this.numeroOperacion || undefined,
+      observaciones:                  this.observaciones
+                                        || `Abono inscripción ${this.tipoServicio} — Contrato #${this.idContrato}`,
+      tipoComprobante:                this.tipoComprobante,
       numeroComprobantePersonalizado: this.numeroComprobantePersonalizado
     };
 
     this.loading = true;
 
-    this.inscripcionService.registrarConPago(request).subscribe({
+    this.inscripcionService.registrarAbono(this.idInscripcion, request).subscribe({
       next: (response) => {
         this.loading = false;
+
+        const pagoCompleto = this.montoAbono >= this.saldoPendiente;
         this.toastr.success(
-          `Servicio de ${this.tipoServicio} inscrito correctamente. Comprobante: ${response.numeroComprobante}`,
+          pagoCompleto
+            ? `Inscripción de ${this.tipoServicio} pagada completamente. Comprobante: ${response.numeroComprobante}`
+            : `Abono de $${this.montoAbono.toFixed(2)} registrado. Comprobante: ${response.numeroComprobante}. Saldo restante: $${(this.saldoPendiente - this.montoAbono).toFixed(2)}`,
           '¡Éxito!'
         );
+
         this.inscripcionExitosa.emit();
         this.cerrarModal();
 
-        // Descargar el comprobante en PDF automáticamente
-        this.inscripcionService.descargarComprobante(response.idPagoInicial).subscribe({
+        this.inscripcionService.descargarComprobante(response.idPagoInscripcionComprobante).subscribe({
           next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
           error: () => {
             this.toastr.warning(
-              'Inscripción guardada. No se pudo abrir el comprobante automáticamente.',
+              'Abono guardado. No se pudo abrir el comprobante automáticamente.',
               'Aviso'
             );
           }
@@ -194,7 +282,7 @@ export class InscripcionServiciosInsertarComponent {
       error: (err) => {
         this.loading = false;
         this.toastr.error(
-          err.error?.message || err.error || 'Error al procesar la inscripción.',
+          err.error?.message || err.error || 'Error al registrar el abono.',
           'Error'
         );
       }

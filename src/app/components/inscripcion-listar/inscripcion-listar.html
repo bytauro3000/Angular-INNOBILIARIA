@@ -91,16 +91,32 @@
 
             <td class="text-center" data-label="Acciones">
               <div class="acciones-container">
-                <button
-                  class="btn-action btn-inscribir"
-                  [disabled]="contrato.tieneLuz && contrato.tieneAgua"
-                  [title]="(contrato.tieneLuz && contrato.tieneAgua) ? 'Servicios completos' : 'Inscribir servicio'"
-                  (click)="abrirModalInscripcion(contrato.idContrato)">
-                  <i class="bi" [ngClass]="(contrato.tieneLuz && contrato.tieneAgua) ? 'bi-check-circle-fill' : 'bi-plus-circle'"></i>
-                </button>
+
+                <!-- Botón principal con indicador de adelanto pendiente -->
+                <div class="btn-inscribir-wrapper">
+                  <button
+                    class="btn-action btn-inscribir"
+                    [disabled]="contrato.tieneLuz && contrato.tieneAgua && !tieneAdelantoPendiente(contrato)"
+                    [title]="(contrato.tieneLuz && contrato.tieneAgua && !tieneAdelantoPendiente(contrato))
+                      ? 'Servicios completos'
+                      : (tieneAdelantoPendiente(contrato) ? 'Completar adelanto o inscribir nuevo servicio' : 'Inscribir servicio')"
+                    (click)="abrirModalInscripcion(contrato)">
+                    <i class="bi"
+                      [ngClass]="(contrato.tieneLuz && contrato.tieneAgua && !tieneAdelantoPendiente(contrato))
+                        ? 'bi-check-circle-fill'
+                        : (tieneAdelantoPendiente(contrato) ? 'bi-cash-coin' : 'bi-plus-circle')">
+                    </i>
+                  </button>
+                  <!-- Punto indicador de adelanto pendiente -->
+                  <span
+                    *ngIf="tieneAdelantoPendiente(contrato)"
+                    class="adelanto-dot"
+                    [title]="getTooltipAdelanto(contrato)">
+                  </span>
+                </div>
 
                 <button
-                  *ngIf="contrato.tieneLuz || contrato.tieneAgua"
+                  *ngIf="contrato.tieneLuz || contrato.tieneAgua || tieneAdelantoPendiente(contrato)"
                   class="btn-action btn-delete"
                   title="Eliminar inscripción"
                   (click)="eliminarInscripcion(contrato)">
@@ -145,5 +161,80 @@
 
 </div>
 
-<app-inscripcion-servicios-insertar #modalInscripcion (inscripcionExitosa)="onInscripcionExitosa()">
+<!-- ══════════════════ MODAL SELECTOR DE PENDIENTE ══════════════════ -->
+<div class="selector-overlay" *ngIf="mostrarSelectorPendiente" (click)="cerrarSelectorPendiente()">
+  <div class="selector-card" (click)="$event.stopPropagation()">
+
+    <div class="selector-header">
+      <h6><i class="bi bi-ui-checks me-2"></i>¿Qué deseas hacer?</h6>
+      <button class="btn-close-custom" (click)="cerrarSelectorPendiente()">&times;</button>
+    </div>
+
+    <p class="selector-subtitle">
+      Contrato #{{ selectorContrato?.idContrato }} — {{ selectorContrato?.nombreCliente }}
+    </p>
+
+    <div class="selector-opciones">
+
+      <!-- Abonar a LUZ pendiente -->
+      <button
+        *ngIf="selectorContrato?.tienePendienteLuz && selectorContrato?.pendienteLuz"
+        class="selector-btn selector-btn-luz"
+        (click)="elegirAbonoPendiente(TipoServicios.LUZ)">
+        <span class="selector-icon">⚡</span>
+        <span class="selector-texto">
+          <strong>Completar adelanto de LUZ</strong>
+          <small>Saldo pendiente:
+            $ {{ ((selectorContrato?.pendienteLuz?.montoTotal ?? 0) -
+                   (selectorContrato?.pendienteLuz?.montoAcumulado ?? 0)) | number:'1.2-2' }}
+          </small>
+        </span>
+        <i class="bi bi-arrow-right-circle"></i>
+      </button>
+
+      <!-- Abonar a AGUA pendiente -->
+      <button
+        *ngIf="selectorContrato?.tienePendienteAgua && selectorContrato?.pendienteAgua"
+        class="selector-btn selector-btn-agua"
+        (click)="elegirAbonoPendiente(TipoServicios.AGUA)">
+        <span class="selector-icon">💧</span>
+        <span class="selector-texto">
+          <strong>Completar adelanto de AGUA</strong>
+          <small>Saldo pendiente:
+            $ {{ ((selectorContrato?.pendienteAgua?.montoTotal ?? 0) -
+                   (selectorContrato?.pendienteAgua?.montoAcumulado ?? 0)) | number:'1.2-2' }}
+          </small>
+        </span>
+        <i class="bi bi-arrow-right-circle"></i>
+      </button>
+
+      <!-- Crear nueva inscripción -->
+      <button
+        *ngIf="puedeCriarNuevoServicio(selectorContrato)"
+        class="selector-btn selector-btn-nuevo"
+        (click)="elegirNuevaInscripcion()">
+        <span class="selector-icon">➕</span>
+        <span class="selector-texto">
+          <strong>Inscribir nuevo servicio</strong>
+          <small>
+            Disponible:
+            <ng-container *ngIf="!selectorContrato?.tieneLuz && !selectorContrato?.tienePendienteLuz">⚡ LUZ </ng-container>
+            <ng-container *ngIf="!selectorContrato?.tieneAgua && !selectorContrato?.tienePendienteAgua">💧 AGUA</ng-container>
+          </small>
+        </span>
+        <i class="bi bi-arrow-right-circle"></i>
+      </button>
+
+    </div>
+
+    <div class="selector-footer">
+      <button class="btn btn-sm btn-secondary" (click)="cerrarSelectorPendiente()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<app-inscripcion-servicios-insertar
+  #modalInscripcion
+  (inscripcionCreada)="onInscripcionCreada()"
+  (inscripcionExitosa)="onInscripcionExitosa()">
 </app-inscripcion-servicios-insertar>

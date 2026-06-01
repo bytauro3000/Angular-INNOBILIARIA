@@ -2,41 +2,34 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { InscripcionServicioDTO } from '../dto/inscripcionservicio.model';
+import { InscripcionServicioDTO } from '../dto/InscripcionServicio.dto';
 import { TipoServicios } from '../enums/tiposervicio';
 import { TipoComprobante } from '../enums/tipocomprobante';
 import { MedioPago } from '../enums/mediopago.enum';
+import { InscripcionResumenDTO } from '../dto/InscripcionResumen.dto';
+import { AbonoInscripcionRequest } from '../dto/AbonoInscripcionRequest.dto';
 
-export interface InscripcionConPagoRequest {
-  idContrato:                    number;
-  tipoServicio:                  string;
-  montoPagado:                   number;
-  fechaPago:                     string;
-  medioPago:                     string;
-  numeroOperacion?:              string;
-  observaciones?:                string;
-  tipoComprobante:               TipoComprobante;
-  numeroComprobantePersonalizado?: string;
+export interface AbonoInscripcionResponse {
+  idPagoInscripcionComprobante: number;
+  numeroComprobante:            string;
+  tipoServicio:                 string;
+  idContrato:                   number;
 }
 
-export interface InscripcionConPagoResponse {
-  idPagoInicial:     number;
-  numeroComprobante: string;
-  tipoServicio:      string;
-  idContrato:        number;
+export interface SaldoInscripcionDTO {
+  idInscripcion:  number;
+  saldoPendiente: number;
 }
 
-export interface InscripcionResumenDTO {
-  idContrato:     number;
-  nombreCliente:  string;
-  manzana:        string;
-  numeroLote:     string;
-  tieneLuz:       boolean;
-  tieneAgua:      boolean;
+export interface PagoInscripcionMsDTO {
+  idPagoInscripcion: number;
+  montoPagado:       number;
+  fechaPago:         string;
+  metodoPago:        string;
 }
 
 export interface PagoInscripcionDTO {
-  idPagoInicial:     number;
+  idPagoInscripcionComprobante: number;
   idContrato:        number;
   importePagado:     number;
   fechaPago:         string;
@@ -46,9 +39,7 @@ export interface PagoInscripcionDTO {
   tipoComprobante:   TipoComprobante;
   numeroComprobante: string;
   fechaEmision:      string;
-  tipoServicio:      string;   // "LUZ" | "AGUA" | "SERVICIO"
-
-  // Datos del lote y programa
+  tipoServicio:      string;
   manzana:           string | null;
   numeroLote:        string | null;
   idPrograma:        number | null;
@@ -60,26 +51,49 @@ export interface PagoInscripcionDTO {
 })
 export class InscripcionService {
 
-  private readonly URL_GATEWAY    = `${environment.apiUrl}/api/gateway/inscripciones`;
+  private readonly URL_GATEWAY     = `${environment.apiUrl}/api/gateway/inscripciones`;
   private readonly URL_COMPROBANTE = `${environment.apiUrl}/api/comprobantes`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // ── Lista resumen (contratos con tieneLuz/tieneAgua) ─────────────────────
   listarResumen(): Observable<InscripcionResumenDTO[]> {
     return this.http.get<InscripcionResumenDTO[]>(`${this.URL_GATEWAY}/resumen`);
   }
 
-  // ── Lista todos los pagos de inscripción con sus comprobantes ─────────────
   listarPagos(): Observable<PagoInscripcionDTO[]> {
     return this.http.get<PagoInscripcionDTO[]>(`${this.URL_GATEWAY}/pagos`);
   }
 
-  // ── Registro simple (sin comprobante) ────────────────────────────────────
-  registrarInscripcion(inscripcion: InscripcionServicioDTO): Observable<InscripcionServicioDTO> {
-    return this.http.post<InscripcionServicioDTO>(
-      `${this.URL_GATEWAY}/registrar`,
-      inscripcion
+  listarPendientesPorContrato(idContrato: number): Observable<InscripcionServicioDTO[]> {
+    return this.http.get<InscripcionServicioDTO[]>(
+      `${this.URL_GATEWAY}/pendientes/${idContrato}`
+    );
+  }
+
+  registrarInscripcion(idContrato: number, tipoServicio: string): Observable<InscripcionServicioDTO> {
+    const payload: Partial<InscripcionServicioDTO> = { idContrato, tipoServicio };
+    return this.http.post<InscripcionServicioDTO>(`${this.URL_GATEWAY}/registrar`, payload);
+  }
+
+  registrarAbono(
+    idInscripcion: number,
+    request: AbonoInscripcionRequest
+  ): Observable<AbonoInscripcionResponse> {
+    return this.http.post<AbonoInscripcionResponse>(
+      `${this.URL_GATEWAY}/${idInscripcion}/abonar`,
+      request
+    );
+  }
+
+  obtenerSaldo(idInscripcion: number): Observable<SaldoInscripcionDTO> {
+    return this.http.get<SaldoInscripcionDTO>(
+      `${this.URL_GATEWAY}/${idInscripcion}/saldo`
+    );
+  }
+
+  listarAbonos(idInscripcion: number): Observable<PagoInscripcionMsDTO[]> {
+    return this.http.get<PagoInscripcionMsDTO[]>(
+      `${this.URL_GATEWAY}/${idInscripcion}/abonos`
     );
   }
 
@@ -88,28 +102,17 @@ export class InscripcionService {
     return this.http.get<number[]>(`${this.URL_GATEWAY}/contratos-activos`, { params });
   }
 
-  // ── Registro con comprobante ──────────────────────────────────────────────
-  registrarConPago(request: InscripcionConPagoRequest): Observable<InscripcionConPagoResponse> {
-    return this.http.post<InscripcionConPagoResponse>(
-      `${this.URL_GATEWAY}/registrar-con-pago`,
-      request
-    );
-  }
-
-  // ── Eliminar inscripción por idInscripcion (del microservicio) ────────────
   eliminarInscripcion(idInscripcion: number): Observable<void> {
     return this.http.delete<void>(`${this.URL_GATEWAY}/${idInscripcion}`);
   }
 
-  // ── PDF comprobante ───────────────────────────────────────────────────────
-  descargarComprobante(idPagoInicial: number): Observable<Blob> {
+  descargarComprobante(idPagoInscripcionComprobante: number): Observable<Blob> {
     return this.http.get(
-      `${this.URL_GATEWAY}/pago/${idPagoInicial}/comprobante-pdf`,
+      `${this.URL_GATEWAY}/pago/${idPagoInscripcionComprobante}/comprobante-pdf`,
       { responseType: 'blob' }
     );
   }
 
-  // ── Preview número de comprobante ─────────────────────────────────────────
   previewSiguienteNumeroComprobante(tipo: TipoComprobante): Observable<string> {
     return this.http.get(
       `${this.URL_COMPROBANTE}/preview-siguiente?tipo=${tipo}`,

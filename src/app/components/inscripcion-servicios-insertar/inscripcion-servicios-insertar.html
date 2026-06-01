@@ -1,7 +1,9 @@
 <div class="modal-overlay" *ngIf="estaAbierto" (click)="cerrarModal()">
   <div class="modal-container" (click)="$event.stopPropagation()">
 
-    <!-- Header -->
+    <!-- ═══════════════════════════════════════════════════════
+         HEADER
+    ════════════════════════════════════════════════════════ -->
     <div class="modal-header">
       <h5>
         <i class="bi bi-plug-fill me-2"></i>
@@ -10,40 +12,106 @@
       <button class="btn-close-custom" (click)="cerrarModal()">&times;</button>
     </div>
 
-    <!-- Body -->
-    <div class="modal-body">
+    <!-- Indicador de pasos -->
+    <div class="pasos-indicador">
+      <div class="paso-item" [class.activo]="paso === 1" [class.completado]="paso === 2">
+        <span class="paso-numero">1</span>
+        <span class="paso-label">Tipo de servicio</span>
+      </div>
+      <div class="paso-linea" [class.completada]="paso === 2"></div>
+      <div class="paso-item" [class.activo]="paso === 2">
+        <span class="paso-numero">2</span>
+        <span class="paso-label">Registrar abono</span>
+      </div>
+    </div>
 
-      <!-- Tipo de servicio -->
+    <!-- ═══════════════════════════════════════════════════════
+         PASO 1 — Seleccionar tipo de servicio
+    ════════════════════════════════════════════════════════ -->
+    <div class="modal-body" *ngIf="paso === 1">
+
       <div class="form-section">
-        <label class="section-label">Tipo de Servicio <span class="req">*</span></label>
+        <label class="section-label">
+          Selecciona el servicio a inscribir <span class="req">*</span>
+        </label>
+        <p class="section-hint">
+          El monto de la instalación se obtendrá automáticamente desde la configuración del sistema.
+        </p>
         <div class="servicio-selector">
-          <label class="servicio-card" [class.selected]="tipoServicio === TipoServicios.LUZ"
-                 (click)="tipoServicio = TipoServicios.LUZ">
+          <!-- LUZ -->
+          <label class="servicio-card"
+                 [class.selected]="tipoServicio === TipoServicios.LUZ && !luzInscrita"
+                 [class.inscrito]="luzInscrita"
+                 (click)="!luzInscrita && (tipoServicio = TipoServicios.LUZ)">
             <span class="servicio-icon">⚡</span>
             <span class="servicio-name">LUZ</span>
+            <span *ngIf="luzInscrita" class="badge-inscrito">
+              <i class="bi bi-check-circle-fill"></i> Ya inscrito
+            </span>
           </label>
-          <label class="servicio-card" [class.selected]="tipoServicio === TipoServicios.AGUA"
-                 (click)="tipoServicio = TipoServicios.AGUA">
+          <!-- AGUA -->
+          <label class="servicio-card"
+                 [class.selected]="tipoServicio === TipoServicios.AGUA && !aguaInscrita"
+                 [class.inscrito]="aguaInscrita"
+                 (click)="!aguaInscrita && (tipoServicio = TipoServicios.AGUA)">
             <span class="servicio-icon">💧</span>
             <span class="servicio-name">AGUA</span>
+            <span *ngIf="aguaInscrita" class="badge-inscrito">
+              <i class="bi bi-check-circle-fill"></i> Ya inscrito
+            </span>
           </label>
         </div>
       </div>
 
-      <!-- Fila: Monto + Fecha -->
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PASO 2 — Registrar abono
+    ════════════════════════════════════════════════════════ -->
+    <div class="modal-body" *ngIf="paso === 2">
+
+      <!-- Resumen de la inscripción creada -->
+      <div class="resumen-inscripcion">
+        <div class="resumen-item">
+          <span class="resumen-label">Servicio</span>
+          <span class="resumen-valor servicio-badge">
+            {{ tipoServicio === TipoServicios.LUZ ? '⚡ LUZ' : '💧 AGUA' }}
+          </span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-label">Costo de<br>Inscripción</span>
+          <span class="resumen-valor monto-total">${{ montoTotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="resumen-item" *ngIf="montoAcumulado > 0">
+          <span class="resumen-label">Adelanto<br>Pagado</span>
+          <span class="resumen-valor adelanto-pagado">${{ montoAcumulado | number:'1.2-2' }}</span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-label">Saldo<br>Pendiente</span>
+          <span class="resumen-valor saldo-pendiente">${{ saldoPendiente | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Fila: Monto a abonar + Fecha -->
       <div class="form-row-2">
         <div class="form-group">
           <label class="form-label">
-            Monto (USD) <span class="req">*</span>
-            <span class="hint">Editable para pagos parciales</span>
+            Monto a abonar (USD) <span class="req">*</span>
+            <span class="hint">Máximo: ${{ saldoPendiente | number:'1.2-2' }}</span>
           </label>
           <div class="input-prefix-group">
             <span class="input-prefix">$</span>
-            <input type="number" step="0.01" min="1" class="form-control"
-                   [(ngModel)]="montoPagado" name="montoPagado"
-                   placeholder="150.00">
+            <input type="number" step="0.01" min="0.01" [max]="saldoPendiente"
+                   class="form-control"
+                   [(ngModel)]="montoAbono" name="montoAbono"
+                   [placeholder]="saldoPendiente.toFixed(2)">
           </div>
-          <p class="field-note">Monto estándar: $150.00. Modifique si el cliente paga en partes.</p>
+          <p class="field-note" *ngIf="montoAbono < saldoPendiente && montoAbono > 0">
+            Pago parcial: quedará pendiente ${{ (saldoPendiente - montoAbono) | number:'1.2-2' }}
+          </p>
+          <p class="field-note field-note-ok" *ngIf="montoAbono === saldoPendiente && montoAbono > 0">
+            ✓ Cubre el saldo completo. La inscripción quedará pagada.
+          </p>
         </div>
 
         <div class="form-group">
@@ -122,22 +190,42 @@
         <label class="form-label">Observaciones</label>
         <textarea class="form-control" rows="2"
                   [(ngModel)]="observaciones" name="observaciones"
-                  [placeholder]="'Inscripción de servicio de ' + tipoServicio + ' — Contrato #' + idContrato">
+                  [placeholder]="'Abono inscripción ' + tipoServicio + ' — Contrato #' + idContrato">
         </textarea>
       </div>
 
-    </div><!-- /modal-body -->
+    </div><!-- /modal-body paso 2 -->
 
-    <!-- Footer -->
+    <!-- ═══════════════════════════════════════════════════════
+         FOOTER
+    ════════════════════════════════════════════════════════ -->
     <div class="modal-footer">
       <button type="button" class="btn btn-cancelar" (click)="cerrarModal()" [disabled]="loading">
         Cancelar
       </button>
-      <button type="button" class="btn btn-confirmar" [disabled]="loading" (click)="confirmarInscripcion()">
+
+      <!-- Paso 1: botón para crear inscripción -->
+      <button *ngIf="paso === 1"
+              type="button" class="btn btn-confirmar"
+              [disabled]="loading"
+              (click)="confirmarTipoServicio()">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        <ng-container *ngIf="!loading">
+          <i class="bi bi-arrow-right-circle me-1"></i>
+          Continuar
+        </ng-container>
+        <ng-container *ngIf="loading">Creando inscripción...</ng-container>
+      </button>
+
+      <!-- Paso 2: botón para registrar abono -->
+      <button *ngIf="paso === 2"
+              type="button" class="btn btn-confirmar"
+              [disabled]="loading"
+              (click)="confirmarAbono()">
         <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
         <ng-container *ngIf="!loading">
           <i class="bi bi-check2-circle me-1"></i>
-          Registrar y Generar Comprobante
+          Registrar Abono y Generar Comprobante
         </ng-container>
         <ng-container *ngIf="loading">Procesando...</ng-container>
       </button>

@@ -54,6 +54,9 @@ import { LetracambioInsertarComponent } from './components/letracambio-insertar/
 // Reporte Mora
 import { ReporteMoraComponent } from './components/reporte-mora/reporte-mora.component';
 
+// Reporte Ingresos
+import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
+
 export const routes: Routes = [
   { path: 'login', component: LoginLayoutComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -87,6 +90,7 @@ export const routes: Routes = [
       { path: 'contratos/registrar', component: ContratoInsertarComponent },
       { path: 'contratos/editar/:id', component: ContratoEditarComponent },
       { path: 'contratos/reporte-mora', component: ReporteMoraComponent },
+      { path: 'reporte-ingresos', component: ReporteIngresosComponent },
 
       // Pago Letras
       { path: 'pagoletras', component: PagoletraListarComponent },

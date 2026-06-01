@@ -1,0 +1,215 @@
+<div class="ri-container">
+
+  <!-- ── ENCABEZADO ──────────────────────────────────────────────────────── -->
+  <div class="ri-header">
+    <div class="ri-header-left">
+      <h2 class="ri-titulo">
+        <i class="bi bi-cash-stack"></i>
+        Reporte de Ingresos
+      </h2>
+      <p class="ri-subtitulo">Detalle de pagos por rango de fechas — Letras · Moras · Iniciales · Inscripciones</p>
+    </div>
+  </div>
+
+  <!-- ── FILTROS DE FECHA ─────────────────────────────────────────────────── -->
+  <div class="ri-filtros-card">
+    <div class="ri-filtros-row">
+
+      <div class="ri-field">
+        <label for="fechaDesde">
+          <i class="bi bi-calendar-event"></i> Desde
+        </label>
+        <input
+          id="fechaDesde"
+          type="date"
+          [(ngModel)]="fechaDesde"
+          class="ri-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="ri-field">
+        <label for="fechaHasta">
+          <i class="bi bi-calendar-event-fill"></i> Hasta
+        </label>
+        <input
+          id="fechaHasta"
+          type="date"
+          [(ngModel)]="fechaHasta"
+          class="ri-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="ri-actions">
+        <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+          <i class="bi bi-search" [class.spin]="cargando"></i>
+          {{ cargando ? 'Consultando...' : 'Consultar' }}
+        </button>
+        <button class="btn-limpiar" (click)="limpiar()" [disabled]="cargando">
+          <i class="bi bi-x-circle"></i> Limpiar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SKELETON (cargando) ─────────────────────────────────────────────── -->
+  <div *ngIf="cargando" class="ri-skeleton-wrap">
+    <div class="ri-skel-cards">
+      <div class="ri-skel-card" *ngFor="let i of [1,2,3,4]">
+        <div class="skel-line skel-title"></div>
+        <div class="skel-line skel-amount"></div>
+        <div class="skel-line skel-qty"></div>
+      </div>
+    </div>
+    <div class="skel-line skel-table" *ngFor="let i of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- ── RESUMEN DE TOTALES ───────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && resumen && resumen.cantidadTotal > 0" class="ri-totales-grid">
+
+    <div class="ri-total-card tc-letras">
+      <div class="tc-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Letras</span>
+        <span class="tc-monto">{{ formatMonto(resumen.totalLetras) }}</span>
+        <span class="tc-qty">{{ resumen.cantidadLetras }} pago{{ resumen.cantidadLetras !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalLetras, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="ri-total-card tc-moras">
+      <div class="tc-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Moras</span>
+        <span class="tc-monto">{{ formatMonto(resumen.totalMoras) }}</span>
+        <span class="tc-qty">{{ resumen.cantidadMoras }} pago{{ resumen.cantidadMoras !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalMoras, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="ri-total-card tc-iniciales">
+      <div class="tc-icon"><i class="bi bi-pen-fill"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Iniciales</span>
+        <span class="tc-monto">{{ formatMonto(resumen.totalIniciales) }}</span>
+        <span class="tc-qty">{{ resumen.cantidadIniciales }} pago{{ resumen.cantidadIniciales !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalIniciales, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="ri-total-card tc-inscripciones">
+      <div class="tc-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Inscripciones Servicios</span>
+        <span class="tc-monto">{{ formatMonto(resumen.totalInscripcionesServicios) }}</span>
+        <span class="tc-qty">{{ resumen.cantidadInscripcionesServicios }} pago{{ resumen.cantidadInscripcionesServicios !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalInscripcionesServicios, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="ri-total-card tc-general">
+      <div class="tc-icon"><i class="bi bi-bank2"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Total General</span>
+        <span class="tc-monto tc-monto-grande">{{ formatMonto(resumen.totalGeneral) }}</span>
+        <span class="tc-qty">{{ resumen.cantidadTotal }} operación{{ resumen.cantidadTotal !== 1 ? 'es' : '' }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── TABLA DETALLE ────────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && resumen && resumen.cantidadTotal > 0" class="ri-tabla-section">
+
+    <!-- Cabecera de tabla con filtro por tipo -->
+    <div class="ri-tabla-header">
+      <h3 class="ri-tabla-titulo">
+        <i class="bi bi-table"></i>
+        Detalle de operaciones
+        <span class="ri-badge-total">{{ detalleFiltrado.length }}</span>
+      </h3>
+      <div class="ri-filtro-tipo">
+        <label>Filtrar por tipo:</label>
+        <select [(ngModel)]="filtroTipo" class="ri-select-tipo">
+          <option value="TODOS">Todos</option>
+          <option value="LETRA">Letras</option>
+          <option value="MORA">Moras</option>
+          <option value="INICIAL">Iniciales</option>
+          <option value="INSCRIPCION_SERVICIO">Inscripciones</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="ri-tabla-wrap">
+      <table class="ri-tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Referencia</th>
+            <th>Comprobante</th>
+            <th>Medio de Pago</th>
+            <th>N° Operación</th>
+            <th class="col-monto">Importe (USD)</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of detalleFiltrado; let i = index">
+            <td class="col-num">{{ i + 1 }}</td>
+            <td>
+              <span class="ri-badge" [ngClass]="claseTipo(item.tipoIngreso)">
+                {{ etiquetaTipo(item.tipoIngreso) }}
+              </span>
+            </td>
+            <td class="col-fecha">{{ formatFecha(item.fechaPago) }}</td>
+            <td class="col-cliente">{{ item.nombreCliente ?? '—' }}</td>
+            <td class="col-ref">{{ item.referencia ?? '—' }}</td>
+            <td class="col-comp">{{ item.numeroComprobante ?? '—' }}</td>
+            <td class="col-medio">{{ formatMedioPago(item.medioPago) }}</td>
+            <td class="col-op">{{ item.numeroOperacion ?? '—' }}</td>
+            <td class="col-monto">{{ formatMonto(item.importePagado) }}</td>
+            <td class="col-obs">{{ item.observaciones ?? '—' }}</td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="detalleFiltrado.length > 0">
+          <tr class="fila-total">
+            <td colspan="8" class="total-label">
+              <i class="bi bi-calculator"></i>
+              Total {{ filtroTipo !== 'TODOS' ? '(' + etiquetaTipo(filtroTipo) + ')' : 'General' }}
+            </td>
+            <td class="col-monto total-valor">
+              {{ formatMonto(totalFiltrado) }}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── SIN RESULTADOS ───────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && buscado && (!resumen || resumen.cantidadTotal === 0)" class="ri-vacio">
+    <i class="bi bi-inbox"></i>
+    <p>No se encontraron ingresos en el rango de fechas seleccionado.</p>
+  </div>
+
+  <!-- ── ESTADO INICIAL ───────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && !buscado" class="ri-inicial">
+    <i class="bi bi-calendar-range"></i>
+    <p>Selecciona un rango de fechas y presiona <strong>Consultar</strong> para ver los ingresos.</p>
+  </div>
+
+</div>

@@ -73,7 +73,7 @@
           <tr *ngFor="let pago of pagosPagina">
 
             <td class="text-center" data-label="ID Pago">
-              <span class="id-number">{{ pago.idPagoInicial }}</span>
+              <span class="id-number">{{ pago.idPagoInscripcionComprobante }}</span>
             </td>
 
             <td class="text-center" data-label="Lote">
@@ -89,7 +89,7 @@
             </td>
 
             <td class="text-right" data-label="Monto">
-              <span class="monto">S/ {{ pago.importePagado | number:'1.2-2' }}</span>
+              <span class="monto">$ {{ pago.importePagado | number:'1.2-2' }}</span>
             </td>
 
             <td class="text-center" data-label="Fecha Pago">
@@ -114,11 +114,11 @@
             <td class="text-center" data-label="Acciones">
               <button
                 class="btn-action btn-pdf"
-                [class.loading]="descargando === pago.idPagoInicial"
-                [disabled]="descargando === pago.idPagoInicial || !pago.numeroComprobante"
+                [class.loading]="descargando === pago.idPagoInscripcionComprobante"
+                [disabled]="descargando === pago.idPagoInscripcionComprobante || !pago.numeroComprobante"
                 title="Ver comprobante PDF"
                 (click)="verComprobantePdf(pago)">
-                <i class="bi" [ngClass]="descargando === pago.idPagoInicial ? 'bi-hourglass-split' : 'bi-file-earmark-pdf'"></i>
+                <i class="bi" [ngClass]="descargando === pago.idPagoInscripcionComprobante ? 'bi-hourglass-split' : 'bi-file-earmark-pdf'"></i>
               </button>
             </td>
 
