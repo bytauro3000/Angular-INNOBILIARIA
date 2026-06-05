@@ -298,6 +298,11 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       border-color: $warning;
       &:hover { background: $warning; color: white; transform: scale(1.05); }
     }
+    &.btn-pdf {
+      color: $danger;
+      border-color: $danger;
+      &:hover { background: $danger; color: white; transform: scale(1.05); }
+    }
     &:disabled { opacity: 0.35; cursor: not-allowed; }
   }
 }
@@ -593,6 +598,11 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         color: $warning;
         border: 1px solid $warning;
         &:hover { background: $warning; color: white; }
+      }
+      &.btn-pdf {
+        color: $danger;
+        border: 1px solid $danger;
+        &:hover { background: $danger; color: white; }
       }
     }
   }

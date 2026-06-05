@@ -91,6 +91,10 @@ export class AdminAnulacionesService {
     return this.http.get(`${this.urlInscripciones}/pago/${idPago}/comprobante-pdf`, { responseType: 'blob' });
   }
 
+  descargarComprobanteInicial(idContrato: number): Observable<Blob> {
+    return this.http.get(`${this.urlContratos}/${idContrato}/pago-inicial/comprobante-pdf`, { responseType: 'blob' });
+  }
+
   /* ── Helpers ──────────────────────────────────────────── */
 
   private buildParams(filtros?: FiltrosAnulacion): HttpParams {

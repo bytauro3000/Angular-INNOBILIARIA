@@ -63,6 +63,10 @@ export class ContratoService {
     });
   }
 
+  descargarComprobanteInicial(idContrato: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${idContrato}/pago-inicial/comprobante-pdf`, { responseType: 'blob' });
+  }
+
   cambiarEstado(id: number, estado: string): Observable<ContratoResponseDTO> {
     const params = new HttpParams().set('estado', estado);
     return this.http.patch<ContratoResponseDTO>(`${this.apiUrl}/${id}/estado`, null, { params });

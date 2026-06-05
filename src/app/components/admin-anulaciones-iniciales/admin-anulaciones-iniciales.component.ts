@@ -82,6 +82,21 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
     this.procesando = false;
   }
 
+  descargarComprobante(pago: PagoInicialAdminDTO): void {
+    if (!pago.idContrato) return;
+    this.anulacionesService.descargarComprobanteInicial(pago.idContrato).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `comprobante-inicial-${pago.numeroComprobante || pago.idContrato}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.mostrarNotificacion('Error al descargar comprobante', 'error')
+    });
+  }
+
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error'): void {
     this.toast = { mostrar: true, mensaje, tipo };
     setTimeout(() => { this.toast.mostrar = false; }, 3500);

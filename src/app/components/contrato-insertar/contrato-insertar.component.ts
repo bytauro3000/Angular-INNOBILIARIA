@@ -212,7 +212,6 @@ export class ContratoInsertarComponent implements OnInit {
   abrirModalPagoInicial(): void {
     // Prellenar con datos del formulario
     this.pagoInicialRequest.importePagado = this.inicialNum;
-    this.pagoInicialRequest.fechaPago = new Date().toISOString().split('T')[0];
 
     // Autogenerar observación
     const loteStr = this.lotesSeleccionados.length > 0
@@ -665,6 +664,14 @@ export class ContratoInsertarComponent implements OnInit {
         `Comprobante de inicial emitido: ${res.pagoInicial.numeroComprobante}`,
         'Comprobante'
       );
+      // Auto-abrir el comprobante PDF en pestaña nueva
+      const idContrato = res?.idContrato;
+      if (idContrato) {
+        this.contratoService.descargarComprobanteInicial(idContrato).subscribe({
+          next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
+          error: () => this.toastr.warning('Contrato guardado. No se pudo abrir el comprobante automáticamente.', 'Aviso')
+        });
+      }
     }
     this.router.navigate(['/secretaria-menu/contratos']);
   }

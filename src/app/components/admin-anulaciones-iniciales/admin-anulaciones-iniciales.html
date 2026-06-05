@@ -86,6 +86,10 @@
           <td data-label="Motivo Anulación" class="motivo">{{ pago.motivoAnulacion || '—' }}</td>
           <td data-label="Acciones" class="acciones-cell">
             <div class="acciones-container">
+              <button class="btn-icon btn-pdf" title="Descargar PDF"
+                      (click)="descargarComprobante(pago)">
+                <i class="fas fa-file-pdf"></i>
+              </button>
               <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado"
                       (click)="abrirModalAnular(pago)">
                 <i class="bi bi-slash-circle"></i>
@@ -140,6 +144,9 @@
         <span>{{ pago.motivoAnulacion }}</span>
       </div>
       <div class="card-acciones">
+        <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
         <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado" (click)="abrirModalAnular(pago)">
           <i class="bi bi-slash-circle"></i> Anular
         </button>
