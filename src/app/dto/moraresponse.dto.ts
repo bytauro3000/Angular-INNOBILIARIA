@@ -1,4 +1,4 @@
-import { PagoMoraResponse } from "./pagomoraresponse.dto";
+import { PagoMoraResponse } from './pagomoraresponse.dto';
 
 export type EstadoMora = 'PENDIENTE' | 'PAGADO' | 'ANULADO';
 
@@ -16,5 +16,8 @@ export interface MoraResponse {
   montoMoraTotal: number;
   fechaGeneracion: string;
   estadoMora: EstadoMora;
+  motivoAnulacion?: string;
+  fechaAnulacion?: string;
+  anuladoPor?: string;
   pagos: PagoMoraResponse[];
 }

@@ -1,31 +1,22 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LoginComponent } from './login.component';
 
 @Component({
   selector: 'app-login-layout',
   standalone: true,
-  imports: [CommonModule, LoginComponent],
-  template: `
-    <div class="login-page-container">
-      <app-login></app-login>
-    </div>
-  `,
-  styles: [`
-    .login-page-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    
-      background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.7)), 
-                  url('https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1772147734/floging_oez9ey.png') no-repeat center center;
-      background-size: cover !important; /* 🟢 Esto elimina las franjas azules laterales */
-      background-attachment: fixed;
-    }
-  `]
+  imports: [CommonModule, RouterLink, LoginComponent],
+  templateUrl: './login-layout.component.html',
+  styleUrls: ['./login-layout.component.scss']
 })
-export class LoginLayoutComponent {}
+export class LoginLayoutComponent {
+
+  readonly anioActual = new Date().getFullYear();
+  readonly telefonoLimpio = '51987891788';
+  readonly whatsappUrl = `https://wa.me/${this.telefonoLimpio}?text=${encodeURIComponent('Hola, necesito ayuda con el acceso al sistema.')}`;
+
+  // Logo optimizado para Cloudinary
+  readonly logoBranding = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_280/v1773725974/logogrande_rfvxhu.png';
+  readonly logoMobile = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_160/v1773725974/logogrande_rfvxhu.png';
+}

@@ -1475,3 +1475,99 @@ $border-color: #e9ecef;
 
   i { font-size: 2rem; }
 }
+// ── PAGO INICIAL ─────────────────────────────────────────────────────────────
+.pago-inicial-info {
+  margin: 10px 0 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #d1e8ff;
+  background: #f0f7ff;
+  font-size: 0.85rem;
+
+  &.pago-inicial-anulado {
+    background: #fff5f5;
+    border-color: #fca5a5;
+    opacity: 0.88;
+  }
+}
+
+.pago-inicial-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #1e40af;
+
+  .pago-inicial-titulo { flex: 1; }
+
+  .badge-anulado {
+    background: #dc2626;
+    color: #fff;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .badge-vigente {
+    background: #16a34a;
+    color: #fff;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.pago-inicial-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.pago-inicial-motivo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7f1d1d;
+  background: #fee2e2;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.pago-inicial-acciones {
+  margin-top: 8px;
+
+  .btn-anular-inicial {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s, transform 0.15s;
+
+    &:hover:not(:disabled) {
+      background: color.adjust(#dc2626, $lightness: -8%, $space: hsl);
+      transform: scale(1.02);
+    }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}

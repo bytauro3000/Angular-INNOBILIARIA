@@ -40,24 +40,30 @@
         <div class="servicio-selector">
           <!-- LUZ -->
           <label class="servicio-card"
-                 [class.selected]="tipoServicio === TipoServicios.LUZ && !luzInscrita"
-                 [class.inscrito]="luzInscrita"
-                 (click)="!luzInscrita && (tipoServicio = TipoServicios.LUZ)">
+                 [class.selected]="tipoServicio === TipoServicios.LUZ && !luzInscrita && !luzPendiente"
+                 [class.inscrito]="luzInscrita || luzPendiente"
+                 (click)="!luzInscrita && !luzPendiente && (tipoServicio = TipoServicios.LUZ)">
             <span class="servicio-icon">⚡</span>
             <span class="servicio-name">LUZ</span>
             <span *ngIf="luzInscrita" class="badge-inscrito">
               <i class="bi bi-check-circle-fill"></i> Ya inscrito
             </span>
+            <span *ngIf="!luzInscrita && luzPendiente" class="badge-inscrito badge-pendiente">
+              <i class="bi bi-clock-fill"></i> Pago pendiente
+            </span>
           </label>
           <!-- AGUA -->
           <label class="servicio-card"
-                 [class.selected]="tipoServicio === TipoServicios.AGUA && !aguaInscrita"
-                 [class.inscrito]="aguaInscrita"
-                 (click)="!aguaInscrita && (tipoServicio = TipoServicios.AGUA)">
+                 [class.selected]="tipoServicio === TipoServicios.AGUA && !aguaInscrita && !aguaPendiente"
+                 [class.inscrito]="aguaInscrita || aguaPendiente"
+                 (click)="!aguaInscrita && !aguaPendiente && (tipoServicio = TipoServicios.AGUA)">
             <span class="servicio-icon">💧</span>
             <span class="servicio-name">AGUA</span>
             <span *ngIf="aguaInscrita" class="badge-inscrito">
               <i class="bi bi-check-circle-fill"></i> Ya inscrito
+            </span>
+            <span *ngIf="!aguaInscrita && aguaPendiente" class="badge-inscrito badge-pendiente">
+              <i class="bi bi-clock-fill"></i> Pago pendiente
             </span>
           </label>
         </div>

@@ -13,4 +13,16 @@ export interface PagoMoraResponse {
   idComprobante: number | null;
   observaciones: string | null;
   urlsVoucher: string[];
+  anulado?: boolean;
+  motivoAnulacion?: string;
+  fechaAnulacion?: string;
+  anuladoPor?: string;
+  // Contexto admin
+  idContrato?: number;
+  manzana?: string;
+  numeroLote?: string;
+  idPrograma?: number;
+  nombrePrograma?: string;
+  nombreCliente?: string;
+  moneda?: 'USD' | 'PEN';
 }

@@ -1,19 +1,13 @@
 @use "sass:color";
 
-// ============================================
-// VARIABLES (mismas que en pagoletra-listar)
-// ============================================
 $navy: #023e8a;
 $green: #27ae60;
+$red: #dc2626;
 $light-blue: #3498db;
 $text-dark: #1e293b;
 $text-light: #334155;
 $border-color: #e9ecef;
-$input-bg: #f9fafc;
 
-// ============================================
-// MODAL PRINCIPAL
-// ============================================
 .modal-content {
   background-color: white !important;
   border-radius: 16px;
@@ -25,11 +19,11 @@ $input-bg: #f9fafc;
 }
 
 .modal-dialog {
-  max-width: 900px;
+  max-width: 960px;
   width: 95%;
   margin: 0 auto;
   display: flex;
-  align-items: center; 
+  align-items: center;
   min-height: 100vh;
 }
 
@@ -44,21 +38,13 @@ $input-bg: #f9fafc;
     display: flex;
     align-items: center;
     gap: 10px;
-
-    i {
-      color: $green;
-      font-size: 1.4rem;
-    }
+    i { color: $green; font-size: 1.4rem; }
   }
 
-  // Estilo para el botón de cierre (solo ajuste de opacidad, sin anular la imagen de Bootstrap)
   .btn-close {
     opacity: 0.7;
     transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
+    &:hover { opacity: 1; }
   }
 }
 
@@ -68,31 +54,26 @@ $input-bg: #f9fafc;
   flex: 1 1 auto;
 }
 
-// ============================================
-// TABLA DE PAGOS
-// ============================================
 .table-pagos {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 
-  thead tr {
-    background: linear-gradient(135deg, $navy, #0353a4);
-  }
+  thead tr { background: linear-gradient(135deg, $navy, #0353a4); }
 
   th {
     color: white;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 12px 8px;
+    letter-spacing: 0.4px;
+    padding: 10px 8px;
     white-space: nowrap;
     text-align: center;
   }
 
   td {
-    padding: 8px 8px;
+    padding: 8px;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
     text-align: center;
@@ -100,73 +81,89 @@ $input-bg: #f9fafc;
   }
 
   tbody tr {
-    transition: background 0.2s;
-
-    &:hover td {
-      background-color: #f1f5f9;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
+    transition: background 0.15s;
+    &:last-child td { border-bottom: none; }
+    &:hover td { background-color: #f1f5f9; }
+    &.row-anulado { opacity: 0.55; background: #f8fafc; td { text-decoration: line-through; color: #94a3b8; } }
   }
 }
 
-// ============================================
-// BOTONES DENTRO DE LA TABLA
-// ============================================
+.badge-vigente {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.badge-anulado {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  cursor: help;
+}
+
+.acciones-container {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 30px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:focus { outline: 2px solid $navy; outline-offset: 2px; }
+
+  &.btn-anular {
+    border-color: $red;
+    color: $red;
+    &:hover:not(:disabled) { background: $red; color: white; transform: scale(1.05); }
+  }
+
+  &.btn-eliminar {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    &:hover:not(:disabled) { background: #e74c3c; color: white; transform: scale(1.05); }
+  }
+}
+
 .btn-ver-voucher {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 20px;
   background: $light-blue;
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-decoration: none;
   transition: all 0.2s;
-
-  i {
-    font-size: 0.9rem;
-  }
-
-  &:hover {
-    background: color.adjust($light-blue, $lightness: -10%, $space: hsl);
-  }
+  &:hover { background: color.adjust($light-blue, $lightness: -10%, $space: hsl); }
 }
 
-.btn-eliminar-pago {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  border: 1px solid #e74c3c;
-  background: transparent;
-  color: #e74c3c;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  i {
-    font-size: 1rem;
-  }
-
-  &:hover:not(:disabled) {
-    background: #e74c3c;
-    color: white;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-// ============================================
-// PIE DEL MODAL
-// ============================================
 .modal-footer {
   border-top: 1px solid $border-color;
   padding: 1rem 1.5rem;
@@ -183,16 +180,10 @@ $input-bg: #f9fafc;
     border: 1px solid $border-color;
     cursor: pointer;
     transition: all 0.2s;
-
-    &:hover {
-      background: #f1f5f9;
-    }
+    &:hover { background: #f1f5f9; }
   }
 }
 
-// ============================================
-// SPINNER
-// ============================================
 .spinner-border {
   display: inline-block;
   width: 2rem;
@@ -203,9 +194,7 @@ $input-bg: #f9fafc;
   animation: spinner-border 0.75s linear infinite;
 }
 
-@keyframes spinner-border {
-  to { transform: rotate(360deg); }
-}
+@keyframes spinner-border { to { transform: rotate(360deg); } }
 
 .visually-hidden {
   position: absolute;

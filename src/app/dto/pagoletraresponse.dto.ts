@@ -14,10 +14,19 @@ export interface PagoLetraResponse {
   idComprobante?: number;
   observaciones?: string;
   urlsVoucher: string[];
-  /** Saldo que quedó pendiente si fue un pago a cuenta */
   saldoPendiente?: number;
-  /** Estado resultante de la letra luego del pago (PAGADO | PARCIAL) */
   estadoLetra?: string;
-  /** Indica si este registro fue un pago a cuenta */
   esPagoAcuenta?: boolean;
+  anulado?: boolean;
+  motivoAnulacion?: string;
+  fechaAnulacion?: string;
+  anuladoPor?: string;
+  // Contexto admin
+  idContrato?: number;
+  manzana?: string;
+  numeroLote?: string;
+  idPrograma?: number;
+  nombrePrograma?: string;
+  nombreCliente?: string;
+  moneda?: 'USD' | 'PEN';
 }

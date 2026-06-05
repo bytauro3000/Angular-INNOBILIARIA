@@ -79,6 +79,67 @@
       </div>
     </div>
 
+    <!-- ── PAGO INICIAL ─────────────────────────────────────────────────────── -->
+    <div *ngIf="contratoEncontrado.pagoInicial" class="pago-inicial-info"
+         [class.pago-inicial-anulado]="contratoEncontrado.pagoInicial.anulado">
+      <div class="pago-inicial-header">
+        <span class="pago-inicial-titulo">
+          <i class="bi bi-cash-stack"></i> Pago inicial
+        </span>
+        <span *ngIf="contratoEncontrado.pagoInicial.anulado"
+              class="badge-anulado"
+              [title]="'Motivo: ' + (contratoEncontrado.pagoInicial.motivoAnulacion || '-') +
+                       ' | Por: ' + (contratoEncontrado.pagoInicial.anuladoPor || '-') +
+                       ' | Fecha: ' + (contratoEncontrado.pagoInicial.fechaAnulacion | date:'dd/MM/yyyy HH:mm')">
+          <i class="bi bi-slash-circle"></i> ANULADO
+        </span>
+        <span *ngIf="!contratoEncontrado.pagoInicial.anulado" class="badge-vigente">
+          <i class="bi bi-check-circle"></i> VIGENTE
+        </span>
+      </div>
+
+      <div class="pago-inicial-datos">
+        <span>
+          <strong>Importe:</strong>
+          {{ contratoEncontrado.moneda === 'PEN' ? 'S/.' : '$' }}
+          {{ contratoEncontrado.pagoInicial.importePagado | number:'1.2-2' }}
+        </span>
+        <span *ngIf="contratoEncontrado.pagoInicial.fechaPago">
+          <strong>Fecha:</strong>
+          {{ contratoEncontrado.pagoInicial.fechaPago | date:'dd/MM/yyyy' }}
+        </span>
+        <span *ngIf="contratoEncontrado.pagoInicial.medioPago">
+          <strong>Medio:</strong> {{ contratoEncontrado.pagoInicial.medioPago }}
+        </span>
+        <span *ngIf="contratoEncontrado.pagoInicial.numeroComprobante">
+          <strong>Comprobante:</strong> {{ contratoEncontrado.pagoInicial.numeroComprobante }}
+        </span>
+        <span *ngIf="contratoEncontrado.pagoInicial.numeroOperacion">
+          <strong>N° Op.:</strong> {{ contratoEncontrado.pagoInicial.numeroOperacion }}
+        </span>
+      </div>
+
+      <div *ngIf="contratoEncontrado.pagoInicial.anulado" class="pago-inicial-motivo">
+        <i class="bi bi-info-circle"></i>
+        <span><strong>Motivo:</strong> {{ contratoEncontrado.pagoInicial.motivoAnulacion }}</span>
+        <span *ngIf="contratoEncontrado.pagoInicial.anuladoPor">
+          — Por: <em>{{ contratoEncontrado.pagoInicial.anuladoPor }}</em>
+        </span>
+      </div>
+
+      <!-- Solo el administrador puede anular el pago inicial -->
+      <div *ngIf="esAdministrador && !contratoEncontrado.pagoInicial.anulado"
+           class="pago-inicial-acciones">
+        <button class="btn-anular-inicial"
+                (click)="anularPagoInicial()"
+                [disabled]="anulandoPagoInicial"
+                title="Anular pago inicial (anulación lógica)">
+          <i class="bi bi-slash-circle"></i>
+          {{ anulandoPagoInicial ? 'Anulando...' : 'Anular pago inicial' }}
+        </button>
+      </div>
+    </div>
+
     <!-- Fila de alertas: mora + parcial en la misma línea -->
     <div class="alertas-row" *ngIf="(moraResumen && moraResumen.cantidadMorasPendientes > 0) || cantidadParciales > 0">
       <!-- Banner de moras pendientes -->

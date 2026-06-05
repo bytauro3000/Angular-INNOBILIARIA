@@ -178,8 +178,26 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       || primerLote.nombrePrograma
       || this.contrato.programa?.nombrePrograma
       || '';
+
+    // Obtener los números de letra ordenados numéricamente
+    const numerosLetras = this.letras
+      .map(l => this.getNumeroLetraLimpio(l.numeroLetra))
+      .filter(n => n !== '')
+      .sort((a, b) => parseInt(a) - parseInt(b));
+
+    let letrasStr: string;
+    if (numerosLetras.length === 0) {
+      letrasStr = '';
+    } else if (numerosLetras.length === 1) {
+      letrasStr = numerosLetras[0];
+    } else {
+      const anteriores = numerosLetras.slice(0, -1).join(', ');
+      const ultima = numerosLetras[numerosLetras.length - 1];
+      letrasStr = anteriores + ' y ' + ultima;
+    }
+
     this.datosComunes.observaciones =
-      `Pago múltiple de ${this.letras.length} letras de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
+      `Pago de las letras ${letrasStr} de la Mz. ${mz} Lt. ${lt} del Programa: ${programa}`;
   }
 
   onMedioPagoChange(): void {

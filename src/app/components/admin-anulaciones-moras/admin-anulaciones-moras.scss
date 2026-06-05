@@ -1,0 +1,674 @@
+@use "sass:color";
+
+// ============================================
+// VARIABLES — Paleta "Pago Letras" Admin
+// ============================================
+$navy:         #023e8a;
+$blue:         #2980b9;
+$green:        #27ae60;
+$yellow:       #f1c40f;
+$orange:       #f39c12;
+$amber:        #d97706;
+$light-blue:   #3498db;
+$gray:         #ecf0f1;
+$light-bg:     #f5f7fa;
+$text-dark:    #1e293b;
+$text-light:   #334155;
+$border-color: #e9ecef;
+
+$primary:      #003b7a;
+$cyan:         #00bcd4;
+$danger:       #e53935;
+$warning:      #ff9800;
+$success:      #43a047;
+$dark-modal:   #2b394a;
+$dark-input:   #3a4a5e;
+
+/* ── Acento propio de Moras: rojo-naranja ── */
+$accent: #f4511e;
+$accent-light: color.adjust($accent, $lightness: 35%);
+
+.anulaciones-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// ============================================
+// HEADER
+// ============================================
+.page-header {
+  margin-bottom: 18px;
+  .page-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    > i { font-size: 2rem; color: $accent; margin-top: 0; }
+    h2  {
+      margin: 0 0 4px;
+      color: $navy;
+      font-weight: 700;
+      font-size: 1.3rem;
+
+      .separator-icon {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0 6px;
+        vertical-align: middle;
+        font-weight: 400;
+      }
+    }
+    p { margin: 0; color: $text-light; font-size: 0.85rem; }
+  }
+}
+
+// ============================================
+// FILTROS — estilo "Pago Letras"
+// ============================================
+.filtros {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid $border-color;
+  position: relative;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 160px;
+    flex: 1;
+
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: $text-light;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background-color: #f9fafc;
+      color: $text-dark;
+      outline: none;
+
+      &:focus {
+        border-color: $navy;
+        box-shadow: 0 0 0 3px rgba($navy, 0.15);
+        background-color: white;
+      }
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 8px rgba($navy, 0.2);
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    &.btn-buscar {
+      background-color: $navy;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: color.adjust($navy, $lightness: -10%, $space: hsl);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba($navy, 0.25);
+      }
+    }
+
+    &.btn-limpiar {
+      background-color: #e74c3c;
+      color: white;
+      box-shadow: 0 4px 8px rgba(#e74c3c, 0.2);
+
+      &:hover {
+        background-color: color.adjust(#e74c3c, $lightness: -10%, $space: hsl);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(#e74c3c, 0.25);
+      }
+    }
+  }
+}
+
+// ============================================
+// TABLA — estilo "Pago Letras"
+// ============================================
+.tabla-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: auto;
+  margin-top: 20px;
+  border: 1px solid $border-color;
+}
+
+.cargando {
+  padding: 40px;
+  text-align: center;
+  color: $text-light;
+
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.08);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border-left-color: $accent;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+.tabla-custom {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: linear-gradient(135deg, $navy, #0353a4);
+  }
+
+  th {
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 10px;
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+    color: $text-dark;
+  }
+
+  tbody tr {
+    transition: background 0.2s;
+
+    &:hover td { background-color: #f1f5f9; }
+    &:last-child td { border-bottom: none; }
+
+    &.anulado td {
+      background-color: #fff5f5;
+      color: #7f1d1d;
+      opacity: 0.85;
+    }
+  }
+
+  .comprobante-badge {
+    display: inline-block;
+    background: rgba($accent, 0.1);
+    color: color.adjust($accent, $lightness: -5%);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .monto {
+    font-weight: 700;
+    color: $accent;
+    text-align: right;
+  }
+
+  .motivo {
+    font-size: 0.85rem;
+    color: $text-light;
+    max-width: 220px;
+  }
+
+  .estado-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    min-width: 95px;
+    font-size: 0.78rem;
+    padding: 0 10px;
+    border-radius: 20px;
+    font-weight: 700;
+
+    &.vigente { background-color: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+    &.anulado { background-color: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+  }
+
+  .acciones-cell {
+    text-align: center;
+  }
+
+  .acciones-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 32px;
+    border-radius: 8px;
+    border: 1px solid;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+
+    i { font-size: 1.1rem; }
+
+    &.btn-pdf {
+      color: $danger;
+      border-color: $danger;
+      &:hover { background: $danger; color: white; transform: scale(1.05); }
+    }
+    &.btn-anular {
+      color: $warning;
+      border-color: $warning;
+      &:hover { background: $warning; color: white; transform: scale(1.05); }
+    }
+    &:disabled { opacity: 0.35; cursor: not-allowed; }
+  }
+}
+
+.sin-resultados {
+  text-align: center;
+  padding: 40px 20px;
+  color: $text-light;
+  font-size: 1rem;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+
+  i { font-size: 2.5rem; margin-bottom: 10px; display: block; color: #cbd5e1; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+// ============================================
+// TOAST
+// ============================================
+.toast-notification {
+  position: fixed; top: 20px; right: 20px;
+  padding: 13px 20px; border-radius: 8px; color: white;
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 500; z-index: 3000; min-width: 260px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+
+  &.success { background: $success; }
+  &.error   { background: $danger; }
+}
+
+// ============================================
+// MODAL
+// ============================================
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+
+  .custom-modal {
+    background: $dark-modal;
+    color: white;
+    width: 500px;
+    max-width: 95vw;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px 10px 0 0;
+      border-left: 4px solid $accent;
+
+      h4 {
+        margin: 0;
+        display: flex; align-items: center; gap: 9px;
+        font-size: 1rem;
+        color: $accent-light;
+      }
+      .close-btn {
+        background: none; border: none; color: #aaa;
+        cursor: pointer; font-size: 1.1rem;
+        &:hover { color: white; }
+      }
+    }
+
+    .modal-body {
+      padding: 22px;
+
+      .info-pago {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 8px;
+        border-left: 3px solid $accent;
+
+        .info-row {
+          display: flex; gap: 10px; margin-bottom: 7px;
+          &:last-child { margin-bottom: 0; }
+          .label { color: #8a9ab8; font-size: 0.8rem; font-weight: 600; min-width: 110px; }
+          .value {
+            color: white; font-size: 0.88rem;
+            &.monto { color: $accent-light; font-weight: 700; }
+          }
+        }
+      }
+
+      label {
+        font-size: 0.72rem; color: #8a9ab8;
+        font-weight: 700; margin-bottom: 5px; display: block;
+      }
+      .requerido { color: $danger; }
+
+      .dark-input {
+        background: $dark-input;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white; resize: none;
+        outline: none;
+        &:focus { border-color: $accent; box-shadow: none; }
+      }
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex; justify-content: flex-end; gap: 10px;
+
+      .btn-confirmar-anular {
+        background: $warning; color: white; border: none;
+        padding: 9px 20px; border-radius: 6px;
+        font-weight: 600; cursor: pointer;
+        display: flex; align-items: center; gap: 8px;
+        transition: 0.2s;
+        &:hover { background: color.adjust($warning, $lightness: -8%); }
+        &:disabled { background: #555; cursor: not-allowed; }
+      }
+      .btn-cancelar {
+        background: transparent; color: #aaa;
+        border: 1px solid #555; padding: 9px 18px;
+        border-radius: 6px; cursor: pointer; font-weight: 600;
+        &:hover { background: rgba(255, 255, 255, 0.05); }
+      }
+    }
+  }
+}
+
+// ============================================
+// CARDS MÓVIL — estilo anulaciones-letras
+// ============================================
+.cards-container,
+.cards-loading { display: none; }
+
+.cards-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.08);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border-left-color: $cyan;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+.cards-container {
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pago-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  &.anulado { opacity: 0.7; background: #fff8f8; }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    .comprobante-badge {
+      display: inline-block;
+      background: rgba($accent, 0.1);
+      color: color.adjust($accent, $lightness: -5%);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .estado-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      min-width: 95px;
+      font-size: 0.72rem;
+      padding: 0 10px;
+      border-radius: 20px;
+      font-weight: 700;
+
+      &.vigente { background-color: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+      &.anulado { background-color: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+    }
+  }
+
+  .card-monto {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: $accent;
+    letter-spacing: -0.3px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .card-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .card-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .card-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .card-motivo {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #fff5f5;
+    border-radius: 8px;
+    color: #c62828;
+    font-size: 0.82rem;
+    line-height: 1.4;
+
+    i { color: $danger; margin-top: 2px; }
+  }
+
+  .card-acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .btn-icon {
+      flex: 1;
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      background: white;
+
+      &.btn-pdf {
+        color: $danger;
+        border: 1px solid $danger;
+        &:hover { background: $danger; color: white; }
+      }
+      &.btn-anular {
+        color: $warning;
+        border: 1px solid $warning;
+        &:hover { background: $warning; color: white; }
+      }
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+// ============================================
+// RESPONSIVE MÓVIL — patrón anulaciones-letras
+// ============================================
+@media screen and (max-width: 767px) {
+  .anulaciones-page {
+    padding: 70px 14px 30px;
+  }
+
+  .page-header .page-title h2 { font-size: 1.1rem; }
+  .page-header .page-title > i { font-size: 1.6rem; }
+
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 12px;
+
+    .form-group { min-width: 100% !important; }
+    button { width: 100%; justify-content: center; }
+  }
+
+  .tabla-wrapper { display: none; }
+
+  .tabla-custom,
+  .cargando { display: none; }
+
+  .cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cards-loading {
+    display: block;
+  }
+
+  // Si la tabla principal no existe como elemento,
+  // se ocultan ambos contenedores para evitar duplicados en desktop.
+  .tabla-custom thead { display: none; }
+  .tabla-custom tbody tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  .tabla-custom tbody td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: right !important;
+
+    &::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: $navy;
+      text-align: left !important;
+      min-width: 120px;
+    }
+
+    &.acciones-cell {
+      justify-content: center !important;
+      &::before { display: none !important; }
+      .acciones-container {
+        justify-content: center !important;
+        width: 100% !important;
+      }
+    }
+  }
+}
+
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }

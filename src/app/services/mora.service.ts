@@ -19,11 +19,6 @@ export class MoraService {
     return this.http.get<CalculoMoraDTO>(`${this.apiUrl}/calcular/${idLetra}`);
   }
 
-  /**
-   * Calcula la mora usando una fecha de referencia específica.
-   * Se usa cuando el usuario registra un pago con fecha de operación retroactiva,
-   * para que el monto de mora refleje los días reales hasta esa fecha y no hasta hoy.
-   */
   calcularMoraConFecha(idLetra: number, fecha: string): Observable<CalculoMoraDTO> {
     const params = new HttpParams().set('fecha', fecha);
     return this.http.get<CalculoMoraDTO>(`${this.apiUrl}/calcular/${idLetra}`, { params });
@@ -48,17 +43,21 @@ export class MoraService {
   pagarMora(request: PagoMoraRequest, vouchers?: File[]): Observable<PagoMoraResponse> {
     const formData = new FormData();
     formData.append('pago', new Blob([JSON.stringify(request)], { type: 'application/json' }));
-    if (vouchers && vouchers.length > 0) {
-      vouchers.forEach(v => formData.append('vouchers', v));
-    }
+    if (vouchers?.length) vouchers.forEach(v => formData.append('vouchers', v));
     return this.http.post<PagoMoraResponse>(`${this.apiUrl}/pagar`, formData);
   }
 
-  anularMora(idMora: number, motivo: string = ''): Observable<MoraResponse> {
+  anularMora(idMora: number, motivo: string): Observable<MoraResponse> {
     return this.http.patch<MoraResponse>(
       `${this.apiUrl}/${idMora}/anular`,
-      null,
-      { params: new HttpParams().set('motivo', motivo) }
+      { motivo }
+    );
+  }
+
+  anularPagoMora(idPagoMora: number, motivo: string): Observable<PagoMoraResponse> {
+    return this.http.patch<PagoMoraResponse>(
+      `${this.apiUrl}/pago/${idPagoMora}/anular`,
+      { motivo }
     );
   }
 
@@ -69,13 +68,10 @@ export class MoraService {
   }
 
   descargarComprobante(idPagoMora: number): Observable<Blob> {
-    return this.http.get(
-      `${this.apiUrl}/pago/${idPagoMora}/comprobante-pdf`,
-      { responseType: 'blob' }
-    );
+    return this.http.get(`${this.apiUrl}/pago/${idPagoMora}/comprobante-pdf`, { responseType: 'blob' });
   }
 
   crearMoraPendiente(idLetra: number): Observable<any> {
-  return this.http.post(`${this.apiUrl}/crear-pendiente/${idLetra}`, {});
-}
+    return this.http.post(`${this.apiUrl}/crear-pendiente/${idLetra}`, {});
+  }
 }

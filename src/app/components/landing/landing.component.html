@@ -1,0 +1,357 @@
+<!-- HEADER / NAVBAR -->
+<header class="landing-header" [class.scrolled]="scrolled()">
+  <div class="container header-container">
+    <a href="#inicio" class="brand" (click)="scrollA('inicio', $event)">
+      <div class="brand-circle">
+        <img [src]="logoHeader" alt="Inmobiliaria Ivan - Constructora E.I.R.L" class="brand-logo" />
+      </div>
+    </a>
+
+    <nav class="nav-desktop">
+      <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
+      <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
+      <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
+      <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
+      <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+    </nav>
+
+    <div class="header-actions">
+      <a [href]="whatsappUrl" target="_blank" rel="noopener" class="phone-link" title="Llámanos">
+        <i class="fas fa-phone-alt"></i>
+        <span>{{ telefono }}</span>
+      </a>
+      <a routerLink="/login" class="btn-login">
+        <i class="fas fa-user"></i> Iniciar Sesión
+      </a>
+      <button class="menu-toggle" (click)="toggleMenu()" [class.active]="menuAbierto()"
+              [attr.aria-label]="menuAbierto() ? 'Cerrar menú' : 'Abrir menú'"
+              [attr.aria-expanded]="menuAbierto()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú móvil -->
+  <nav class="nav-mobile" [class.open]="menuAbierto()">
+    <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
+    <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
+    <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
+    <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
+    <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+    <a routerLink="/login" (click)="toggleMenu()" class="btn-login-mobile">
+      <i class="fas fa-user"></i> Iniciar Sesión
+    </a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section id="inicio" class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80&auto=format&fit=crop"
+         alt="Terrenos en Carabayllo" loading="eager" />
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="container hero-content">
+    <span class="hero-badge">
+      <i class="fas fa-map-marker-alt"></i> Carabayllo · Lima
+    </span>
+    <h1>
+      Tu nuevo hogar comienza con
+      <span class="gradient-text">el terreno ideal</span>
+    </h1>
+    <p class="hero-subtitle">
+      Lotes de vivienda con título de propiedad, financiamiento directo y la mejor
+      ubicación de Lima Norte. Construye el futuro de tu familia con seguridad y
+      confianza.
+    </p>
+    <div class="hero-ctas">
+      <a href="#proyectos" (click)="scrollA('proyectos', $event)" class="btn-primary">
+        <i class="fas fa-map-marked-alt"></i> Ver Proyectos
+      </a>
+      <a [href]="whatsappUrl" target="_blank" rel="noopener" class="btn-whatsapp">
+        <i class="fab fa-whatsapp"></i> Hablar por WhatsApp
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <strong>+15</strong>
+        <span>años de experiencia</span>
+      </div>
+      <div class="stat">
+        <strong>+500</strong>
+        <span>familias atendidas</span>
+      </div>
+      <div class="stat">
+        <strong>100%</strong>
+        <span>con título saneado</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section id="nosotros" class="nosotros section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Sobre nosotros</span>
+      <h2>Más de 15 años construyendo sueños en <span class="gradient-text">Carabayllo</span></h2>
+      <p class="section-sub">
+        Somos Inmobiliaria Constructora Ivan E.I.R.L, una empresa peruana especializada
+        en la venta de terrenos urbanos con documentación legal al día.
+      </p>
+    </div>
+
+    <div class="nosotros-grid">
+      <article class="nosotros-card">
+        <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+        <h3>Misión</h3>
+        <p>Brindar a las familias peruanas acceso a terrenos con título de propiedad, en ubicaciones estratégicas, con servicios básicos y a precios justos.</p>
+      </article>
+      <article class="nosotros-card">
+        <div class="card-icon"><i class="fas fa-eye"></i></div>
+        <h3>Visión</h3>
+        <p>Ser la inmobiliaria líder en Lima Norte, reconocida por nuestra transparencia, seriedad y compromiso con el desarrollo urbano ordenado.</p>
+      </article>
+      <article class="nosotros-card">
+        <div class="card-icon"><i class="fas fa-handshake"></i></div>
+        <h3>Valores</h3>
+        <p>Transparencia, compromiso, seriedad y cercanía. Cada cliente es parte de nuestra familia y merece la mejor asesoría en su inversión.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PROYECTOS -->
+<section id="proyectos" class="proyectos section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Nuestros proyectos</span>
+      <h2>Lotes disponibles en <span class="gradient-text">Carabayllo</span></h2>
+      <p class="section-sub">
+        Encuentra el lote ideal para construir la casa de tus sueños.
+        Todos cuentan con servicios básicos y título de propiedad.
+      </p>
+    </div>
+
+    <div class="proyectos-grid">
+      <article *ngFor="let p of proyectos" class="proyecto-card">
+        <div class="proyecto-img">
+          <img [src]="p.imagen" [alt]="p.nombre" loading="lazy" />
+          <span class="proyecto-estado" [class]="'estado-' + p.estado.toLowerCase().replace(' ', '-')">
+            {{ p.estado }}
+          </span>
+        </div>
+        <div class="proyecto-body">
+          <h3>{{ p.nombre }}</h3>
+          <p class="proyecto-ubicacion">
+            <i class="fas fa-map-marker-alt"></i> {{ p.ubicacion }}
+          </p>
+          <div class="proyecto-meta">
+            <div class="meta-item">
+              <i class="fas fa-ruler-combined"></i>
+              <span>{{ p.area }}</span>
+            </div>
+            <div class="meta-item" *ngIf="p.lotes > 0">
+              <i class="fas fa-th-large"></i>
+              <span>{{ p.lotes }} lotes</span>
+            </div>
+          </div>
+          <div class="proyecto-footer">
+            <div class="precio">
+              <span class="precio-label">Desde</span>
+              <strong>{{ p.precioDesde }}</strong>
+            </div>
+            <a [href]="whatsappUrl" target="_blank" rel="noopener" class="btn-card">
+              Consultar <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section id="beneficios" class="beneficios section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">¿Por qué elegirnos?</span>
+      <h2>La mejor decisión para tu <span class="gradient-text">inversión</span></h2>
+      <p class="section-sub">
+        Te acompañamos en cada paso, con transparencia y seguridad.
+      </p>
+    </div>
+
+    <div class="beneficios-grid">
+      <div *ngFor="let b of beneficios" class="beneficio-card">
+        <div class="beneficio-icon">
+          <i class="fas {{ b.icono }}"></i>
+        </div>
+        <h3>{{ b.titulo }}</h3>
+        <p>{{ b.descripcion }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section class="testimonios section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Testimonios</span>
+      <h2>Lo que dicen nuestros <span class="gradient-text">clientes</span></h2>
+    </div>
+
+    <div class="testimonios-grid">
+      <article *ngFor="let t of testimonios" class="testimonio-card">
+        <div class="testimonio-stars">
+          <i *ngFor="let _ of getEstrellas(t.calificacion)" class="fas fa-star"></i>
+        </div>
+        <p class="testimonio-texto">"{{ t.comentario }}"</p>
+        <div class="testimonio-autor">
+          <img [src]="t.imagen" [alt]="t.nombre" loading="lazy" />
+          <div>
+            <strong>{{ t.nombre }}</strong>
+            <span>{{ t.rol }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto" class="contacto section">
+  <div class="container">
+    <div class="contacto-grid">
+      <div class="contacto-info">
+        <span class="section-eyebrow light">Contáctanos</span>
+        <h2>¿Listo para tu <span class="gradient-text">nuevo lote</span>?</h2>
+        <p>
+          Escríbenos y un asesor se pondrá en contacto contigo en menos de 24 horas.
+        </p>
+
+        <div class="contacto-items">
+          <a [href]="whatsappUrl" target="_blank" rel="noopener" class="contacto-item">
+            <i class="fab fa-whatsapp"></i>
+            <div>
+              <strong>WhatsApp</strong>
+              <span>+51 {{ telefono }}</span>
+            </div>
+          </a>
+          <a [href]="'tel:+51' + telefonoLimpio" class="contacto-item">
+            <i class="fas fa-phone-alt"></i>
+            <div>
+              <strong>Teléfono</strong>
+              <span>(01) {{ telefono }}</span>
+            </div>
+          </a>
+          <a [href]="'mailto:' + correo" class="contacto-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <strong>Correo</strong>
+              <span>{{ correo }}</span>
+            </div>
+          </a>
+          <div class="contacto-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div>
+              <strong>Ubicación</strong>
+              <span>Carabayllo, Lima - Perú</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="contacto-form" (submit)="enviarContacto($event)">
+        <h3>Envíanos un mensaje</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" [(ngModel)]="formContacto.nombre" name="nombre" required placeholder="Tu nombre" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="formContacto.telefono" name="telefono" required placeholder="987 654 321" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" [(ngModel)]="formContacto.correo" name="correo" required placeholder="tu@correo.com" />
+        </div>
+        <div class="form-group">
+          <label>Mensaje</label>
+          <textarea [(ngModel)]="formContacto.mensaje" name="mensaje" rows="4" required
+                    placeholder="¿En qué podemos ayudarte?"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="enviando()">
+          <span *ngIf="!enviando() && !enviado()">
+            <i class="fas fa-paper-plane"></i> Enviar mensaje
+          </span>
+          <span *ngIf="enviando()">
+            <i class="fas fa-spinner fa-spin"></i> Enviando...
+          </span>
+          <span *ngIf="enviado()">
+            <i class="fas fa-check"></i> ¡Mensaje enviado!
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="landing-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <div class="brand">
+          <img [src]="logoFooter" alt="Inmobiliaria Ivan" class="brand-logo" />
+        </div>
+        <p>
+          Empresa peruana con RUC {{ ruc }}, dedicada a la venta de
+          lotes de vivienda con título de propiedad en Carabayllo.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Enlaces</h4>
+        <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
+        <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
+        <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
+        <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+        <a routerLink="/login">Iniciar Sesión</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Proyectos</h4>
+        <a href="#proyectos" (click)="scrollA('proyectos', $event)">Los Pinos de Carabayllo</a>
+        <a href="#proyectos" (click)="scrollA('proyectos', $event)">Lomas de Carabayllo</a>
+        <a href="#proyectos" (click)="scrollA('proyectos', $event)">Villa El Sol</a>
+        <a href="#proyectos" (click)="scrollA('proyectos', $event)">Praderas del Norte</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <a [href]="whatsappUrl" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> +51 {{ telefono }}</a>
+        <a [href]="'tel:+51' + telefonoLimpio"><i class="fas fa-phone-alt"></i> {{ telefono }}</a>
+        <a [href]="'mailto:' + correo"><i class="fas fa-envelope"></i> {{ correo }}</a>
+        <span><i class="fas fa-map-marker-alt"></i> Carabayllo, Lima</span>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© {{ anioActual }} Inmobiliaria Constructora Ivan E.I.R.L · RUC {{ ruc }} · Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Botón flotante WhatsApp -->
+<a [href]="whatsappUrl" target="_blank" rel="noopener" class="fab-whatsapp" title="Hablar por WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>

@@ -248,6 +248,11 @@ $red:         #dc2626;
     background:   #dcfce7;
     padding:      2px 8px;
     border-radius: 20px;
+
+    &.badge-pendiente {
+      color:      #b45309;
+      background: #fef3c7;
+    }
   }
 
   .servicio-icon { font-size: 2rem; }

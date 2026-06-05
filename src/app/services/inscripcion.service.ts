@@ -44,6 +44,13 @@ export interface PagoInscripcionDTO {
   numeroLote:        string | null;
   idPrograma:        number | null;
   nombrePrograma:    string | null;
+  // Campos admin
+  anulado?:          boolean;
+  motivoAnulacion?:  string;
+  fechaAnulacion?:   string;
+  anuladoPor?:       string;
+  nombreCliente?:    string;
+  moneda?:           'USD' | 'PEN';
 }
 
 @Injectable({

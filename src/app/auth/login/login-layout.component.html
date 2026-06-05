@@ -1,0 +1,85 @@
+<div class="login-split">
+  <!-- Panel izquierdo: Branding -->
+  <aside class="branding-panel">
+    <!-- Logo en la esquina superior izquierda, a la misma altura que el botón "Volver al inicio" -->
+    <div class="brand">
+      <img [src]="logoBranding" alt="Inmobiliaria Ivan - Constructora E.I.R.L" class="brand-logo" />
+    </div>
+
+    <!-- Botón "Volver al inicio" en la esquina superior derecha del panel -->
+    <a routerLink="/" class="back-home">
+      <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+
+    <div class="branding-content">
+      <div class="branding-hero">
+        <h1>Bienvenido de vuelta</h1>
+        <p>
+          Accede al sistema para gestionar clientes, contratos, lotes y
+          reportes de tu inmobiliaria.
+        </p>
+
+        <ul class="branding-features">
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Gestión integral de ventas y cobranzas</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Reportes en tiempo real</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Acceso seguro con autenticación JWT</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Plataforma multi-rol (Administrador, Secretaria, Soporte)</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="branding-footer">
+        <a [href]="whatsappUrl" target="_blank" rel="noopener" class="support-link">
+          <i class="fab fa-whatsapp"></i>
+          ¿Necesitas ayuda? Contáctanos
+        </a>
+        <p>© {{ anioActual }} Inmobiliaria Ivan · RUC 20537853108</p>
+      </div>
+    </div>
+
+    <div class="branding-bg">
+      <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop"
+           alt="" aria-hidden="true" />
+      <div class="branding-overlay"></div>
+      <div class="branding-glow"></div>
+    </div>
+  </aside>
+
+  <!-- Panel derecho: Formulario -->
+  <main class="form-panel">
+    <div class="form-wrapper">
+      <div class="form-mobile-brand">
+        <img [src]="logoMobile" alt="Inmobiliaria Ivan" class="form-mobile-logo" />
+      </div>
+
+      <a routerLink="/" class="form-mobile-back">
+        <i class="fas fa-arrow-left"></i> Inicio
+      </a>
+
+      <div class="form-header">
+        <h2>Iniciar sesión</h2>
+        <p>Ingresa tus credenciales para acceder al sistema</p>
+      </div>
+
+      <app-login></app-login>
+
+      <div class="form-footer">
+        <p>
+          <i class="fas fa-shield-alt"></i>
+          Tus credenciales están protegidas con encriptación.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

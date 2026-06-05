@@ -174,10 +174,16 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
 
     if (!tienePendLuz && !tienePendAgua) {
       // Sin pendientes → Paso 1 normal, pasando qué servicios ya están inscritos
+      // Bloquear si está pagado O si tiene pendiente de pago
       this.modalInscripcion.abrirModal(
         contrato.idContrato,
         undefined,
-        { tieneLuz: contrato.tieneLuz, tieneAgua: contrato.tieneAgua }
+        {
+          tieneLuz:           contrato.tieneLuz,
+          tieneAgua:          contrato.tieneAgua,
+          tienePendienteLuz:  contrato.tienePendienteLuz,
+          tienePendienteAgua: contrato.tienePendienteAgua
+        }
       );
       return;
     }
@@ -215,10 +221,17 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
     const c = this.selectorContrato;
     this.mostrarSelectorPendiente = false;
     this.selectorContrato = undefined;
+    // Bloquear un servicio si ya está pagado (tieneLuz/tieneAgua)
+    // O si tiene una inscripción pendiente de pago (tienePendienteLuz/tienePendienteAgua)
     this.modalInscripcion.abrirModal(
       c.idContrato,
       undefined,
-      { tieneLuz: c.tieneLuz, tieneAgua: c.tieneAgua }
+      {
+        tieneLuz:            c.tieneLuz,
+        tieneAgua:           c.tieneAgua,
+        tienePendienteLuz:   c.tienePendienteLuz,
+        tienePendienteAgua:  c.tienePendienteAgua
+      }
     );
   }
 

@@ -3,18 +3,22 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+import { jwtDecode } from 'jwt-decode';
 
 import { ContratoService } from '../../services/contrato.service';
 import { ProgramaService } from '../../services/programa.service';
 import { LetrasCambioService } from '../../services/letracambio.service';
 import { PagoLetraService } from '../../services/pagoletra.service';
 import { MoraService } from '../../services/mora.service';
+import { TokenService } from '../../auth/token.service';
 
 import { Programa } from '../../models/programa.model';
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { MoraResumenContratoDTO } from '../../dto/moraresumencontrato.dto';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 import { ContratoResponseDTO } from '../../dto/contratoreponse.dto';
+import { PagoInicialResponseDTO } from '../../dto/pagoinicialresponse.dto';
 
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
 import { PagoletraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
@@ -103,6 +107,10 @@ export class PagoletraListarComponent implements OnInit {
   buscandoModal: boolean = false;
   modosBusquedaModal: 'nombre' | 'id' = 'nombre';
 
+  // ── PAGO INICIAL ────────────────────────────────────────────────────────────
+  esAdministrador: boolean = false;
+  anulandoPagoInicial: boolean = false;
+
   constructor(
     private contratoService: ContratoService,
     private programaService: ProgramaService,
@@ -111,10 +119,23 @@ export class PagoletraListarComponent implements OnInit {
     private moraService: MoraService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
+    private tokenService: TokenService,
   ) {}
 
   ngOnInit(): void {
     this.cargarProgramas();
+    this.verificarRol();
+  }
+
+  private verificarRol(): void {
+    const token = this.tokenService.getToken();
+    if (!token) return;
+    try {
+      const decoded: { rol: string } = jwtDecode(token);
+      this.esAdministrador = decoded.rol === 'ROLE_ADMINISTRADOR';
+    } catch {
+      this.esAdministrador = false;
+    }
   }
 
   cargarProgramas(): void {
@@ -778,5 +799,56 @@ formatearNumeroLote(): void {
     if (event.key === 'Enter') {
       this.buscarEnModal();
     }
+  }
+
+  // ── ANULACIÓN DE PAGO INICIAL ────────────────────────────────────────────────
+
+  anularPagoInicial(): void {
+    const idContrato = this.contratoEncontrado?.idContrato;
+    const pagoInicial: PagoInicialResponseDTO | undefined = this.contratoEncontrado?.pagoInicial;
+
+    if (!idContrato || !pagoInicial) return;
+
+    Swal.fire({
+      title: '¿Anular pago inicial?',
+      html: `
+        <p style="margin-bottom:12px">Esta acción es <strong>irreversible</strong>. El pago quedará marcado como anulado.</p>
+        <textarea id="motivo-anulacion-inicial" class="swal2-textarea"
+          placeholder="Motivo de anulación (obligatorio)..."
+          rows="3" style="width:100%;resize:vertical"></textarea>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, anular',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      preConfirm: () => {
+        const motivo = (document.getElementById('motivo-anulacion-inicial') as HTMLTextAreaElement)?.value?.trim();
+        if (!motivo) {
+          Swal.showValidationMessage('El motivo es obligatorio');
+          return false;
+        }
+        return motivo;
+      }
+    }).then(result => {
+      if (!result.isConfirmed || !result.value) return;
+      this.anulandoPagoInicial = true;
+      this.contratoService.anularPagoInicial(idContrato, result.value).subscribe({
+        next: (pagoAnulado) => {
+          this.anulandoPagoInicial = false;
+          // Actualizar el pagoInicial en el contrato local sin recargar todo
+          this.contratoEncontrado = {
+            ...this.contratoEncontrado,
+            pagoInicial: pagoAnulado
+          };
+          this.toastr.success('Pago inicial anulado correctamente', 'Éxito');
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.anulandoPagoInicial = false;
+          const msg = err?.error?.message || 'No se pudo anular el pago inicial';
+          this.toastr.error(msg, 'Error');
+        }
+      });
+    });
   }
 }

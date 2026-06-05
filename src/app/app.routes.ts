@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
+import { LandingComponent } from './components/landing/landing.component';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
 
@@ -13,6 +14,14 @@ import { AdminMenuComponent } from './components/menu-admin/admin-menu.component
 
 // Importa los dashboards para los menús
 import { SecretariaDashboard } from './components/secretaria-dashboard/secretaria-dashboard';
+
+// ── Admin: subrutas ──────────────────────────────────────────────────────────
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { AdminGestionUsuariosComponent } from './components/admin-gestion-usuarios/admin-gestion-usuarios.component';
+import { AdminAnulacionesLetrasComponent } from './components/admin-anulaciones-letras/admin-anulaciones-letras.component';
+import { AdminAnulacionesMorasComponent } from './components/admin-anulaciones-moras/admin-anulaciones-moras.component';
+import { AdminAnulacionesInicialesComponent } from './components/admin-anulaciones-iniciales/admin-anulaciones-iniciales.component';
+import { AdminAnulacionesInscripcionesComponent } from './components/admin-anulaciones-inscripciones/admin-anulaciones-inscripciones.component';
 
 // Clientes
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
@@ -58,8 +67,8 @@ import { ReporteMoraComponent } from './components/reporte-mora/reporte-mora.com
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
 
 export const routes: Routes = [
+  { path: '', component: LandingComponent },
   { path: 'login', component: LoginLayoutComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
 
   // ── Secretaria ────────────────────────────────────────────────────────────
   {
@@ -104,10 +113,10 @@ export const routes: Routes = [
       { path: 'parceleros', component: ParceleroListarComponent },
 
       // Servicios Básicos
-      { path: 'servicios-basicos/inscripciones',        component: InscripcionListarComponent },
-      { path: 'servicios-basicos/inscripciones/pagos',  component: PagoInscripcionListarComponent },
-      { path: 'servicios-basicos',                       component: LecturaPlanillaComponent },
-      { path: 'servicios-basicos/listar',                component: RecibosListarComponent },
+      { path: 'servicios-basicos/inscripciones',       component: InscripcionListarComponent },
+      { path: 'servicios-basicos/inscripciones/pagos', component: PagoInscripcionListarComponent },
+      { path: 'servicios-basicos',                     component: LecturaPlanillaComponent },
+      { path: 'servicios-basicos/listar',              component: RecibosListarComponent },
 
       // Mensajería
       { path: 'mensajeria', component: MensajeriaComponent }
@@ -130,6 +139,15 @@ export const routes: Routes = [
     path: 'admin-menu',
     component: AdminMenuComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ROLE_ADMINISTRADOR'] }
+    data: { roles: ['ROLE_ADMINISTRADOR'] },
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard',          component: AdminDashboardComponent },
+      { path: 'gestion-usuarios',   component: AdminGestionUsuariosComponent },
+      { path: 'anulaciones/letras',         component: AdminAnulacionesLetrasComponent },
+      { path: 'anulaciones/moras',          component: AdminAnulacionesMorasComponent },
+      { path: 'anulaciones/iniciales',      component: AdminAnulacionesInicialesComponent },
+      { path: 'anulaciones/inscripciones',  component: AdminAnulacionesInscripcionesComponent }
+    ]
   }
 ];

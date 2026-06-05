@@ -1,0 +1,241 @@
+<div class="anulaciones-page">
+
+  <!-- Toast -->
+  <div class="toast-notification" *ngIf="toast.mostrar" [ngClass]="toast.tipo">
+    <i class="fas" [ngClass]="toast.tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
+    <span>{{ toast.mensaje }}</span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <i class="fas fa-file-invoice-dollar"></i>
+      <div>
+        <h2>Anulaciones <i class="bi bi-chevron-double-right separator-icon"></i> Pagos de Letras</h2>
+        <p>Gestión y anulación de pagos registrados en letras de cambio</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-panel">
+    <div class="filtro-group">
+      <label>N° Comprobante</label>
+      <input type="text" class="form-control" placeholder="RB01-XXXXXX"
+             [(ngModel)]="filtros.numeroComprobante">
+    </div>
+    <div class="filtro-group">
+      <label>Programa</label>
+      <input type="text" class="form-control" placeholder="Programa..."
+             [(ngModel)]="filtros.programa">
+    </div>
+    <div class="filtro-group">
+      <label>Manzana</label>
+      <input type="text" class="form-control" placeholder="Mz..."
+             [(ngModel)]="filtros.manzana">
+    </div>
+    <div class="filtro-group">
+      <label>Lote</label>
+      <input type="text" class="form-control" placeholder="Lt..."
+             [(ngModel)]="filtros.lote">
+    </div>
+    <div class="filtro-group">
+      <label>Fecha Desde</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.fechaDesde">
+    </div>
+    <div class="filtro-group">
+      <label>Fecha Hasta</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.fechaHasta">
+    </div>
+    <div class="filtro-acciones">
+      <button class="btn-buscar" (click)="aplicarFiltros()">
+        <i class="fas fa-search"></i> Buscar
+      </button>
+      <button class="btn-limpiar" (click)="limpiarFiltros()">
+        <i class="fas fa-times"></i> Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>N° Comprobante</th>
+          <th>Letra</th>
+          <th>Fecha Pago</th>
+          <th>Importe</th>
+          <th>Medio Pago</th>
+          <th>Estado</th>
+          <th>Motivo Anulación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="cargando">
+        <tr>
+          <td colspan="8" class="loading-cell">
+            <div class="spinner"></div>
+            <p>Cargando pagos...</p>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!cargando">
+        <tr *ngFor="let pago of pagosFiltrados" [class.anulado]="pago.anulado">
+          <td>
+            <span class="comprobante-badge">{{ pago.numeroComprobante || '—' }}</span>
+          </td>
+          <td>{{ pago.numeroLetra || '—' }}</td>
+          <td>{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
+          <td class="monto">{{ pago.moneda === 'USD' ? '$' : 'S/' }} {{ pago.importePagado | number:'1.2-2' }}</td>
+          <td>{{ pago.medioPago || '—' }}</td>
+          <td>
+            <span class="badge-estado" [ngClass]="pago.anulado ? 'anulado' : 'vigente'">
+              {{ pago.anulado ? 'ANULADO' : 'VIGENTE' }}
+            </span>
+          </td>
+          <td class="motivo">{{ pago.motivoAnulacion || '—' }}</td>
+          <td>
+            <div class="acciones">
+            <button class="btn-icon btn-pdf" title="Descargar PDF"
+                    (click)="descargarComprobante(pago)">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+            <button class="btn-icon btn-anular" title="Anular"
+                    *ngIf="!pago.anulado"
+                    (click)="abrirModalAnular(pago)">
+              <i class="fas fa-ban"></i>
+            </button>
+            <button class="btn-icon btn-eliminar" title="Eliminar"
+                    (click)="abrirModalEliminar(pago)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="pagosFiltrados.length === 0">
+          <td colspan="8" class="empty-cell">
+            <i class="fas fa-inbox"></i>
+            <p>No se encontraron pagos con los filtros aplicados.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cards móvil (ocultas por defecto, se activan con CSS) -->
+  <div class="cards-loading" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Cargando pagos...</p>
+  </div>
+
+  <div class="cards-container" *ngIf="!cargando">
+    <article class="pago-card" *ngFor="let pago of pagosFiltrados" [class.anulado]="pago.anulado">
+      <header class="card-head">
+        <span class="comprobante-badge">{{ pago.numeroComprobante || '—' }}</span>
+        <span class="badge-estado" [ngClass]="pago.anulado ? 'anulado' : 'vigente'">
+          {{ pago.anulado ? 'ANULADO' : 'VIGENTE' }}
+        </span>
+      </header>
+      <div class="card-monto">{{ pago.moneda === 'USD' ? '$' : 'S/' }} {{ pago.importePagado | number:'1.2-2' }}</div>
+      <div class="card-grid">
+        <div class="card-item">
+          <span class="card-label">Letra</span>
+          <span class="card-value">{{ pago.numeroLetra || '—' }}</span>
+        </div>
+        <div class="card-item">
+          <span class="card-label">Fecha Pago</span>
+          <span class="card-value">{{ pago.fechaPago | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="card-item">
+          <span class="card-label">Medio Pago</span>
+          <span class="card-value">{{ pago.medioPago || '—' }}</span>
+        </div>
+      </div>
+      <div class="card-motivo" *ngIf="pago.motivoAnulacion">
+        <i class="fas fa-comment-dots"></i>
+        <span>{{ pago.motivoAnulacion }}</span>
+      </div>
+      <div class="card-acciones">
+        <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+        <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado" (click)="abrirModalAnular(pago)">
+          <i class="fas fa-ban"></i> Anular
+        </button>
+        <button class="btn-icon btn-eliminar" title="Eliminar" (click)="abrirModalEliminar(pago)">
+          <i class="fas fa-trash-alt"></i> Eliminar
+        </button>
+      </div>
+    </article>
+
+    <div class="empty-state" *ngIf="pagosFiltrados.length === 0">
+      <i class="fas fa-inbox"></i>
+      <p>No se encontraron pagos con los filtros aplicados.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Anular -->
+<div class="modal-overlay" *ngIf="mostrarModalAnular">
+  <div class="custom-modal modal-anular">
+    <div class="modal-header danger">
+      <h4><i class="fas fa-ban"></i> Anular Pago de Letra</h4>
+      <button class="close-btn" (click)="cerrarModalAnular()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="pagoSeleccionado">
+      <div class="info-pago">
+        <div class="info-row">
+          <span class="label">Comprobante:</span>
+          <span class="value">{{ pagoSeleccionado.numeroComprobante }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Importe:</span>
+          <span class="value monto">{{ pagoSeleccionado.moneda === 'USD' ? '$' : 'S/' }} {{ pagoSeleccionado.importePagado | number:'1.2-2' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Fecha Pago:</span>
+          <span class="value">{{ pagoSeleccionado.fechaPago | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label>MOTIVO DE ANULACIÓN <span class="requerido">*</span></label>
+        <textarea class="form-control dark-input" rows="3"
+                  [(ngModel)]="motivoAnulacion"
+                  placeholder="Ingresa el motivo de la anulación..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-confirmar-anular" (click)="confirmarAnulacion()"
+              [disabled]="!motivoAnulacion.trim() || procesando">
+        <i class="fas fa-ban"></i> {{ procesando ? 'Procesando...' : 'Confirmar Anulación' }}
+      </button>
+      <button class="btn-cancelar" (click)="cerrarModalAnular()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal-overlay" *ngIf="mostrarModalEliminar">
+  <div class="custom-modal modal-eliminar">
+    <div class="modal-header danger">
+      <h4><i class="fas fa-trash-alt"></i> Eliminar Pago</h4>
+      <button class="close-btn" (click)="cerrarModalEliminar()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="pagoAEliminar">
+      <div class="confirm-message">
+        <i class="fas fa-exclamation-triangle warn-icon"></i>
+        <p>¿Estás seguro de que deseas <strong>eliminar permanentemente</strong> el pago
+          <strong>{{ pagoAEliminar.numeroComprobante }}</strong>?
+        </p>
+        <p class="sub-msg">Esta acción no se puede deshacer.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-confirmar-eliminar" (click)="confirmarEliminar()" [disabled]="procesando">
+        <i class="fas fa-trash-alt"></i> {{ procesando ? 'Eliminando...' : 'Sí, Eliminar' }}
+      </button>
+      <button class="btn-cancelar" (click)="cerrarModalEliminar()">Cancelar</button>
+    </div>
+  </div>
+</div>

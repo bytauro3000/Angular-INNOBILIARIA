@@ -36,6 +36,10 @@ export class InscripcionServiciosInsertarComponent {
   luzInscrita:  boolean = false;
   aguaInscrita: boolean = false;
 
+  /** Servicios que tienen inscripción con pago pendiente (no completamente pagados) */
+  luzPendiente:  boolean = false;
+  aguaPendiente: boolean = false;
+
   idInscripcion!: number;
   montoTotal: number = 0;
   montoAcumulado: number = 0;
@@ -75,13 +79,17 @@ export class InscripcionServiciosInsertarComponent {
   abrirModal(
     idContrato: number,
     inscripcionPendiente?: { idInscripcion: number; tipoServicio: TipoServicios; montoTotal: number; montoAcumulado: number },
-    serviciosInscritos?: { tieneLuz: boolean; tieneAgua: boolean }
+    serviciosInscritos?: { tieneLuz: boolean; tieneAgua: boolean; tienePendienteLuz?: boolean; tienePendienteAgua?: boolean }
   ): void {
     this.idContrato    = idContrato;
     this.loading       = false;
     this.estaAbierto   = true;
+    // tieneLuz/tieneAgua = pagado completamente
     this.luzInscrita   = serviciosInscritos?.tieneLuz  ?? false;
     this.aguaInscrita  = serviciosInscritos?.tieneAgua ?? false;
+    // pendientes = inscrito pero sin terminar de pagar
+    this.luzPendiente  = serviciosInscritos?.tienePendienteLuz  ?? false;
+    this.aguaPendiente = serviciosInscritos?.tienePendienteAgua ?? false;
     this.resetearPaso2();
 
     if (inscripcionPendiente) {
@@ -93,12 +101,14 @@ export class InscripcionServiciosInsertarComponent {
       this.montoAbono     = this.saldoPendiente;
       this.paso           = 2;
     } else {
-      // Auto-seleccionar el único servicio disponible si el otro ya está inscrito
-      if (!this.luzInscrita && !this.aguaInscrita) {
+      // Auto-seleccionar el único servicio disponible si el otro ya está inscrito o pendiente
+      const luzBloqueada  = this.luzInscrita  || this.luzPendiente;
+      const aguaBloqueada = this.aguaInscrita || this.aguaPendiente;
+      if (!luzBloqueada && !aguaBloqueada) {
         this.tipoServicio = TipoServicios.LUZ;
-      } else if (this.luzInscrita && !this.aguaInscrita) {
+      } else if (luzBloqueada && !aguaBloqueada) {
         this.tipoServicio = TipoServicios.AGUA;
-      } else if (!this.luzInscrita && this.aguaInscrita) {
+      } else if (!luzBloqueada && aguaBloqueada) {
         this.tipoServicio = TipoServicios.LUZ;
       }
       this.paso = 1;

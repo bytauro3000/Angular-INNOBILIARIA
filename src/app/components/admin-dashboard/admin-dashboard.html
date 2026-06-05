@@ -1,0 +1,233 @@
+<div class="dashboard-page">
+
+  <!-- ═══════════════════ HERO HEADER ═══════════════════ -->
+  <header class="hero-header">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="dot"></span>
+          <span>Sistema en línea</span>
+        </div>
+        <h1>{{ saludo }}, <span class="hero-name">Administrador</span></h1>
+        <p class="hero-sub">Aquí tienes el resumen general de tu inmobiliaria en tiempo real.</p>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-time">
+          <i class="far fa-clock"></i>
+          <span>{{ horaActual }}</span>
+        </div>
+        <div class="hero-date">
+          <i class="far fa-calendar-alt"></i>
+          <span>{{ fechaSeleccionada | date:"EEEE d 'de' MMMM, y":'':'es' }}</span>
+        </div>
+        <button class="btn-refresh" (click)="refrescar()" [disabled]="cargandoTotales || cargandoIngresos" title="Refrescar datos">
+          <i class="fas fa-sync-alt" [class.spinning]="cargandoTotales || cargandoIngresos"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ KPIs ═══════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon"><i class="fas fa-chart-pie"></i></span>
+        <div>
+          <h2>Indicadores Generales</h2>
+          <p>Visión general del sistema</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-grid" *ngIf="!cargandoTotales && totales; else cargandoKpi">
+      <article class="kpi-card {{ card.color }}" *ngFor="let card of kpiCards; let i = index" [style.animation-delay.ms]="i * 60">
+        <div class="kpi-icon">
+          <i class="fas {{ card.icon }}"></i>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">{{ card.label }}</span>
+          <span class="kpi-value">{{ totales![card.key] }}</span>
+        </div>
+        <div class="kpi-bar">
+          <div class="kpi-bar-fill"></div>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #cargandoKpi>
+      <div class="loading-state" *ngIf="cargandoTotales">
+        <div class="spinner"></div>
+        <p>Cargando indicadores...</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <!-- ═══════════════════ INGRESOS ═══════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon money"><i class="fas fa-coins"></i></span>
+        <div>
+          <h2>Ingresos del Día</h2>
+          <p>Recaudación desglosada por tipo de pago</p>
+        </div>
+      </div>
+
+      <div class="date-picker-wrap">
+        <label>Fecha</label>
+        <div class="date-input">
+          <i class="far fa-calendar"></i>
+          <input type="date" [(ngModel)]="fechaSeleccionada" (change)="onFechaChange()">
+        </div>
+      </div>
+    </div>
+
+    <div class="ingresos-grid" *ngIf="!cargandoIngresos && ingresos; else cargandoIng">
+
+      <article class="ingreso-card {{ card.color }}" *ngFor="let card of ingresosCards; let i = index" [style.animation-delay.ms]="i * 70">
+        <div class="ingreso-head">
+          <div class="ingreso-icon"><i class="fas {{ card.icon }}"></i></div>
+          <span class="ingreso-pct">{{ getPorcentajeIngreso(card.key) }}%</span>
+        </div>
+        <span class="ingreso-label">{{ card.label }}</span>
+        <span class="ingreso-monto">S/ {{ getMonto(card.key) | number:'1.2-2' }}</span>
+        <div class="ingreso-bar">
+          <div class="ingreso-bar-fill" [style.width.%]="getPorcentajeIngreso(card.key)"></div>
+        </div>
+        <span class="ingreso-cant">
+          <i class="fas fa-receipt"></i> {{ getCantidad(card.key) }} registros
+        </span>
+      </article>
+
+      <!-- Recaudación total como tarjeta del grid -->
+      <article class="ingreso-card green total-card" style="animation-delay: 280ms">
+        <div class="ingreso-head">
+          <div class="ingreso-icon"><i class="fas fa-wallet"></i></div>
+          <span class="ingreso-pct total-pct">100%</span>
+        </div>
+        <span class="ingreso-label">Recaudación Total</span>
+        <span class="ingreso-monto total-monto">S/ {{ ingresos!.totalGeneral | number:'1.2-2' }}</span>
+        <div class="ingreso-bar">
+          <div class="ingreso-bar-fill" style="width: 100%"></div>
+        </div>
+        <span class="ingreso-cant">
+          <i class="fas fa-receipt"></i> {{ getTotalRegistros() }} registros totales
+        </span>
+      </article>
+    </div>
+
+    <ng-template #cargandoIng>
+      <div class="loading-state" *ngIf="cargandoIngresos">
+        <div class="spinner"></div>
+        <p>Cargando ingresos...</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <!-- ═══════════════════ LOTES POR PROGRAMA ═══════════════════ -->
+  <section class="section" *ngIf="totales && getGraficoLotesKeys().length > 0">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon lotes"><i class="fas fa-map"></i></span>
+        <div>
+          <h2>Estado de Lotes por Programa</h2>
+          <p>Distribución de disponibilidad, separados y vendidos</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lotes-table-container">
+      <table class="lotes-table">
+        <thead>
+          <tr>
+            <th>Programa</th>
+            <th class="text-center disponible">Disponibles</th>
+            <th class="text-center separado">Separados</th>
+            <th class="text-center vendido">Vendidos</th>
+            <th class="text-center">Total</th>
+            <th>Ocupación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prog of getGraficoLotesKeys(); let i = index" [style.animation-delay.ms]="i * 50" class="lote-row">
+            <td class="prog-name"><i class="fas fa-map-pin"></i> {{ prog }}</td>
+            <td class="text-center disponible-val">{{ totales!.graficoLotes[prog].Disponible || 0 }}</td>
+            <td class="text-center separado-val">{{ totales!.graficoLotes[prog].Separado || 0 }}</td>
+            <td class="text-center vendido-val">{{ totales!.graficoLotes[prog].Vendido || 0 }}</td>
+            <td class="text-center total-val">{{ getTotalLotesPrograma(prog) }}</td>
+            <td>
+              <div class="barra-progreso">
+                <div class="barra-disponible"
+                     [style.width.%]="getPorcentaje(totales!.graficoLotes[prog].Disponible || 0, getTotalLotesPrograma(prog))">
+                </div>
+                <div class="barra-separado"
+                     [style.width.%]="getPorcentaje(totales!.graficoLotes[prog].Separado || 0, getTotalLotesPrograma(prog))">
+                </div>
+                <div class="barra-vendido"
+                     [style.width.%]="getPorcentaje(totales!.graficoLotes[prog].Vendido || 0, getTotalLotesPrograma(prog))">
+                </div>
+              </div>
+              <div class="barra-leyenda">
+                <span class="disponible">{{ getPorcentaje(totales!.graficoLotes[prog].Disponible || 0, getTotalLotesPrograma(prog)) }}% disp.</span>
+                <span class="vendido">{{ getPorcentaje(totales!.graficoLotes[prog].Vendido || 0, getTotalLotesPrograma(prog)) }}% vend.</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CONTRATOS ═══════════════════ -->
+  <section class="section" *ngIf="totales && getGraficoContratosKeys().length > 0">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon contratos"><i class="fas fa-file-contract"></i></span>
+        <div>
+          <h2>Tipo de Contratos</h2>
+          <p>Contratos al contado vs financiados por programa</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contratos-grid">
+      <article class="contrato-card" *ngFor="let prog of getGraficoContratosKeys(); let i = index" [style.animation-delay.ms]="i * 60">
+        <div class="contrato-head">
+          <i class="fas fa-folder-open"></i>
+          <h3>{{ prog }}</h3>
+        </div>
+        <div class="contrato-body">
+          <div class="contrato-row contado">
+            <div class="contrato-row-info">
+              <span class="ctr-icon"><i class="fas fa-money-bill-wave"></i></span>
+              <span class="ctr-label">Al contado</span>
+            </div>
+            <span class="ctr-value">{{ totales!.graficoContratos[prog].CONTADO || 0 }}</span>
+          </div>
+          <div class="contrato-row financiado">
+            <div class="contrato-row-info">
+              <span class="ctr-icon"><i class="fas fa-hand-holding-usd"></i></span>
+              <span class="ctr-label">Financiado</span>
+            </div>
+            <span class="ctr-value">{{ totales!.graficoContratos[prog].FINANCIADO || 0 }}</span>
+          </div>
+        </div>
+        <div class="contrato-barra">
+          <div class="contrato-seg contado"
+               [style.width.%]="getPorcentaje(totales!.graficoContratos[prog].CONTADO || 0, getTotalContratosPrograma(prog))">
+          </div>
+          <div class="contrato-seg financiado"
+               [style.width.%]="getPorcentaje(totales!.graficoContratos[prog].FINANCIADO || 0, getTotalContratosPrograma(prog))">
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</div>

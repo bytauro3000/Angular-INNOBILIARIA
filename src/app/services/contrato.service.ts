@@ -89,4 +89,11 @@ export class ContratoService {
       formData
     );
   }
+
+  anularPagoInicial(idContrato: number, motivo: string): Observable<import('../dto/pagoinicialresponse.dto').PagoInicialResponseDTO> {
+    return this.http.patch<import('../dto/pagoinicialresponse.dto').PagoInicialResponseDTO>(
+      `${this.apiUrl}/${idContrato}/pago-inicial/anular`,
+      { motivo }
+    );
+  }
 }
