@@ -38,7 +38,7 @@ export class AdminAnulacionesService {
   }
 
   eliminarPagoLetra(idPago: number): Observable<void> {
-    return this.http.delete<void>(`${this.urlPagos}/eliminar/${idPago}`);
+    return this.http.delete<void>(`${this.urlPagos}/${idPago}`);
   }
 
   /* ── PAGOS MORAS ──────────────────────────────────────── */
