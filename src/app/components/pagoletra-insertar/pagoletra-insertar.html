@@ -172,7 +172,7 @@
                 <span class="badge-manual" *ngIf="modoManualComprobante">Manual</span>
               </label>
               <div class="input-group">
-                <input type="text" id="numeroComprobantePreview" class="form-control"
+                <input type="text" id="numeroComprobantePreview" #numeroComprobanteInput class="form-control"
                        [value]="cargandoPreview ? 'Calculando...' : (modoManualComprobante ? numeroComprobanteManual : (numeroComprobantePreview || '—'))"
                        [readonly]="!modoManualComprobante || cargandoPreview"
                        [class.input-manual]="modoManualComprobante"

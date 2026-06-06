@@ -26,6 +26,7 @@ import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.comp
 })
 export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
+  @ViewChild('numeroComprobanteInput') numeroComprobanteInput!: ElementRef<HTMLInputElement>;
   private modal?: bootstrap.Modal;
 
   @Input() letra!: LetraCambio;
@@ -296,6 +297,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (this.modoManualComprobante) {
       this.numeroComprobanteManual = this.seriePrefix;
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
+      setTimeout(() => {
+        const input = this.numeroComprobanteInput?.nativeElement;
+        if (!input) return;
+        input.focus();
+        const pos = this.seriePrefix.length;
+        input.setSelectionRange(pos, pos);
+      }, 0);
     } else {
       this.numeroComprobanteManual = '';
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
