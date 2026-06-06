@@ -19,7 +19,12 @@ export class OcrVoucherService {
     if (this.workerPromise) return this.workerPromise;
 
     this.workerPromise = (async () => {
-      const Tesseract = await import('tesseract.js');
+      // Tesseract.js v7 es CommonJS: `module.exports = { createWorker, ... }`.
+      // El bundler de Angular para producción envuelve el CJS y deja los named
+      // exports en `.default`. En dev server expone los named exports directo.
+      // Usamos `??` para que funcione en ambos entornos.
+      const TesseractModule = await import('tesseract.js');
+      const Tesseract = (TesseractModule as any).default ?? TesseractModule;
       const worker = await Tesseract.createWorker('spa', 1, {
         logger: () => {}
       });
