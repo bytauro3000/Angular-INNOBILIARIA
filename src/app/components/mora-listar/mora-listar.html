@@ -38,12 +38,12 @@
             <thead>
               <tr>
                 <th>Letra</th>
-                <th>Vencimiento</th>
+                <th>F. Vencimiento</th>
+                <th>F. Pago</th>
                 <th>Días</th>
-                <th>Interés 5%</th>
-                <th>Diario</th>
+                <th>Mora 5%</th>
+                <th>Mora Diaria</th>
                 <th>Total Mora</th>
-                <th>Fecha Reg.</th>
                 <th>Estado</th>
                 <th>Pagos</th>
                 <th class="text-center">Acciones</th>
@@ -56,16 +56,16 @@
                 'row-anulado':   mora.estadoMora === 'ANULADO'
               }">
                 <td data-label="Letra">{{ mora.numeroLetra }}</td>
-                <td data-label="Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' }}</td>
+                <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' }}</td>
+                <td data-label="F. Pago">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' }}</td>
                 <td data-label="Días" class="text-center">
                   <span class="dias-chip">{{ mora.diasMora }}</span>
                 </td>
-                <td data-label="Interés 5%">{{ simboloMoneda }} {{ mora.montoPorcentaje | number:'1.2-2' }}</td>
-                <td data-label="Diario">{{ simboloMoneda }} {{ mora.montoDiario | number:'1.2-2' }}</td>
+                <td data-label="Mora 5%">{{ simboloMoneda }} {{ mora.montoPorcentaje | number:'1.2-2' }}</td>
+                <td data-label="Mora Diaria">{{ simboloMoneda }} {{ mora.montoDiario | number:'1.2-2' }}</td>
                 <td data-label="Total Mora" class="mora-total-cell">
                   {{ simboloMoneda }} {{ mora.montoMoraTotal | number:'1.2-2' }}
                 </td>
-                <td data-label="Fecha Reg.">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' }}</td>
                 <td data-label="Estado">
                   <span class="estado-badge" [ngClass]="{
                     'estado-pendiente': mora.estadoMora === 'PENDIENTE',

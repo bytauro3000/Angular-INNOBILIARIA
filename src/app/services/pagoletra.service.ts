@@ -55,7 +55,7 @@ export class PagoLetraService {
   }
 
   eliminarPago(idPago: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/eliminar/${idPago}`);
+    return this.http.delete<void>(`${this.apiUrl}/${idPago}`);
   }
 
   anularPago(idPago: number, motivo: string): Observable<PagoLetraResponse> {
