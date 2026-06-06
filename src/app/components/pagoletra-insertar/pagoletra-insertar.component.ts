@@ -113,6 +113,25 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
       this.pagarMoraTambien = false;
       this.moraDecisionTomada = false;
     }
+
+    this.cargarTipoComprobanteSugerido();
+  }
+
+  private cargarTipoComprobanteSugerido(): void {
+    if (!this.contrato?.idContrato) return;
+    this.pagoService.listarPorContrato(this.contrato.idContrato).subscribe({
+      next: (pagos) => {
+        if (!pagos || pagos.length === 0) return;
+        const pagosValidos = pagos.filter(p => !p.anulado);
+        if (pagosValidos.length === 0) return;
+        const ultimoPago = pagosValidos.reduce((max, p) => p.idPago > max.idPago ? p : max);
+        if (ultimoPago.tipoComprobante) {
+          this.pagoRequest.tipoComprobante = ultimoPago.tipoComprobante as TipoComprobante;
+          this.onTipoComprobanteChange();
+        }
+      },
+      error: () => { /* si falla, no preselecciona nada */ }
+    });
   }
 
   ngAfterViewInit(): void {

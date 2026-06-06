@@ -117,7 +117,7 @@ $border:     #e2e8f0;
     letter-spacing: 0.4px;
     padding: 10px 8px;
     white-space: nowrap;
-    text-align: left;
+    text-align: center;
   }
 
   td {
@@ -125,6 +125,7 @@ $border:     #e2e8f0;
     border-bottom: 1px solid $border;
     vertical-align: middle;
     color: $text-dark;
+    text-align: center;
   }
 
   tbody tr {
