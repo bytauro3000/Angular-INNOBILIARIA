@@ -66,6 +66,9 @@ import { ReporteMoraComponent } from './components/reporte-mora/reporte-mora.com
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
 
+// Reporte Historial de Moras (por contrato)
+import { HistorialMorasPickerComponent } from './components/historial-moras/historial-moras-picker.component';
+
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginLayoutComponent },
@@ -100,6 +103,7 @@ export const routes: Routes = [
       { path: 'contratos/editar/:id', component: ContratoEditarComponent },
       { path: 'contratos/reporte-mora', component: ReporteMoraComponent },
       { path: 'reporte-ingresos', component: ReporteIngresosComponent },
+      { path: 'historial-moras', component: HistorialMorasPickerComponent },
 
       // Pago Letras
       { path: 'pagoletras', component: PagoletraListarComponent },

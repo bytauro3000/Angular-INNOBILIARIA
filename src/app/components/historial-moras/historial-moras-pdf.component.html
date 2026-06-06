@@ -1,0 +1,309 @@
+<div class="modal-overlay" *ngIf="idContrato" (click)="cerrar.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h5>
+        <i class="bi bi-file-earmark-pdf-fill"></i>
+        Historial de Moras — Contrato #{{ idContrato }}
+      </h5>
+      <button type="button" class="btn-close-custom" (click)="cerrar.emit()" aria-label="Cerrar">&times;</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab" [class.active]="tab === 'preview'" (click)="tab = 'preview'">
+        <i class="bi bi-eye"></i> Vista Previa
+      </button>
+      <button class="tab" [class.active]="tab === 'tabla'" (click)="tab = 'tabla'">
+        <i class="bi bi-table"></i> Tabla
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <ng-container *ngIf="loading">
+        <div class="loading-skeleton">
+          <div class="skl-line w-60"></div>
+          <div class="skl-line w-80"></div>
+          <div class="skl-line w-40"></div>
+          <div class="skl-block"></div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="!loading && data">
+        <!-- ==================== VISTA PREVIA (estilo print) ==================== -->
+        <div *ngIf="tab === 'preview'" class="print-document" id="printDocument">
+          <!-- Header empresa + logo -->
+          <div class="doc-header">
+            <div class="doc-empresa">
+              <strong>INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.</strong>
+            </div>
+            <div class="doc-logo">
+              <img src="https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1773723460/logo_y1ygeg.png"
+                   alt="Logo" />
+            </div>
+          </div>
+          <div class="doc-titulo">HISTORIAL DE MORAS</div>
+          <div class="doc-kardex">KARDEX N°: <strong>{{ data.kardex }}</strong></div>
+          <div class="doc-emision">EMISION: <strong>{{ fmtFechaHora(data.fechaEmision) }}</strong></div>
+          <hr class="doc-sep" />
+
+          <!-- Bloque cliente (2 columnas: pares label/valor lado a lado) -->
+          <div class="doc-cliente">
+            <ng-container *ngIf="data.contrato.clientes?.length === 2; else unCliente">
+              <div class="pair">
+                <span class="lbl">CLIENTE 1:</span>
+                <span class="val">{{ data.contrato.clientes[0].nombre }} {{ data.contrato.clientes[0].apellidos }}</span>
+              </div>
+              <div class="pair">
+                <span class="lbl">DNI:</span>
+                <span class="val">{{ data.contrato.clientes[0].numDoc || '—' }}</span>
+              </div>
+              <div class="pair">
+                <span class="lbl">CLIENTE 2:</span>
+                <span class="val">{{ data.contrato.clientes[1].nombre }} {{ data.contrato.clientes[1].apellidos }}</span>
+              </div>
+              <div class="pair">
+                <span class="lbl">DNI:</span>
+                <span class="val">{{ data.contrato.clientes[1].numDoc || '—' }}</span>
+              </div>
+            </ng-container>
+            <ng-template #unCliente>
+              <div class="pair">
+                <span class="lbl">CLIENTE:</span>
+                <span class="val">{{ data.contrato.clientes[0]?.nombre }} {{ data.contrato.clientes[0]?.apellidos }}</span>
+              </div>
+              <div class="pair">
+                <span class="lbl">DNI:</span>
+                <span class="val">{{ data.contrato.clientes[0]?.numDoc || '—' }}</span>
+              </div>
+            </ng-template>
+
+            <div class="pair">
+              <span class="lbl">DIRECCION:</span>
+              <span class="val">{{ data.contrato.clientes[0]?.direccion }}, {{ data.contrato.clientes[0]?.distrito?.nombre }}</span>
+            </div>
+            <div class="pair">
+              <span class="lbl">TELEFONO:</span>
+              <span class="val">{{ data.contrato.clientes[0]?.celular || '—' }}</span>
+            </div>
+
+            <div class="pair">
+              <span class="lbl">PROGRAMA:</span>
+              <span class="val">{{ data.contrato.lotes[0]?.nombrePrograma || '—' }}</span>
+            </div>
+            <div class="pair">
+              <span class="lbl">AREA:</span>
+              <span class="val">{{ data.contrato.lotes[0]?.area ? fmtNumero(data.contrato.lotes[0]!.area) + ' m²' : '—' }}</span>
+            </div>
+
+            <div class="pair">
+              <span class="lbl">MANZANA:</span>
+              <span class="val">{{ data.contrato.lotes[0]?.manzana || '—' }}</span>
+            </div>
+            <div class="pair">
+              <span class="lbl">LOTE:</span>
+              <span class="val">{{ data.contrato.lotes[0]?.numeroLote || '—' }}</span>
+            </div>
+            <div class="pair">
+              <span class="lbl">PRECIO:</span>
+              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.montoTotal) }}</span>
+            </div>
+            <div class="pair">
+              <span class="lbl">SALDO:</span>
+              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.saldo) }}</span>
+            </div>
+
+            <div class="pair">
+              <span class="lbl">INICIAL:</span>
+              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.inicial) }}</span>
+            </div>
+          </div>
+
+          <!-- Bloque A: Moras registradas -->
+          <div class="doc-banda banda-azul">MORAS REGISTRADAS</div>
+          <table class="doc-tabla">
+            <thead>
+              <tr class="grupo-row">
+                <th colspan="4" class="grupo-lbl grupo-l">LETRAS</th>
+                <th colspan="4" class="grupo-lbl grupo-m">MORAS</th>
+              </tr>
+              <tr>
+                <th>N° LETRA</th>
+                <th>F. VENC.</th>
+                <th>F. PAGO</th>
+                <th>COMPROBANTE</th>
+                <th>D. ATRAS</th>
+                <th>MORA 5%</th>
+                <th>MORA DIARIA</th>
+                <th>MORA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of data.bloqueA">
+                <td>{{ i.numeroLetra }}</td>
+                <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                <td>{{ fmtFecha(i.fechaPago) }}</td>
+                <td>{{ comprobante(i) }}</td>
+                <td>{{ i.diasMora }}</td>
+                <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoPorcentaje) }}</td>
+                <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoDiario) }}</td>
+                <td class="num strong">{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</td>
+              </tr>
+              <tr *ngIf="data.bloqueA.length === 0">
+                <td colspan="8" class="empty">— Sin moras registradas —</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Anuladas -->
+          <ng-container *ngIf="data.bloqueAAnuladas.length > 0">
+            <div class="doc-subtitulo-anuladas">— ANULADAS (no suman al total) —</div>
+            <table class="doc-tabla anuladas">
+              <thead>
+                <tr class="grupo-row">
+                  <th colspan="4" class="grupo-lbl grupo-l">LETRAS</th>
+                  <th colspan="4" class="grupo-lbl grupo-m">MORAS</th>
+                </tr>
+                <tr>
+                  <th>N° LETRA</th><th>F. VENC.</th><th>F. PAGO</th><th>COMPROBANTE</th>
+                  <th>D. ATRAS</th><th>MORA 5%</th><th>MORA DIARIA</th><th>MORA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of data.bloqueAAnuladas">
+                  <td><s>{{ i.numeroLetra }}</s></td>
+                  <td><s>{{ fmtFecha(i.fechaVencimiento) }}</s></td>
+                  <td><s>{{ fmtFecha(i.fechaPago) }}</s></td>
+                  <td><s>{{ comprobante(i) }}</s></td>
+                  <td><s>{{ i.diasMora }}</s></td>
+                  <td class="num"><s>{{ data.simboloMoneda }} {{ fmtNumero(i.montoPorcentaje) }}</s></td>
+                  <td class="num"><s>{{ data.simboloMoneda }} {{ fmtNumero(i.montoDiario) }}</s></td>
+                  <td class="num"><s>{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</s></td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+
+          <!-- Bloque B: Pendientes -->
+          <div class="doc-banda banda-naranja">MORAS PENDIENTES (calculadas)</div>
+          <table class="doc-tabla">
+            <thead>
+              <tr class="grupo-row">
+                <th colspan="4" class="grupo-lbl grupo-l">LETRAS</th>
+                <th colspan="4" class="grupo-lbl grupo-m">MORAS</th>
+              </tr>
+              <tr>
+                <th>N° LETRA</th>
+                <th>F. VENC.</th>
+                <th>F. ACTUAL</th>
+                <th>COMPROBANTE</th>
+                <th>D. ATRAS</th>
+                <th>MORA 5%</th>
+                <th>MORA DIARIA</th>
+                <th>MORA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of data.bloqueB">
+                <td>{{ i.numeroLetra }}</td>
+                <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                <td>{{ fmtFechaActual() }}</td>
+                <td></td>
+                <td>{{ i.diasMora }}</td>
+                <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoPorcentaje) }}</td>
+                <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoDiario) }}</td>
+                <td class="num strong">{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</td>
+              </tr>
+              <tr *ngIf="data.bloqueB.length === 0">
+                <td colspan="8" class="empty">— No hay moras pendientes —</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Total mora -->
+          <div class="doc-total-mora">
+            TOTAL MORA: <strong>{{ data.simboloMoneda }} {{ fmtNumero(data.totalMora) }}</strong>
+          </div>
+        </div>
+
+        <!-- ==================== VISTA TABLA (compacta) ==================== -->
+        <div *ngIf="tab === 'tabla'" class="tabla-vista">
+          <div class="resumen">
+            <span class="chip chip-blue">{{ data.bloqueA.length }} registradas</span>
+            <span class="chip chip-orange">{{ data.bloqueB.length }} pendientes</span>
+            <span *ngIf="data.bloqueAAnuladas.length" class="chip chip-gray">{{ data.bloqueAAnuladas.length }} anuladas</span>
+            <span class="chip chip-total">TOTAL: {{ data.simboloMoneda }} {{ fmtNumero(data.totalMora) }}</span>
+          </div>
+          <table class="tabla-simple">
+            <thead>
+              <tr class="grupo-row">
+                <th class="grupo-bloque" rowspan="2">Bloque</th>
+                <th colspan="4" class="grupo-lbl grupo-l">LETRAS</th>
+                <th colspan="4" class="grupo-lbl grupo-m">MORAS</th>
+              </tr>
+              <tr>
+                <th>N°</th>
+                <th>F. Venc</th>
+                <th>F. Pago / Actual</th>
+                <th>Comprobante</th>
+                <th>Días</th>
+                <th>5%</th>
+                <th>Diaria</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of data.bloqueA">
+                <td><span class="badge bg-blue">A</span></td>
+                <td>{{ i.numeroLetra }}</td>
+                <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                <td>{{ fmtFecha(i.fechaPago) }}</td>
+                <td>{{ comprobante(i) }}</td>
+                <td>{{ i.diasMora }}</td>
+                <td class="num">{{ fmtNumero(i.montoPorcentaje) }}</td>
+                <td class="num">{{ fmtNumero(i.montoDiario) }}</td>
+                <td class="num strong">{{ fmtNumero(i.montoMoraTotal) }}</td>
+              </tr>
+              <tr *ngFor="let i of data.bloqueB" class="row-pendiente">
+                <td><span class="badge bg-orange">B</span></td>
+                <td>{{ i.numeroLetra }}</td>
+                <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                <td>{{ fmtFechaActual() }}</td>
+                <td></td>
+                <td>{{ i.diasMora }}</td>
+                <td class="num">{{ fmtNumero(i.montoPorcentaje) }}</td>
+                <td class="num">{{ fmtNumero(i.montoDiario) }}</td>
+                <td class="num strong">{{ fmtNumero(i.montoMoraTotal) }}</td>
+              </tr>
+              <tr *ngFor="let i of data.bloqueAAnuladas" class="row-anulada">
+                <td><span class="badge bg-gray">A×</span></td>
+                <td><s>{{ i.numeroLetra }}</s></td>
+                <td><s>{{ fmtFecha(i.fechaVencimiento) }}</s></td>
+                <td><s>{{ fmtFecha(i.fechaPago) }}</s></td>
+                <td><s>{{ comprobante(i) }}</s></td>
+                <td><s>{{ i.diasMora }}</s></td>
+                <td class="num"><s>{{ fmtNumero(i.montoPorcentaje) }}</s></td>
+                <td class="num"><s>{{ fmtNumero(i.montoDiario) }}</s></td>
+                <td class="num"><s>{{ fmtNumero(i.montoMoraTotal) }}</s></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
+        <i class="bi bi-x-lg"></i> Cerrar
+      </button>
+      <button type="button" class="btn-imprimir" (click)="imprimir()" [disabled]="loading || !data">
+        <i class="bi bi-printer"></i> Imprimir
+      </button>
+      <button type="button" class="btn-pdf" (click)="descargarPdf()" [disabled]="loading || !data">
+        <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+      </button>
+    </div>
+  </div>
+</div>

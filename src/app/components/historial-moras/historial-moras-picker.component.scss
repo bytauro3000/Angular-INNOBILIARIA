@@ -1,0 +1,149 @@
+$navy:        #023e8a;
+$blue:        #1e4db7;
+$green:       #16a34a;
+$red:         #dc2626;
+$text-dark:   #1e293b;
+$text-muted:  #64748b;
+$border:      #e2e8f0;
+$input-bg:    #f8fafc;
+$white:       #ffffff;
+$gray-100:    #f1f5f9;
+$gray-200:    #e2e8f0;
+
+.picker-page {
+  padding: 2rem 1.5rem;
+  min-height: 100%;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.picker-card {
+  max-width:      960px;
+  margin:         0 auto;
+  background:     $white;
+  border-radius:  14px;
+  box-shadow:     0 6px 22px rgba(15, 23, 42, 0.06);
+  overflow:       hidden;
+}
+
+.picker-header {
+  padding:    1.6rem 1.8rem 1rem 1.8rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color:      $white;
+  h2 {
+    margin:      0 0 6px 0;
+    font-size:   1.25rem;
+    font-weight: 700;
+    display:     flex;
+    align-items: center;
+    gap:         8px;
+  }
+  p {
+    margin:     0;
+    font-size:  0.85rem;
+    color:      rgba(255,255,255,0.75);
+  }
+}
+
+.picker-form {
+  padding: 1.4rem 1.8rem 0 1.8rem;
+}
+
+.form-row {
+  display:        flex;
+  gap:            12px;
+  align-items:    flex-end;
+  flex-wrap:      wrap;
+}
+.form-group {
+  display:        flex;
+  flex-direction: column;
+  flex:           1;
+  min-width:      140px;
+  &.flex-2 { flex: 2; }
+  &.form-actions {
+    flex-direction: row;
+    gap:             8px;
+    align-items:     center;
+  }
+  label {
+    font-size:     0.78rem;
+    font-weight:   700;
+    color:         $text-dark;
+    margin-bottom: 4px;
+    .req { color: $red; }
+  }
+}
+.form-control {
+  width:         100%;
+  padding:       0.5rem 0.75rem;
+  font-size:     0.875rem;
+  border:        1px solid $border;
+  border-radius: 8px;
+  background:    $input-bg;
+  color:         $text-dark;
+  &:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); background: $white; }
+}
+
+.btn {
+  padding:       0.55rem 1.2rem;
+  border-radius: 8px;
+  font-size:     0.875rem;
+  font-weight:   600;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+  border:        none;
+  transition:    all 0.15s;
+  &.btn-primary {
+    background: $blue;
+    color:      $white;
+    &:hover:not(:disabled) { background: $navy; transform: translateY(-1px); }
+  }
+  &.btn-ghost {
+    background: $white;
+    color:      $text-muted;
+    border:     1px solid $border;
+    &:hover { background: $gray-100; }
+  }
+  &.btn-pdf {
+    background: linear-gradient(135deg, $red 0%, #b91c1c 100%);
+    color:      $white;
+    padding:    0.7rem 1.4rem;
+    font-size:  0.95rem;
+    &:hover { opacity: 0.92; transform: translateY(-1px); }
+  }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.contrato-card {
+  margin:      1.4rem 1.8rem 1.8rem 1.8rem;
+  padding:     1.2rem 1.4rem;
+  background:  #f0fdf4;
+  border:      1px solid #86efac;
+  border-radius: 10px;
+  display:     flex;
+  flex-direction: column;
+  gap:         12px;
+}
+.contrato-titulo {
+  font-size:     1rem;
+  font-weight:   700;
+  color:         #15803d;
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+}
+.contrato-grid {
+  display:         grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:            6px 24px;
+  font-size:      0.85rem;
+  .lbl { color: $text-muted; font-weight: 600; margin-right: 4px; }
+  .val { color: $text-dark; }
+}
+
+@media (max-width: 600px) {
+  .form-row { flex-direction: column; align-items: stretch; }
+  .contrato-grid { grid-template-columns: 1fr; }
+}

@@ -241,6 +241,13 @@
           </span>
         </button>
 
+        <button class="btn-accion-secundaria pdf"
+                (click)="abrirReporteMoras()"
+                title="Ver reporte PDF de Historial de Moras">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+          <span>Historial de Moras</span>
+        </button>
+
         <button *ngIf="tipoLista === 'pendientes' && cantidadSeleccionadas > 1"
                 class="btn-pagar-multiple"
                 (click)="abrirModalPagoMultiple()">
@@ -600,6 +607,13 @@
   [simboloMoneda]="contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$'"
   (onClose)="cerrarMoraListar()">
 </app-mora-listar>
+
+<!-- Modal reporte PDF de Historial de Moras -->
+<app-historial-moras-pdf
+  *ngIf="mostrarReporteMoras && contratoEncontrado"
+  [idContrato]="contratoEncontrado.idContrato"
+  (cerrar)="cerrarReporteMoras()">
+</app-historial-moras-pdf>
 
 <!-- Alerta de mora antes de pagar una letra vencida -->
 <app-mora-alerta

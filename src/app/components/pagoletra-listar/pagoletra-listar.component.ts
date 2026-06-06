@@ -25,6 +25,7 @@ import { PagoletraMultipleInsertarComponent } from '../pagoletra-multiple-insert
 import { PagoListaModalComponent } from '../pago-lista-modal/pago-lista-modal.component';
 import { MoraListarComponent } from '../mora-listar/mora-listar.component';
 import { MoraAlertaComponent } from '../mora-alerta/mora-alerta.component';
+import { HistorialMorasPdfComponent } from '../historial-moras/historial-moras-pdf.component';
 
 interface LetraCambioConSeleccion extends LetraCambio {
   seleccionada?: boolean;
@@ -42,6 +43,7 @@ interface LetraCambioConSeleccion extends LetraCambio {
     PagoListaModalComponent,
     MoraListarComponent,
     MoraAlertaComponent,
+    HistorialMorasPdfComponent,
   ],
   templateUrl: './pagoletra-listar.html',
   styleUrls: ['./pagoletra-listar.scss'],
@@ -92,6 +94,7 @@ export class PagoletraListarComponent implements OnInit {
   // ── MORA ────────────────────────────────────────────────────────────────────
   moraResumen: MoraResumenContratoDTO | null = null;
   mostrarMoraListar: boolean = false;
+  mostrarReporteMoras: boolean = false;
   mostrarMoraAlerta: boolean = false;
   letraParaPagarConMora: LetraCambio | null = null;
   calculoMoraParaPago: CalculoMoraDTO | null = null;
@@ -273,6 +276,17 @@ export class PagoletraListarComponent implements OnInit {
     if (this.contratoEncontrado) {
       this.cargarResumenMora(this.contratoEncontrado.idContrato);
     }
+  }
+
+  abrirReporteMoras(): void {
+    if (!this.contratoEncontrado) {
+      return;
+    }
+    this.mostrarReporteMoras = true;
+  }
+
+  cerrarReporteMoras(): void {
+    this.mostrarReporteMoras = false;
   }
 
   onMoraPagadaQuierePagarLetra(calculo: CalculoMoraDTO): void {
