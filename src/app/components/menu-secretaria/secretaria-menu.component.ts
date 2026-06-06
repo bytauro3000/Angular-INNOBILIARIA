@@ -1,9 +1,11 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { LogoutService } from '../../auth/logout.service';
+
+type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios';
 
 @Component({
   selector: 'app-secretaria-menu',
@@ -12,7 +14,7 @@ import { LogoutService } from '../../auth/logout.service';
   templateUrl: './secretaria-menu.html',
   styleUrls: ['./secretaria-menu.scss']
 })
-export class SecretariaMenuComponent implements OnInit {
+export class SecretariaMenuComponent implements OnInit, OnDestroy {
 
     usuarioLogueado: any;
     isMenuOpen: boolean = false;
@@ -21,6 +23,10 @@ export class SecretariaMenuComponent implements OnInit {
     isServiciosBasicosSubmenuOpen: boolean = false;
     isLotesSubmenuOpen: boolean = false;
     isUserDropdownOpen: boolean = false;
+
+    /** true si el dispositivo tiene puntero fino (mouse/trackpad) → usar hover */
+    hasHoverSupport: boolean = false;
+    private hoverCloseTimeout: any = null;
 
     constructor(
         private tokenService: TokenService,
@@ -42,6 +48,16 @@ export class SecretariaMenuComponent implements OnInit {
                 console.error('Error decodificando el token:', error);
                 this.usuarioLogueado = null;
             }
+        }
+
+        this.hasHoverSupport = typeof window !== 'undefined'
+            && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }
+
+    ngOnDestroy(): void {
+        if (this.hoverCloseTimeout) {
+            clearTimeout(this.hoverCloseTimeout);
+            this.hoverCloseTimeout = null;
         }
     }
 
@@ -68,6 +84,7 @@ export class SecretariaMenuComponent implements OnInit {
     }
 
     toggleClientesSubmenu() {
+        if (this.hasHoverSupport) return;
         this.isUserDropdownOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
@@ -76,6 +93,7 @@ export class SecretariaMenuComponent implements OnInit {
     }
 
     toggleContratoSubmenu() {
+        if (this.hasHoverSupport) return;
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
@@ -84,6 +102,7 @@ export class SecretariaMenuComponent implements OnInit {
     }
 
     toggleServiciosBasicosSubmenu() {
+        if (this.hasHoverSupport) return;
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
@@ -92,11 +111,50 @@ export class SecretariaMenuComponent implements OnInit {
     }
 
     toggleLotesSubmenu() {
+        if (this.hasHoverSupport) return;
         this.isUserDropdownOpen = false;
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = !this.isLotesSubmenuOpen;
+    }
+
+    /** Hover: abre el submenú y cierra los demás */
+    onSubmenuEnter(submenu: SubmenuKey) {
+        if (!this.hasHoverSupport) return;
+        if (this.hoverCloseTimeout) {
+            clearTimeout(this.hoverCloseTimeout);
+            this.hoverCloseTimeout = null;
+        }
+        this.isClientesSubmenuOpen = false;
+        this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
+        if (submenu === 'clientes') this.isClientesSubmenuOpen = true;
+        else if (submenu === 'contrato') this.isContratoSubmenuOpen = true;
+        else if (submenu === 'lotes') this.isLotesSubmenuOpen = true;
+        else if (submenu === 'servicios') this.isServiciosBasicosSubmenuOpen = true;
+    }
+
+    /** Hover: programa el cierre para dar tiempo a entrar al submenú */
+    onSubmenuLeave(submenu: SubmenuKey) {
+        if (!this.hasHoverSupport) return;
+        this.hoverCloseTimeout = setTimeout(() => {
+            if (submenu === 'clientes') this.isClientesSubmenuOpen = false;
+            else if (submenu === 'contrato') this.isContratoSubmenuOpen = false;
+            else if (submenu === 'lotes') this.isLotesSubmenuOpen = false;
+            else if (submenu === 'servicios') this.isServiciosBasicosSubmenuOpen = false;
+            this.hoverCloseTimeout = null;
+        }, 150);
+    }
+
+    /** Hover sobre el submenú abierto: cancela el cierre programado */
+    onSubmenuContentEnter() {
+        if (!this.hasHoverSupport) return;
+        if (this.hoverCloseTimeout) {
+            clearTimeout(this.hoverCloseTimeout);
+            this.hoverCloseTimeout = null;
+        }
     }
 
     toggleUserDropdown(event: Event) {

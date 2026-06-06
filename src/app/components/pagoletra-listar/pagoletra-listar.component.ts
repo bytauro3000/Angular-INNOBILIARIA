@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -100,6 +100,8 @@ export class PagoletraListarComponent implements OnInit {
   private ultimaLetraPagadaNum: number = 0;
 
   // ── MODAL BÚSQUEDA DE CONTRATO ───────────────────────────────────────────────
+  @ViewChild('inputBusquedaNombre') inputBusquedaNombre!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputBusquedaId') inputBusquedaId!: ElementRef<HTMLInputElement>;
   mostrarModalBusqueda: boolean = false;
   terminoBusquedaModal: string = '';      // búsqueda por nombre/apellido
   idContratoModal: string = '';           // búsqueda por ID de contrato
@@ -699,6 +701,17 @@ formatearNumeroLote(): void {
     this.resultadosModal = [];
     this.buscandoModal = false;
     this.modosBusquedaModal = 'nombre';
+    setTimeout(() => this.inputBusquedaNombre?.nativeElement?.focus(), 50);
+  }
+
+  /** Cambia el modo de búsqueda y enfoca el input correspondiente */
+  cambiarModoBusqueda(modo: 'nombre' | 'id'): void {
+    this.modosBusquedaModal = modo;
+    this.resultadosModal = [];
+    setTimeout(() => {
+      const input = modo === 'nombre' ? this.inputBusquedaNombre : this.inputBusquedaId;
+      input?.nativeElement?.focus();
+    }, 50);
   }
 
   /** Cierra el modal */

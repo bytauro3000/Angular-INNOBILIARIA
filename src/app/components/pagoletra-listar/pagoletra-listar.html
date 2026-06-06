@@ -463,11 +463,11 @@
     <!-- Tabs de modo de búsqueda -->
     <div class="modal-busqueda-tabs">
       <button class="modal-tab" [class.active]="modosBusquedaModal === 'nombre'"
-              (click)="modosBusquedaModal = 'nombre'; resultadosModal = []">
+              (click)="cambiarModoBusqueda('nombre')">
         <i class="bi bi-person-fill"></i> Por nombre / apellido
       </button>
       <button class="modal-tab" [class.active]="modosBusquedaModal === 'id'"
-              (click)="modosBusquedaModal = 'id'; resultadosModal = []">
+              (click)="cambiarModoBusqueda('id')">
         <i class="bi bi-hash"></i> Por ID de contrato
       </button>
     </div>
@@ -480,6 +480,7 @@
         <div class="modal-busqueda-input-group">
           <i class="bi bi-person-fill modal-input-icon"></i>
           <input
+            #inputBusquedaNombre
             type="text"
             class="modal-busqueda-input"
             placeholder="Ingrese nombre o apellido del cliente..."
@@ -499,6 +500,7 @@
         <div class="modal-busqueda-input-group">
           <i class="bi bi-hash modal-input-icon"></i>
           <input
+            #inputBusquedaId
             type="number"
             class="modal-busqueda-input"
             placeholder="Ingrese el ID del contrato..."
