@@ -211,6 +211,8 @@
               <app-voucher-preview
                 [(ngModel)]="voucherFiles"
                 [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
+                [enableOcr]="pagoRequest.medioPago !== 'EFECTIVO'"
+                (ocrData)="onVoucherOcr($event)"
                 name="vouchers">
               </app-voucher-preview>
             </div>

@@ -77,6 +77,29 @@
           cursor: not-allowed;
         }
       }
+
+      .ocr-badge {
+        position: absolute;
+        bottom: 2px;
+        left: 2px;
+        right: 2px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        font-weight: 600;
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+
+        &.ocr-processing {
+          background: rgba(245, 158, 11, 0.9);
+        }
+        &.ocr-done {
+          background: rgba(16, 185, 129, 0.85);
+        }
+      }
     }
   }
 

@@ -16,6 +16,7 @@ import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
+import { VoucherOcrData } from '../../services/ocr-voucher.service';
 
 @Component({
   selector: 'app-pago-letra-form',
@@ -238,6 +239,40 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (this.pagoRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoRequest.numeroOperacion = '';
       this.voucherFiles = [];
+    }
+  }
+
+  /**
+   * Recibe los datos extraídos por OCR del voucher.
+   * Sobrescribe siempre los campos detectados (el usuario puede corregir manualmente después).
+   * Solo autollena si el OCR encontró el valor (no aplica fallbacks).
+   */
+  onVoucherOcr(data: VoucherOcrData): void {
+    console.log('[OCR] Datos extraídos:', data);
+
+    const cambios: string[] = [];
+
+    if (data.numeroOperacion) {
+      this.pagoRequest.numeroOperacion = data.numeroOperacion;
+      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    }
+
+    if (data.fechaPago) {
+      this.pagoRequest.fechaPago = data.fechaPago;
+      this.onFechaPagoChange();
+      cambios.push(`Fecha: ${data.fechaPago}`);
+    }
+
+    if (cambios.length > 0) {
+      this.toastr.info(
+        `Detectado (${data.confidence.toFixed(0)}% conf.): ${cambios.join(' | ')}`,
+        'OCR'
+      );
+    } else {
+      this.toastr.warning(
+        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        'OCR'
+      );
     }
   }
 
