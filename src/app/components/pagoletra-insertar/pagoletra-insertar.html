@@ -177,6 +177,7 @@
                        [readonly]="!modoManualComprobante || cargandoPreview"
                        [class.input-manual]="modoManualComprobante"
                        (input)="onNumeroManualChange($event)"
+                       (focus)="onNumeroComprobanteFocus($event)"
                        [placeholder]="modoManualComprobante ? 'Ingrese N° comprobante' : '—'"
                        [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
                        [style.color]="modoManualComprobante ? '#1e293b' : '#6c757d'"

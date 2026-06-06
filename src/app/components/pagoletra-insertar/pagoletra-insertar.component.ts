@@ -68,6 +68,10 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   moraDecisionTomada: boolean = false;
   pagandoMora: boolean = false;
 
+  // Número de letra más alta ya pagada en el contrato (sin anulados).
+  // Se usa para detectar backfill y omitir la auto-descarga del PDF.
+  private maximaLetraPagada: number = 0;
+
   // ── Control de cierre sin race condition ──────────────────────────────────
   private _hiddenHandler?: EventListener;
 
@@ -129,6 +133,11 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
           this.pagoRequest.tipoComprobante = ultimoPago.tipoComprobante as TipoComprobante;
           this.onTipoComprobanteChange();
         }
+        this.maximaLetraPagada = pagosValidos.reduce((max, p) => {
+          const numStr = p.numeroLetra?.split('/')[0];
+          const num = numStr ? parseInt(numStr, 10) : NaN;
+          return !isNaN(num) && num > max ? num : max;
+        }, 0);
       },
       error: () => { /* si falla, no preselecciona nada */ }
     });
@@ -306,6 +315,15 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     this.pagoRequest.numeroComprobantePersonalizado = soloDigitos ? valor.trim() : undefined;
   }
 
+  onNumeroComprobanteFocus(event: FocusEvent): void {
+    if (!this.modoManualComprobante) return;
+    const input = event.target as HTMLInputElement;
+    const prefijo = this.seriePrefix;
+    if (!prefijo || !input.value.startsWith(prefijo)) return;
+    const pos = prefijo.length;
+    setTimeout(() => input.setSelectionRange(pos, pos), 0);
+  }
+
   guardarPago(): void {
     if (!this.pagoRequest.importePagado || this.pagoRequest.importePagado <= 0) {
       this.toastr.warning('El importe pagado debe ser mayor a cero', 'Validación');
@@ -446,6 +464,18 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
     this.onPagoExitoso.emit();
     this.cerrarModal(); // Bootstrap animará cierre → hidden.bs.modal → onClose
+
+    // ── Auto-abrir PDF solo si NO es backfill ──────────────────────────────
+    // Backfill = registrar una letra anterior a la más alta ya pagada
+    // (típicamente al cargar recibos físicos antiguos con fecha pasada).
+    const letraActual = parseInt(this.numeroLetraLimpio, 10);
+    const esBackfill = this.maximaLetraPagada > 0
+      && !isNaN(letraActual)
+      && letraActual < this.maximaLetraPagada;
+
+    if (esBackfill) {
+      return;
+    }
 
     this.pagoService.descargarComprobante(idPago).subscribe({
       next: (blob) => { window.open(URL.createObjectURL(blob), '_blank'); },
