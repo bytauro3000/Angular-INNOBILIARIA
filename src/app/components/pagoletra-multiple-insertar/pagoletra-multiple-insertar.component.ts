@@ -24,6 +24,7 @@ import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.comp
 })
 export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('modalElement') modalElement!: ElementRef;
+  @ViewChild('numeroComprobanteInput') numeroComprobanteInput!: ElementRef<HTMLInputElement>;
   private modal?: bootstrap.Modal;
 
   @Input() letras: LetraCambio[] = [];
@@ -56,6 +57,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   cargandoPreview: boolean = false;
   modoManualComprobante: boolean = false;
   numeroComprobanteManual: string = '';
+
+  // Número de letra más alta ya pagada en el contrato (sin anulados).
+  // Se usa para detectar backfill y omitir la auto-descarga del PDF.
+  private maximaLetraPagada: number = 0;
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
@@ -93,6 +98,29 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   ngOnInit(): void {
     this.datosComunes.fechaPago = new Date().toISOString().split('T')[0];
     this.generarObservaciones();
+    this.cargarTipoComprobanteSugerido();
+  }
+
+  private cargarTipoComprobanteSugerido(): void {
+    if (!this.contrato?.idContrato) return;
+    this.pagoService.listarPorContrato(this.contrato.idContrato).subscribe({
+      next: (pagos) => {
+        if (!pagos || pagos.length === 0) return;
+        const pagosValidos = pagos.filter(p => !p.anulado);
+        if (pagosValidos.length === 0) return;
+        const ultimoPago = pagosValidos.reduce((max, p) => p.idPago > max.idPago ? p : max);
+        if (ultimoPago.tipoComprobante) {
+          this.datosComunes.tipoComprobante = ultimoPago.tipoComprobante as TipoComprobante;
+          this.onTipoComprobanteChange();
+        }
+        this.maximaLetraPagada = pagosValidos.reduce((max, p) => {
+          const numStr = p.numeroLetra?.split('/')[0];
+          const num = numStr ? parseInt(numStr, 10) : NaN;
+          return !isNaN(num) && num > max ? num : max;
+        }, 0);
+      },
+      error: () => { /* si falla, no preselecciona nada */ }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -233,6 +261,13 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
       this.numeroComprobanteManual = this.seriePrefix;
+      setTimeout(() => {
+        const input = this.numeroComprobanteInput?.nativeElement;
+        if (!input) return;
+        input.focus();
+        const pos = this.seriePrefix.length;
+        input.setSelectionRange(pos, pos);
+      }, 0);
     } else {
       this.numeroComprobanteManual = '';
     }
@@ -247,6 +282,15 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       input.value = valor;
     }
     this.numeroComprobanteManual = valor;
+  }
+
+  onNumeroComprobanteFocus(event: FocusEvent): void {
+    if (!this.modoManualComprobante) return;
+    const input = event.target as HTMLInputElement;
+    const prefijo = this.seriePrefix;
+    if (!prefijo || !input.value.startsWith(prefijo)) return;
+    const pos = prefijo.length;
+    setTimeout(() => input.setSelectionRange(pos, pos), 0);
   }
 
   toggleDescuento(): void {
@@ -338,8 +382,22 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
     this.enviando = true;
     this.pagoService.registrarPagosMultiples(request, this.voucherFiles).subscribe({
       next: (res) => {
-        // Guardar el número de comprobante para abrirlo automáticamente al cerrar
-        this.numeroComprobanteGenerado = res?.numeroComprobanteGenerado ?? null;
+        // Determinar si es backfill: la letra más alta del lote es menor
+        // a la letra más alta ya pagada en el contrato.
+        const maxLetraLote = this.letras.reduce((max, l) => {
+          const numStr = l.numeroLetra?.split('/')[0];
+          const num = numStr ? parseInt(numStr, 10) : NaN;
+          return !isNaN(num) && num > max ? num : max;
+        }, 0);
+        const esBackfill = this.maximaLetraPagada > 0
+          && !isNaN(maxLetraLote)
+          && maxLetraLote < this.maximaLetraPagada;
+
+        // Si es backfill, NO emitir el comprobante para que el padre no abra el PDF
+        this.numeroComprobanteGenerado = esBackfill
+          ? null
+          : (res?.numeroComprobanteGenerado ?? null);
+
         this.toastr.success('Pagos múltiples registrados correctamente', 'Éxito');
         this.enviando = false;
         this.pagoExitosoAlCerrar = true;

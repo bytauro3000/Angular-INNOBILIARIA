@@ -180,11 +180,12 @@
                 <span class="badge-manual" *ngIf="modoManualComprobante">Manual</span>
               </label>
               <div class="input-group">
-                <input type="text" id="numeroComprobantePreview" class="form-control"
+                <input type="text" id="numeroComprobantePreview" #numeroComprobanteInput class="form-control"
                        [value]="cargandoPreview ? 'Generando...' : (modoManualComprobante ? numeroComprobanteManual : (numeroComprobantePreview || ''))"
                        [readonly]="!modoManualComprobante || cargandoPreview"
                        [class.input-manual]="modoManualComprobante"
                        (input)="onNumeroManualChange($event)"
+                       (focus)="onNumeroComprobanteFocus($event)"
                        [placeholder]="modoManualComprobante ? 'Ingrese N°' : (datosComunes.tipoComprobante ? 'Calculando...' : 'Se asigna al guardar')"
                        [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
                        [style.color]="modoManualComprobante ? '#0f172a' : '#64748b'"
