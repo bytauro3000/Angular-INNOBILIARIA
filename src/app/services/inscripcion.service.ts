@@ -84,11 +84,15 @@ export class InscripcionService {
 
   registrarAbono(
     idInscripcion: number,
-    request: AbonoInscripcionRequest
+    request: AbonoInscripcionRequest,
+    vouchers?: File[]
   ): Observable<AbonoInscripcionResponse> {
+    const formData = new FormData();
+    formData.append('pago', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+    if (vouchers?.length) vouchers.forEach(v => formData.append('vouchers', v));
     return this.http.post<AbonoInscripcionResponse>(
       `${this.URL_GATEWAY}/${idInscripcion}/abonar`,
-      request
+      formData
     );
   }
 

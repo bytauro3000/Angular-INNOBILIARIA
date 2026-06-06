@@ -28,6 +28,8 @@ import { TipoCambioService } from '../../services/tipo-cambio.service';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
+import { VoucherOcrData } from '../../services/ocr-voucher.service';
 
 @Component({
   selector: 'app-contrato-insertar',
@@ -35,7 +37,8 @@ import { PagoLetraService } from '../../services/pagoletra.service';
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule, FormsModule,
     FontAwesomeModule, VendedorInsertar, ClienteInsertarComponent,
-    ProgramaInsertEdit, LotesInsertarEditar, CurrencyFormatterDirective
+    ProgramaInsertEdit, LotesInsertarEditar, CurrencyFormatterDirective,
+    VoucherPreviewComponent
   ],
   templateUrl: './contrato-insertar.html',
   styleUrls: ['./contrato-insertar.scss'],
@@ -102,8 +105,7 @@ export class ContratoInsertarComponent implements OnInit {
   numeroComprobanteInicialManual: string = '';
 
   // Voucher dentro del modal
-  voucherInicialFile: File | null = null;
-  voucherInicialPreviewUrl: string | null = null;
+  voucherInicialFiles: File[] = [];
 
   // Estado del guardado (para el flujo de 2 pasos: guardar contrato → subir voucher)
   idContratoGuardado: number | null = null;
@@ -263,24 +265,40 @@ export class ContratoInsertarComponent implements OnInit {
   onMedioPagoInicialChange(): void {
     if (this.pagoInicialRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoInicialRequest.numeroOperacion = null;
-      this.voucherInicialFile = null;
-      this.voucherInicialPreviewUrl = null;
+      this.voucherInicialFiles = [];
     }
   }
 
-  onVoucherInicialSeleccionado(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-    this.voucherInicialFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.voucherInicialPreviewUrl = e.target?.result as string; };
-    reader.readAsDataURL(file);
-  }
+  /**
+   * Recibe los datos extraídos por OCR del voucher del pago inicial.
+   * Sobrescribe siempre los campos detectados (el usuario puede corregir manualmente después).
+   */
+  onVoucherOcr(data: VoucherOcrData): void {
+    console.log('[OCR Pago Inicial] Datos extraídos:', data);
 
-  eliminarVoucherInicial(): void {
-    this.voucherInicialFile = null;
-    this.voucherInicialPreviewUrl = null;
+    const cambios: string[] = [];
+
+    if (data.numeroOperacion) {
+      this.pagoInicialRequest.numeroOperacion = data.numeroOperacion;
+      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    }
+
+    if (data.fechaPago) {
+      this.pagoInicialRequest.fechaPago = data.fechaPago;
+      cambios.push(`Fecha: ${data.fechaPago}`);
+    }
+
+    if (cambios.length > 0) {
+      this.toastr.info(
+        `Detectado (${data.confidence.toFixed(0)}% conf.): ${cambios.join(' | ')}`,
+        'OCR'
+      );
+    } else {
+      this.toastr.warning(
+        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        'OCR'
+      );
+    }
   }
 
   confirmarPagoInicial(): void {
@@ -391,12 +409,11 @@ export class ContratoInsertarComponent implements OnInit {
 
   private handleFormChanges() {
     this.contratoForm.get('montoTotal')?.valueChanges.subscribe(() => this.actualizarSaldo());
-    this.contratoForm.get('inicial')?.valueChanges.subscribe(() => {
+      this.contratoForm.get('inicial')?.valueChanges.subscribe(() => {
       this.actualizarSaldo();
       if (this.inicialNum <= 0) {
         this.pagoInicialRequest = this.resetPagoInicial();
-        this.voucherInicialFile = null;
-        this.voucherInicialPreviewUrl = null;
+        this.voucherInicialFiles = [];
       }
     });
 
@@ -406,8 +423,7 @@ export class ContratoInsertarComponent implements OnInit {
         this.contratoForm.get('cantidadLetras')?.setValue(0, { emitEvent: false });
         this.actualizarSaldo();
         this.pagoInicialRequest = this.resetPagoInicial();
-        this.voucherInicialFile = null;
-        this.voucherInicialPreviewUrl = null;
+        this.voucherInicialFiles = [];
       }
       this.actualizarObservacion();
     });
@@ -636,8 +652,8 @@ export class ContratoInsertarComponent implements OnInit {
       next: (res: any) => {
         this.idContratoGuardado = res?.idContrato ?? null;
         // Si hay voucher pendiente, subirlo
-        if (this.voucherInicialFile && this.idContratoGuardado) {
-          this.contratoService.subirVoucherInicial(this.idContratoGuardado, this.voucherInicialFile).subscribe({
+        if (this.voucherInicialFiles.length > 0 && this.idContratoGuardado) {
+          this.contratoService.subirVoucherInicial(this.idContratoGuardado, this.voucherInicialFiles[0]).subscribe({
             next: () => { this.finalizarGuardado(res); },
             error: () => {
               // El contrato se guardó bien; el voucher falló → aviso pero navegar igual
@@ -687,8 +703,7 @@ export class ContratoInsertarComponent implements OnInit {
     this.terminoBusquedaSeparacion = ''; this.saldoDisplay = '$ 0.00';
     this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0;
     this.pagoInicialRequest = this.resetPagoInicial();
-    this.voucherInicialFile = null;
-    this.voucherInicialPreviewUrl = null;
+    this.voucherInicialFiles = [];
   }
 
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }

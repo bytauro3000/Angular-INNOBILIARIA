@@ -243,7 +243,7 @@
             <span><strong>Medio:</strong> {{ pagoInicialRequest.medioPago }}</span>
             <span><strong>Importe:</strong> {{ formatearMoneda(pagoInicialRequest.importePagado) }}</span>
             <span *ngIf="pagoInicialRequest.numeroOperacion"><strong>N° Op.:</strong> {{ pagoInicialRequest.numeroOperacion }}</span>
-            <span *ngIf="voucherInicialFile"><i class="bi bi-paperclip"></i> {{ voucherInicialFile.name }}</span>
+            <span *ngIf="voucherInicialFiles.length > 0"><i class="bi bi-paperclip"></i> {{ voucherInicialFiles[0].name }}</span>
           </div>
         </div>
       </div>
@@ -518,23 +518,12 @@
             <span class="req" *ngIf="requiereVoucher">*</span>
           </label>
 
-          <!-- Sin voucher cargado -->
-          <div *ngIf="!voucherInicialPreviewUrl" class="voucher-drop-zone" [class.disabled]="!requiereVoucher">
-            <label class="voucher-drop-label" [class.disabled]="!requiereVoucher">
-              <input type="file" accept="image/*" (change)="onVoucherInicialSeleccionado($event)"
-                     [disabled]="!requiereVoucher" style="display:none" />
-              <i class="bi bi-cloud-upload"></i>
-              <span>{{ requiereVoucher ? 'Haz clic para subir imagen' : 'No aplica para efectivo' }}</span>
-            </label>
-          </div>
-
-          <!-- Con voucher cargado -->
-          <div *ngIf="voucherInicialPreviewUrl" class="voucher-preview-pi">
-            <img [src]="voucherInicialPreviewUrl" alt="Voucher" />
-            <button type="button" class="btn-remove-voucher" (click)="eliminarVoucherInicial()">
-              <i class="bi bi-x-circle-fill"></i>
-            </button>
-          </div>
+          <app-voucher-preview
+            [(ngModel)]="voucherInicialFiles"
+            [disabled]="!requiereVoucher"
+            [enableOcr]="requiereVoucher"
+            (ocrData)="onVoucherOcr($event)">
+          </app-voucher-preview>
         </div>
       </div>
 

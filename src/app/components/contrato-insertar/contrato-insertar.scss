@@ -927,60 +927,6 @@ $error-bg:    #fff5f5;
   font-style: italic;
 }
 
-.voucher-drop-zone {
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-  transition: border-color 0.2s;
-
-  &:not(.disabled):hover { border-color: #0466c8; }
-  &.disabled { opacity: 0.5; }
-}
-
-.voucher-drop-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  color: #64748b;
-
-  i { font-size: 1.6rem; color: #94a3b8; }
-  span { font-size: 0.8rem; }
-
-  &.disabled { cursor: not-allowed; }
-}
-
-.voucher-preview-pi {
-  position: relative;
-  display: inline-block;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 2px solid #b2dfcc;
-
-  img {
-    max-width: 100%;
-    max-height: 160px;
-    display: block;
-    object-fit: contain;
-  }
-}
-
-.btn-remove-voucher {
-  position: absolute;
-  top: 6px; right: 6px;
-  background: rgba(231,76,60,0.9);
-  border: none;
-  color: white;
-  border-radius: 50%;
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  &:hover { background: #c0392b; }
-}
-
 .pago-inicial-modal-footer {
   padding: 0.9rem 1.4rem;
   border-top: 1px solid #e2e8f0;

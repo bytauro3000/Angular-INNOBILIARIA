@@ -200,6 +200,20 @@
         </textarea>
       </div>
 
+      <!-- Voucher -->
+      <div class="form-group">
+        <label class="form-label">
+          Voucher (imagen)
+          <span class="req" *ngIf="medioPago !== 'EFECTIVO'">*</span>
+        </label>
+        <app-voucher-preview
+          [(ngModel)]="voucherInscripcionFiles"
+          [disabled]="medioPago === 'EFECTIVO'"
+          [enableOcr]="medioPago !== 'EFECTIVO'"
+          (ocrData)="onVoucherOcr($event)">
+        </app-voucher-preview>
+      </div>
+
     </div><!-- /modal-body paso 2 -->
 
     <!-- ═══════════════════════════════════════════════════════

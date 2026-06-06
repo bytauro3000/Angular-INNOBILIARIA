@@ -121,7 +121,15 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     this.ocrService.terminate();
   }
 
-  writeValue(obj: any): void {}
+  writeValue(obj: any): void {
+    // Cuando el padre asigna null/undefined o un array vacío, limpiamos el preview.
+    // Caso típico: cambio de medioPago a EFECTIVO, o botón "quitar voucher" en el padre.
+    if (obj === null || obj === undefined || (Array.isArray(obj) && obj.length === 0)) {
+      this.files = [];
+      this.ocrDoneForFileName = null;
+      this.ocrProcessed = false;
+    }
+  }
   registerOnChange(fn: any): void { this.onChange = fn; }
   registerOnTouched(fn: any): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }

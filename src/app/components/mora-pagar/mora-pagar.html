@@ -126,7 +126,9 @@
                             <app-voucher-preview
                                 [(ngModel)]="voucherFiles"
                                 name="vouchers"
-                                [disabled]="enviando">
+                                [disabled]="enviando"
+                                [enableOcr]="request.medioPago !== 'EFECTIVO'"
+                                (ocrData)="onVoucherOcr($event)">
                             </app-voucher-preview>
                         </div>
                     </div>

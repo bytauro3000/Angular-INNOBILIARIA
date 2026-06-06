@@ -8,11 +8,13 @@ import { TipoServicios } from '../../enums/tiposervicio';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { ToastrService } from 'ngx-toastr';
+import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
+import { VoucherOcrData } from '../../services/ocr-voucher.service';
 
 @Component({
   selector: 'app-inscripcion-servicios-insertar',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VoucherPreviewComponent],
   templateUrl: './inscripcion-servicios-insertar.html',
   styleUrls: ['./inscripcion-servicios-insertar.scss']
 })
@@ -56,6 +58,8 @@ export class InscripcionServiciosInsertarComponent {
   cargandoPreview: boolean           = false;
   modoManualComprobante: boolean     = false;
   numeroComprobanteManual: string    = '';
+
+  voucherInscripcionFiles: File[]    = [];
 
   loading: boolean = false;
 
@@ -133,6 +137,7 @@ export class InscripcionServiciosInsertarComponent {
     this.numeroComprobantePreview = '';
     this.modoManualComprobante    = false;
     this.numeroComprobanteManual  = '';
+    this.voucherInscripcionFiles  = [];
   }
 
   confirmarTipoServicio(): void {
@@ -171,6 +176,39 @@ export class InscripcionServiciosInsertarComponent {
   onMedioPagoChange(): void {
     if (this.medioPago === MedioPago.EFECTIVO) {
       this.numeroOperacion = '';
+      this.voucherInscripcionFiles = [];
+    }
+  }
+
+  /**
+   * Recibe los datos extraídos por OCR del voucher.
+   * Sobrescribe siempre los campos detectados (el usuario puede corregir manualmente después).
+   */
+  onVoucherOcr(data: VoucherOcrData): void {
+    console.log('[OCR Pago Inscripción] Datos extraídos:', data);
+
+    const cambios: string[] = [];
+
+    if (data.numeroOperacion) {
+      this.numeroOperacion = data.numeroOperacion;
+      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    }
+
+    if (data.fechaPago) {
+      this.fechaPago = data.fechaPago;
+      cambios.push(`Fecha: ${data.fechaPago}`);
+    }
+
+    if (cambios.length > 0) {
+      this.toastr.info(
+        `Detectado (${data.confidence.toFixed(0)}% conf.): ${cambios.join(' | ')}`,
+        'OCR'
+      );
+    } else {
+      this.toastr.warning(
+        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        'OCR'
+      );
     }
   }
 
@@ -247,6 +285,13 @@ export class InscripcionServiciosInsertarComponent {
       );
       return;
     }
+    if (this.medioPago !== MedioPago.EFECTIVO && this.voucherInscripcionFiles.length === 0) {
+      this.toastr.warning(
+        'Debe adjuntar al menos un voucher para este medio de pago.',
+        'Validación'
+      );
+      return;
+    }
 
     const request: AbonoInscripcionRequest = {
       idInscripcion:                  this.idInscripcion,
@@ -264,7 +309,7 @@ export class InscripcionServiciosInsertarComponent {
 
     this.loading = true;
 
-    this.inscripcionService.registrarAbono(this.idInscripcion, request).subscribe({
+    this.inscripcionService.registrarAbono(this.idInscripcion, request, this.voucherInscripcionFiles).subscribe({
       next: (response) => {
         this.loading = false;
 
