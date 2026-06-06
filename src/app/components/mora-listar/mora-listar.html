@@ -55,7 +55,7 @@
                 'row-pagado':    mora.estadoMora === 'PAGADO',
                 'row-anulado':   mora.estadoMora === 'ANULADO'
               }">
-                <td data-label="Letra">{{ mora.numeroLetra }}</td>
+                <td data-label="Letra">{{ obtenerNumeroLetra(mora.numeroLetra) }}</td>
                 <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' }}</td>
                 <td data-label="F. Pago">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' }}</td>
                 <td data-label="Días" class="text-center">

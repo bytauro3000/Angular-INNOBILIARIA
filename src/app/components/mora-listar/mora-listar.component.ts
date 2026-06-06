@@ -76,6 +76,11 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   get morasAnuladas(): MoraResponse[]   { return this.moras.filter(m => m.estadoMora === 'ANULADO'); }
   get totalPendiente(): number { return this.morasPendientes.reduce((s, m) => s + m.montoMoraTotal, 0); }
 
+  obtenerNumeroLetra(numeroLetra: string): string {
+    if (!numeroLetra) return '';
+    return numeroLetra.split('/')[0];
+  }
+
   abrirPagarMora(mora: MoraResponse): void { this.moraParaPagar = mora; }
   cerrarPagarMora(): void { this.moraParaPagar = null; }
 
