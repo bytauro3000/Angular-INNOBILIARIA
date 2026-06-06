@@ -25,7 +25,7 @@ function extractNumeroOperacion(text: string): string | null {
   const labelPatterns = [
     /N[úu]mero\s+de\s+operaci[oó]n/i,
     /Nro\.?\s+de\s+operaci[oó]n/i,
-    /N[°º]\s*de\s+operaci[oó]n/i,
+    /N[°ºo0.\-]?\s*de\s+operaci[oó]n/i,
     /C[oó]digo\s+de\s+operaci[oó]n/i,
     /C[oó]d\.?\s+de\s+operaci[oó]n/i,
     /ID\s+de\s+(?:operaci[oó]n|transacci[oó]n)/i,

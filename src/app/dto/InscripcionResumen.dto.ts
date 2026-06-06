@@ -1,12 +1,13 @@
 import { PendienteInscripcionDTO } from "./PendienteInscripcion.dto";
 
 export interface InscripcionResumenDTO {
-  idContrato:    number;
-  nombreCliente: string;
-  manzana:       string;
-  numeroLote:    string;
-  tieneLuz:      boolean;
-  tieneAgua:     boolean;
+  idContrato:     number;
+  nombreCliente:  string;
+  manzana:        string;
+  numeroLote:     string;
+  nombrePrograma?: string;
+  tieneLuz:       boolean;
+  tieneAgua:      boolean;
 
   /** true si tiene una inscripción de LUZ en estado PENDIENTE_PAGO */
   tienePendienteLuz:   boolean;

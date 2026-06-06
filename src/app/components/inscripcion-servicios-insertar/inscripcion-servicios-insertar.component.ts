@@ -28,6 +28,9 @@ export class InscripcionServiciosInsertarComponent {
 
   estaAbierto: boolean = false;
   idContrato!: number;
+  manzana: string = '';
+  numeroLote: string = '';
+  nombrePrograma: string = '';
 
   /** 1 = seleccionar servicio | 2 = registrar abono */
   paso: 1 | 2 = 1;
@@ -83,9 +86,13 @@ export class InscripcionServiciosInsertarComponent {
   abrirModal(
     idContrato: number,
     inscripcionPendiente?: { idInscripcion: number; tipoServicio: TipoServicios; montoTotal: number; montoAcumulado: number },
-    serviciosInscritos?: { tieneLuz: boolean; tieneAgua: boolean; tienePendienteLuz?: boolean; tienePendienteAgua?: boolean }
+    serviciosInscritos?: { tieneLuz: boolean; tieneAgua: boolean; tienePendienteLuz?: boolean; tienePendienteAgua?: boolean },
+    datosContrato?: { manzana?: string; numeroLote?: string; nombrePrograma?: string }
   ): void {
     this.idContrato    = idContrato;
+    this.manzana       = datosContrato?.manzana       ?? '';
+    this.numeroLote    = datosContrato?.numeroLote    ?? '';
+    this.nombrePrograma = datosContrato?.nombrePrograma ?? '';
     this.loading       = false;
     this.estaAbierto   = true;
     // tieneLuz/tieneAgua = pagado completamente
@@ -117,6 +124,8 @@ export class InscripcionServiciosInsertarComponent {
       }
       this.paso = 1;
     }
+    // Regenerar la observación por defecto ahora que tipoServicio ya está asignado
+    this.observaciones = this.generarObservacionesAutomatica();
   }
 
   cerrarModal(): void {
@@ -138,6 +147,19 @@ export class InscripcionServiciosInsertarComponent {
     this.modoManualComprobante    = false;
     this.numeroComprobanteManual  = '';
     this.voucherInscripcionFiles  = [];
+  }
+
+  /**
+   * Genera la observación por defecto: "Pago de inscripción de {servicio}
+   * de la Mz. {manzana} Lt. {lote} - Programa: {programa}".
+   * Si falta algún dato, usa "___" como placeholder.
+   */
+  generarObservacionesAutomatica(): string {
+    const tipo   = this.tipoServicio ?? 'servicio';
+    const mz     = this.manzana       || '___';
+    const lt     = this.numeroLote    || '___';
+    const prog   = this.nombrePrograma || '___';
+    return `Pago de inscripción de ${tipo} de la Mz. ${mz} Lt. ${lt} - Programa: ${prog}`;
   }
 
   confirmarTipoServicio(): void {

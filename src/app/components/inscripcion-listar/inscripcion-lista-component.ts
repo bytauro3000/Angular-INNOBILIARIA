@@ -172,6 +172,12 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
       (tienePendLuz  && puedeCriarAgua) ||
       (tienePendAgua && puedeCriarLuz);
 
+    const datosContrato = {
+      manzana:        contrato.manzana,
+      numeroLote:     contrato.numeroLote,
+      nombrePrograma: contrato.nombrePrograma
+    };
+
     if (!tienePendLuz && !tienePendAgua) {
       // Sin pendientes → Paso 1 normal, pasando qué servicios ya están inscritos
       // Bloquear si está pagado O si tiene pendiente de pago
@@ -183,7 +189,8 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
           tieneAgua:          contrato.tieneAgua,
           tienePendienteLuz:  contrato.tienePendienteLuz,
           tienePendienteAgua: contrato.tienePendienteAgua
-        }
+        },
+        datosContrato
       );
       return;
     }
@@ -231,6 +238,11 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
         tieneAgua:           c.tieneAgua,
         tienePendienteLuz:   c.tienePendienteLuz,
         tienePendienteAgua:  c.tienePendienteAgua
+      },
+      {
+        manzana:        c.manzana,
+        numeroLote:     c.numeroLote,
+        nombrePrograma: c.nombrePrograma
       }
     );
   }
@@ -245,12 +257,23 @@ export class InscripcionListarComponent implements OnInit, AfterViewInit {
     tipo: TipoServicios,
     pendiente: PendienteInscripcionDTO
   ): void {
-    this.modalInscripcion.abrirModal(idContrato, {
-      idInscripcion:  pendiente.idInscripcion,
-      tipoServicio:   tipo,
-      montoTotal:     pendiente.montoTotal,
-      montoAcumulado: pendiente.montoAcumulado
-    });
+    // Buscar el contrato en la lista cargada para pasar manzana/lote/programa
+    const c = this.contratos.find(x => x.idContrato === idContrato);
+    this.modalInscripcion.abrirModal(
+      idContrato,
+      {
+        idInscripcion:  pendiente.idInscripcion,
+        tipoServicio:   tipo,
+        montoTotal:     pendiente.montoTotal,
+        montoAcumulado: pendiente.montoAcumulado
+      },
+      undefined,
+      c ? {
+        manzana:        c.manzana,
+        numeroLote:     c.numeroLote,
+        nombrePrograma: c.nombrePrograma
+      } : undefined
+    );
   }
 
   onInscripcionCreada(): void {
