@@ -57,6 +57,14 @@
           <span>{{ cliente.distrito.nombre }}</span>
         </div>
         <div class="data-item">
+          <label>Provincia / Dpto:</label>
+          <span>{{ cliente.distrito.provincia || '-' }} / {{ cliente.distrito.departamento || '-' }}</span>
+        </div>
+        <div class="data-item">
+          <label>Ubigeo:</label>
+          <span>{{ cliente.distrito.codigoUbigeo || '-' }}</span>
+        </div>
+        <div class="data-item">
           <label>Teléfono Fijo:</label>
           <span>{{ cliente.telefono || 'No registrado' }}</span>
         </div>

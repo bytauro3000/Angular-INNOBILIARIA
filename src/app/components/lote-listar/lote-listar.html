@@ -1,34 +1,32 @@
-<div class="lotes-container">
+<div class="contratos-container">
   <h2>Gestión de Lotes</h2>
 
   <div class="filtros-header">
     <div class="busqueda-grupo">
       <div class="selector-programa">
-        <label for="progSelect">Programa:</label>
-        <select id="progSelect" class="form-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
-          <option [value]="null" disabled>-- Seleccione --</option>
+        <select class="filtro-select" [(ngModel)]="idProgramaSeleccionado" (change)="onProgramaChange()">
+          <option [value]="null" disabled>-- Seleccione Programa --</option>
           <option *ngFor="let prog of programas" [value]="prog.idPrograma">{{ prog.nombrePrograma }}</option>
         </select>
       </div>
 
       <div class="input-busqueda">
-        <label>Manzana:</label>
-        <input type="text" [(ngModel)]="busquedaManzana" (input)="onProgramaChange()" placeholder="Ej: A" class="form-control">
+        <input type="text" [(ngModel)]="busquedaManzana" (input)="onProgramaChange()" placeholder="Manzana" class="filtro-input">
       </div>
 
       <div class="input-busqueda">
-        <label>Lote:</label>
-        <input type="text" [(ngModel)]="busquedaLote" (input)="onProgramaChange()" placeholder="Ej: 15" class="form-control">
+        <input type="text" [(ngModel)]="busquedaLote" (input)="onProgramaChange()" placeholder="Lote" class="filtro-input">
       </div>
     </div>
 
-    <button (click)="abrirCrearLote()" class="btn btn-success btn-agregar">
-      <i class="bi bi-plus-lg"></i> <span>Crear Lote</span>
+    <button class="btn-nuevo" (click)="abrirCrearLote()">
+      <i class="bi bi-plus-circle-fill icono-agregar"></i>
+      <span>Crear Lote</span>
     </button>
   </div>
 
-  <div class="tabla-lotes">
-    <table>
+  <div class="tabla-wrapper">
+    <table class="table-custom">
       <thead>
         <tr>
           <th>Id</th>
@@ -38,7 +36,7 @@
           <th>Precio/m²</th>
           <th>Programa</th>
           <th>Estado</th>
-          <th>Acciones</th>
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -52,52 +50,59 @@
           <td data-label="Estado">
             <span class="badge"
                   [ngClass]="{
-                    'bg-success': lote.estado === 'Disponible',
-                    'bg-warning text-dark': lote.estado === 'Separado',
-                    'bg-danger': lote.estado === 'Vendido'
+                    'badge-success': lote.estado === 'Disponible',
+                    'badge-warning': lote.estado === 'Separado',
+                    'badge-danger': lote.estado === 'Vendido'
                   }">
               {{ lote.estado }}
             </span>
           </td>
           <td class="acciones-cell">
-            <button class="btn btn-outline-info btn-sm me-1" (click)="mostrarDetalle(lote)" title="Ver detalle">
-              <i class="bi bi-eye"></i>
-            </button>
-            <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirEditarLote(lote)" title="Editar">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm" (click)="mostrarEliminar(lote)" title="Eliminar">
-              <i class="bi bi-trash"></i>
-            </button>
+            <div class="acciones-container">
+              <button class="btn-action btn-view" (click)="mostrarDetalle(lote)" title="Ver detalle">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn-action btn-edit" (click)="abrirEditarLote(lote)" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="mostrarEliminar(lote)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="paginatedLotes.length === 0">
+          <td colspan="8" class="no-data">
+            {{ idProgramaSeleccionado ? 'No hay lotes en este programa.' : 'Seleccione un programa para ver los lotes.' }}
           </td>
         </tr>
       </tbody>
     </table>
-    <div *ngIf="paginatedLotes.length === 0" class="no-results">
-      {{ idProgramaSeleccionado ? 'No hay lotes en este programa.' : 'Seleccione un programa para ver los lotes.' }}
-    </div>
   </div>
 
-  <div *ngIf="totalPages > 1" class="paginacion-controles">
-  <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn btn-outline-secondary">
-    Anterior
-  </button>
-
-  <ng-container *ngFor="let page of getPagesArray()">
-    <button *ngIf="page !== '...'" 
-            (click)="goToPage($any(page))" 
-            [class.active]="currentPage === page"
-            class="btn pagina-numero-btn">
-      {{ page }}
+  <div class="paginacion-controles" *ngIf="totalPages > 1">
+    <button class="btn-paginacion" (click)="goToPage(1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-double-left"></i>
+    </button>
+    <button class="btn-paginacion" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-left"></i>
     </button>
 
-    <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
-  </ng-container>
+    <ng-container *ngFor="let page of getPagesArray()">
+      <span class="ellipsis-spacer" *ngIf="page === '...'">...</span>
+      <button class="btn-paginacion" [class.active]="page === currentPage" *ngIf="page !== '...'" (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </ng-container>
 
-  <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn btn-outline-secondary">
-    Siguiente
-  </button>
-</div>
+    <button class="btn-paginacion" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <button class="btn-paginacion" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-double-right"></i>
+    </button>
+  </div>
 
   <app-lotes-insertar-editar #loteModal (loteGuardado)="onProgramaChange()"></app-lotes-insertar-editar>
 </div>

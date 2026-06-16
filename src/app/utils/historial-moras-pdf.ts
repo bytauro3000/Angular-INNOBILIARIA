@@ -75,7 +75,7 @@ export class HistorialMorasPdf {
     doc.setLineWidth(0.3);
     doc.line(14, 44, pageW - 14, 44);
 
-    // ── Bloque cliente ─────────────────────────────────────
+    // ── Bloque cliente ────────────────────────────────────
     const clienteY = this.drawClienteBlock(doc, data.contrato, 48);
 
     // ── Tabla bloque A (moras registradas) ─────────────────

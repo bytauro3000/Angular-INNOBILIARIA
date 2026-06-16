@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProgramaService } from '../../services/programa.service';
 import { DistritoService } from '../../services/distrito.service';
-import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit'; // Importar el componente hijo del modal
+import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-edit';
 import { Programa } from '../../models/programa.model';
 import { Distrito } from '../../models/distrito.model';
 
@@ -16,11 +16,14 @@ import { Distrito } from '../../models/distrito.model';
 })
 export class ProgramaListarComponent implements OnInit {
 
-  // REFERENCIA AL COMPONENTE DEL MODAL
   @ViewChild('registroModal') registroModal!: ProgramaInsertEdit;
 
   programas: Programa[] = [];
   distritos: Distrito[] = [];
+
+  filtroTexto = '';
+  currentPage = 1;
+  itemsPerPage = 10;
 
   nuevoPrograma: Programa = {
     nombrePrograma: '',
@@ -44,26 +47,80 @@ export class ProgramaListarComponent implements OnInit {
     this.cargarDistritos();
   }
 
-  // Método para cargar los distritos desde el servicio
+  get programasFiltrados(): Programa[] {
+    let data = this.programas;
+    if (this.filtroTexto.trim()) {
+      const term = this.filtroTexto.toLowerCase();
+      data = data.filter(p =>
+        p.nombrePrograma?.toLowerCase().includes(term) ||
+        p.ubicacion?.toLowerCase().includes(term) ||
+        p.distrito?.nombre?.toLowerCase().includes(term)
+      );
+    }
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return data.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalPages(): number {
+    let data = this.programas;
+    if (this.filtroTexto.trim()) {
+      const term = this.filtroTexto.toLowerCase();
+      data = data.filter(p =>
+        p.nombrePrograma?.toLowerCase().includes(term) ||
+        p.ubicacion?.toLowerCase().includes(term) ||
+        p.distrito?.nombre?.toLowerCase().includes(term)
+      );
+    }
+    return Math.max(1, Math.ceil(data.length / this.itemsPerPage));
+  }
+
+  get paginas(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const total = this.totalPages;
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (this.currentPage > 3) pages.push('...');
+      const start = Math.max(2, this.currentPage - 1);
+      const end = Math.min(total - 1, this.currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (this.currentPage < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  }
+
+  irPagina(n: number | string) {
+    if (typeof n === 'number') {
+      this.currentPage = n;
+    }
+  }
+
+  filtrarProgramas() {
+    this.currentPage = 1;
+  }
+
+  recargar() {
+    this.cargarProgramas();
+  }
+
   cargarDistritos() {
     this.distritoService.listarDistritos().subscribe(data => {
       this.distritos = data;
     });
   }
 
-  // Método para cargar los programas desde el servicio
   cargarProgramas() {
     this.programaService.listarProgramas().subscribe(data => {
       this.programas = data;
     });
   }
 
-  // Método para abrir el modal, pasándole el programa a editar
   abrirModal(programa?: Programa) {
-    this.registroModal.abrirModal(programa); // Llamamos al método del componente hijo para abrir el modal
+    this.registroModal.abrirModal(programa);
   }
 
-  // Método para guardar el programa (nuevo o editado)
   guardarPrograma() {
     if (this.programaEditando && this.programaEditando.idPrograma) {
       this.programaService.actualizarPrograma(this.programaEditando.idPrograma, this.nuevoPrograma).subscribe(() => {
@@ -80,19 +137,16 @@ export class ProgramaListarComponent implements OnInit {
     }
   }
 
-  // Método para eliminar un programa
   eliminarPrograma(id: number) {
     this.programaService.eliminarPrograma(id).subscribe(() => {
       this.cargarProgramas();
     });
   }
 
-  // Método para cerrar el modal
   cerrarModal() {
-    this.registroModal.cerrarModal(); // Llamamos al método del componente hijo para cerrar el modal
+    this.registroModal.cerrarModal();
   }
 
-  // Método para reiniciar el formulario
   private resetForm() {
     this.nuevoPrograma = {
       nombrePrograma: '',
@@ -105,7 +159,6 @@ export class ProgramaListarComponent implements OnInit {
     };
   }
 
-  // Función para exportar en Excel
   descargarExcel() {
     this.programaService.descargarExcel().subscribe((data: Blob) => {
       const url = window.URL.createObjectURL(data);
@@ -117,25 +170,21 @@ export class ProgramaListarComponent implements OnInit {
     });
   }
 
-  // Función para exportar en PDF
   exportarPDF() {
     import('jspdf').then(jsPDF => {
       const doc = new jsPDF.jsPDF();
-
       doc.text('Listado de Programas', 10, 10);
-
       this.programas.forEach((p, i) => {
         doc.text(
-          `${i + 1}. ${p.nombrePrograma} - Ubicación: ${p.ubicacion || 'N/A'} 
-          Área: ${p.areaTotal} m² - Precio: ${p.precioM2 || 0} x m² 
-          Total: ${p.costoTotal || 0} 
-          Parcelero: ${p.parcelero ? (p.parcelero.nombres + ' ' + p.parcelero.apellidos) : 'N/A'} 
+          `${i + 1}. ${p.nombrePrograma} - Ubicación: ${p.ubicacion || 'N/A'}
+          Área: ${p.areaTotal} m² - Precio: ${p.precioM2 || 0} x m²
+          Total: ${p.costoTotal || 0}
+          Parcelero: ${p.parcelero ? (p.parcelero.nombres + ' ' + p.parcelero.apellidos) : 'N/A'}
           Distrito: ${p.distrito?.nombre || 'N/A'}`,
           10,
           20 + i * 30
         );
       });
-
       doc.save('programas.pdf');
     });
   }

@@ -1,8 +1,16 @@
 <div class="contratos-container">
-  <div class="filtros-header d-flex justify-content-between align-items-center">
-    <h2>Gestión de Separaciones</h2>
-    <button class="btn btn-nuevo" (click)="mostrarCrear()">
-      + Nueva Separación
+  <h2>Gestión de Separaciones</h2>
+
+  <div class="filtros-header">
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" placeholder="Buscar por cliente, DNI o vendedor..." [(ngModel)]="filtroTexto" (input)="filtrar()" />
+      <i class="bi bi-x-circle btn-clear-inline" [class.active]="filtroTexto" (click)="filtroTexto=''; filtrar()"></i>
+    </div>
+
+    <button class="btn-nuevo" (click)="mostrarCrear()">
+      <i class="bi bi-plus-circle-fill icono-agregar"></i>
+      <span>Nueva Separación</span>
     </button>
   </div>
 
@@ -19,39 +27,33 @@
           <th>F. Límite</th>
           <th>Monto</th>
           <th>Estado</th>
-          <th style="width: 120px;">Acciones</th>
+          <th style="width: 120px;" class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let s of paginasSeparaciones">
-          <td class="text-center">{{s.idSeparacion}}</td>
-          
+          <td class="text-center">{{ s.idSeparacion }}</td>
+
           <td>
-            <div *ngFor="let c of s.clientes">
-              {{ c.nombreCompleto }}
-            </div>
-          </td>
-          
-          <td class="text-center">
-            <div *ngFor="let c of s.clientes">
-              {{ c.numDoc }}
-            </div>
+            <div *ngFor="let c of s.clientes">{{ c.nombreCompleto }}</div>
           </td>
 
           <td class="text-center">
-            <div *ngFor="let l of s.lotes">
-              Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}
-            </div>
+            <div *ngFor="let c of s.clientes">{{ c.numDoc }}</div>
+          </td>
+
+          <td class="text-center">
+            <div *ngFor="let l of s.lotes">Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}</div>
           </td>
 
           <td>{{ s.nomVendedor }}</td>
           <td class="text-center">{{ s.fechaSepara | date:'dd/MM/yyyy' }}</td>
           <td class="text-center">{{ s.fechaLimite | date:'dd/MM/yyyy' }}</td>
           <td class="text-end">{{ s.monto | currency:'USD':'symbol':'1.2-2' }}</td>
-          
+
           <td class="text-center">
             <span class="badge" [ngClass]="s.estadoSeparacion === 'EN_PROCESO' ? 'badge-warning' : 'badge-success'">
-              {{ s.estadoSeparacion }}
+              {{ s.estadoSeparacion === 'EN_PROCESO' ? 'En Proceso' : 'Completado' }}
             </span>
           </td>
 
@@ -66,7 +68,7 @@
             </div>
           </td>
         </tr>
-        
+
         <tr *ngIf="paginasSeparaciones.length === 0">
           <td colspan="10" class="no-data">No hay separaciones registradas.</td>
         </tr>
@@ -74,9 +76,26 @@
     </table>
   </div>
 
-  <div *ngIf="totalPages > 1" class="paginacion-simple">
-    <button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</button>
-    <span class="page-info">Página {{currentPage}} de {{totalPages}}</span>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">Siguiente</button>
+  <div class="paginacion-controles" *ngIf="totalPages > 1">
+    <button class="btn-paginacion" (click)="irPagina(1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-double-left"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(currentPage - 1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let p of paginas">
+      <span class="ellipsis-spacer" *ngIf="p === '...'">...</span>
+      <button class="btn-paginacion" [class.active]="p === currentPage" *ngIf="p !== '...'" (click)="irPagina(p)">
+        {{ p }}
+      </button>
+    </ng-container>
+
+    <button class="btn-paginacion" (click)="irPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(totalPages)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-double-right"></i>
+    </button>
   </div>
 </div>

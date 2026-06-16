@@ -555,7 +555,24 @@ $ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
       }
     }
 
-    .sidebar-footer {
+.protection-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 0 14px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: $text-muted;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s $ease-out;
+  &:hover { color: $text-primary; background: $hover-bg; }
+  &.active { color: #fbbf24; }
+  i { font-size: 0.95rem; width: 20px; text-align: center; }
+}
+
+.sidebar-footer {
       padding: 14px 12px;
       align-items: center;
 

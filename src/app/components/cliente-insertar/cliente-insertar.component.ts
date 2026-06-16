@@ -35,6 +35,9 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
 
   clienteForm!: FormGroup;
   distritos: Distrito[] = [];
+  distritosFiltrados: Distrito[] = [];
+  departamentos: string[] = [];
+  provincias: string[] = [];
   Generos = Object.values(Genero);
   EstadosCiviles = Object.values(EstadoCivil);
   cargandoDni: boolean = false;
@@ -79,9 +82,30 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   ngOnInit(): void {
     this.inicializarFormulario();
     this.distritoService.listarDistritos().subscribe({
-      next: (data) => this.distritos = data,
+      next: (data) => {
+        this.distritos = data;
+        this.departamentos = [...new Set(data.map(d => d.departamento).filter((d): d is string => !!d))].sort();
+      },
       error: (err) => console.error('Error al cargar distritos:', err)
     });
+  }
+
+  onDepartamentoChange(event: Event): void {
+    const dpt = (event.target as HTMLSelectElement).value;
+    this.provincias = dpt
+      ? [...new Set(this.distritos.filter(d => d.departamento === dpt).map(d => d.provincia).filter((p): p is string => !!p))].sort()
+      : [];
+    this.distritosFiltrados = [];
+    this.clienteForm.get('distrito')?.get('idDistrito')?.setValue('');
+  }
+
+  onProvinciaChange(event: Event): void {
+    const prv = (event.target as HTMLSelectElement).value;
+    const dpt = (document.getElementById('departamento') as HTMLSelectElement)?.value;
+    this.distritosFiltrados = (dpt && prv)
+      ? this.distritos.filter(d => d.departamento === dpt && d.provincia === prv)
+      : [];
+    this.clienteForm.get('distrito')?.get('idDistrito')?.setValue('');
   }
 
   ngAfterViewInit(): void {

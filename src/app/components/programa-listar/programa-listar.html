@@ -1,20 +1,21 @@
-<div class="clientes-container">
+<div class="contratos-container">
   <h2>Gestión de Programas</h2>
 
-  <div class="filtros">
-    <button class="btn btn-success" (click)="abrirModal()">
-      <i class="bi bi-plus-lg"></i> Nuevo Programa
-    </button>
-    <button class="btn btn-outline-primary" (click)="descargarExcel()">
-      📥 Exportar Excel
-    </button>
-    <button class="btn btn-outline-danger" (click)="exportarPDF()">
-      📄 Exportar PDF
+  <div class="filtros-header">
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" placeholder="Buscar programa..." [(ngModel)]="filtroTexto" (input)="filtrarProgramas()" />
+      <i class="bi bi-x-circle btn-clear-inline" [class.active]="filtroTexto" (click)="filtroTexto=''; filtrarProgramas()"></i>
+    </div>
+
+    <button class="btn-nuevo" (click)="abrirModal()">
+      <i class="bi bi-plus-circle-fill icono-agregar"></i>
+      <span>Nuevo Programa</span>
     </button>
   </div>
 
-  <div class="tabla-clientes">
-    <table>
+  <div class="tabla-wrapper">
+    <table class="table-custom">
       <thead>
         <tr>
           <th>ID</th>
@@ -24,36 +25,62 @@
           <th>Precio m²</th>
           <th>Costo Total</th>
           <th>Distrito</th>
-          <th>Acciones</th>
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let programa of programas">
+        <tr *ngFor="let programa of programasFiltrados">
           <td>{{ programa.idPrograma }}</td>
           <td>{{ programa.nombrePrograma }}</td>
           <td>{{ programa.ubicacion }}</td>
           <td>{{ programa.areaTotal }}</td>
           <td>{{ programa.precioM2 | currency:'USD':'symbol':'1.0-2' }}</td>
           <td class="fw-bold">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
-          <td><span class="estado-propietario">{{ programa.distrito.nombre }}</span></td>
+          <td>{{ programa.distrito.nombre }}</td>
           <td class="acciones-cell">
-             <button class="btn btn-outline-primary btn-sm me-1" (click)="abrirModal(programa)" title="Editar">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminarPrograma(programa.idPrograma!)" title="Eliminar">
-              <i class="bi bi-trash"></i>
-            </button>
+            <div class="acciones-container">
+              <button class="btn-action btn-edit" (click)="abrirModal(programa)" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="eliminarPrograma(programa.idPrograma!)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
+        </tr>
+
+        <tr *ngIf="programasFiltrados.length === 0">
+          <td colspan="8" class="no-data">No se encontraron programas disponibles.</td>
         </tr>
       </tbody>
     </table>
-    <div *ngIf="programas.length === 0" class="no-results">
-        No se encontraron programas disponibles.
-    </div>
+  </div>
+
+  <div class="paginacion-controles" *ngIf="totalPages > 1">
+    <button class="btn-paginacion" (click)="irPagina(1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-double-left"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(currentPage - 1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let p of paginas">
+      <span class="ellipsis-spacer" *ngIf="p === '...'">...</span>
+      <button class="btn-paginacion" [class.active]="p === currentPage" *ngIf="p !== '...'" (click)="irPagina(p)">
+        {{ p }}
+      </button>
+    </ng-container>
+
+    <button class="btn-paginacion" (click)="irPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(totalPages)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-double-right"></i>
+    </button>
   </div>
 </div>
-<!-- Aquí estamos invocando el modal -->
+
 <app-programa-inset-edit
   #registroModal
-  (programaGuardado)="cargarProgramas()">
+  (programaGuardado)="recargar()">
 </app-programa-inset-edit>

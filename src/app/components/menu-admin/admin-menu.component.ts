@@ -1,12 +1,13 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { LogoutService } from '../../auth/logout.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-admin-menu',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AsyncPipe],
   templateUrl: './admin-menu.html',
   styleUrls: ['./admin-menu.scss']
 })
@@ -19,7 +20,10 @@ export class AdminMenuComponent implements OnInit {
 
   private readonly STORAGE_KEY = 'admin-sidebar-colapsado';
 
-  constructor(private logoutService: LogoutService) {}
+  constructor(
+    private logoutService: LogoutService,
+    protected themeSvc: ThemeService
+  ) {}
 
   ngOnInit(): void {
     const guardado = localStorage.getItem(this.STORAGE_KEY);

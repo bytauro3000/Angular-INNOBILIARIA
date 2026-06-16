@@ -13,6 +13,8 @@ export interface PagoMoraResponse {
   idComprobante: number | null;
   observaciones: string | null;
   urlsVoucher: string[];
+  sunatAceptado?: boolean;
+  sunatMensaje?: string;
   anulado?: boolean;
   motivoAnulacion?: string;
   fechaAnulacion?: string;

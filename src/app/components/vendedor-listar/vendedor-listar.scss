@@ -65,7 +65,7 @@ $border-color: #e9ecef;
 
   .filtro-select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 7px 12px;
     border: 1px solid $border-color;
     border-radius: 10px;
     font-size: 0.95rem;
@@ -96,7 +96,7 @@ $border-color: #e9ecef;
 
     input {
       border: none;
-      padding: 10px 12px;
+      padding: 7px 12px;
       width: 100%;
       outline: none;
       font-size: 0.95rem;
@@ -182,8 +182,8 @@ $border-color: #e9ecef;
       margin-top: -16px;
       width: 32px;
       height: 32px;
-      object-fit: contain;
-      filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white) drop-shadow(-0.5px 0px 0px white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
       transition: transform 0.3s ease;
       transform-origin: center center;
     }
@@ -427,8 +427,8 @@ $border-color: #e9ecef;
         margin-top: -16px;
         width: 32px;
         height: 32px;
-        flex-shrink: 0;
-        filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
         transition: transform 0.3s ease !important;
         transform-origin: center center !important;
       }

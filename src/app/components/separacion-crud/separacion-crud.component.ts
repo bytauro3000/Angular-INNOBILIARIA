@@ -28,6 +28,7 @@ export class SeparacionComponent implements OnInit {
   pageSize = 6;
   currentPage = 1;
   totalPages = 0;
+  filtroTexto = '';
 
   constructor(
     private separacionService: SeparacionService,
@@ -43,8 +44,8 @@ export class SeparacionComponent implements OnInit {
     this.separacionService.obtenerSeparacionResumen().subscribe({
       next: (data) => {
         this.separaciones = data;
-        this.actualizarPaginacion();
-        this.cdr.detectChanges(); 
+        this.aplicarFiltro();
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error al cargar separaciones:', error);
@@ -53,11 +54,55 @@ export class SeparacionComponent implements OnInit {
     });
   }
 
+  get datosFiltrados(): SeparacionResumen[] {
+    if (!this.filtroTexto.trim()) return this.separaciones;
+    const term = this.filtroTexto.toLowerCase();
+    return this.separaciones.filter(s =>
+      s.clientes.some(c => c.nombreCompleto?.toLowerCase().includes(term)) ||
+      s.clientes.some(c => c.numDoc?.includes(term)) ||
+      s.nomVendedor?.toLowerCase().includes(term)
+    );
+  }
+
+  aplicarFiltro(): void {
+    this.currentPage = 1;
+    this.actualizarPaginacion();
+  }
+
+  filtrar(): void {
+    this.aplicarFiltro();
+  }
+
   actualizarPaginacion(): void {
-    this.totalPages = Math.ceil(this.separaciones.length / this.pageSize);
+    const data = this.datosFiltrados;
+    this.totalPages = Math.ceil(data.length / this.pageSize);
     const start = (this.currentPage - 1) * this.pageSize;
-    this.paginasSeparaciones = this.separaciones.slice(start, start + this.pageSize);
+    this.paginasSeparaciones = data.slice(start, start + this.pageSize);
     this.cdr.detectChanges();
+  }
+
+  get paginas(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const total = this.totalPages;
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (this.currentPage > 3) pages.push('...');
+      const start = Math.max(2, this.currentPage - 1);
+      const end = Math.min(total - 1, this.currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (this.currentPage < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
+  }
+
+  irPagina(n: number | string): void {
+    if (typeof n === 'number') {
+      this.currentPage = n;
+      this.actualizarPaginacion();
+    }
   }
 
   previousPage(): void {

@@ -1,16 +1,17 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { LogoutService } from '../../auth/logout.service';
+import { ThemeService } from '../../services/theme.service';
 
 type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios' | 'reportes';
 
 @Component({
   selector: 'app-secretaria-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterOutlet, AsyncPipe],
   templateUrl: './secretaria-menu.html',
   styleUrls: ['./secretaria-menu.scss']
 })
@@ -32,7 +33,8 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     constructor(
         private tokenService: TokenService,
         private logoutService: LogoutService,
-        private router: Router
+        private router: Router,
+        protected themeSvc: ThemeService
     ) { }
 
     ngOnInit(): void {

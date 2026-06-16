@@ -17,6 +17,8 @@ export interface PagoLetraResponse {
   saldoPendiente?: number;
   estadoLetra?: string;
   esPagoAcuenta?: boolean;
+  sunatAceptado?: boolean;
+  sunatMensaje?: string;
   anulado?: boolean;
   motivoAnulacion?: string;
   fechaAnulacion?: string;

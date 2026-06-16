@@ -113,7 +113,7 @@ $border-color: #e9ecef;
     .search-icon { color: #94a3b8; font-size: 0.9rem; flex-shrink: 0; }
 
     input {
-      border: none; padding: 10px 0; flex: 1; outline: none;
+      border: none; padding: 7px 0; flex: 1; outline: none;
       font-size: 0.95rem; background: transparent; color: $text-dark; min-width: 0;
       &::placeholder { color: #94a3b8; }
     }
@@ -186,8 +186,9 @@ $border-color: #e9ecef;
     &:active { transform: scale(0.95); }
     .icono-agregar {
       position: absolute !important; left: 5px !important; top: 50% !important;
-      margin-top: -16px; width: 32px; height: 32px; object-fit: contain;
-      filter: brightness(0) invert(1) drop-shadow(0.5px 0px 0px white) drop-shadow(-0.5px 0px 0px white);
+      margin-top: -16px; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
       transition: transform 0.3s ease; transform-origin: center center;
     }
     &:hover .icono-agregar { transform: rotate(90deg); }
@@ -663,7 +664,8 @@ $border-color: #e9ecef;
         margin-top: -16px;
         width: 32px;
         height: 32px;
-        filter: brightness(0) invert(1);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
         pointer-events: none;
       }
       &:hover .icono-agregar { transform: rotate(90deg) !important; }

@@ -30,6 +30,11 @@ export class ClienteEditarComponent implements OnInit {
   clienteForm!: FormGroup;
   clienteId!: number;
   distritos: Distrito[] = [];
+  distritosFiltrados: Distrito[] = [];
+  departamentos: string[] = [];
+  provincias: string[] = [];
+  departamentoSeleccionado: string = '';
+  provinciaSeleccionada: string = '';
 
   estadosCliente = Object.values(EstadoCliente);
   tiposCliente = Object.values(TipoCliente);
@@ -72,8 +77,31 @@ export class ClienteEditarComponent implements OnInit {
   ngOnInit(): void {
     this.inicializarFormulario();
     this.distritoService.listarDistritos().subscribe({
-      next: (data) => this.distritos = data
+      next: (data) => {
+        this.distritos = data;
+        this.departamentos = [...new Set(data.map(d => d.departamento).filter((d): d is string => !!d))].sort();
+      }
     });
+  }
+
+  onDepartamentoChange(event: Event): void {
+    const dpt = (event.target as HTMLSelectElement).value;
+    this.departamentoSeleccionado = dpt;
+    this.provincias = dpt
+      ? [...new Set(this.distritos.filter(d => d.departamento === dpt).map(d => d.provincia).filter((p): p is string => !!p))].sort()
+      : [];
+    this.distritosFiltrados = [];
+    this.provinciaSeleccionada = '';
+    this.clienteForm.get('distrito')?.get('idDistrito')?.setValue('');
+  }
+
+  onProvinciaChange(event: Event): void {
+    const prv = (event.target as HTMLSelectElement).value;
+    this.provinciaSeleccionada = prv;
+    this.distritosFiltrados = (this.departamentoSeleccionado && prv)
+      ? this.distritos.filter(d => d.departamento === this.departamentoSeleccionado && d.provincia === prv)
+      : [];
+    this.clienteForm.get('distrito')?.get('idDistrito')?.setValue('');
   }
 
   public abrirModal(id: number): void {
@@ -187,12 +215,43 @@ export class ClienteEditarComponent implements OnInit {
           });
           this.actualizarValidacionDocumento(cliente.tipoCliente);
           this.actualizarValidacionNacionalidad(cliente.tipoCliente);
+
+          // Preseleccionar departamento, provincia y distrito
+          const distritoObj = this.distritos.find(d => d.idDistrito === cliente.distrito?.idDistrito);
+          if (distritoObj && distritoObj.departamento) {
+            this.departamentoSeleccionado = distritoObj.departamento;
+            this.provincias = [...new Set(
+              this.distritos.filter(d => d.departamento === distritoObj.departamento)
+                .map(d => d.provincia).filter((p): p is string => !!p)
+            )].sort();
+            if (distritoObj.provincia) {
+              this.provinciaSeleccionada = distritoObj.provincia;
+              this.distritosFiltrados = this.distritos.filter(d =>
+                d.departamento === distritoObj.departamento &&
+                d.provincia === distritoObj.provincia
+              );
+            }
+          }
+
           if (cliente.tipoCliente === 'CE' && cliente.nacionalidad) {
             const pais = this.paises.find(p =>
               p.nacionalidadM === cliente.nacionalidad?.toLowerCase() ||
               p.nacionalidadF === cliente.nacionalidad?.toLowerCase()
             );
             this.paisSeleccionado = pais || null;
+          }
+
+          // Formatear celular con guiones al cargar
+          const celular = cliente.celular;
+          if (celular) {
+            const soloDigitos = celular.replace(/\D/g, '');
+            if (soloDigitos.length > 0) {
+              const partes = [];
+              for (let i = 0; i < soloDigitos.length; i += 3) {
+                partes.push(soloDigitos.substr(i, 3));
+              }
+              this.clienteForm.patchValue({ celular: partes.join('-') });
+            }
           }
         }
         this.cargandoDatos = false;
@@ -228,4 +287,20 @@ export class ClienteEditarComponent implements OnInit {
       .map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
     this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
   }
+
+  formatearCelular(event: any): void {
+    const input = event.target;
+    let valor = input.value.replace(/\D/g, '');
+    if (valor.length > 0) {
+      const partes = [];
+      for (let i = 0; i < valor.length; i += 3) {
+        partes.push(valor.substr(i, 3));
+      }
+      valor = partes.join('-');
+    }
+    this.clienteForm.get('celular')?.setValue(valor, { emitEvent: false });
+    input.value = valor;
+  }
+
+  manejarBackspace(event: KeyboardEvent): void {}
 }

@@ -104,7 +104,7 @@
               </div>
               <div class="form-group">
                 <label for="celular"><i class="bi bi-phone"></i> Celular</label>
-                <input type="tel" id="celular" formControlName="celular" placeholder="+51 999 999 999">
+                <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999" (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)">
               </div>
               <div class="form-group">
                 <label for="email"><i class="bi bi-envelope"></i> Email <span class="label-opcional">(Opcional)</span></label>
@@ -112,16 +112,34 @@
               </div>
             </div>
 
-            <!-- Dirección y Distrito -->
-            <div class="form-row form-2-col-direccion">
-              <div class="form-group">
+            <!-- Dirección -->
+            <div class="form-row">
+              <div class="form-group width-100">
                 <label for="direccion"><i class="bi bi-geo-alt"></i> Dirección Completa</label>
                 <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Av., Mz y Lote...">
+              </div>
+            </div>
+            <!-- Departamento, Provincia, Distrito -->
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label for="departamento"><i class="bi bi-geo-alt-fill"></i> Departamento</label>
+                <select id="departamento" (change)="onDepartamentoChange($event)">
+                  <option value="">Seleccione departamento</option>
+                  <option *ngFor="let dpt of departamentos" [value]="dpt" [selected]="dpt === departamentoSeleccionado">{{ dpt }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="provincia"><i class="bi bi-geo"></i> Provincia</label>
+                <select id="provincia" (change)="onProvinciaChange($event)">
+                  <option value="">Seleccione provincia</option>
+                  <option *ngFor="let prv of provincias" [value]="prv" [selected]="prv === provinciaSeleccionada">{{ prv }}</option>
+                </select>
               </div>
               <div class="form-group" formGroupName="distrito">
                 <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
                 <select id="idDistrito" formControlName="idDistrito">
-                  <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
+                  <option value="">Seleccione distrito</option>
+                  <option *ngFor="let d of distritosFiltrados" [value]="d.idDistrito">{{ d.nombre }}</option>
                 </select>
               </div>
             </div>

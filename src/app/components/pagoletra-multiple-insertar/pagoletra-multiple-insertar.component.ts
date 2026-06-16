@@ -431,7 +431,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
           ? null
           : (res?.numeroComprobanteGenerado ?? null);
 
-        this.toastr.success('Pagos múltiples registrados correctamente', 'Éxito');
+        const sunatOk = res?.pagos?.some((p: any) => p.sunatAceptado);
+        let msg = 'Pagos múltiples registrados correctamente';
+        if (sunatOk) msg += '. Boleta enviada a SUNAT: ACEPTADA';
+        this.toastr.success(msg, 'Éxito', { timeOut: 6000 });
         this.enviando = false;
         this.pagoExitosoAlCerrar = true;
         this.cerrarModal();

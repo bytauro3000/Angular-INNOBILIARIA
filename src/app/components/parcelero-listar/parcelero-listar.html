@@ -1,24 +1,22 @@
-<div class="container mt-4">
-  <!-- Título -->
-  <h2 class="text-center mb-4 text-primary fw-bold">📋 Listado de Parceleros</h2>
+<div class="contratos-container">
+  <h2>Listado de Parceleros</h2>
 
-  <!-- Botones de acciones -->
-  <div class="d-flex justify-content-end gap-2 mb-3">
-    <button class="btn btn-success shadow-sm" (click)="abrirModal()">
-      ➕ Agregar Parcelero
-    </button>
-    <button class="btn btn-outline-primary shadow-sm" (click)="exportarExcel()">
-      📥 Exportar Excel
-    </button>
-    <button class="btn btn-outline-danger shadow-sm" (click)="exportarPDF()">
-      📄 Exportar PDF
+  <div class="filtros-header">
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" placeholder="Buscar por nombre, DNI o distrito..." [(ngModel)]="filtroTexto" (input)="filtrar()" />
+      <i class="bi bi-x-circle btn-clear-inline" [class.active]="filtroTexto" (click)="filtroTexto=''; filtrar()"></i>
+    </div>
+
+    <button class="btn-nuevo" (click)="abrirModal()">
+      <i class="bi bi-plus-circle-fill icono-agregar"></i>
+      <span>Agregar Parcelero</span>
     </button>
   </div>
 
-  <!-- Tabla -->
-  <div class="table-responsive shadow-sm rounded-3">
-    <table class="table align-middle table-hover text-center">
-      <thead class="table-dark">
+  <div class="tabla-wrapper">
+    <table class="table-custom">
+      <thead>
         <tr>
           <th>ID</th>
           <th>Nombres</th>
@@ -27,44 +25,71 @@
           <th>Celular</th>
           <th>Email</th>
           <th>Distrito</th>
-          <th>Acciones</th>
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let p of parceleros">
-          <td class="fw-semibold">{{ p.idParcelero }}</td>
+        <tr *ngFor="let p of parcelerosFiltrados">
+          <td>{{ p.idParcelero }}</td>
           <td>{{ p.nombres }}</td>
           <td>{{ p.apellidos }}</td>
           <td>{{ p.dni }}</td>
           <td>{{ p.celular }}</td>
-          <td class="text-muted">{{ p.email }}</td>
+          <td>{{ p.email }}</td>
           <td>
-            <span class="badge bg-info text-dark px-3 py-2">
-              {{ p.distrito.nombre }}
-            </span>
+            <span class="badge badge-distrito">{{ p.distrito.nombre }}</span>
           </td>
-          <td>
-            <button class="btn btn-warning btn-sm me-1 shadow-sm" (click)="abrirModal(p)">
-              ✏️
-            </button>
-            <button class="btn btn-danger btn-sm shadow-sm" (click)="eliminarParcelero(p.idParcelero!)">
-              🗑
-            </button>
+          <td class="acciones-cell">
+            <div class="acciones-container">
+              <button class="btn-action btn-edit" (click)="abrirModal(p)" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="eliminarParcelero(p.idParcelero!)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
+        </tr>
+
+        <tr *ngIf="parcelerosFiltrados.length === 0">
+          <td colspan="8" class="no-data">No se encontraron parceleros.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="paginacion-controles" *ngIf="totalPages > 1">
+    <button class="btn-paginacion" (click)="irPagina(1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-double-left"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(currentPage - 1)" [disabled]="currentPage === 1">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <ng-container *ngFor="let p of paginas">
+      <span class="ellipsis-spacer" *ngIf="p === '...'">...</span>
+      <button class="btn-paginacion" [class.active]="p === currentPage" *ngIf="p !== '...'" (click)="irPagina(p)">
+        {{ p }}
+      </button>
+    </ng-container>
+
+    <button class="btn-paginacion" (click)="irPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <button class="btn-paginacion" (click)="irPagina(totalPages)" [disabled]="currentPage === totalPages">
+      <i class="bi bi-chevron-double-right"></i>
+    </button>
   </div>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="parceleroModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content shadow-lg rounded-3">
+    <div class="modal-content">
       <form (ngSubmit)="guardarParcelero()">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header">
           <h5 class="modal-title">
-            {{ parceleroEditando ? '✏️ Editar Parcelero' : '➕ Agregar Parcelero' }}
+            {{ parceleroEditando ? 'Editar Parcelero' : 'Agregar Parcelero' }}
           </h5>
           <button type="button" class="btn-close" (click)="cerrarModal()"></button>
         </div>
@@ -75,18 +100,14 @@
           <input class="form-control mb-2" type="text" placeholder="Celular" [(ngModel)]="nuevoParcelero.celular" name="celular">
           <input class="form-control mb-2" type="text" placeholder="Dirección" [(ngModel)]="nuevoParcelero.direccion" name="direccion">
           <input class="form-control mb-2" type="email" placeholder="Email" [(ngModel)]="nuevoParcelero.email" name="email">
-
-          <!-- Select de distritos -->
-          <select class="form-select mb-2" [(ngModel)]="nuevoParcelero.distrito.idDistrito" name="idDistrito" required>
+          <select class="form-control mb-2" [(ngModel)]="nuevoParcelero.distrito.idDistrito" name="idDistrito" required>
             <option value="" disabled selected>Seleccione un distrito</option>
-            <option *ngFor="let d of distritos" [value]="d.idDistrito">
-              {{ d.nombre }}
-            </option>
+            <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
           </select>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary shadow-sm">
+          <button type="submit" class="btn btn-primary">
             {{ parceleroEditando ? 'Actualizar' : 'Guardar' }}
           </button>
         </div>

@@ -124,6 +124,13 @@
 
     <!-- Footer -->
     <div class="sidebar-footer">
+      <div class="protection-btn"
+           (click)="themeSvc.toggle()"
+           [class.active]="(themeSvc.isActive$ | async)"
+           title="Protección de vista">
+        <i class="fas fa-eye"></i>
+        <span class="nav-label">Prot. Vista</span>
+      </div>
       <div class="user-card">
         <div class="user-avatar">
           <i class="fas fa-user-shield"></i>

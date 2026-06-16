@@ -9,6 +9,7 @@ import * as bootstrap from 'bootstrap';
 import { MoraService } from '../../services/mora.service';
 import { MoraResponse } from '../../dto/moraresponse.dto';
 import { PagoMoraRequest } from '../../dto/pagomorarequest.dto';
+import { PagoMoraResponse } from '../../dto/pagomoraresponse.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { PagoLetraService } from '../../services/pagoletra.service';
@@ -206,8 +207,12 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
 
     this.enviando = true;
     this.moraService.pagarMora(this.request, this.voucherFiles).subscribe({
-      next: (res) => {
-        this.toastr.success('Mora pagada correctamente', 'Éxito');
+      next: (res: PagoMoraResponse) => {
+        let mensaje = 'Mora pagada correctamente';
+        if (res.sunatAceptado) {
+          mensaje += '. Boleta enviada a SUNAT: ACEPTADA';
+        }
+        this.toastr.success(mensaje, 'Éxito', { timeOut: 6000 });
         this.enviando = false;
         this.voucherFiles = [];
         this.cerrarModal();

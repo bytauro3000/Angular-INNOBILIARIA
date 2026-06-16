@@ -12,6 +12,7 @@ import { PagoLetraService } from '../../services/pagoletra.service';
 import { MoraService } from '../../services/mora.service';
 import { PagoLetraRequest } from '../../dto/pagoletrarequest.dto';
 import { PagoMoraRequest } from '../../dto/pagomorarequest.dto';
+import { PagoLetraResponse } from '../../dto/pagoletraresponse.dto';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
@@ -409,11 +410,11 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     this.enviando = true;
 
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFiles).subscribe({
-      next: (response) => {
+      next: (response: PagoLetraResponse) => {
         if (this.pagarMoraTambien && this.calculoMora && !this.moraPreviamentePagada) {
-          this.registrarPagoMoraTrasLetra(response.idPago);
+          this.registrarPagoMoraTrasLetra(response);
         } else {
-          this.finalizarPago(response.idPago);
+          this.finalizarPago(response);
         }
       },
       error: (err) => {
@@ -424,8 +425,9 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     });
   }
 
-  private registrarPagoMoraTrasLetra(idPagoLetra: number): void {
+  private registrarPagoMoraTrasLetra(letraResponse: PagoLetraResponse): void {
     this.pagandoMora = true;
+    const idPagoLetra = letraResponse.idPago;
 
     this.moraService.listarPorLetra(this.letra.idLetra).subscribe({
       next: (moras) => {
@@ -436,7 +438,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
             'Aviso'
           );
           this.pagandoMora = false;
-          this.finalizarPago(idPagoLetra);
+          this.finalizarPago(letraResponse);
           return;
         }
 
@@ -462,7 +464,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
             );
             this.pagandoMora = false;
             this.abrirComprobanteMora(pagoMoraRes.idPagoMora);
-            this.finalizarPago(idPagoLetra);
+            this.finalizarPago(letraResponse);
           },
           error: (err) => {
             const msg = err?.error?.message
@@ -472,7 +474,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
               'Pago parcial'
             );
             this.pagandoMora = false;
-            this.finalizarPago(idPagoLetra);
+            this.finalizarPago(letraResponse);
           }
         });
       },
@@ -482,28 +484,27 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
           'Aviso'
         );
         this.pagandoMora = false;
-        this.finalizarPago(idPagoLetra);
+        this.finalizarPago(letraResponse);
       }
     });
   }
 
-  private finalizarPago(idPago: number): void {
+  private finalizarPago(response: PagoLetraResponse): void {
     this.enviando = false;
+    const idPago = response.idPago;
 
     // ── Mensaje de éxito con número de letra y tipo de pago ───────────────
+    let mensaje: string;
+    let titulo = 'Pago registrado';
     if (this.modoPagoAcuenta) {
-      this.toastr.success(
-        `Pago a cuenta registrado correctamente para la Letra N° ${this.numeroLetraLimpio}`,
-        'Pago registrado',
-        { timeOut: 5000 }
-      );
+      mensaje = `Pago a cuenta registrado correctamente para la Letra N° ${this.numeroLetraLimpio}`;
     } else {
-      this.toastr.success(
-        `Letra N° ${this.numeroLetraLimpio} pagada correctamente`,
-        'Pago registrado',
-        { timeOut: 5000 }
-      );
+      mensaje = `Letra N° ${this.numeroLetraLimpio} pagada correctamente`;
     }
+    if (response.sunatAceptado) {
+      mensaje += '. Boleta enviada a SUNAT: ACEPTADA';
+    }
+    this.toastr.success(mensaje, titulo, { timeOut: 6000 });
 
     this.onPagoExitoso.emit();
     this.cerrarModal(); // Bootstrap animará cierre → hidden.bs.modal → onClose

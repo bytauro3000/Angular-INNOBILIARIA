@@ -129,16 +129,33 @@
               </div>
             </div>
 
-            <!-- Distrito y Teléfono fijo -->
-            <div class="form-row form-2-col">
-              <div class="form-group" formGroupName="distrito">
-                <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
-                <select id="idDistrito" formControlName="idDistrito" required>
-                  <option value="">Selecciona distrito</option>
-                  <option *ngFor="let d of distritos" [value]="d.idDistrito">{{ d.nombre }}</option>
+            <!-- Departamento, Provincia, Distrito -->
+            <div class="form-row form-3-col">
+              <div class="form-group">
+                <label for="departamento"><i class="bi bi-geo-alt-fill"></i> Departamento</label>
+                <select id="departamento" (change)="onDepartamentoChange($event)">
+                  <option value="">Seleccione departamento</option>
+                  <option *ngFor="let dpt of departamentos" [value]="dpt">{{ dpt }}</option>
                 </select>
               </div>
               <div class="form-group">
+                <label for="provincia"><i class="bi bi-geo"></i> Provincia</label>
+                <select id="provincia" (change)="onProvinciaChange($event)">
+                  <option value="">Seleccione provincia</option>
+                  <option *ngFor="let prv of provincias" [value]="prv">{{ prv }}</option>
+                </select>
+              </div>
+              <div class="form-group" formGroupName="distrito">
+                <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
+                <select id="idDistrito" formControlName="idDistrito" required>
+                  <option value="">Seleccione distrito</option>
+                  <option *ngFor="let d of distritosFiltrados" [value]="d.idDistrito">{{ d.nombre }}</option>
+                </select>
+              </div>
+            </div>
+            <!-- Teléfono fijo -->
+            <div class="form-row">
+              <div class="form-group width-100">
                 <label for="telefono"><i class="bi bi-telephone"></i> Teléfono Fijo <span class="label-opcional">(Opcional)</span></label>
                 <input type="tel" id="telefono" formControlName="telefono" placeholder="Número fijo" />
               </div>
