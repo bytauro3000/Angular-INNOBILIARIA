@@ -95,6 +95,18 @@ export class AdminAnulacionesService {
     return this.http.get(`${this.urlContratos}/${idContrato}/pago-inicial/comprobante-pdf`, { responseType: 'blob' });
   }
 
+  /* ── NOTA DE CREDITO ──────────────────────────────────── */
+
+  enviarNotaCredito(idPago: number, tipoPago: string, codMotivo: string, desMotivo: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/nota-credito/enviar`, {
+      idPago, tipoPago, codMotivo, desMotivo
+    });
+  }
+
+  obtenerMotivosNotaCredito(): Observable<{[key: string]: string}> {
+    return this.http.get<{[key: string]: string}>(`${environment.apiUrl}/api/nota-credito/motivos`);
+  }
+
   /* ── Helpers ──────────────────────────────────────────── */
 
   private buildParams(filtros?: FiltrosAnulacion): HttpParams {

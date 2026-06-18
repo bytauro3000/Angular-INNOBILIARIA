@@ -135,7 +135,6 @@ export class ClienteEditarComponent implements OnInit {
       distrito: this.fb.group({ idDistrito: ['', Validators.required] }),
       estado: [null, Validators.required],
       telefono: [''],
-      fechaRegistro: [{ value: '', disabled: true }],
       nacionalidad: [null],
     });
 
@@ -206,11 +205,8 @@ export class ClienteEditarComponent implements OnInit {
     this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
       next: (cliente) => {
         if (cliente) {
-          const fechaFormato = cliente.fechaRegistro
-            ? new Date(cliente.fechaRegistro).toISOString().substring(0, 10) : '';
           this.clienteForm.patchValue({
             ...cliente,
-            fechaRegistro: fechaFormato,
             distrito: { idDistrito: cliente.distrito?.idDistrito }
           });
           this.actualizarValidacionDocumento(cliente.tipoCliente);
@@ -263,11 +259,14 @@ export class ClienteEditarComponent implements OnInit {
   onSubmit(): void {
     if (this.clienteForm.valid) {
       const raw = this.clienteForm.getRawValue();
-      const payload = {
+      const payload: any = {
         ...raw,
-        // Si no es CE, aseguramos enviar null
         nacionalidad: raw.tipoCliente === TipoCliente.CE ? raw.nacionalidad : null
       };
+      if (payload.distrito?.idDistrito) {
+        payload.idDistrito = payload.distrito.idDistrito;
+      }
+      delete payload.distrito;
       this.clienteService.actualizarCliente(this.clienteId, payload).subscribe({
         next: () => {
           this.toastr.success('Cliente actualizado correctamente.');

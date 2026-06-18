@@ -65,7 +65,7 @@ export class ContratoInsertarComponent implements OnInit {
 
   modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
-  tipoComprobanteOptions = Object.values(TipoComprobante);
+  tipoComprobanteOptions = Object.values(TipoComprobante).filter(t => t === 'RECIBO' || t === 'BOLETA');
   medioPagoOptions = Object.values(MedioPago);
 
   terminoBusquedaSeparacion: string = '';

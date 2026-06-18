@@ -456,6 +456,24 @@ $border-color: #e9ecef;
 }
 
 // ============================================
+// COLUMNAS OCULTAS EN PANTALLAS MEDIANAS
+// ============================================
+.hide-lg { display: table-cell; }
+.hide-md { display: table-cell; }
+
+@media (max-width: 1300px) {
+  .table-custom {
+    .hide-lg { display: none; }
+  }
+}
+
+@media (max-width: 1100px) {
+  .table-custom {
+    .hide-md { display: none; }
+  }
+}
+
+// ============================================
 // RESPONSIVE: TABLETS
 // ============================================
 @media screen and (max-width: 992px) and (min-width: 768px) {
@@ -514,6 +532,8 @@ $border-color: #e9ecef;
       min-width: 0;
       word-break: break-word;
     }
+
+    &.hide-lg, &.hide-md { display: grid; }
 
     &:first-child {
       background: linear-gradient(135deg, $navy, #0353a4);

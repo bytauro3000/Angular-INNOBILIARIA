@@ -73,18 +73,18 @@
     <table class="table-custom">
       <thead>
         <tr>
-          <th class="text-center" style="width:60px;">ID</th>
-          <th>CLIENTE(S)</th>
-          <th class="text-center">DOCUMENTO</th>
-          <th class="text-center">MZ Y LT</th>
-          <th class="text-center">FECHA C.</th>
-          <th class="text-center">TIPO C.</th>
-          <th class="text-center">ESTADO</th>
-          <th class="text-center">TOTAL</th>
-          <th class="text-end">INICIAL</th>
-          <th class="text-end">SALDO</th>
-          <th class="text-center" style="width:70px;">LETRAS</th>
-          <th class="text-center" style="width:150px;">ACCIONES</th>
+          <th class="col-id text-center">ID</th>
+          <th class="col-cliente">CLIENTE(S)</th>
+          <th class="col-doc text-center hide-lg">DOCUMENTO</th>
+          <th class="col-lote text-center">MZ Y LT</th>
+          <th class="col-fecha text-center hide-md">FECHA C.</th>
+          <th class="col-tipo text-center hide-md">TIPO</th>
+          <th class="col-estado text-center">ESTADO</th>
+          <th class="col-total text-center">TOTAL</th>
+          <th class="col-inicial text-end hide-lg">INICIAL</th>
+          <th class="col-saldo text-end hide-md">SALDO</th>
+          <th class="col-cant-letras text-center hide-md">LETRAS</th>
+          <th class="col-acciones text-center">ACCIONES</th>
         </tr>
       </thead>
 
@@ -104,39 +104,39 @@
           <tr *ngFor="let contrato of paginatedContratos; trackBy: trackById">
 
             <!-- ID -->
-            <td class="text-center" data-label="ID">
+            <td class="col-id text-center" data-label="ID">
               <span class="id-number">{{ contrato.idContrato }}</span>
             </td>
 
             <!-- Clientes -->
-            <td data-label="Cliente(s)">
+            <td class="col-cliente" data-label="Cliente(s)">
               <div class="multi-item-container">
                 <div *ngFor="let cliente of contrato.clientes">{{ cliente.nombre }} {{ cliente.apellidos }}</div>
               </div>
             </td>
 
             <!-- Documentos -->
-            <td class="text-center" data-label="Documento">
+            <td class="col-doc text-center hide-lg" data-label="Documento">
               <div class="multi-item-container">
                 <div *ngFor="let cliente of contrato.clientes">{{ cliente.numDoc }}</div>
               </div>
             </td>
 
             <!-- Lotes -->
-            <td class="text-center" data-label="Mz y Lt">
+            <td class="col-lote text-center" data-label="Mz y Lt">
               <div class="multi-item-container">
                 <div *ngFor="let lote of contrato.lotes">Mz. {{ lote.manzana }} - Lt. {{ lote.numeroLote }}</div>
               </div>
             </td>
 
             <!-- Fecha -->
-            <td class="text-center" data-label="Fecha C.">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+            <td class="col-fecha text-center hide-md" data-label="Fecha C.">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
 
             <!-- Tipo -->
-            <td class="text-center" data-label="Tipo C.">{{ contrato.tipoContrato }}</td>
+            <td class="col-tipo text-center hide-md" data-label="Tipo">{{ contrato.tipoContrato }}</td>
 
             <!-- Estado con badge + dropdown -->
-            <td class="text-center" data-label="Estado">
+            <td class="col-estado text-center" data-label="Estado">
               <div class="estado-cell">
                 <span class="estado-badge" [ngClass]="getEstadoConfig(contrato.estadoContrato).cssClass">
                   <i class="bi" [ngClass]="getEstadoConfig(contrato.estadoContrato).icon"></i>
@@ -160,17 +160,17 @@
             </td>
 
             <!-- Montos -->
-            <td class="text-end fw-bold" data-label="Total" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ?
+            <td class="col-total text-end fw-bold" data-label="Total" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ?
               'S/.' : '$' }}{{ contrato.montoTotal | number:'1.2-2' }}</td>
-            <td class="text-end" data-label="Inicial" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' :
+            <td class="col-inicial text-end hide-lg" data-label="Inicial" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' :
               '$' }}{{ contrato.inicial | number:'1.2-2' }}</td>
-            <td class="text-end" data-label="Saldo" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' :
+            <td class="col-saldo text-end hide-md" data-label="Saldo" style="white-space:nowrap">{{ contrato.moneda === 'PEN' ? 'S/.' :
               '$'
               }}{{ contrato.saldo | number:'1.2-2' }}</td>
-            <td class="text-center" data-label="Letras">{{ contrato.cantidadLetras }}</td>
+            <td class="col-cant-letras text-center hide-md" data-label="Letras">{{ contrato.cantidadLetras }}</td>
 
             <!-- Acciones -->
-            <td class="acciones-cell" data-label="Acciones">
+            <td class="col-acciones acciones-cell" data-label="Acciones">
               <div class="acciones-container">
 
                 <button [routerLink]="['/secretaria-menu/contratos/editar', contrato.idContrato]"

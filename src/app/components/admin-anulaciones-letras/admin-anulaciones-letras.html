@@ -102,9 +102,14 @@
               <i class="fas fa-file-pdf"></i>
             </button>
             <button class="btn-icon btn-anular" title="Anular"
-                    *ngIf="!pago.anulado"
+                    *ngIf="!pago.anulado && !puedeAnularConSunat(pago)"
                     (click)="abrirModalAnular(pago)">
               <i class="fas fa-ban"></i>
+            </button>
+            <button class="btn-icon btn-sunat" title="Anular con SUNAT"
+                    *ngIf="!pago.anulado && puedeAnularConSunat(pago)"
+                    (click)="abrirModalNotaCredito(pago)">
+              <i class="fas fa-cloud-upload-alt"></i>
             </button>
             <button class="btn-icon btn-eliminar" title="Eliminar"
                     (click)="abrirModalEliminar(pago)">
@@ -114,7 +119,7 @@
           </td>
         </tr>
         <tr *ngIf="pagosFiltrados.length === 0">
-          <td colspan="8" class="empty-cell">
+          <td colspan="9" class="empty-cell">
             <i class="fas fa-inbox"></i>
             <p>No se encontraron pagos con los filtros aplicados.</p>
           </td>
@@ -160,8 +165,11 @@
         <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
           <i class="fas fa-file-pdf"></i> PDF
         </button>
-        <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado" (click)="abrirModalAnular(pago)">
+        <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado && !puedeAnularConSunat(pago)" (click)="abrirModalAnular(pago)">
           <i class="fas fa-ban"></i> Anular
+        </button>
+        <button class="btn-icon btn-sunat" title="Anular con SUNAT" *ngIf="!pago.anulado && puedeAnularConSunat(pago)" (click)="abrirModalNotaCredito(pago)">
+          <i class="fas fa-cloud-upload-alt"></i> NC SUNAT
         </button>
         <button class="btn-icon btn-eliminar" title="Eliminar" (click)="abrirModalEliminar(pago)">
           <i class="fas fa-trash-alt"></i> Eliminar
@@ -236,6 +244,52 @@
         <i class="fas fa-trash-alt"></i> {{ procesando ? 'Eliminando...' : 'Sí, Eliminar' }}
       </button>
       <button class="btn-cancelar" (click)="cerrarModalEliminar()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nota de Crédito SUNAT -->
+<div class="modal-overlay" *ngIf="mostrarModalNotaCredito">
+  <div class="custom-modal modal-anular">
+    <div class="modal-header danger">
+      <h4><i class="fas fa-cloud-upload-alt"></i> Anular con SUNAT — Nota de Crédito</h4>
+      <button class="close-btn" (click)="cerrarModalNotaCredito()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="pagoNc">
+      <div class="info-pago">
+        <div class="info-row">
+          <span class="label">Comprobante a anular:</span>
+          <span class="value">{{ pagoNc.numeroComprobante }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Importe:</span>
+          <span class="value monto">{{ pagoNc.moneda === 'USD' ? '$' : 'S/' }} {{ pagoNc.importePagado | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label>MOTIVO <span class="requerido">*</span></label>
+        <select class="form-control dark-input" [(ngModel)]="codMotivoNc">
+          <option *ngFor="let item of motivosNc | keyvalue" [value]="item.key">
+            {{ item.key }} — {{ item.value }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group mt-3">
+        <label>DESCRIPCIÓN DEL MOTIVO <span class="requerido">*</span></label>
+        <textarea class="form-control dark-input" rows="3"
+                  [(ngModel)]="desMotivoNc"
+                  placeholder="Ej: ANULACION DE LA OPERACION"></textarea>
+      </div>
+      <div class="alert alert-warning" *ngIf="procesandoNc">
+        <i class="fas fa-spinner fa-spin"></i> Enviando a SUNAT...
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-confirmar-anular" (click)="confirmarNotaCredito()"
+              [disabled]="!desMotivoNc.trim() || procesandoNc">
+        <i class="fas fa-cloud-upload-alt"></i> {{ procesandoNc ? 'Enviando...' : 'Emitir Nota de Crédito' }}
+      </button>
+      <button class="btn-cancelar" (click)="cerrarModalNotaCredito()" [disabled]="procesandoNc">Cancelar</button>
     </div>
   </div>
 </div>

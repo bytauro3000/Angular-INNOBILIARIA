@@ -1,5 +1,5 @@
 <div class="letras-container">
-  <h2 class="titulo">Letras de Cambio del Contrato #{{ idContrato }}</h2>
+  <h2 class="titulo">{{ tituloLetras }}</h2>
 
   <div class="filtros">
     <label for="buscar-input" class="label-buscar">Buscar:</label>
@@ -54,21 +54,21 @@
     <table *ngIf="!cargando && paginatedLetras.length > 0">
       <thead>
         <tr>
-          <th>#</th>
-          <th>Número Letra</th>
-          <th>Fecha Giro</th>
-          <th>Fecha Vencimiento</th>
-          <th>Importe</th>
-          <th>Importe Texto</th>
+          <th class="col-num text-center">#</th>
+          <th class="col-letra">NÚMERO</th>
+          <th class="col-fecha-giro hide-md text-center">FECHA GIRO</th>
+          <th class="col-fecha-ven text-center">FECHA VENCIMIENTO</th>
+          <th class="col-importe text-end">IMPORTE</th>
+          <th class="col-importe-texto hide-lg">IMPORTE TEXTO</th>
         </tr>
       </thead>
 
-      <tbody>
+      <tbody #tableBody>
         <tr *ngFor="let letra of paginatedLetras; let i = index">
-          <td data-label="#">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-          <td data-label="Número Letra">{{ letra.numeroLetra }}</td>
-          <td data-label="Fecha Giro">{{ letra.fechaGiro | date: 'dd/MM/yyyy' }}</td>
-          <td data-label="Fecha Vencimiento" (dblclick)="iniciarEdicion(letra, 'fechaVencimiento')" class="celda-importe">
+          <td class="col-num text-center" data-label="#">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td class="col-letra" data-label="NÚMERO">{{ letra.numeroLetra }}</td>
+          <td class="col-fecha-giro hide-md text-center" data-label="FECHA GIRO">{{ letra.fechaGiro | date: 'dd/MM/yyyy' }}</td>
+          <td class="col-fecha-ven text-center" data-label="FECHA VENCIMIENTO" (dblclick)="iniciarEdicion(letra, 'fechaVencimiento')">
             <input
               *ngIf="editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento'"
               [value]="valorTemporal"
@@ -85,7 +85,7 @@
             </span>
           </td>
 
-          <td data-label="Importe" (dblclick)="iniciarEdicion(letra, 'importe')" class="celda-importe">
+          <td class="col-importe text-end" data-label="IMPORTE" (dblclick)="iniciarEdicion(letra, 'importe')">
             <input
               *ngIf="editingLetraId === letra.idLetra && campoEditando === 'importe'"
               [value]="valorTemporal"
@@ -103,7 +103,7 @@
             </span>
           </td>
 
-          <td data-label="Importe Texto">
+          <td class="col-importe-texto hide-lg" data-label="IMPORTE TEXTO">
             <span class="importe-texto">{{ letra.importeLetras }}</span>
           </td>
         </tr>

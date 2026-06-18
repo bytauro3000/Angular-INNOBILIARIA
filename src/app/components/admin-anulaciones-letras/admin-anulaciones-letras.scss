@@ -124,6 +124,7 @@ $dark-input:#3a4a5e;
             &.btn-pdf     { color: $danger;   border-color: $danger; }
             &.btn-anular  { color: $warning;  border-color: $warning; }
             &.btn-eliminar{ color: $danger;   border-color: $danger; }
+            &.btn-sunat   { color: $cyan;     border-color: $cyan; }
 
             &:hover { opacity: 0.75; }
             &:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -263,11 +264,13 @@ $dark-input:#3a4a5e;
         &.btn-pdf      { color: $danger;  border: 1px solid $danger; }
         &.btn-anular   { color: $warning; border: 1px solid $warning; }
         &.btn-eliminar { color: $danger;  border: 1px solid $danger; }
+        &.btn-sunat    { color: $cyan;    border: 1px solid $cyan; }
 
         &:hover  { color: white; }
         &.btn-pdf:hover      { background: $danger; }
         &.btn-anular:hover   { background: $warning; }
         &.btn-eliminar:hover { background: $danger; }
+        &.btn-sunat:hover    { background: $cyan; }
       }
     }
   }

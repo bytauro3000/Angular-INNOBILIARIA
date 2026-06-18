@@ -69,7 +69,7 @@ export class InscripcionServiciosInsertarComponent {
   TipoServicios          = TipoServicios;
   MedioPago              = MedioPago;
   medioPagoOptions       = Object.values(MedioPago);
-  tipoComprobanteOptions = Object.values(TipoComprobante);
+  tipoComprobanteOptions = Object.values(TipoComprobante).filter(t => t === 'RECIBO' || t === 'BOLETA');
 
   constructor(
     private inscripcionService: InscripcionService,

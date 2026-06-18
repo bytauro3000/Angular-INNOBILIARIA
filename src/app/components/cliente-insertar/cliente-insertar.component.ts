@@ -293,12 +293,15 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     if (this.clienteForm.valid) {
       const formValue = this.clienteForm.value;
       const celularData: any = formValue.celular;
-      const nuevoCliente: Cliente = {
+      const nuevoCliente: any = {
         ...formValue,
         celular: celularData?.internationalNumber || String(formValue.celular || ''),
-        // Si no es CE, aseguramos enviar null para que el backend use peruano/peruana
         nacionalidad: formValue.tipoCliente === TipoCliente.CE ? formValue.nacionalidad : null
       };
+      if (nuevoCliente.distrito?.idDistrito) {
+        nuevoCliente.idDistrito = nuevoCliente.distrito.idDistrito;
+      }
+      delete nuevoCliente.distrito;
 
       this.clienteService.agregarCliente(nuevoCliente).subscribe({
         next: () => {

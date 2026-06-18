@@ -12,4 +12,6 @@ export interface PagoLetraRequest {
   observaciones?: string;
   /** true = pago a cuenta (parcial); false/omitido = pago total */
   esPagoAcuenta?: boolean;
+  /** Serie personalizada para el comprobante (ej: B001, EB01, F001) */
+  seriePersonalizada?: string;
 }

@@ -36,7 +36,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   @Output() onPagoExitoso = new EventEmitter<string | null>();
 
   medioPagoOptions = Object.values(MedioPago);
-  tipoComprobanteOptions = Object.values(TipoComprobante);
+  tipoComprobanteOptions = Object.values(TipoComprobante).filter(t => t === 'RECIBO' || t === 'BOLETA');
 
   datosComunes = {
     medioPago: MedioPago.EFECTIVO,

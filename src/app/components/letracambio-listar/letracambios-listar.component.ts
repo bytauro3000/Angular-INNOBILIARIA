@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LetrasCambioService } from '../../services/letracambio.service';
+import { ContratoService } from '../../services/contrato.service';
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -20,7 +21,7 @@ import { faPrint, faCalendarAlt, faTrash } from '@fortawesome/free-solid-svg-ico
   styleUrls: ['./letracambios-listar.scss'],
   imports: [CommonModule, FormsModule, FontAwesomeModule],
 })
-export class LetracambioListarComponent implements OnInit {
+export class LetracambioListarComponent implements OnInit, AfterViewInit {
   letras: LetraCambio[] = [];
   letrasFiltradas: LetraCambio[] = [];
   paginatedLetras: LetraCambio[] = [];
@@ -31,10 +32,17 @@ export class LetracambioListarComponent implements OnInit {
   cargando: boolean = false;
   error: string | null = null;
 
+  // Información del contrato para el título
+  contratoLotes: { manzana: string; numeroLote: string; nombrePrograma: string }[] = [];
+
   // Paginación
   pageSize: number = 9;
   currentPage: number = 1;
   totalPages: number = 0;
+  private readonly ROW_HEIGHT_PX = 50;
+  private readonly PAGINATION_RESERVE_PX = 100;
+
+  @ViewChild('tableBody') tableBody!: ElementRef<HTMLElement>;
 
   //Define propiedades para usar los iconos en el HTML
   faPrint = faPrint;
@@ -49,9 +57,11 @@ export class LetracambioListarComponent implements OnInit {
 
   constructor(
     private letrasService: LetrasCambioService,
+    private contratoService: ContratoService,
     private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
     //Inyecta la librería de iconos en el constructor
     library: FaIconLibrary
   ) {
@@ -65,11 +75,63 @@ export class LetracambioListarComponent implements OnInit {
       this.idContrato = id ? +id : 0;
 
       if (this.idContrato > 0) {
+        this.cargarContratoInfo();
         this.cargarLetras();
       } else {
         this.error = 'ID de contrato inválido.';
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.calcularPageSize(), 50);
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.calcularPageSize();
+  }
+
+  private calcularPageSize(): void {
+    if (!this.tableBody?.nativeElement) return;
+    const tbodyTop = this.tableBody.nativeElement.getBoundingClientRect().top;
+    const available = window.innerHeight - tbodyTop - this.PAGINATION_RESERVE_PX;
+    const nuevaPageSize = Math.max(3, Math.floor(available / this.ROW_HEIGHT_PX));
+    if (nuevaPageSize !== this.pageSize) {
+      this.pageSize = nuevaPageSize;
+      this.currentPage = 1;
+      this.aplicarPaginacion();
+      this.cdr.detectChanges();
+    }
+  }
+
+  cargarContratoInfo(): void {
+    this.contratoService.obtenerContratoPorId(this.idContrato).subscribe({
+      next: (contrato) => {
+        if (contrato.lotes && contrato.lotes.length > 0) {
+          this.contratoLotes = contrato.lotes.map(l => ({
+            manzana: l.manzana,
+            numeroLote: l.numeroLote,
+            nombrePrograma: l.nombrePrograma
+          }));
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  get tituloLetras(): string {
+    if (this.contratoLotes.length === 1) {
+      const l = this.contratoLotes[0];
+      return `Letras de Cambio - MZ. ${l.manzana} LT. ${l.numeroLote} - ${l.nombrePrograma}`;
+    }
+    if (this.contratoLotes.length > 1) {
+      const progs = this.contratoLotes.map(l => l.nombrePrograma);
+      const progUnico = progs.every(p => p === progs[0]) ? progs[0] : 'Varios programas';
+      const mzLt = this.contratoLotes.map(l => `MZ. ${l.manzana} LT. ${l.numeroLote}`).join(' / ');
+      return `Letras de Cambio - ${mzLt} - ${progUnico}`;
+    }
+    return `Letras de Cambio del Contrato #${this.idContrato}`;
   }
 
   cargarLetras(): void {

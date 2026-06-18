@@ -40,7 +40,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   @Output() onPagoExitoso = new EventEmitter<void>();
 
   medioPagoOptions = Object.values(MedioPago);
-  tipoComprobanteOptions = Object.values(TipoComprobante);
+  tipoComprobanteOptions = Object.values(TipoComprobante).filter(t => t === 'RECIBO' || t === 'BOLETA');
 
   pagoRequest: PagoLetraRequest = {
     idLetra: 0,
@@ -62,6 +62,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   cargandoPreview: boolean = false;
   modoManualComprobante: boolean = false;
   numeroComprobanteManual: string = '';
+  serieEditable: string = '';
 
   voucherFiles: File[] = [];
   enviando: boolean = false;
@@ -331,32 +332,34 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (this.cargandoPreview) return;
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
-      this.numeroComprobanteManual = this.seriePrefix;
-      this.pagoRequest.numeroComprobantePersonalizado = undefined;
-      setTimeout(() => {
-        const input = this.numeroComprobanteInput?.nativeElement;
-        if (!input) return;
-        input.focus();
-        const pos = this.seriePrefix.length;
-        input.setSelectionRange(pos, pos);
-      }, 0);
-    } else {
+      this.serieEditable = this.seriePrefix.replace('-', '');
       this.numeroComprobanteManual = '';
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
+      this.pagoRequest.seriePersonalizada = undefined;
+    } else {
+      this.numeroComprobanteManual = '';
+      this.serieEditable = '';
+      this.pagoRequest.numeroComprobantePersonalizado = undefined;
+      this.pagoRequest.seriePersonalizada = undefined;
     }
   }
 
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const prefijo = this.seriePrefix;
-    let valor = input.value;
-    if (prefijo && !valor.startsWith(prefijo)) {
-      valor = prefijo;
-      input.value = valor;
-    }
+    const valor = input.value;
     this.numeroComprobanteManual = valor;
-    const soloDigitos = valor.substring(prefijo.length).trim();
-    this.pagoRequest.numeroComprobantePersonalizado = soloDigitos ? valor.trim() : undefined;
+    const soloDigitos = valor.trim();
+    this.pagoRequest.numeroComprobantePersonalizado = soloDigitos ? soloDigitos : undefined;
+  }
+
+  onSerieChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.serieEditable = input.value.trim().toUpperCase();
+    if (this.serieEditable) {
+      this.pagoRequest.seriePersonalizada = this.serieEditable;
+    } else {
+      this.pagoRequest.seriePersonalizada = undefined;
+    }
   }
 
   onNumeroComprobanteFocus(event: FocusEvent): void {

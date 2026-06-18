@@ -29,6 +29,14 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
   mostrarModalEliminar = false;
   pagoAEliminar?: PagoLetraResponse;
 
+  // Modal Nota de Crédito
+  mostrarModalNotaCredito = false;
+  pagoNc?: PagoLetraResponse;
+  codMotivoNc = '01';
+  desMotivoNc = '';
+  procesandoNc = false;
+  motivosNc: {[key: string]: string} = {};
+
   toast = { mostrar: false, mensaje: '', tipo: 'success' };
 
   constructor(private anulacionesService: AdminAnulacionesService) {}
@@ -118,6 +126,54 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
     this.mostrarModalEliminar = false;
     this.pagoAEliminar = undefined;
     this.procesando = false;
+  }
+
+  // ── Nota de Crédito ─────────────────────────────────────
+
+  puedeAnularConSunat(pago: PagoLetraResponse): boolean {
+    return !pago.anulado && !!pago.numeroComprobante && pago.numeroComprobante.startsWith('B');
+  }
+
+  abrirModalNotaCredito(pago: PagoLetraResponse): void {
+    this.pagoNc = pago;
+    this.codMotivoNc = '01';
+    this.desMotivoNc = '';
+    this.procesandoNc = false;
+    this.mostrarModalNotaCredito = true;
+    if (Object.keys(this.motivosNc).length === 0) {
+      this.anulacionesService.obtenerMotivosNotaCredito().subscribe({
+        next: (m) => this.motivosNc = m,
+        error: () => this.motivosNc = { '01': 'Anulacion de la operacion', '06': 'Devolucion total' }
+      });
+    }
+  }
+
+  confirmarNotaCredito(): void {
+    if (!this.pagoNc || !this.desMotivoNc.trim()) return;
+    this.procesandoNc = true;
+    this.anulacionesService.enviarNotaCredito(
+      this.pagoNc.idPago,
+      'LETRA',
+      this.codMotivoNc,
+      this.desMotivoNc
+    ).subscribe({
+      next: (res: any) => {
+        this.mostrarNotificacion(res.mensaje || 'Nota de crédito emitida correctamente', 'success');
+        this.cerrarModalNotaCredito();
+        this.cargarPagos();
+      },
+      error: (err) => {
+        const msg = err.error?.error || 'Error al emitir nota de crédito';
+        this.mostrarNotificacion(msg, 'error');
+        this.procesandoNc = false;
+      }
+    });
+  }
+
+  cerrarModalNotaCredito(): void {
+    this.mostrarModalNotaCredito = false;
+    this.pagoNc = undefined;
+    this.procesandoNc = false;
   }
 
   // ── Utilidades ──────────────────────────────────────────

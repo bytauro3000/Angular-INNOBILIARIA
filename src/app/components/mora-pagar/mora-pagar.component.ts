@@ -34,7 +34,7 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   @Output() onPagoExitoso = new EventEmitter<number>();
 
   medioPagoOptions    = Object.values(MedioPago);
-  tipoComprobanteOptions = Object.values(TipoComprobante);
+  tipoComprobanteOptions = Object.values(TipoComprobante).filter(t => t === 'RECIBO' || t === 'BOLETA');
   enviando = false;
 
   // Archivos de voucher seleccionados

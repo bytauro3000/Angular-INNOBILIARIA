@@ -95,8 +95,14 @@
               <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
                 <i class="bi bi-file-earmark-pdf"></i>
               </button>
-              <button class="btn-icon btn-anular" title="Anular" (click)="abrirModalAnular(pago)">
+              <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado"
+                      (click)="abrirModalAnular(pago)">
                 <i class="bi bi-slash-circle"></i>
+              </button>
+              <button class="btn-icon btn-sunat" title="Anular con SUNAT"
+                      *ngIf="puedeAnularConSunat(pago)"
+                      (click)="abrirModalNotaCredito(pago)">
+                <i class="bi bi-cloud-upload"></i>
               </button>
             </div>
           </td>
@@ -155,8 +161,11 @@
         <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
           <i class="bi bi-file-earmark-pdf"></i> PDF
         </button>
-        <button class="btn-icon btn-anular" title="Anular" (click)="abrirModalAnular(pago)">
+        <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado" (click)="abrirModalAnular(pago)">
           <i class="bi bi-slash-circle"></i> Anular
+        </button>
+        <button class="btn-icon btn-sunat" title="Anular con SUNAT" *ngIf="puedeAnularConSunat(pago)" (click)="abrirModalNotaCredito(pago)">
+          <i class="bi bi-cloud-upload"></i> NC SUNAT
         </button>
       </div>
     </article>
@@ -202,6 +211,53 @@
         <i class="bi bi-slash-circle"></i> {{ procesando ? 'Procesando...' : 'Confirmar' }}
       </button>
       <button class="btn-cancelar" (click)="cerrarModalAnular()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nota de Crédito SUNAT -->
+<div class="modal-overlay" *ngIf="mostrarModalNotaCredito">
+  <div class="custom-modal modal-anular">
+    <div class="modal-header danger">
+      <h4><i class="bi bi-cloud-upload"></i> Anular con SUNAT — Nota de Crédito</h4>
+      <button class="close-btn" (click)="cerrarModalNotaCredito()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="pagoNc">
+      <div class="info-pago">
+        <div class="info-row">
+          <span class="label">Comprobante a anular:</span>
+          <span class="value">{{ pagoNc.numeroComprobante }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Servicio:</span>
+          <span class="value">{{ pagoNc.tipoServicio }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Monto:</span>
+          <span class="value monto">{{ pagoNc.moneda === 'USD' ? '$' : 'S/.' }} {{ pagoNc.importePagado | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label>MOTIVO <span class="requerido">*</span></label>
+        <select class="form-control dark-input" [(ngModel)]="codMotivoNc">
+          <option *ngFor="let item of motivosNc | keyvalue" [value]="item.key">
+            {{ item.key }} — {{ item.value }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group mt-3">
+        <label>DESCRIPCIÓN <span class="requerido">*</span></label>
+        <textarea class="form-control dark-input" rows="3"
+                  [(ngModel)]="desMotivoNc"
+                  placeholder="Ej: ANULACION DE LA OPERACION"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-confirmar-anular" (click)="confirmarNotaCredito()"
+              [disabled]="!desMotivoNc.trim() || procesandoNc">
+        <i class="bi bi-cloud-upload"></i> {{ procesandoNc ? 'Enviando...' : 'Emitir Nota de Crédito' }}
+      </button>
+      <button class="btn-cancelar" (click)="cerrarModalNotaCredito()" [disabled]="procesandoNc">Cancelar</button>
     </div>
   </div>
 </div>

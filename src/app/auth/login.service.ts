@@ -10,13 +10,20 @@ import { environment } from '../../environments/environment';
 })
 export class LoginService {
 
-  private readonly URL_AUTH = `${environment.apiUrl}/api/auth/login`;
+  private readonly URL_AUTH = `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient) { }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.URL_AUTH}/login`, credentials);
+  }
 
-    return this.http.post<LoginResponse>(this.URL_AUTH, credentials);
+  refreshToken(refreshToken: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.URL_AUTH}/refresh`, { refreshToken });
+  }
+
+  logout(refreshToken: string): Observable<void> {
+    return this.http.post<void>(`${this.URL_AUTH}/logout`, { refreshToken });
   }
 }
 
