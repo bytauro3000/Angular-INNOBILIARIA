@@ -291,15 +291,15 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
   toggleModoManual(): void {
     if (this.cargandoPreview) return;
+    if (!this.datosComunes.tipoComprobante) return;
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
-      this.numeroComprobanteManual = this.seriePrefix;
+      this.numeroComprobanteManual = 'EB01-';
       setTimeout(() => {
         const input = this.numeroComprobanteInput?.nativeElement;
         if (!input) return;
         input.focus();
-        const pos = this.seriePrefix.length;
-        input.setSelectionRange(pos, pos);
+        input.setSelectionRange(5, 5);
       }, 0);
     } else {
       this.numeroComprobanteManual = '';
@@ -308,22 +308,56 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const prefijo = this.seriePrefix;
     let valor = input.value;
-    if (prefijo && !valor.startsWith(prefijo)) {
-      valor = prefijo;
-      input.value = valor;
+    if (!valor.startsWith('EB01-')) {
+      valor = 'EB01-';
+    } else {
+      const soloDigitos = valor.substring(5).replace(/\D/g, '');
+      valor = 'EB01-' + soloDigitos;
     }
+    input.value = valor;
     this.numeroComprobanteManual = valor;
   }
 
   onNumeroComprobanteFocus(event: FocusEvent): void {
     if (!this.modoManualComprobante) return;
     const input = event.target as HTMLInputElement;
-    const prefijo = this.seriePrefix;
-    if (!prefijo || !input.value.startsWith(prefijo)) return;
-    const pos = prefijo.length;
-    setTimeout(() => input.setSelectionRange(pos, pos), 0);
+    const guionIdx = input.value.indexOf('-');
+    if (guionIdx < 0) return;
+    setTimeout(() => input.setSelectionRange(guionIdx + 1, guionIdx + 1), 0);
+  }
+
+  onNumeroComprobanteBlur(event: FocusEvent): void {
+    if (!this.modoManualComprobante || !this.numeroComprobanteManual) return;
+    if (!this.numeroComprobantePreview) return;
+
+    const previewParts = this.numeroComprobantePreview.split('-');
+    if (previewParts.length < 2) return;
+    const expectedSerie = previewParts[0];
+    const expectedNumero = parseInt(previewParts[1], 10);
+
+    const typed = this.numeroComprobanteManual.trim();
+    let typedSerie: string;
+    let typedNumero: number;
+
+    if (typed.includes('-')) {
+      const parts = typed.split('-');
+      typedSerie = parts[0].trim().toUpperCase();
+      typedNumero = parseInt(parts[1].trim(), 10);
+    } else {
+      typedSerie = expectedSerie;
+      typedNumero = parseInt(typed, 10);
+    }
+
+    if (isNaN(typedNumero)) return;
+
+    if (typedSerie.startsWith('B') && typedNumero !== expectedNumero) {
+      this.toastr.warning(
+        `El siguiente número correlativo es ${this.numeroComprobantePreview}`,
+        'Serie correlativa'
+      );
+      this.numeroComprobanteManual = this.numeroComprobantePreview;
+    }
   }
 
   toggleDescuento(): void {
@@ -443,6 +477,11 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
         const mensaje = err.error?.message || 'Error al registrar los pagos';
         this.toastr.error(mensaje, 'Error');
         this.enviando = false;
+        if (this.datosComunes.tipoComprobante && mensaje.includes('correlativa')) {
+          this.modoManualComprobante = false;
+          this.numeroComprobanteManual = '';
+          this.onTipoComprobanteChange();
+        }
       }
     });
   }

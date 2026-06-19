@@ -330,12 +330,19 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   toggleModoManual(): void {
     if (this.cargandoPreview) return;
+    if (!this.pagoRequest.tipoComprobante) return;
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
-      this.serieEditable = this.seriePrefix.replace('-', '');
-      this.numeroComprobanteManual = '';
+      this.serieEditable = 'EB01';
+      this.numeroComprobanteManual = 'EB01-';
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
-      this.pagoRequest.seriePersonalizada = undefined;
+      this.pagoRequest.seriePersonalizada = 'EB01';
+      setTimeout(() => {
+        const input = this.numeroComprobanteInput?.nativeElement;
+        if (!input) return;
+        input.focus();
+        input.setSelectionRange(5, 5);
+      }, 0);
     } else {
       this.numeroComprobanteManual = '';
       this.serieEditable = '';
@@ -346,10 +353,16 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const valor = input.value;
+    let valor = input.value;
+    if (!valor.startsWith('EB01-')) {
+      valor = 'EB01-';
+    } else {
+      const soloDigitos = valor.substring(5).replace(/\D/g, '');
+      valor = 'EB01-' + soloDigitos;
+    }
+    input.value = valor;
     this.numeroComprobanteManual = valor;
-    const soloDigitos = valor.trim();
-    this.pagoRequest.numeroComprobantePersonalizado = soloDigitos ? soloDigitos : undefined;
+    this.pagoRequest.numeroComprobantePersonalizado = valor;
   }
 
   onSerieChange(event: Event): void {
@@ -365,10 +378,43 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   onNumeroComprobanteFocus(event: FocusEvent): void {
     if (!this.modoManualComprobante) return;
     const input = event.target as HTMLInputElement;
-    const prefijo = this.seriePrefix;
-    if (!prefijo || !input.value.startsWith(prefijo)) return;
-    const pos = prefijo.length;
-    setTimeout(() => input.setSelectionRange(pos, pos), 0);
+    const guionIdx = input.value.indexOf('-');
+    if (guionIdx < 0) return;
+    setTimeout(() => input.setSelectionRange(guionIdx + 1, guionIdx + 1), 0);
+  }
+
+  onNumeroComprobanteBlur(event: FocusEvent): void {
+    if (!this.modoManualComprobante || !this.numeroComprobanteManual) return;
+    if (!this.numeroComprobantePreview) return;
+
+    const previewParts = this.numeroComprobantePreview.split('-');
+    if (previewParts.length < 2) return;
+    const expectedSerie = previewParts[0];
+    const expectedNumero = parseInt(previewParts[1], 10);
+
+    const typed = this.numeroComprobanteManual.trim();
+    let typedSerie: string;
+    let typedNumero: number;
+
+    if (typed.includes('-')) {
+      const parts = typed.split('-');
+      typedSerie = parts[0].trim().toUpperCase();
+      typedNumero = parseInt(parts[1].trim(), 10);
+    } else {
+      typedSerie = expectedSerie;
+      typedNumero = parseInt(typed, 10);
+    }
+
+    if (isNaN(typedNumero)) return;
+
+    if (typedSerie.startsWith('B') && typedNumero !== expectedNumero) {
+      this.toastr.warning(
+        `El siguiente número correlativo es ${this.numeroComprobantePreview}`,
+        'Serie correlativa'
+      );
+      this.numeroComprobanteManual = this.numeroComprobantePreview;
+      this.pagoRequest.numeroComprobantePersonalizado = this.numeroComprobantePreview;
+    }
   }
 
   guardarPago(): void {
@@ -424,6 +470,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
         const mensaje = err.error?.message || 'Error al registrar el pago';
         this.toastr.error(mensaje, 'Error');
         this.enviando = false;
+        if (this.pagoRequest.tipoComprobante && mensaje.includes('correlativa')) {
+          this.modoManualComprobante = false;
+          this.numeroComprobanteManual = '';
+          this.pagoRequest.numeroComprobantePersonalizado = undefined;
+          this.pagoRequest.seriePersonalizada = undefined;
+          this.onTipoComprobanteChange();
+        }
       }
     });
   }

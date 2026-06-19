@@ -186,6 +186,7 @@
                        [class.input-manual]="modoManualComprobante"
                        (input)="onNumeroManualChange($event)"
                        (focus)="onNumeroComprobanteFocus($event)"
+                       (blur)="onNumeroComprobanteBlur($event)"
                        [placeholder]="modoManualComprobante ? 'Ingrese N°' : (datosComunes.tipoComprobante ? 'Calculando...' : 'Se asigna al guardar')"
                        [style.background-color]="modoManualComprobante ? 'white' : '#f8f9fa'"
                        [style.color]="modoManualComprobante ? '#0f172a' : '#64748b'"
@@ -193,7 +194,9 @@
                 <span class="input-group-text btn-toggle-manual"
                       (click)="toggleModoManual()"
                       [title]="modoManualComprobante ? 'Volver al automático' : 'Ingresar manualmente'"
-                      [class.active]="modoManualComprobante">
+                      [class.active]="modoManualComprobante"
+                      [style.cursor]="datosComunes.tipoComprobante ? 'pointer' : 'not-allowed'"
+                      [style.opacity]="datosComunes.tipoComprobante ? '1' : '0.35'">
                   <span *ngIf="cargandoPreview" class="spinner-border spinner-border-sm text-secondary"></span>
                   <i *ngIf="!cargandoPreview && modoManualComprobante" class="bi bi-pencil-fill text-primary"></i>
                   <i *ngIf="!cargandoPreview && !modoManualComprobante" class="bi bi-pencil text-secondary"></i>
