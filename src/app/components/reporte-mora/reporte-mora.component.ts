@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReporteMoraService } from '../../services/reporte-mora.service';
 import { ReporteClientesMoraDTO, FilaClienteMora } from '../../dto/reporte-mora.dto';
 import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-reporte-mora',
@@ -16,6 +18,7 @@ export class ReporteMoraComponent implements OnInit {
   grupos: ReporteClientesMoraDTO[] = [];
   cargando = true;
   descargandoPdf = false;
+  enviandoWhatsapp = new Map<number, boolean>();
 
   constructor(
     private reporteMoraService: ReporteMoraService,
@@ -92,7 +95,7 @@ export class ReporteMoraComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte-mora-${new Date().toISOString().slice(0, 10)}.pdf`;
+        a.download = `reporte-mora-${obtenerFechaPeru()}.pdf`;
         a.click();
         URL.revokeObjectURL(url);
         this.descargandoPdf = false;
@@ -100,6 +103,36 @@ export class ReporteMoraComponent implements OnInit {
       error: () => {
         this.toastr.error('No se pudo descargar el PDF', 'Error');
         this.descargandoPdf = false;
+      }
+    });
+  }
+
+  enviarWhatsapp(fila: FilaClienteMora): void {
+    if (!fila.celular) {
+      this.toastr.warning(`El cliente "${fila.nombreClientes}" no tiene celular registrado`, 'WhatsApp');
+      return;
+    }
+    const celular = fila.celular.replace(/\D/g, '');
+    const celularLimpio = celular.startsWith('51') ? celular : '51' + celular;
+    if (celularLimpio === '51' || celularLimpio.match(/^510+$/)) {
+      this.toastr.warning(`El celular de "${fila.nombreClientes}" no es válido`, 'WhatsApp');
+      return;
+    }
+
+    this.enviandoWhatsapp.set(fila.idContrato, true);
+    this.reporteMoraService.enviarWhatsapp(fila).subscribe({
+      next: (res: any) => {
+        this.enviandoWhatsapp.set(fila.idContrato, false);
+        if (res.success) {
+          this.toastr.success(`Mensaje enviado a ${fila.nombreClientes}`, 'WhatsApp');
+        } else {
+          this.toastr.error(res.error || 'Error al enviar mensaje', 'WhatsApp');
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.enviandoWhatsapp.set(fila.idContrato, false);
+        const msg = err.error?.error || 'Error de conexión con el servidor';
+        this.toastr.error(msg, 'WhatsApp');
       }
     });
   }

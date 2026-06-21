@@ -320,9 +320,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
     const input = event.target as HTMLInputElement;
     let valor = input.value;
     if (valor) {
-      valor = valor.toLowerCase().split(' ')
-        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
-        .join(' ');
+      valor = valor.toUpperCase();
       this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
     }
   }

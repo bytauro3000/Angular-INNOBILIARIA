@@ -30,6 +30,7 @@ import { MedioPago } from '../../enums/mediopago.enum';
 import { PagoLetraService } from '../../services/pagoletra.service';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-contrato-insertar',
@@ -202,7 +203,7 @@ export class ContratoInsertarComponent implements OnInit {
   private resetPagoInicial(): PagoInicialRequestDTO {
     return {
       importePagado: 0,
-      fechaPago: new Date().toISOString().split('T')[0],
+      fechaPago: obtenerFechaPeru(),
       medioPago: null,
       numeroOperacion: null,
       observaciones: null,
@@ -387,7 +388,7 @@ export class ContratoInsertarComponent implements OnInit {
     this.contratoForm = this.fb.group({
       modalidadContrato: ['DIRECTO', Validators.required],
       tipoContrato: ['FINANCIADO', Validators.required],
-      fechaContrato: [new Date().toISOString().split('T')[0], Validators.required],
+      fechaContrato: [obtenerFechaPeru(), Validators.required],
       vendedorId: [null, Validators.required],
       idPrograma: [null, Validators.required],
       idSeparacion: [null],

@@ -30,6 +30,7 @@ import { ProgramaInsertEdit } from '../programa-insertar-editar/programa-inset-e
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-separacion-insert-edit',
@@ -110,7 +111,7 @@ export class SeparacionInsertEdit implements OnInit {
   private getEmptySeparacion(): Separacion {
     return {
       monto: 0,
-      fechaSeparacion: new Date().toISOString().split('T')[0],
+      fechaSeparacion: obtenerFechaPeru(),
       fechaLimite: '',
       estado: EstadoSeparacion.EN_PROCESO,
       clientes: [],

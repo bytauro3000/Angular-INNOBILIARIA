@@ -9,6 +9,7 @@ import * as bootstrap from 'bootstrap';
 
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 import { MoraService } from '../../services/mora.service';
 import { PagoLetraRequest } from '../../dto/pagoletrarequest.dto';
 import { PagoMoraRequest } from '../../dto/pagomorarequest.dto';
@@ -90,7 +91,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
-    this.pagoRequest.fechaPago = new Date().toISOString().split('T')[0];
+    this.pagoRequest.fechaPago = obtenerFechaPeru();
     // Guardamos la fecha con que se calculó la mora (la fecha actual al abrir el modal)
     this.fechaCalculoMora = this.pagoRequest.fechaPago;
     this.generarObservaciones();
@@ -499,7 +500,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
         }
 
         const fechaPago: string =
-          this.pagoRequest.fechaPago || new Date().toISOString().split('T')[0];
+          this.pagoRequest.fechaPago || obtenerFechaPeru();
 
         const pagoMora: PagoMoraRequest = {
           idMora:          moraPendiente.idMora,

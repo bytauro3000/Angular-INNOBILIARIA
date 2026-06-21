@@ -9,6 +9,7 @@ import * as bootstrap from 'bootstrap';
 
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoLetraService } from '../../services/pagoletra.service';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 import { PagosMultiplesRequest } from '../../dto/pagosmultiplesrequest.dto';
 import { PagoLetraRequest } from '../../dto/pagoletrarequest.dto';
 import { MedioPago } from '../../enums/mediopago.enum';
@@ -97,7 +98,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   ) {}
 
   ngOnInit(): void {
-    this.datosComunes.fechaPago = new Date().toISOString().split('T')[0];
+    this.datosComunes.fechaPago = obtenerFechaPeru();
     this.generarObservaciones();
     this.cargarTipoComprobanteSugerido();
   }

@@ -73,8 +73,8 @@
               <th class="text-center">Letras Atrasadas</th>
               <th class="text-center">Rango</th>
               <th class="text-right">Importe Adeudado</th>
-              
               <th>Celular</th>
+              <th class="text-center">WhatsApp</th>
             </tr>
           </thead>
           <tbody>
@@ -116,11 +116,21 @@
                 {{ simbolo(fila.moneda) }} {{ fila.importeTotal | number:'1.2-2' }}
               </td>
 
-             
-
               <td class="td-celular">
                 <span *ngIf="fila.celular">{{ fila.celular }}</span>
                 <span *ngIf="!fila.celular" class="sin-celular">—</span>
+              </td>
+
+              <td class="td-whatsapp text-center">
+                <button class="btn-whatsapp"
+                        *ngIf="fila.celular"
+                        (click)="enviarWhatsapp(fila)"
+                        [disabled]="enviandoWhatsapp.get(fila.idContrato)"
+                        title="Enviar recordatorio por WhatsApp">
+                  <i class="fab fa-whatsapp" [class.fa-spin]="enviandoWhatsapp.get(fila.idContrato)"></i>
+                  {{ enviandoWhatsapp.get(fila.idContrato) ? 'Enviando...' : 'Enviar' }}
+                </button>
+                <span *ngIf="!fila.celular" class="sin-whatsapp">—</span>
               </td>
             </tr>
           </tbody>

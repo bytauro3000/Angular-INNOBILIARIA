@@ -6,6 +6,7 @@ import { LecturaService } from '../../services/lectura.service';
 import { ProgramaService } from '../../services/programa.service';
 import { LecturaUnificadaDTO } from '../../dto/Lecturaunificada.dto';
 import { Programa } from '../../models/programa.model';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-lectura-planilla',
@@ -18,8 +19,8 @@ export class LecturaPlanillaComponent implements OnInit {
   programaId: number | null = null;
   filtroManzana: string = '';
   filtroLote: string = '';
-  fechaGiroManual: string = new Date().toISOString().split('T')[0];
-  fechaLecturaManual: string = new Date().toISOString().split('T')[0];
+  fechaGiroManual: string = obtenerFechaPeru();
+  fechaLecturaManual: string = obtenerFechaPeru();
 
   guardando: boolean = false;
   planillaCompleta: LecturaUnificadaDTO[] = [];

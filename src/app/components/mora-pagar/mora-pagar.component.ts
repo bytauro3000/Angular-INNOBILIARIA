@@ -15,6 +15,7 @@ import { TipoComprobante } from '../../enums/tipocomprobante';
 import { PagoLetraService } from '../../services/pagoletra.service';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-mora-pagar',
@@ -69,7 +70,7 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.request.idMora      = this.mora.idMora;
     this.request.montoPagado = this.mora.montoMoraTotal;
-    this.request.fechaPago   = new Date().toISOString().split('T')[0];
+    this.request.fechaPago   = obtenerFechaPeru();
     this.request.observaciones = `Pago de mora - Letra N° ${this.mora.numeroLetra}`;
   }
 

@@ -312,6 +312,34 @@ $bg-white:   #ffffff;
 
 .sin-celular { color: $text-light; font-style: italic; }
 
+// ── WhatsApp button ─────────────────────────────────────────────────────────
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #25d366;
+  color: #fff;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  i { font-size: 0.9rem; }
+
+  &:hover:not(:disabled) { background: #1da851; }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.sin-whatsapp { color: $text-light; font-style: italic; font-size: 0.82rem; }
+.td-whatsapp { min-width: 100px; }
+
 // ── Responsive ────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .reporte-header {

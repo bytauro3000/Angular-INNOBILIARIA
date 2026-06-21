@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DashboardService } from '../../services/dashboard.service';
 import { DashboardData } from '../../models/dashboard.model';
 import { IngresoDiarioDTO } from '../../dto/ingresodiario.dto';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -19,7 +20,7 @@ export class AdminDashboardComponent implements OnInit {
   cargandoTotales = true;
   cargandoIngresos = true;
 
-  fechaSeleccionada: string = new Date().toISOString().split('T')[0];
+  fechaSeleccionada: string = obtenerFechaPeru();
   horaActual: string = '';
 
   kpiCards: { key: keyof DashboardData; label: string; icon: string; color: string; }[] = [

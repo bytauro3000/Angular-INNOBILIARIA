@@ -9,6 +9,7 @@ import { MedioPago } from '../../enums/mediopago.enum';
 import { TipoComprobante } from '../../enums/tipocomprobante';
 import { ToastrService } from 'ngx-toastr';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
 
 @Component({
@@ -53,7 +54,7 @@ export class InscripcionServiciosInsertarComponent {
 
   medioPago: MedioPago               = MedioPago.EFECTIVO;
   tipoComprobante?: TipoComprobante;
-  fechaPago: string                  = new Date().toISOString().split('T')[0];
+  fechaPago: string                  = obtenerFechaPeru();
   numeroOperacion: string            = '';
   observaciones: string              = '';
 
@@ -140,7 +141,7 @@ export class InscripcionServiciosInsertarComponent {
     this.montoAbono               = 0;
     this.medioPago                = MedioPago.EFECTIVO;
     this.tipoComprobante          = undefined;
-    this.fechaPago                = new Date().toISOString().split('T')[0];
+    this.fechaPago                = obtenerFechaPeru();
     this.numeroOperacion          = '';
     this.observaciones            = '';
     this.numeroComprobantePreview = '';

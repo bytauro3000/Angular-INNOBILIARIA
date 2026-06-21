@@ -282,9 +282,11 @@ export class ClienteEditarComponent implements OnInit {
 
   formatearTexto(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;
-    let valor = input.value.toLowerCase().split(' ')
-      .map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-    this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+    let valor = input.value;
+    if (valor) {
+      valor = valor.toUpperCase();
+      this.clienteForm.get(controlName)?.setValue(valor, { emitEvent: false });
+    }
   }
 
   formatearCelular(event: any): void {

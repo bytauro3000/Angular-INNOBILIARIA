@@ -7,6 +7,7 @@ import {
   ResumenIngresoItemDTO
 } from '../../dto/resumen-ingresos-rango.dto';
 import { ToastrService } from 'ngx-toastr';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-reporte-ingresos',
@@ -36,7 +37,7 @@ export class ReporteIngresosComponent implements OnInit {
 
   ngOnInit(): void {
     // Por defecto: hoy
-    const hoy = new Date().toISOString().slice(0, 10);
+    const hoy = obtenerFechaPeru();
     this.fechaDesde = hoy;
     this.fechaHasta = hoy;
   }
@@ -74,7 +75,7 @@ export class ReporteIngresosComponent implements OnInit {
   }
 
   limpiar(): void {
-    const hoy = new Date().toISOString().slice(0, 10);
+    const hoy = obtenerFechaPeru();
     this.fechaDesde = hoy;
     this.fechaHasta = hoy;
     this.resumen    = null;
