@@ -207,6 +207,8 @@ export class ClienteEditarComponent implements OnInit {
         if (cliente) {
           this.clienteForm.patchValue({
             ...cliente,
+            nombre: cliente.nombre?.toUpperCase() || '',
+            apellidos: cliente.apellidos?.toUpperCase() || '',
             distrito: { idDistrito: cliente.distrito?.idDistrito }
           });
           this.actualizarValidacionDocumento(cliente.tipoCliente);
@@ -261,6 +263,8 @@ export class ClienteEditarComponent implements OnInit {
       const raw = this.clienteForm.getRawValue();
       const payload: any = {
         ...raw,
+        nombre: raw.nombre?.toUpperCase() || '',
+        apellidos: raw.apellidos?.toUpperCase() || '',
         nacionalidad: raw.tipoCliente === TipoCliente.CE ? raw.nacionalidad : null
       };
       if (payload.distrito?.idDistrito) {

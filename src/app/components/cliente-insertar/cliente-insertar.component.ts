@@ -295,6 +295,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       const celularData: any = formValue.celular;
       const nuevoCliente: any = {
         ...formValue,
+        nombre: formValue.nombre?.toUpperCase() || '',
+        apellidos: formValue.apellidos?.toUpperCase() || '',
         celular: celularData?.internationalNumber || String(formValue.celular || ''),
         nacionalidad: formValue.tipoCliente === TipoCliente.CE ? formValue.nacionalidad : null
       };
