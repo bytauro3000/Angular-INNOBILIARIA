@@ -42,7 +42,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   datosComunes = {
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
-    fechaPago: '',
+    fechaOperacion: '',
     tipoComprobante: undefined as TipoComprobante | undefined,
     observaciones: ''
   };
@@ -98,7 +98,6 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   ) {}
 
   ngOnInit(): void {
-    this.datosComunes.fechaPago = obtenerFechaPeru();
     this.generarObservaciones();
     this.cargarTipoComprobanteSugerido();
   }
@@ -252,8 +251,8 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
     }
 
     if (data.fechaPago) {
-      this.datosComunes.fechaPago = data.fechaPago;
-      cambios.push(`Fecha: ${data.fechaPago}`);
+      this.datosComunes.fechaOperacion = data.fechaPago;
+      cambios.push(`Fecha operación: ${data.fechaPago}`);
     }
 
     if (cambios.length > 0) {
@@ -430,7 +429,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       importePagado: (l.saldoPendiente != null && l.saldoPendiente > 0) ? l.saldoPendiente : l.importe,
       medioPago: this.datosComunes.medioPago,
       numeroOperacion: this.datosComunes.numeroOperacion || undefined,
-      fechaPago: this.datosComunes.fechaPago,
+      fechaOperacion: this.datosComunes.fechaOperacion,
       tipoComprobante: this.datosComunes.tipoComprobante,
       numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual
         ? this.numeroComprobanteManual

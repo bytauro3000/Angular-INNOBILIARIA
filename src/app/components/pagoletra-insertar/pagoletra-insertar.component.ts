@@ -91,9 +91,6 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
-    this.pagoRequest.fechaPago = obtenerFechaPeru();
-    // Guardamos la fecha con que se calculó la mora (la fecha actual al abrir el modal)
-    this.fechaCalculoMora = this.pagoRequest.fechaPago;
     this.generarObservaciones();
 
     if (this.letra.estadoLetra === 'PARCIAL') {
@@ -261,9 +258,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     }
 
     if (data.fechaPago) {
-      this.pagoRequest.fechaPago = data.fechaPago;
-      this.onFechaPagoChange();
-      cambios.push(`Fecha: ${data.fechaPago}`);
+      this.pagoRequest.fechaOperacion = data.fechaPago;
+      cambios.push(`Fecha operación: ${data.fechaPago}`);
     }
 
     if (cambios.length > 0) {

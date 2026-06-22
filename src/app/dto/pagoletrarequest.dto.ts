@@ -6,7 +6,10 @@ export interface PagoLetraRequest {
   importePagado: number;
   medioPago: MedioPago;
   numeroOperacion?: string;
-  fechaPago: string;
+  /** @deprecated El backend ignora este valor, siempre usa LocalDate.now() */
+  fechaPago?: string;
+  /** Fecha del voucher (solo referencial, opcional) */
+  fechaOperacion?: string;
   tipoComprobante?: TipoComprobante;
   numeroComprobantePersonalizado?: string;
   observaciones?: string;

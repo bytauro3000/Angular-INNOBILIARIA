@@ -6,6 +6,7 @@ export interface PagoLetraResponse {
   idLetra?: number;
   numeroLetra?: string;
   fechaPago?: string;
+  fechaOperacion?: string;
   importePagado?: number;
   medioPago?: string;
   numeroOperacion?: string;
