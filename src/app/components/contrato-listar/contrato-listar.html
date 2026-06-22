@@ -191,14 +191,14 @@
                 <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)"
                   [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
                   [queryParams]="{tieneLetras: '0'}" class="btn-action btn-letras" title="Generar letras">
-                  <i class="bi bi-receipt-cutoff"></i>
+                  <i class="fas fa-file-pen"></i>
                 </a>
 
-                <!-- Si YA tiene letras generadas → botón ver (ojo) -->
+                <!-- Si YA tiene letras generadas → botón ver -->
                 <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && contrato.letras && contrato.letras.length > 0"
                   [routerLink]="['/secretaria-menu/letras/listar', contrato.idContrato]"
                   class="btn-action btn-ver-letras" title="Ver letras de cambio">
-                  <i class="bi bi-eye"></i>
+                  <i class="fas fa-file-invoice-dollar"></i>
                 </a>
 
               </div>

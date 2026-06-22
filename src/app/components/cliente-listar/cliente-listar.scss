@@ -31,6 +31,8 @@ $border-color: #e9ecef;
     margin-bottom: 24px;
     padding-left: 20px;
     border-left: none;
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum";
 
     &::before {
       content: '';

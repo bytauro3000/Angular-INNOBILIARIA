@@ -9,7 +9,10 @@
   <div class="page-header">
     <div class="page-title">
       <i class="fas fa-users-cog"></i>
-      <h2>Gestión de Usuarios</h2>
+      <div>
+        <h2>Gestión <i class="bi bi-chevron-double-right separator-icon"></i> Usuarios</h2>
+        <p>Administración de usuarios del sistema</p>
+      </div>
     </div>
   </div>
 
@@ -99,7 +102,7 @@
       <button class="close-btn" (click)="cerrarModal()"><i class="fas fa-times"></i></button>
     </div>
 
-    <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()">
+    <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" autocomplete="off">
       <div class="modal-body">
 
         <div class="row mb-3">
@@ -116,13 +119,13 @@
         <div class="row mb-3">
           <div class="col-md-6 form-group">
             <label>CORREO ELECTRÓNICO</label>
-            <input type="email" class="form-control dark-input" formControlName="correo">
+            <input type="email" class="form-control dark-input" formControlName="correo" autocomplete="off">
           </div>
           <div class="col-md-6 form-group">
             <label>CONTRASEÑA
               <span *ngIf="modoAccion === 'editar'" class="label-hint">(Dejar en blanco para no cambiar)</span>
             </label>
-            <input type="password" class="form-control dark-input" formControlName="contrasena">
+            <input type="password" class="form-control dark-input" formControlName="contrasena" autocomplete="new-password">
           </div>
         </div>
 

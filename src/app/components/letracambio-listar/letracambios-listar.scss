@@ -26,6 +26,9 @@ $border-color: #e9ecef;
     font-size: 1.3rem;
     margin-bottom: 24px;
     padding-left: 20px;
+    border-left: none;
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum";
 
     &::before {
       content: '';
@@ -141,6 +144,7 @@ $border-color: #e9ecef;
       padding: 12px 8px; white-space: normal; word-break: break-word;
       &.text-center { text-align: center; }
       &.text-end { text-align: right; }
+      &.col-importe-texto { padding-left: 76px !important; }
     }
 
     td {
@@ -149,6 +153,7 @@ $border-color: #e9ecef;
       &.text-center { text-align: center; }
       &.text-end { text-align: right; }
       &.fw-bold { font-weight: 600; }
+      &.col-importe-texto { padding-left: 76px !important; }
     }
 
     tbody tr {
@@ -160,16 +165,16 @@ $border-color: #e9ecef;
     .col-num { width: 5%; }
     .col-letra { width: 9%; font-weight: 500; }
     .col-fecha-giro { width: 11%; }
-    .col-fecha-ven { width: 14%; }
-    .col-importe { width: 11%; padding-right: 18px; }
-    .col-importe-texto { width: 50%; padding-left: 24px; }
+    .col-fecha-ven { width: 18%; }
+    .col-importe { width: 10%; padding-right: 44px; text-align: right; }
+    .col-importe-texto { width: 41%; padding-left: 76px !important; }
 
     .celda-importe { cursor: pointer; &:hover { background-color: #fef9e7; } }
 
     .importe-texto {
       display: block;
       font-size: 0.75rem;
-      color: #555;
+      color: $text-dark;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -193,11 +198,11 @@ $border-color: #e9ecef;
     table {
       min-width: 550px;
 
-      .col-num { width: 8%; }
-      .col-letra { width: 16%; }
-      .col-fecha-giro { width: 20%; }
-      .col-fecha-ven { width: 28%; }
-      .col-importe { width: 28%; }
+      .col-num { width: 7%; }
+      .col-letra { width: 15%; }
+      .col-fecha-giro { width: 18%; }
+      .col-fecha-ven { width: 25%; }
+      .col-importe { width: 35%; }
     }
   }
 

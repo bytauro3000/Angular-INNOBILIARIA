@@ -69,7 +69,7 @@
               {{ pago.anulado ? 'ANULADO' : 'VIGENTE' }}
             </span>
           </td>
-          <td data-label="Motivo Anulación" class="motivo">{{ pago.motivoAnulacion || '—' }}</td>
+          <td data-label="Motivo Anulación" class="motivo">{{ pago.motivoAnulacion || '' }}</td>
           <td data-label="Acciones" class="acciones-cell">
             <div class="acciones-container">
               <button class="btn-icon btn-pdf" title="PDF" (click)="descargarComprobante(pago)">

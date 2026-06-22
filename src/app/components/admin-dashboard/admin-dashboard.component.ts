@@ -22,13 +22,15 @@ export class AdminDashboardComponent implements OnInit {
 
   fechaSeleccionada: string = obtenerFechaPeru();
   horaActual: string = '';
+  totalContratos = 0;
 
-  kpiCards: { key: keyof DashboardData; label: string; icon: string; color: string; }[] = [
-    { key: 'clientes',    label: 'Clientes',    icon: 'fa-users',          color: 'blue'   },
-    { key: 'lotes',       label: 'Lotes',       icon: 'fa-map-marked-alt', color: 'green'  },
-    { key: 'vendedores',  label: 'Vendedores',  icon: 'fa-user-tie',       color: 'orange' },
-    { key: 'programas',   label: 'Programas',   icon: 'fa-city',           color: 'cyan'   },
-    { key: 'parceleros',  label: 'Parceleros',  icon: 'fa-hard-hat',       color: 'purple' }
+  kpiCards: { key: string; label: string; icon: string; color: string; bgGrad: string }[] = [
+    { key: 'clientes',   label: 'Clientes',   icon: 'fa-users',          color: '#0f766e', bgGrad: 'linear-gradient(135deg, #0f766e, #14b8a6)'   },
+    { key: 'lotes',      label: 'Lotes',      icon: 'fa-map-marked-alt', color: '#0891b2', bgGrad: 'linear-gradient(135deg, #0891b2, #22d3ee)'   },
+    { key: 'vendedores', label: 'Vendedores', icon: 'fa-user-tie',       color: '#d97706', bgGrad: 'linear-gradient(135deg, #d97706, #fbbf24)'   },
+    { key: 'programas',  label: 'Programas',  icon: 'fa-city',           color: '#7c3aed', bgGrad: 'linear-gradient(135deg, #7c3aed, #a78bfa)'   },
+    { key: 'parceleros', label: 'Parceleros', icon: 'fa-hard-hat',       color: '#be185d', bgGrad: 'linear-gradient(135deg, #be185d, #f472b6)'   },
+    { key: 'contratos',  label: 'Contratos',  icon: 'fa-file-contract',  color: '#059669', bgGrad: 'linear-gradient(135deg, #059669, #34d399)'   }
   ];
 
   ingresosCards: { key: string; label: string; icon: string; color: string; }[] = [
@@ -50,7 +52,13 @@ export class AdminDashboardComponent implements OnInit {
   cargarTotales(): void {
     this.cargandoTotales = true;
     this.dashboardService.getTotales().subscribe({
-      next: (data) => { this.totales = data; this.cargandoTotales = false; },
+      next: (data) => {
+        this.totales = data;
+        this.totalContratos = Object.values(data.graficoContratos).reduce(
+          (acc, curr) => acc + (curr.CONTADO || 0) + (curr.FINANCIADO || 0), 0
+        );
+        this.cargandoTotales = false;
+      },
       error: () => { this.cargandoTotales = false; }
     });
   }
@@ -128,6 +136,11 @@ export class AdminDashboardComponent implements OnInit {
   getMonto(campo: string): number {
     if (!this.ingresos) return 0;
     return (this.ingresos as any)[campo] || 0;
+  }
+
+  getKpiValue(key: string): number {
+    if (key === 'contratos') return this.totalContratos;
+    return (this.totales as any)[key] || 0;
   }
 
   getTotalRegistros(): number {

@@ -4,16 +4,18 @@
    Incluir en cada componente de anulaciones
    ============================================================ */
 
-$primary:   #003b7a;
+$primary:   #0f766e;
 $cyan:      #00bcd4;
 $danger:    #e53935;
 $warning:   #ff9800;
 $success:   #43a047;
-$dark-modal:#2b394a;
-$dark-input:#3a4a5e;
+$dark-modal:#122b39;
+$dark-input:#1a3a4a;
+$ease-out-ek: cubic-bezier(0.23, 1, 0.32, 1);
 
 .anulaciones-page {
   padding: 28px 32px;
+  animation: pageEnter 0.3s $ease-out-ek backwards;
 
   /* ── Header ─────────────────────────────────── */
   .page-header {
@@ -22,8 +24,8 @@ $dark-input:#3a4a5e;
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      > i { font-size: 2rem; color: $primary; margin-top: 4px; }
-      h2  { margin: 0 0 4px; color: $primary; font-weight: 700; font-size: 1.3rem; }
+      > i { font-size: 2rem; color: $primary; margin-top: 4px; filter: drop-shadow(0 2px 4px rgba(15, 118, 110, 0.3)); }
+      h2  { margin: 0 0 4px; color: #0c1f2a; font-weight: 700; font-size: 1.3rem; }
       h2 .separator-icon {
         font-size: 0.85rem;
         color: #64748b;
@@ -65,14 +67,18 @@ $dark-input:#3a4a5e;
 
       .btn-buscar {
         background: $primary; color: white; border: none;
-        padding: 9px 18px; border-radius: 6px; font-weight: 600; cursor: pointer;
+        padding: 9px 18px; border-radius: 8px; font-weight: 600; cursor: pointer;
         display: flex; align-items: center; gap: 7px; font-size: 0.88rem;
-        &:hover { opacity: 0.9; }
+        transition: transform 0.15s $ease-out-ek, background 0.2s, box-shadow 0.2s;
+        &:hover { background: #0d9488; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3); }
+        &:active { transform: scale(0.97); }
       }
       .btn-limpiar {
         background: white; color: #888; border: 1px solid #ccc;
-        padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 0.88rem;
-        &:hover { background: #f5f5f5; }
+        padding: 9px 14px; border-radius: 8px; cursor: pointer; font-size: 0.88rem;
+        transition: transform 0.15s $ease-out-ek, background 0.2s, border-color 0.2s;
+        &:hover { background: #f5f5f5; border-color: #999; }
+        &:active { transform: scale(0.97); }
       }
     }
   }
@@ -91,42 +97,45 @@ $dark-input:#3a4a5e;
     min-width: 900px;
 
     thead {
-      background: $primary;
+      background: linear-gradient(135deg, #0c1f2a, #0f766e);
       color: white;
-      th { padding: 13px 14px; font-weight: 500; font-size: 0.82rem; text-align: left; white-space: nowrap; }
+      th { padding: 13px 14px; font-weight: 600; font-size: 0.82rem; text-align: left; white-space: nowrap; letter-spacing: 0.3px; }
     }
 
     tbody tr {
       border-bottom: 1px solid #f0f0f0;
       transition: background 0.15s;
+      animation: rowEnter 0.25s $ease-out-ek backwards;
 
-      &:hover { background: #f9fbfd; }
+      &:hover { background: rgba(15, 118, 110, 0.04); }
       &.anulado { background: #fff8f8; td { opacity: 0.7; } }
 
       td {
         padding: 12px 14px; font-size: 0.88rem; vertical-align: middle;
 
-        &.monto   { font-weight: 600; color: $primary; }
+        &.monto   { font-weight: 700; color: #0f766e; }
         &.motivo  { font-size: 0.8rem; color: #888; max-width: 200px; }
 
         .comprobante-badge {
-          background: rgba($cyan, 0.1); color: color.adjust($cyan, $lightness: -15%);
-          padding: 3px 9px; border-radius: 4px; font-size: 0.82rem; font-weight: 600;
+          background: rgba(15, 118, 110, 0.1); color: #0f766e;
+          padding: 3px 9px; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
         }
 
         .acciones {
           display: flex; gap: 6px;
 
           .btn-icon {
-            background: none; border: 1px solid; border-radius: 5px;
-            padding: 5px 8px; cursor: pointer; transition: 0.15s;
+            background: none; border: 1px solid; border-radius: 6px;
+            padding: 5px 8px; cursor: pointer;
+            transition: transform 0.15s $ease-out-ek, opacity 0.15s, background 0.15s;
 
             &.btn-pdf     { color: $danger;   border-color: $danger; }
             &.btn-anular  { color: $warning;  border-color: $warning; }
             &.btn-eliminar{ color: $danger;   border-color: $danger; }
             &.btn-sunat   { color: $cyan;     border-color: $cyan; }
 
-            &:hover { opacity: 0.75; }
+            &:hover { opacity: 0.8; transform: translateY(-1px); }
+            &:active { transform: scale(0.93); }
             &:disabled { opacity: 0.35; cursor: not-allowed; }
           }
         }
@@ -175,7 +184,7 @@ $dark-input:#3a4a5e;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s $ease-out-ek, box-shadow 0.2s;
 
     &:hover {
       transform: translateY(-2px);
@@ -194,7 +203,7 @@ $dark-input:#3a4a5e;
     .card-monto {
       font-size: 1.5rem;
       font-weight: 800;
-      color: $primary;
+      color: #0f766e;
       letter-spacing: -0.3px;
     }
 
@@ -258,7 +267,7 @@ $dark-input:#3a4a5e;
         font-size: 0.8rem;
         font-weight: 600;
         cursor: pointer;
-        transition: 0.2s;
+        transition: transform 0.15s $ease-out-ek, background 0.2s, color 0.2s;
         background: white;
 
         &.btn-pdf      { color: $danger;  border: 1px solid $danger; }
@@ -267,6 +276,7 @@ $dark-input:#3a4a5e;
         &.btn-sunat    { color: $cyan;    border: 1px solid $cyan; }
 
         &:hover  { color: white; }
+        &:active { transform: scale(0.95); }
         &.btn-pdf:hover      { background: $danger; }
         &.btn-anular:hover   { background: $warning; }
         &.btn-eliminar:hover { background: $danger; }
@@ -355,7 +365,7 @@ $dark-input:#3a4a5e;
       &.danger { border-left: 4px solid $danger; }
 
       h4 { margin: 0; display: flex; align-items: center; gap: 9px; font-size: 1rem;
-           color: #ef9a9a; }
+           color: #fca5a5; }
       .close-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.1rem;
                    &:hover { color: white; } }
     }
@@ -381,8 +391,8 @@ $dark-input:#3a4a5e;
       .requerido { color: $danger; }
       .dark-input {
         background: $dark-input; border: 1px solid rgba(255,255,255,0.1);
-        color: white; resize: none;
-        &:focus { border-color: $cyan; box-shadow: none; }
+        color: white; resize: none; border-radius: 8px;
+        &:focus { border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15); }
       }
 
       .confirm-message {
@@ -401,24 +411,114 @@ $dark-input:#3a4a5e;
 
       .btn-confirmar-anular {
         background: $warning; color: white; border: none;
-        padding: 9px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+        padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;
         display: flex; align-items: center; gap: 8px;
+        transition: transform 0.15s $ease-out-ek, background 0.2s;
+        &:hover:not(:disabled) { background: color.adjust($warning, $lightness: -8%); transform: translateY(-1px); }
+        &:active:not(:disabled) { transform: scale(0.97); }
         &:disabled { background: #555; cursor: not-allowed; }
       }
       .btn-confirmar-eliminar {
         background: $danger; color: white; border: none;
-        padding: 9px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+        padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;
         display: flex; align-items: center; gap: 8px;
+        transition: transform 0.15s $ease-out-ek, background 0.2s;
+        &:hover:not(:disabled) { background: color.adjust($danger, $lightness: -8%); transform: translateY(-1px); }
+        &:active:not(:disabled) { transform: scale(0.97); }
         &:disabled { background: #555; cursor: not-allowed; }
       }
       .btn-cancelar {
         background: transparent; color: #aaa; border: 1px solid #555;
-        padding: 9px 18px; border-radius: 6px; cursor: pointer; font-weight: 600;
-        &:hover { background: rgba(255,255,255,0.05); }
+        padding: 9px 18px; border-radius: 8px; cursor: pointer; font-weight: 600;
+        transition: transform 0.15s $ease-out-ek, background 0.2s, color 0.2s;
+        &:hover { background: rgba(255,255,255,0.08); color: white; }
+        &:active { transform: scale(0.97); }
       }
     }
   }
 }
 
-@keyframes spin    { to { transform: rotate(360deg); } }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .anulaciones-page {
+    .page-header .page-title {
+      h2 { color: #f1f5f9; }
+      h2 .separator-icon { color: #64748b; }
+      p { color: #94a3b8; }
+    }
+
+    .filtros-panel {
+      background: #0f1f36;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      .filtro-group label { color: #94a3b8; }
+      .filtro-group .form-control {
+        background: #152b45;
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f1f5f9;
+        &::placeholder { color: #64748b; }
+        &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
+      }
+      .btn-limpiar { background: transparent; border-color: rgba(255, 255, 255, 0.15); color: #94a3b8;
+        &:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.25); } }
+    }
+
+    .table-container {
+      background: #0f1f36;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-table {
+      thead { background: #0f1f36; border-bottom: 2px solid #c9952e; }
+      tbody tr {
+        border-bottom: none;
+        td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }
+        &:hover { background: rgba(201, 149, 46, 0.08); }
+        td.monto { color: #e2b859; }
+        td.motivo { color: rgba(255, 255, 255, 0.5); }
+        &.anulado { background: rgba(239, 68, 68, 0.04); td { background: transparent; } }
+        &.anulado:hover { background: rgba(239, 68, 68, 0.1); }
+        .comprobante-badge { background: rgba(201, 149, 46, 0.12); color: #e2b859; }
+      }
+    }
+
+    .pago-card {
+      background: #0f1f36;
+      border-color: rgba(255, 255, 255, 0.06);
+      .card-monto { color: #e2b859; }
+      .card-grid { border-color: rgba(255, 255, 255, 0.06); }
+      .card-label { color: #94a3b8; }
+      .card-value { color: #f1f5f9; }
+      .card-acciones .btn-icon { background: #0f1f36; }
+    }
+
+    .empty-state { background: #0f1f36; color: #64748b; }
+  }
+  .badge-estado {
+    &.vigente { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }
+    &.anulado { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+  }
+}
+
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes slideIn   { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes pageEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes rowEnter  { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .anulaciones-page,
+  tbody tr,
+  .pago-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

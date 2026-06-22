@@ -46,13 +46,19 @@
     </div>
 
     <div class="kpi-grid" *ngIf="!cargandoTotales && totales; else cargandoKpi">
-      <article class="kpi-card {{ card.color }}" *ngFor="let card of kpiCards; let i = index" [style.animation-delay.ms]="i * 60">
-        <div class="kpi-icon">
-          <i class="fas {{ card.icon }}"></i>
+      <article class="kpi-card" *ngFor="let card of kpiCards; let i = index"
+               [style.animation-delay.ms]="i * 60"
+               [style.--card-accent]="card.color"
+               [style.--card-gradient]="card.bgGrad">
+        <div class="kpi-glow"></div>
+        <div class="kpi-icon-wrap">
+          <div class="kpi-icon">
+            <i class="fas {{ card.icon }}"></i>
+          </div>
         </div>
         <div class="kpi-body">
           <span class="kpi-label">{{ card.label }}</span>
-          <span class="kpi-value">{{ totales![card.key] }}</span>
+          <span class="kpi-value">{{ getKpiValue(card.key) }}</span>
         </div>
         <div class="kpi-bar">
           <div class="kpi-bar-fill"></div>

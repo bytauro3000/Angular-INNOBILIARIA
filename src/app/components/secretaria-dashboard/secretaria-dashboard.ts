@@ -23,6 +23,7 @@ export class SecretariaDashboard implements OnInit {
   totalVendedores: number = 0;
   totalProgramas: number = 0;
   totalClientes: number = 0;
+  totalContratos: number = 0;
 
   // ── Tipo de cambio ─────────────────────────────────────────────────────────
   tcCompra: number = 0;
@@ -166,6 +167,9 @@ export class SecretariaDashboard implements OnInit {
         this.totalVendedores = data.vendedores;
         this.totalProgramas  = data.programas;
         this.totalClientes   = data.clientes;
+        this.totalContratos  = Object.values(data.graficoContratos).reduce(
+          (acc, curr) => acc + (curr.CONTADO || 0) + (curr.FINANCIADO || 0), 0
+        );
 
         const nombresOriginales = Object.keys(data.graficoLotes);
         const nombresLimpios    = nombresOriginales.map(n => this.limpiarNombrePrograma(n));

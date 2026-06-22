@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly STORAGE_KEY = 'protection-mode';
+  private readonly STORAGE_KEY = 'dark-mode';
   private isActiveSubject = new BehaviorSubject<boolean>(false);
   isActive$: Observable<boolean> = this.isActiveSubject.asObservable();
 
@@ -22,7 +22,7 @@ export class ThemeService {
   private setActive(active: boolean): void {
     this.isActiveSubject.next(active);
     if (isPlatformBrowser(this.platformId)) {
-      document.body.classList.toggle('protection-mode', active);
+      document.body.classList.toggle('dark-mode', active);
       localStorage.setItem(this.STORAGE_KEY, String(active));
     }
   }

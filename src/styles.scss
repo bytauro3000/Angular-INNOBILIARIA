@@ -24,12 +24,533 @@ body {
   }
 }
 
-body.protection-mode {
-  filter: sepia(0.35) saturate(0.85) hue-rotate(-5deg);
+body.dark-mode {
+  background: #0a1628;
+}
 
-  img, video, canvas, iframe, svg,
-  i, .fa, .fas, .far, .fal, .fab, .mat-icon,
-  [class*="icon"], [class*="Icon"], [class*="logo"], [class*="Logo"] {
-    filter: sepia(0) saturate(1) hue-rotate(0deg) !important;
+body.dark-mode .main-content,
+body.dark-mode app-admin-dashboard,
+body.dark-mode app-admin-anulaciones-letras,
+body.dark-mode app-admin-anulaciones-moras,
+body.dark-mode app-admin-anulaciones-iniciales,
+body.dark-mode app-admin-anulaciones-inscripciones,
+body.dark-mode app-admin-gestion-usuarios,
+body.dark-mode app-secretaria-menu,
+body.dark-mode app-secretaria-dashboard,
+body.dark-mode app-cliente-listar,
+body.dark-mode app-separacion-crud,
+body.dark-mode app-contrato-listar,
+body.dark-mode app-pagoletra-listar,
+body.dark-mode app-programa-listar,
+body.dark-mode app-vendedor-listar,
+body.dark-mode app-lote-listar,
+body.dark-mode app-parcelero-listar,
+body.dark-mode app-inscripcion-listar,
+body.dark-mode app-letracambio-listar,
+body.dark-mode app-recibos-listar,
+body.dark-mode app-pago-inscripcion-listar,
+body.dark-mode app-reporte-mora,
+body.dark-mode app-reporteingresos,
+body.dark-mode app-reporte-lote,
+body.dark-mode app-lectura-plantilla,
+body.dark-mode app-mensajeria,
+body.dark-mode app-historial-moras-picker,
+body.dark-mode app-separacion-insert-edit {
+  background: #0a1628 !important;
+}
+
+// ── DARK MODE: TABLAS Y LISTADOS (secretaria) ─────────────────────────────
+body.dark-mode .clientes-container,
+body.dark-mode .contratos-container,
+body.dark-mode .vendedores-container,
+body.dark-mode .pagos-container,
+body.dark-mode .letras-container,
+body.dark-mode .pago-inscripcion-container,
+body.dark-mode .reporte-mora-container,
+body.dark-mode .ri-container,
+body.dark-mode .planilla-container,
+body.dark-mode .picker-page,
+body.dark-mode .messaging-container {
+  h2, .titulo, .ri-titulo { color: #f1f5f9 !important; }
+  h3 { color: #e2e8f0; }
+  .ri-subtitulo { color: #64748b; }
+}
+
+// ── FILTERS ──
+body.dark-mode .filtros-header .search-box,
+body.dark-mode .filtros .search-box {
+  background: #0f1f36 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  input { color: #e2e8f0 !important; &::placeholder { color: #64748b !important; }
+    &:focus { outline: none !important; } }
+  .search-icon { color: #64748b; }
+  .spinner-search { color: #06b6d4; }
+  &:focus-within { border-color: #06b6d4 !important; box-shadow: 0 0 0 2px rgba(6,182,212,0.08) !important; }
+}
+
+body.dark-mode .filtros-header .filtro-select,
+body.dark-mode .filtros .filtro-select,
+body.dark-mode .select-programa,
+body.dark-mode .input-lote,
+body.dark-mode .filtro-select {
+  background-color: #152b45 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #e2e8f0 !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  &:focus { border-color: #06b6d4 !important; box-shadow: 0 0 0 2px rgba(6,182,212,0.08) !important; background-color: #1a334d !important; }
+}
+
+body.dark-mode .filtros-header .filtro-input,
+body.dark-mode .filtros .filtro-input {
+  background-color: #152b45 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #e2e8f0 !important;
+  &:focus { outline: none !important; border-color: #06b6d4 !important; box-shadow: 0 0 0 2px rgba(6,182,212,0.08) !important; background-color: #1a334d !important; }
+}
+
+body.dark-mode .filtros-header .selector-busqueda {
+  background: #152b45;
+  border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-mode .filtros-header .btn-toggle {
+  color: #94a3b8;
+  &:hover:not(.active) { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+  &.active { background: #0f1f36; color: #06b6d4; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+}
+
+body.dark-mode .btn-clear-inline {
+  color: #f87171 !important;
+  &:hover { color: #ef4444 !important; }
+}
+
+body.dark-mode .filtros-header .busqueda-lote {
+  .select-programa, .input-lote {
+    background-color: #152b45;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; box-shadow: 0 0 0 2px rgba(6,182,212,0.08); background-color: #1a334d; }
   }
 }
+
+// ── PAGOLETRA / LETRACAMBIO / RECIBOS .filtros cards ──
+body.dark-mode .filtros,
+body.dark-mode .picker-card {
+  background: #0a1628;
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  label { color: #94a3b8; }
+  select, input {
+    background-color: #152b45;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; box-shadow: 0 0 0 2px rgba(6,182,212,0.08); background-color: #1a334d; }
+  }
+}
+
+// ── TABLE WRAPPER ──
+body.dark-mode .tabla-wrapper,
+body.dark-mode .main-card,
+body.dark-mode .contrato-card {
+  background: #0f1f36 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+// ── TABLE ──
+body.dark-mode .table-custom {
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  .id-number { color: #06b6d4; }
+  .multi-item-container div:not(:last-child) { border-bottom-color: rgba(255,255,255,0.06); }
+  .no-data { color: #64748b; }
+}
+
+body.dark-mode .tabla-recibos {
+  background: #0f1f36;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; background: transparent; }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  .estado-pendiente { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .estado-pagado    { background: rgba(52,211,153,0.15); color: #34d399; }
+  .estado-vencido   { background: rgba(248,113,113,0.15); color: #f87171; }
+  .btn-pdf { color: #f87171; }
+}
+
+// ── ACTION BUTTONS ──
+body.dark-mode .table-custom .btn-action,
+body.dark-mode .tabla-recibos .btn-action {
+  &.btn-edit { color: #c9952e; border-color: #c9952e; &:hover { background: #c9952e; color: #0a1628; } }
+  &.btn-view { color: #06b6d4; border-color: #06b6d4; &:hover { background: #06b6d4; color: #0a1628; } }
+  &.btn-delete { color: #f87171; border-color: #f87171; &:hover { background: #f87171; color: #0a1628; } }
+  &.btn-print { color: #c9952e; border-color: #c9952e; &:hover { background: #c9952e; color: #0a1628; } }
+  &.btn-letras { color: #34d399; border-color: #34d399; &:hover { background: #34d399; color: #0a1628; } }
+  &.btn-ver-letras { color: #06b6d4; border-color: #06b6d4; &:hover { background: #06b6d4; color: #0a1628; } }
+  &.btn-inscripcion { color: #60a5fa; border-color: #60a5fa; &:hover { background: #60a5fa; color: #0a1628; } }
+  &.btn-success-active { background: rgba(52,211,153,0.15) !important; color: #34d399 !important; border-color: #34d399 !important; }
+}
+
+// ── PAGINATION ──
+body.dark-mode .paginacion-controles .btn-paginacion {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  &:hover:not(:disabled) { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+  &:disabled { opacity: 0.4; }
+  &.active { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+}
+
+body.dark-mode .paginacion-controles .ellipsis-spacer { color: #64748b; }
+
+// ── BADGES ──
+body.dark-mode .badge-success { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.3); }
+body.dark-mode .badge-warning { background: rgba(251,191,36,0.15);  color: #fbbf24;  border-color: rgba(251,191,36,0.3); }
+body.dark-mode .badge-danger  { background: rgba(248,113,113,0.15); color: #f87171;  border-color: rgba(248,113,113,0.3); }
+
+// ── ESTADO BADGES ──
+body.dark-mode .estado-badge {
+  &.badge-activo      { background: rgba(52,211,153,0.15); color: #34d399; }
+  &.badge-mora        { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+  &.badge-carta       { background: rgba(248,113,113,0.15); color: #f87171; }
+  &.badge-resolucion  { background: rgba(196,181,253,0.15); color: #c4b5fd; }
+  &.badge-resuelto    { background: rgba(148,163,184,0.15); color: #94a3b8; }
+  &.badge-cancelado   { background: rgba(96,165,250,0.15);  color: #60a5fa; }
+  &.badge-renuncia    { background: rgba(216,180,254,0.15); color: #d8b4fe; }
+  &.badge-transferido { background: rgba(251,191,36,0.15);  color: #fb923c; }
+}
+
+// ── ESTADO DROPDOWN ──
+body.dark-mode .estado-dropdown .btn-estado-menu {
+  border-color: rgba(255,255,255,0.08);
+  color: #64748b;
+  &:hover { background: rgba(6,182,212,0.1); border-color: #06b6d4; color: #06b6d4; }
+}
+body.dark-mode .estado-menu {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  .estado-menu-item {
+    color: #cbd5e1;
+    &:hover { background: rgba(6,182,212,0.08); color: #06b6d4; }
+  }
+}
+
+// ── LOADING ──
+body.dark-mode .loading-dots-wrapper-inline { background: #0f1f36; }
+body.dark-mode .loading-dots span { background: #06b6d4; }
+body.dark-mode .loading-text { color: #64748b; }
+
+// ── EMPTY STATE ──
+body.dark-mode .empty-state { background: #0f1f36; }
+body.dark-mode .empty-state i { color: #334155; }
+body.dark-mode .empty-title { color: #94a3b8; }
+body.dark-mode .empty-subtitle { color: #64748b; }
+body.dark-mode .no-data { color: #64748b; }
+
+// ── CONTRATO INFO CARD (pagoletras) ──
+body.dark-mode .contrato-info-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  h4 { color: #06b6d4; }
+  .info-grid strong { color: #94a3b8; }
+  .info-grid span { color: #cbd5e1; }
+}
+
+// ── CHIP FILTROS (pago-inscripcion) ──
+body.dark-mode .filtro-chips .chip {
+  background: #152b45;
+  border-color: rgba(255,255,255,0.08);
+  color: #94a3b8;
+  &.active { background: rgba(6,182,212,0.15); border-color: #06b6d4; color: #06b6d4; }
+  &:hover:not(.active) { background: rgba(255,255,255,0.05); }
+}
+body.dark-mode .filtro-chips .chip-count { background: rgba(255,255,255,0.06); color: #94a3b8; }
+
+// ── LECTURA PLANILLA ──
+body.dark-mode .main-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  .card-header h2 { color: #f1f5f9; }
+  .badge-price { color: #cbd5e1; }
+}
+body.dark-mode .filter-section {
+  .form-group label { color: #94a3b8; }
+  select, input {
+    background-color: #152b45;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; }
+  }
+}
+
+// ── REPORTE MORA ──
+body.dark-mode .reporte-header {
+  .reporte-title-block h2 { color: #f1f5f9; }
+  .reporte-subtitle { color: #64748b; }
+}
+body.dark-mode .resumen-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  .card-valor { color: #f1f5f9; }
+  .card-label { color: #94a3b8; }
+  .card-icon { color: #06b6d4; }
+}
+body.dark-mode .programa-bloque {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+}
+body.dark-mode .programa-header h3 { color: #e2e8f0; }
+body.dark-mode .programa-badge { background: rgba(6,182,212,0.15); color: #06b6d4; }
+body.dark-mode .estado-cargando { color: #94a3b8; }
+body.dark-mode .estado-vacio { color: #64748b; i { color: #34d399; } }
+body.dark-mode .tabla-mora {
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #cbd5e1; border-bottom-color: rgba(255,255,255,0.06); }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  .fila-critica td { background-color: rgba(248,113,113,0.06) !important; }
+  .badge-letras { background: rgba(6,182,212,0.15); color: #06b6d4; }
+  .badge-bajo  { background: rgba(52,211,153,0.15); color: #34d399; }
+  .badge-medio { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+  .badge-alto  { background: rgba(248,113,113,0.15); color: #f87171; }
+  .rango-chip { background: #152b45; color: #94a3b8; }
+  .btn-whatsapp { background: rgba(37,211,102,0.15); color: #25d366; border-color: rgba(37,211,102,0.3);
+    &:hover:not(:disabled) { background: #25d366; color: #0a1628; } }
+  .sin-celular, .sin-whatsapp { color: #64748b; }
+  .lote-linea { color: #cbd5e1; }
+}
+
+// ── REPORTE INGRESOS ──
+body.dark-mode .ri-filtros-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  label { color: #94a3b8; }
+}
+body.dark-mode .ri-input-fecha {
+  background: #152b45;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+  &::-webkit-calendar-picker-indicator { filter: invert(1); }
+  &:focus { border-color: #06b6d4; }
+}
+body.dark-mode .ri-actions .btn-buscar { background: #06b6d4; color: #0a1628; &:hover { filter: brightness(1.1); } }
+body.dark-mode .ri-actions .btn-limpiar { background: #374151; color: #cbd5e1; &:hover { background: #4b5563; } }
+body.dark-mode .ri-total-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  .tc-label { color: #94a3b8; }
+  .tc-monto { color: #e2e8f0; }
+  .tc-monto-grande { color: #f1f5f9; }
+  .tc-qty { color: #64748b; }
+  .tc-barra { background: rgba(255,255,255,0.06); }
+}
+body.dark-mode .ri-tabla-section {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+}
+body.dark-mode .ri-tabla-titulo { color: #f1f5f9; }
+body.dark-mode .ri-badge-total { background: #152b45; color: #06b6d4; }
+body.dark-mode .ri-select-tipo {
+  background: #152b45;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+body.dark-mode .ri-tabla {
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  tfoot .fila-total td { background: rgba(6,182,212,0.06); color: #06b6d4; }
+}
+body.dark-mode .ri-badge { background: #152b45; color: #94a3b8; }
+body.dark-mode .ri-vacio, body.dark-mode .ri-inicial { color: #64748b; i { color: #334155; } }
+
+// ── REPORTE LOTE ──
+body.dark-mode .reporte-toolbar {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  .toolbar-left { color: #f1f5f9; }
+}
+body.dark-mode .reporte-header .empresa-nombre { color: #f1f5f9; }
+body.dark-mode .reporte-header .reporte-titulo { color: #e2e8f0; }
+body.dark-mode .reporte-header .reporte-meta p { color: #94a3b8; }
+body.dark-mode .reporte-divider { border-color: rgba(255,255,255,0.08); }
+body.dark-mode .programa-nombre { color: #f1f5f9; }
+body.dark-mode .programa-meta-info { color: #94a3b8; }
+body.dark-mode .tabla-lotes {
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  .badge-estado { background: #152b45; color: #94a3b8; }
+  .estado-disponible { background: rgba(52,211,153,0.15); color: #34d399; }
+  .estado-vendido    { background: rgba(248,113,113,0.15); color: #f87171; }
+  .estado-separado   { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+  .tfoot-resumen td { background: rgba(6,182,212,0.06); color: #06b6d4; }
+  .subtotal-label { color: #cbd5e1; }
+}
+body.dark-mode .reporte-footer p { color: #64748b; }
+
+// ── HISTORIAL MORAS PICKER ──
+body.dark-mode .picker-header h2 { color: #f1f5f9; }
+body.dark-mode .picker-header p { color: #64748b; }
+body.dark-mode .picker-form .form-group label { color: #94a3b8; }
+body.dark-mode .picker-form select,
+body.dark-mode .picker-form input {
+  background-color: #152b45;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+  &:focus { border-color: #06b6d4; }
+}
+
+// ── INSCRIPCION LISTAR (servicios basicos, pago-inscripcion) ──
+body.dark-mode .selector-programa label { color: #94a3b8; }
+body.dark-mode .selector-programa select {
+  background-color: #152b45;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+
+// ── MENSAJERIA ── (keep minimal, it works with global bg)
+body.dark-mode .messaging-container {
+  .sidebar-header h2 { color: #f1f5f9; }
+  .chat-item { border-color: rgba(255,255,255,0.06); }
+  .chat-item .chat-info h4 { color: #e2e8f0; }
+  .chat-item .chat-info p { color: #64748b; }
+  .chat-item:hover, .chat-item.active { background: rgba(6,182,212,0.04); }
+  .chat-window-header { border-color: rgba(255,255,255,0.06); }
+  .chat-window-header h3 { color: #f1f5f9; }
+}
+
+// ── CARGANDO (recibos) ──
+body.dark-mode .cargando {
+  background: #0f1f36;
+  color: #06b6d4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  &::after { border-color: #06b6d4; border-top-color: transparent; }
+}
+body.dark-mode .sin-resultados {
+  background: #0f1f36;
+  color: #64748b;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+// ── LETRACAMBIO LISTAR ──
+body.dark-mode .tabla-letras {
+  background: #0f1f36 !important;
+  table {
+    thead tr { background: linear-gradient(135deg, #0a1628, #1a334d) !important; }
+    th { color: #f1f5f9 !important; border-bottom: 2px solid #06b6d4 !important; }
+    td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+    tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+    .importe-texto { color: #e2e8f0 !important; }
+    .celda-importe:hover td { background-color: rgba(6,182,212,0.08) !important; }
+    .input-edicion { background: #1a334d; border-color: #06b6d4; color: #e2e8f0; }
+  }
+  .no-results { color: #64748b; }
+}
+@media (max-width: 767px) {
+  body.dark-mode .tabla-letras tr {
+    background: #0f1f36 !important;
+    border-color: rgba(255,255,255,0.06) !important;
+  }
+  body.dark-mode .tabla-letras td {
+    border-bottom-color: rgba(255,255,255,0.06) !important;
+    &::before { color: #06b6d4 !important; }
+  }
+  body.dark-mode .tabla-letras td:first-child {
+    background: linear-gradient(135deg, #0a1628, #1a334d) !important;
+  }
+}
+body.dark-mode .mensaje-cargando { color: #94a3b8; }
+body.dark-mode .alerta-error { background: rgba(248,113,113,0.1); color: #f87171; border-color: rgba(248,113,113,0.2); }
+body.dark-mode .btn-eliminar { background: rgba(248,113,113,0.15); color: #f87171; border-color: rgba(248,113,113,0.3);
+  &:hover:not(:disabled) { background: #f87171; color: #0a1628; } }
+body.dark-mode .btn-imprimirletra { background: rgba(6,182,212,0.15); color: #06b6d4; border-color: rgba(6,182,212,0.3);
+  &:hover:not(:disabled) { background: #06b6d4; color: #0a1628; } }
+body.dark-mode .btn-imprimircronograma { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.3);
+  &:hover:not(:disabled) { background: #34d399; color: #0a1628; } }
+body.dark-mode .tabla-letras .pagina-btn,
+body.dark-mode .tabla-letras .pagina-numero-btn {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+  &:hover:not(:disabled) { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+  &:disabled { opacity: 0.4; }
+  &.active { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+}
+
+// ── PAGO-INSCRIPCION LISTAR ──
+body.dark-mode .btn-outline-secondary {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+  &:hover:not(:disabled) { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+  &:disabled { opacity: 0.4; }
+}
+body.dark-mode .pagina-numero-btn {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.08);
+  color: #cbd5e1;
+  &:hover:not(:disabled) { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+  &.active { background: #06b6d4; color: #0a1628; border-color: #06b6d4; }
+}
+body.dark-mode .resultado-contador { color: #94a3b8; }
+body.dark-mode .programa-label { color: #06b6d4; }
+
+// ── LECTURA PLANILLA (unified-table, cards, inputs) ──
+body.dark-mode .unified-table {
+  thead tr { background: linear-gradient(135deg, #0a1628, #1a334d); }
+  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  td.bg-light { background: #152b45 !important; color: #cbd5e1; }
+  .name-box strong { color: #e2e8f0; }
+  .badge-mz { background: #152b45; color: #94a3b8; }
+  .input-cell {
+    background: #152b45;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; box-shadow: 0 0 0 2px rgba(6,182,212,0.08); }
+  }
+}
+body.dark-mode .vivienda-card {
+  background: #0f1f36;
+  border-color: rgba(255,255,255,0.06);
+  .name-box strong { color: #e2e8f0; }
+  .badge-mz { background: #152b45; color: #94a3b8; }
+  .input-card {
+    background: #152b45;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; }
+    &:disabled { opacity: 0.5; }
+  }
+  .service-block { border-color: rgba(255,255,255,0.06); }
+  .block-label { color: #94a3b8; }
+  .data-col label { color: #64748b; }
+  .data-col strong { color: #e2e8f0; }
+}
+body.dark-mode .empty-state-box { color: #64748b; }
+body.dark-mode .footer-actions { border-color: rgba(255,255,255,0.06); }
+body.dark-mode .db-info { color: #64748b; }
+body.dark-mode .btn-save {
+  background: #06b6d4;
+  color: #0a1628;
+  &:hover:not(:disabled) { filter: brightness(1.15); }
+  &:disabled { opacity: 0.5; }
+}
+body.dark-mode .floating-search-btn {
+  background: #0f1f36;
+  color: #06b6d4;
+  border-color: rgba(255,255,255,0.08);
+}
+
