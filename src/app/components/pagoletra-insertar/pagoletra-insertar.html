@@ -212,13 +212,14 @@
                 Voucher (imagen)
                 <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span>
               </label>
-              <app-voucher-preview
-                [(ngModel)]="voucherFiles"
-                [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
-                [enableOcr]="pagoRequest.medioPago !== 'EFECTIVO'"
-                (ocrData)="onVoucherOcr($event)"
-                name="vouchers">
-              </app-voucher-preview>
+<app-voucher-preview
+    [(ngModel)]="voucherFiles"
+    [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
+    [enableOcr]="pagoRequest.medioPago !== 'EFECTIVO'"
+    (ocrData)="onVoucherOcr($event)"
+    (filesChange)="onVoucherFilesChange($event)"
+    name="vouchers">
+</app-voucher-preview>
             </div>
           </div>
 
@@ -252,6 +253,34 @@
         </button>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL PIN DE AUTORIZACIÓN ── -->
+<div class="modal-overlay" *ngIf="pinModalAbierto" (click)="cerrarPinModal()">
+  <div class="modal-content pin-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="bi bi-shield-lock-fill"></i> Autorización requerida
+      </h5>
+      <button type="button" class="btn-close" (click)="cerrarPinModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>El pago está fuera del orden consecutivo.</p>
+      <p class="text-muted small">Ingrese el PIN de autorización para desbloquear:</p>
+      <div class="form-group">
+        <input type="password" class="form-control" placeholder="PIN"
+               [(ngModel)]="pinIngresado" name="pinModal"
+               (keydown.enter)="confirmarPin()" autofocus>
+      </div>
+      <div *ngIf="pinError" class="alert alert-danger mt-2">{{ pinError }}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="cerrarPinModal()">Cancelar</button>
+      <button class="btn btn-save" (click)="confirmarPin()">
+        <i class="bi bi-check-circle"></i> Autorizar
+      </button>
     </div>
   </div>
 </div>

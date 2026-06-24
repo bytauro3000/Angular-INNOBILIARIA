@@ -24,6 +24,7 @@ export interface PagoLetraResponse {
   motivoAnulacion?: string;
   fechaAnulacion?: string;
   anuladoPor?: string;
+  idNotaCredito?: number;
   // Contexto admin
   idContrato?: number;
   manzana?: string;

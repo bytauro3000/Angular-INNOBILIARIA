@@ -224,6 +224,7 @@
                 [disabled]="datosComunes.medioPago === 'EFECTIVO'"
                 [enableOcr]="datosComunes.medioPago !== 'EFECTIVO'"
                 (ocrData)="onVoucherOcr($event)"
+                (filesChange)="onVoucherFilesChange($event)"
                 name="vouchers">
               </app-voucher-preview>
             </div>

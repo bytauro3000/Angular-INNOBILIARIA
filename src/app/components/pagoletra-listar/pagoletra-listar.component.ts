@@ -19,6 +19,7 @@ import { MoraResumenContratoDTO } from '../../dto/moraresumencontrato.dto';
 import { CalculoMoraDTO } from '../../dto/calculomora.dto';
 import { ContratoResponseDTO } from '../../dto/contratoreponse.dto';
 import { PagoInicialResponseDTO } from '../../dto/pagoinicialresponse.dto';
+import { ClienteResponseDTO } from '../../dto/clienteresponse.dto';
 
 import { PagoletraInsertarComponent } from '../pagoletra-insertar/pagoletra-insertar.component';
 import { PagoletraMultipleInsertarComponent } from '../pagoletra-multiple-insertar/pagoletra-multiple-insertar.component';
@@ -26,6 +27,7 @@ import { PagoListaModalComponent } from '../pago-lista-modal/pago-lista-modal.co
 import { MoraListarComponent } from '../mora-listar/mora-listar.component';
 import { MoraAlertaComponent } from '../mora-alerta/mora-alerta.component';
 import { HistorialMorasPdfComponent } from '../historial-moras/historial-moras-pdf.component';
+import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.component';
 
 interface LetraCambioConSeleccion extends LetraCambio {
   seleccionada?: boolean;
@@ -44,6 +46,7 @@ interface LetraCambioConSeleccion extends LetraCambio {
     MoraListarComponent,
     MoraAlertaComponent,
     HistorialMorasPdfComponent,
+    ClienteEditarComponent,
   ],
   templateUrl: './pagoletra-listar.html',
   styleUrls: ['./pagoletra-listar.scss'],
@@ -100,7 +103,167 @@ export class PagoletraListarComponent implements OnInit {
   calculoMoraParaPago: CalculoMoraDTO | null = null;
   moraPreviamentePagada: boolean = false;
 
-  private ultimaLetraPagadaNum: number = 0;
+  ultimaLetraPagadaNum: number = 0;
+
+  // ── BLOQUEO DE LETRAS ANTERIORES ────────────────────────────────────────────
+  // ── BLOQUEO DE LETRAS ANTERIORES ────────────────────────────────────────────
+  pinCachePorContrato: Map<number, string> = new Map();
+  pinModalAbierto: boolean = false;
+  pinIngresado: string = '';
+  pinError: string = '';
+  pinValidado: boolean = false;
+
+  private readonly LS_INTENTOS = 'pin_intentos';
+  private readonly LS_BLOQ_HASTA = 'pin_bloqueo_hasta';
+  private readonly LS_BLOQ_PERM  = 'pin_bloqueo_permanente';
+
+  private get pinIntentos(): number {
+    return Number(localStorage.getItem(this.LS_INTENTOS)) || 0;
+  }
+  private set pinIntentos(v: number) { localStorage.setItem(this.LS_INTENTOS, String(v)); }
+
+  private get pinBloqueoHasta(): number {
+    return Number(localStorage.getItem(this.LS_BLOQ_HASTA)) || 0;
+  }
+  private set pinBloqueoHasta(v: number) { localStorage.setItem(this.LS_BLOQ_HASTA, String(v)); }
+
+  get pinBloqueoPermanente(): boolean {
+    return localStorage.getItem(this.LS_BLOQ_PERM) === 'true';
+  }
+  private set pinBloqueoPermanente(v: boolean) { localStorage.setItem(this.LS_BLOQ_PERM, String(v)); }
+
+  get pinBotonDeshabilitado(): boolean {
+    if (this.pinBloqueoPermanente) return true;
+    if (this.pinBloqueoHasta > Date.now()) return true;
+    return false;
+  }
+
+  get pinMensajeBoton(): string {
+    if (this.pinBloqueoPermanente) return 'Cuenta bloqueada - Comuníquese con soporte';
+    const restante = this.pinBloqueoHasta - Date.now();
+    if (restante > 0) {
+      const segs = Math.ceil(restante / 1000);
+      return `Demasiados intentos. Espere ${segs} segundos`;
+    }
+    return '';
+  }
+
+  letraBloqueada(letra: LetraCambioConSeleccion): boolean {
+    if (this.pinValidado) return false;
+    if (letra.estadoLetra === 'PAGADO' || letra.estadoLetra === 'PARCIAL') return false;
+    if (this.ultimaLetraPagadaNum <= 0) return false;
+    return this.extraerNumeroLetra(letra.numeroLetra) < this.ultimaLetraPagadaNum;
+  }
+
+  get hayLetrasBloqueadas(): boolean {
+    return this.contratoEncontrado != null && this.ultimaLetraPagadaNum > 0
+        && this.paginatedLetras.some(l => this.letraBloqueada(l));
+  }
+
+  abrirModalDesbloqueo(): void {
+    this.pinIngresado = '';
+    this.pinError = '';
+
+    // Verificar si hay bloqueo activo
+    if (this.pinBloqueoPermanente) {
+      this.toastr.error('Ha superado el límite de intentos. Comuníquese con soporte.', 'Bloqueo permanente');
+      return;
+    }
+    if (this.pinBloqueoHasta > Date.now()) {
+      const restante = Math.ceil((this.pinBloqueoHasta - Date.now()) / 1000);
+      this.toastr.warning(`Demasiados intentos. Espere ${restante} segundos.`, 'Bloqueo temporal');
+      return;
+    }
+
+    // Mostrar intentos restantes
+    const restantes = this.pinIntentos < 3 ? 3 - this.pinIntentos : 5 - this.pinIntentos;
+    if (restantes > 0 && this.pinIntentos > 0) {
+      this.toastr.info(`Intentos restantes: ${restantes}`, 'Validación PIN');
+    }
+
+    this.pinModalAbierto = true;
+  }
+
+  confirmarPinDesbloqueo(): void {
+    if (!this.pinIngresado.trim()) {
+      this.pinError = 'Ingrese el PIN';
+      return;
+    }
+    this.pinError = '';
+    this.pagoService.validarPin(this.pinIngresado.trim()).subscribe({
+      next: (res) => {
+        if (!res.valido) {
+          this.procesarIntentoFallido();
+          return;
+        }
+        // PIN correcto: resetear contadores
+        this.pinIntentos = 0;
+        this.pinBloqueoHasta = 0;
+        this.pinBloqueoPermanente = false;
+        if (this.contratoEncontrado) {
+          this.pinCachePorContrato.set(this.contratoEncontrado.idContrato, this.pinIngresado.trim());
+        }
+        this.pinValidado = true;
+        this.pinModalAbierto = false;
+        this.toastr.success('Letras desbloqueadas correctamente.', 'Desbloqueo exitoso');
+      },
+      error: () => {
+        this.pinError = 'Error al validar PIN. Intente nuevamente.';
+      }
+    });
+  }
+
+  private procesarIntentoFallido(): void {
+    const nuevos = this.pinIntentos + 1;
+    this.pinIntentos = nuevos;
+
+    if (nuevos >= 5) {
+      // Bloqueo permanente
+      this.pinBloqueoPermanente = true;
+      this.pinModalAbierto = false;
+      this.pinIngresado = '';
+      this.pinError = '';
+      this.toastr.error('Ha superado el límite de intentos. Comuníquese con soporte.', 'Bloqueo permanente');
+      return;
+    }
+
+    if (nuevos >= 3) {
+      // Bloqueo temporal de 2 minutos
+      this.pinBloqueoHasta = Date.now() + 120000;
+      this.pinModalAbierto = false;
+      this.pinIngresado = '';
+      this.pinError = '';
+      const restantes = 5 - nuevos;
+      this.toastr.warning(
+        `PIN incorrecto. Bloqueado 2 minutos. Le queda${restantes === 1 ? 'n' : ''} ${restantes} intento${restantes === 1 ? '' : 's'} después del bloqueo.`,
+        'Demasiados intentos');
+      return;
+    }
+
+    // Menos de 3 intentos: mostrar error como toastr, modal abierto para reintentar
+    const restantes = 3 - nuevos;
+    this.toastr.error(`PIN incorrecto. Le queda${restantes === 1 ? '' : 'n'} ${restantes} intento${restantes === 1 ? '' : 's'}.`, 'Error');
+    this.pinIngresado = '';
+  }
+
+  cerrarPinModal(): void {
+    this.pinModalAbierto = false;
+    this.pinIngresado = '';
+    this.pinError = '';
+  }
+
+  getPinAutorizacion(): string | undefined {
+    return this.contratoEncontrado
+        ? this.pinCachePorContrato.get(this.contratoEncontrado.idContrato)
+        : undefined;
+  }
+
+  resetearBloqueoPin(): void {
+    this.pinIntentos = 0;
+    this.pinBloqueoHasta = 0;
+    this.pinBloqueoPermanente = false;
+    this.toastr.success('Bloqueo de PIN reseteado correctamente.', 'Soporte');
+  }
 
   // ── MODAL BÚSQUEDA DE CONTRATO ───────────────────────────────────────────────
   @ViewChild('inputBusquedaNombre') inputBusquedaNombre!: ElementRef<HTMLInputElement>;
@@ -115,6 +278,12 @@ export class PagoletraListarComponent implements OnInit {
   // ── PAGO INICIAL ────────────────────────────────────────────────────────────
   esAdministrador: boolean = false;
   anulandoPagoInicial: boolean = false;
+
+  // ── MODAL EDITAR CLIENTE ────────────────────────────────────────────────────
+  @ViewChild('modalEditarCliente') modalEditarCliente!: ClienteEditarComponent;
+  clienteParaEditar: ClienteResponseDTO | null = null;
+  indiceClienteActual: number = 0;
+  clientesSinDatos: ClienteResponseDTO[] = [];
 
   constructor(
     private contratoService: ContratoService,
@@ -155,6 +324,7 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.warning('Debe seleccionar programa, manzana y número de lote', 'Atención');
       return;
     }
+    this.pinValidado = false;
     this.contratoService.buscarPorProgramaManzanaLote(
       this.programaSeleccionado,
       this.manzanaBusqueda.trim().toUpperCase(),
@@ -164,6 +334,7 @@ export class PagoletraListarComponent implements OnInit {
         this.contratoEncontrado = contrato;
         this.cargarLetrasPendientes(contrato.idContrato);
         this.cargarResumenMora(contrato.idContrato);
+        this.verificarClientesYMostrarAlerta();
       },
       error: () => {
         this.toastr.error('No se encontró ningún contrato para esos datos', 'Error');
@@ -174,6 +345,15 @@ export class PagoletraListarComponent implements OnInit {
         this.moraResumen = null;
       }
     });
+  }
+
+  private verificarClientesYMostrarAlerta(): void {
+    const clientesSinDatos = this.verificarClientesSinDatos();
+    if (clientesSinDatos.length > 0) {
+      this.clientesSinDatos = clientesSinDatos;
+      this.indiceClienteActual = 0;
+      this.mostrarSweetAlertClienteSigiente();
+    }
   }
 
   cargarLetrasPendientes(idContrato: number): void {
@@ -189,15 +369,15 @@ export class PagoletraListarComponent implements OnInit {
         this.seleccionadasMap.clear();
         this.filtroNumeroLetra = '';
 
-        const maxPagadoNum = this.letrasPagadas.length > 0
+        this.ultimaLetraPagadaNum = this.letrasPagadas.length > 0
           ? Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)))
           : 0;
 
         let paginaDestino = 1;
 
-        if (maxPagadoNum > 0) {
+        if (this.ultimaLetraPagadaNum > 0) {
           const indiceSiguiente = this.letrasPendientes
-            .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= maxPagadoNum + 1);
+            .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= this.ultimaLetraPagadaNum + 1);
           if (indiceSiguiente >= 0) {
             paginaDestino = Math.floor(indiceSiguiente / this.pageSize) + 1;
           }
@@ -236,6 +416,10 @@ export class PagoletraListarComponent implements OnInit {
         this.seleccionadasMap.clear();
         this.filtroNumeroLetra = '';
 
+        this.ultimaLetraPagadaNum = this.letrasPagadas.length > 0
+          ? Math.max(...this.letrasPagadas.map(l => this.extraerNumeroLetra(l.numeroLetra)))
+          : this.ultimaLetraPagadaNum;
+
         const siguienteNum = this.ultimaLetraPagadaNum + 1;
         const indiceSiguiente = this.letrasPendientes
           .findIndex(l => this.extraerNumeroLetra(l.numeroLetra) >= siguienteNum);
@@ -245,8 +429,6 @@ export class PagoletraListarComponent implements OnInit {
         } else {
           this.currentPage = 1;
         }
-
-        this.ultimaLetraPagadaNum = 0;
         this.aplicarPaginacion();
         this.cargandoLetras = false;
         this.cdr.markForCheck();
@@ -316,14 +498,72 @@ export class PagoletraListarComponent implements OnInit {
       this.toastr.error(errorOrden, 'Pago no permitido');
       return;
     }
+    this.procederConPago(letra);
+  }
 
+  private verificarClientesSinDatos(): ClienteResponseDTO[] {
+    if (!this.contratoEncontrado?.clientes) return [];
+    return this.contratoEncontrado.clientes.filter((c: ClienteResponseDTO) => {
+      const celularInvalido = !c.celular || c.celular.trim() === '' || c.celular === '000-000-000' || c.celular === '000000000';
+      const emailInvalido = !c.email || c.email.trim() === '';
+      return celularInvalido || emailInvalido;
+    });
+  }
+
+  private mostrarSweetAlertClienteSigiente(): void {
+    if (this.indiceClienteActual >= this.clientesSinDatos.length) {
+      const letra = this.letraParaPagarConMora || this.letraSeleccionada;
+      if (letra) {
+        this.procederConPago(letra);
+      }
+      return;
+    }
+
+    const cliente = this.clientesSinDatos[this.indiceClienteActual];
+    const celularInvalido = !cliente.celular || cliente.celular.trim() === '' || cliente.celular === '000-000-000' || cliente.celular === '000000000';
+    const emailInvalido = !cliente.email || cliente.email.trim() === '';
+
+    let mensaje = `El cliente <strong>${cliente.nombre} ${cliente.apellidos}</strong> no tiene datos registrados:`;
+    if (celularInvalido) mensaje += `<br>- Celular`;
+    if (emailInvalido) mensaje += `<br>- Correo electrónico`;
+    mensaje += `<br><br>¿Desea registrar los datos ahora?`;
+
+    Swal.fire({
+      title: 'Datos incompletos del cliente',
+      html: mensaje,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.clienteParaEditar = cliente;
+        setTimeout(() => {
+          this.modalEditarCliente?.abrirModal(cliente.idCliente, cliente);
+        }, 100);
+      } else {
+        this.letraParaPagarConMora = null;
+        this.clientesSinDatos = [];
+      }
+    });
+  }
+
+  onDatosClienteActualizados(): void {
+    this.indiceClienteActual++;
+    this.refrescarContrato();
+    setTimeout(() => {
+      this.mostrarSweetAlertClienteSigiente();
+    }, 300);
+  }
+
+  private procederConPago(letra: LetraCambio): void {
     if (letra.estadoLetra === 'VENCIDO') {
-      // Letra vencida → mostrar alerta de mora primero
       this.letraParaPagarConMora = letra;
       this.moraPreviamentePagada = false;
       this.mostrarMoraAlerta = true;
     } else {
-      // PENDIENTE o PARCIAL → ir directo al modal de pago sin pasar por mora-alerta
       this.calculoMoraParaPago = null;
       this.moraPreviamentePagada = false;
       this.letraSeleccionada = letra;
@@ -393,6 +633,9 @@ formatearNumeroLote(): void {
     this.calculoMoraParaPago = null;
     this.moraPreviamentePagada = false;
     this.filtroNumeroLetra = '';
+    this.clientesSinDatos = [];
+    this.indiceClienteActual = 0;
+    this.clienteParaEditar = null;
   }
 
   private extraerNumeroLetra(numeroLetra: string): number {

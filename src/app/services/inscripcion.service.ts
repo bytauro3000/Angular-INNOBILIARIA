@@ -45,6 +45,7 @@ export interface PagoInscripcionDTO {
   idPrograma:        number | null;
   nombrePrograma:    string | null;
   // Campos admin
+  idComprobante?:    number;
   anulado?:          boolean;
   motivoAnulacion?:  string;
   fechaAnulacion?:   string;

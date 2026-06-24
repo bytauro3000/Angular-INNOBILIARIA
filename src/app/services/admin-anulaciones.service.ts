@@ -103,8 +103,25 @@ export class AdminAnulacionesService {
     });
   }
 
+  buscarNotaCreditoPorOriginal(idOriginal: number): Observable<{ idNotaCredito: number | null; serie?: string }> {
+    return this.http.get<{ idNotaCredito: number | null; serie?: string }>(
+      `${environment.apiUrl}/api/nota-credito/por-original/${idOriginal}`);
+  }
+
   obtenerMotivosNotaCredito(): Observable<{[key: string]: string}> {
     return this.http.get<{[key: string]: string}>(`${environment.apiUrl}/api/nota-credito/motivos`);
+  }
+
+  descargarPdfNotaCredito(idNotaCredito: number): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}/api/nota-credito/${idNotaCredito}/pdf`,
+      { responseType: 'blob' });
+  }
+
+  descargarPdfNotaCreditoRecibo(idNotaCredito: number): Observable<Blob> {
+    return this.http.get(
+      `${environment.apiUrl}/api/nota-credito/recibo/${idNotaCredito}/pdf`,
+      { responseType: 'blob' });
   }
 
   /* ── Helpers ──────────────────────────────────────────── */

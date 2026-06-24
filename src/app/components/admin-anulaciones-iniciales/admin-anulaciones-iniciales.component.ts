@@ -120,6 +120,12 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
         this.mostrarNotificacion(res.mensaje || 'Nota de crédito emitida', 'success');
         this.cerrarModalNotaCredito();
         this.cargarPagos();
+        if (res.idNotaCredito) {
+          const obs = res.serieNC?.startsWith('BB')
+            ? this.anulacionesService.descargarPdfNotaCredito(res.idNotaCredito)
+            : this.anulacionesService.descargarPdfNotaCreditoRecibo(res.idNotaCredito);
+          obs.subscribe({ next: (blob) => window.open(URL.createObjectURL(blob), '_blank') });
+        }
       },
       error: (err) => {
         const msg = err.error?.error || 'Error al emitir nota de crédito';
@@ -148,6 +154,33 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
       },
       error: () => this.mostrarNotificacion('Error al descargar comprobante', 'error')
     });
+  }
+
+  private descargarNc(idNc: number, serieNc: string | undefined): void {
+    const obs = serieNc?.startsWith('BB')
+      ? this.anulacionesService.descargarPdfNotaCredito(idNc)
+      : this.anulacionesService.descargarPdfNotaCreditoRecibo(idNc);
+    obs.subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.download = `nc-${idNc}.pdf`; a.href = url;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.mostrarNotificacion('Error al descargar nota de crédito', 'error')
+    });
+  }
+
+  descargarNotaCredito(pago: PagoInicialAdminDTO): void {
+    if (pago.idComprobante) {
+      this.anulacionesService.buscarNotaCreditoPorOriginal(pago.idComprobante).subscribe({
+        next: (res) => {
+          if (res.idNotaCredito) this.descargarNc(res.idNotaCredito, res.serie);
+        },
+        error: () => this.mostrarNotificacion('No se encontró nota de crédito', 'error')
+      });
+    }
   }
 
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error'): void {

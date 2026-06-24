@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, HostListener, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
@@ -25,7 +25,10 @@ export class ClienteEditarComponent implements OnInit {
   @ViewChild('modalEditarElement') modalElement!: ElementRef;
   private modal?: bootstrap.Modal;
 
+  @Input() soloEmailCelular: boolean = false;
+
   @Output() clienteActualizado = new EventEmitter<void>();
+  @Output() datosActualizados = new EventEmitter<void>();
 
   clienteForm!: FormGroup;
   clienteId!: number;
@@ -104,7 +107,7 @@ export class ClienteEditarComponent implements OnInit {
     this.clienteForm.get('distrito')?.get('idDistrito')?.setValue('');
   }
 
-  public abrirModal(id: number): void {
+  public abrirModal(id: number, clientePrecargado?: any): void {
     this.clienteId = id;
     if (!this.modal) {
       this.modal = new bootstrap.Modal(this.modalElement.nativeElement);
@@ -116,7 +119,11 @@ export class ClienteEditarComponent implements OnInit {
     this.cargandoDatos = true;
     // Abrir modal inmediatamente — el usuario ve el spinner mientras carga
     this.modal.show();
-    this.cargarDatosCliente();
+    if (clientePrecargado) {
+      this.cargarDatosClientePrecargado(clientePrecargado);
+    } else {
+      this.cargarDatosCliente();
+    }
   }
 
   private inicializarFormulario(): void {
@@ -205,56 +212,85 @@ export class ClienteEditarComponent implements OnInit {
     this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
       next: (cliente) => {
         if (cliente) {
-          this.clienteForm.patchValue({
-            ...cliente,
-            nombre: cliente.nombre?.toUpperCase() || '',
-            apellidos: cliente.apellidos?.toUpperCase() || '',
-            distrito: { idDistrito: cliente.distrito?.idDistrito }
-          });
-          this.actualizarValidacionDocumento(cliente.tipoCliente);
-          this.actualizarValidacionNacionalidad(cliente.tipoCliente);
-
-          // Preseleccionar departamento, provincia y distrito
-          const distritoObj = this.distritos.find(d => d.idDistrito === cliente.distrito?.idDistrito);
-          if (distritoObj && distritoObj.departamento) {
-            this.departamentoSeleccionado = distritoObj.departamento;
-            this.provincias = [...new Set(
-              this.distritos.filter(d => d.departamento === distritoObj.departamento)
-                .map(d => d.provincia).filter((p): p is string => !!p)
-            )].sort();
-            if (distritoObj.provincia) {
-              this.provinciaSeleccionada = distritoObj.provincia;
-              this.distritosFiltrados = this.distritos.filter(d =>
-                d.departamento === distritoObj.departamento &&
-                d.provincia === distritoObj.provincia
-              );
-            }
-          }
-
-          if (cliente.tipoCliente === 'CE' && cliente.nacionalidad) {
-            const pais = this.paises.find(p =>
-              p.nacionalidadM === cliente.nacionalidad?.toLowerCase() ||
-              p.nacionalidadF === cliente.nacionalidad?.toLowerCase()
-            );
-            this.paisSeleccionado = pais || null;
-          }
-
-          // Formatear celular con guiones al cargar
-          const celular = cliente.celular;
-          if (celular) {
-            const soloDigitos = celular.replace(/\D/g, '');
-            if (soloDigitos.length > 0) {
-              const partes = [];
-              for (let i = 0; i < soloDigitos.length; i += 3) {
-                partes.push(soloDigitos.substr(i, 3));
-              }
-              this.clienteForm.patchValue({ celular: partes.join('-') });
-            }
-          }
+          this.cargarDatosEnFormulario(cliente);
         }
         this.cargandoDatos = false;
       },
       error: () => { this.cargandoDatos = false; }
+    });
+  }
+
+  cargarDatosClientePrecargado(cliente: any): void {
+    this.cargandoDatos = false;
+    this.cargarDatosEnFormulario(cliente);
+    if (this.soloEmailCelular) {
+      this.bloquearCamposExceptoEmailCelular();
+    }
+  }
+
+  private cargarDatosEnFormulario(cliente: any): void {
+    this.clienteForm.patchValue({
+      ...cliente,
+      nombre: cliente.nombre?.toUpperCase() || '',
+      apellidos: cliente.apellidos?.toUpperCase() || '',
+      distrito: { idDistrito: cliente.distrito?.idDistrito }
+    });
+    this.actualizarValidacionDocumento(cliente.tipoCliente);
+    this.actualizarValidacionNacionalidad(cliente.tipoCliente);
+
+    const distritoObj = this.distritos.find(d => d.idDistrito === cliente.distrito?.idDistrito);
+    if (distritoObj && distritoObj.departamento) {
+      this.departamentoSeleccionado = distritoObj.departamento;
+      this.provincias = [...new Set(
+        this.distritos.filter(d => d.departamento === distritoObj.departamento)
+          .map(d => d.provincia).filter((p): p is string => !!p)
+      )].sort();
+      if (distritoObj.provincia) {
+        this.provinciaSeleccionada = distritoObj.provincia;
+        this.distritosFiltrados = this.distritos.filter(d =>
+          d.departamento === distritoObj.departamento &&
+          d.provincia === distritoObj.provincia
+        );
+      }
+    }
+
+    if (cliente.tipoCliente === 'CE' && cliente.nacionalidad) {
+      const pais = this.paises.find(p =>
+        p.nacionalidadM === cliente.nacionalidad?.toLowerCase() ||
+        p.nacionalidadF === cliente.nacionalidad?.toLowerCase()
+      );
+      this.paisSeleccionado = pais || null;
+    }
+
+    const celular = cliente.celular;
+    if (celular) {
+      const soloDigitos = celular.replace(/\D/g, '');
+      if (soloDigitos.length > 0) {
+        const partes = [];
+        for (let i = 0; i < soloDigitos.length; i += 3) {
+          partes.push(soloDigitos.substr(i, 3));
+        }
+        this.clienteForm.patchValue({ celular: partes.join('-') });
+      }
+    }
+  }
+
+  private bloquearCamposExceptoEmailCelular(): void {
+    const camposBloquear = ['nombre', 'apellidos', 'tipoCliente', 'numDoc', 'genero', 'estadoCivil', 'direccion', 'distrito', 'estado', 'telefono', 'nacionalidad'];
+    camposBloquear.forEach(campo => {
+      this.clienteForm.get(campo)?.disable({ emitEvent: false });
+    });
+  }
+
+  private deshabilitarCampos(): void {
+    Object.keys(this.clienteForm.controls).forEach(key => {
+      this.clienteForm.get(key)?.disable({ emitEvent: false });
+    });
+  }
+
+  private habilitarTodosLosCampos(): void {
+    Object.keys(this.clienteForm.controls).forEach(key => {
+      this.clienteForm.get(key)?.enable({ emitEvent: false });
     });
   }
 
@@ -274,15 +310,27 @@ export class ClienteEditarComponent implements OnInit {
       this.clienteService.actualizarCliente(this.clienteId, payload).subscribe({
         next: () => {
           this.toastr.success('Cliente actualizado correctamente.');
+          if (this.soloEmailCelular) {
+            this.datosActualizados.emit();
+          } else {
+            this.clienteActualizado.emit();
+          }
           this.modal?.hide();
-          this.clienteActualizado.emit();
+          if (this.soloEmailCelular) {
+            this.habilitarTodosLosCampos();
+          }
         },
         error: (err) => this.toastr.error(err.error?.message || 'Error al actualizar')
       });
     }
   }
 
-  cerrarModal(): void { this.modal?.hide(); }
+  cerrarModal(): void {
+    if (this.soloEmailCelular) {
+      this.habilitarTodosLosCampos();
+    }
+    this.modal?.hide();
+  }
 
   formatearTexto(event: any, controlName: string): void {
     const input = event.target as HTMLInputElement;

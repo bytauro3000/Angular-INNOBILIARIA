@@ -337,3 +337,41 @@ input, select, textarea {
   .form-row   { grid-template-columns: 1fr !important; gap: 0.8rem; }
   .modal-body { padding: 0.75rem; }
 }
+
+// ============================================
+// FIELDSETS PARA MODO SOLO EMAIL/CELULAR
+// ============================================
+fieldset {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  legend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 0.5rem;
+  }
+
+  &.fieldset-bloqueado {
+    background-color: #f8f9fa;
+    opacity: 0.7;
+
+    input:read-only, select:disabled {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+    }
+  }
+
+  &.fieldset-activo {
+    background-color: #f0fdf4;
+    border-color: #86efac;
+
+    legend {
+      color: #15803d;
+    }
+  }
+}

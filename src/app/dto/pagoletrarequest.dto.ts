@@ -17,4 +17,6 @@ export interface PagoLetraRequest {
   esPagoAcuenta?: boolean;
   /** Serie personalizada para el comprobante (ej: B001, EB01, F001) */
   seriePersonalizada?: string;
+  /** PIN de autorización para pagos fuera de orden */
+  pin?: string;
 }

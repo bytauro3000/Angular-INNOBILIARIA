@@ -26,9 +26,6 @@ $border-color: #e9ecef;
     font-size: 1.3rem;
     margin-bottom: 24px;
     padding-left: 20px;
-    border-left: none;
-    font-variant-numeric: lining-nums;
-    font-feature-settings: "lnum";
 
     &::before {
       content: '';
@@ -144,7 +141,7 @@ $border-color: #e9ecef;
       padding: 12px 8px; white-space: normal; word-break: break-word;
       &.text-center { text-align: center; }
       &.text-end { text-align: right; }
-      &.col-importe-texto { padding-left: 76px !important; }
+      &.col-importe-texto { padding-left: 56px !important; }
     }
 
     td {
@@ -153,7 +150,7 @@ $border-color: #e9ecef;
       &.text-center { text-align: center; }
       &.text-end { text-align: right; }
       &.fw-bold { font-weight: 600; }
-      &.col-importe-texto { padding-left: 76px !important; }
+      &.col-importe-texto { padding-left: 56px !important; }
     }
 
     tbody tr {
@@ -166,8 +163,8 @@ $border-color: #e9ecef;
     .col-letra { width: 9%; font-weight: 500; }
     .col-fecha-giro { width: 11%; }
     .col-fecha-ven { width: 18%; }
-    .col-importe { width: 10%; padding-right: 44px; text-align: right; }
-    .col-importe-texto { width: 41%; padding-left: 76px !important; }
+    .col-importe { width: 10%; padding-right: 24px; text-align: right; }
+    .col-importe-texto { width: 41%; padding-left: 56px !important; }
 
     .celda-importe { cursor: pointer; &:hover { background-color: #fef9e7; } }
 

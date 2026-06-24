@@ -40,6 +40,7 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
 
   // Archivos de voucher seleccionados
   voucherFiles: File[] = [];
+  private ocrOperationNumbers: Map<string, string> = new Map();
 
   // Preview readonly del número que se emitirá
   numeroComprobantePreview: string = '';
@@ -111,9 +112,10 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
 
     const cambios: string[] = [];
 
-    if (data.numeroOperacion) {
-      this.request.numeroOperacion = data.numeroOperacion;
-      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    if (data.numeroOperacion && data.fileName) {
+      this.ocrOperationNumbers.set(data.fileName, data.numeroOperacion);
+      this.actualizarNumeroOperacion();
+      cambios.push(`N° op: ${data.numeroOperacion}`);
     }
 
     if (data.fechaPago) {
@@ -128,10 +130,25 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
       );
     } else {
       this.toastr.warning(
-        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        `No se pudo extraer datos del voucher "${data.fileName ?? ''}". Lláenalos manualmente.`,
         'OCR'
       );
     }
+  }
+
+  onVoucherFilesChange(files: File[]): void {
+    const nombresActuales = new Set(files.map(f => f.name));
+    for (const fileName of this.ocrOperationNumbers.keys()) {
+      if (!nombresActuales.has(fileName)) {
+        this.ocrOperationNumbers.delete(fileName);
+      }
+    }
+    this.actualizarNumeroOperacion();
+  }
+
+  private actualizarNumeroOperacion(): void {
+    const numeros = Array.from(this.ocrOperationNumbers.values());
+    this.request.numeroOperacion = numeros.length > 0 ? numeros.join(', ') : '';
   }
 
   /**

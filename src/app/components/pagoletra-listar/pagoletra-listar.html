@@ -224,6 +224,27 @@
       </div>
     </div>
 
+    <!-- ── BARRA DE DESBLOQUEO ─────────────────────────────────────────────── -->
+    <div *ngIf="hayLetrasBloqueadas" class="desbloquear-bar" [class.bloqueada]="pinBotonDeshabilitado">
+      <span class="desbloquear-info">
+        <i class="bi" [ngClass]="pinBloqueoPermanente ? 'bi-shield-lock-fill' : 'bi-lock-fill'"></i>
+        <ng-container *ngIf="!pinBloqueoPermanente; else bloqueoPerm">
+          Hay letras anteriores bloqueadas. Ingrese PIN para desbloquear.
+        </ng-container>
+        <ng-template #bloqueoPerm>
+          Ha superado el límite de intentos. Comuníquese con soporte.
+        </ng-template>
+      </span>
+      <button class="btn-desbloquear" [disabled]="pinBotonDeshabilitado"
+              (click)="abrirModalDesbloqueo()">
+        <i class="bi bi-unlock-fill"></i> Desbloquear letras
+      </button>
+      <button *ngIf="pinBloqueoPermanente && esAdministrador"
+              class="btn-reset-pin" (click)="resetearBloqueoPin()">
+        <i class="bi bi-arrow-counterclockwise"></i> Resetear bloqueo
+      </button>
+    </div>
+
     <!-- FILA 2: acciones secundarias izquierda + paginación derecha -->
     <div class="tabla-toolbar-bottom">
       <div class="acciones-secundarias">
@@ -358,10 +379,6 @@
       <thead>
         <tr>
           <th *ngIf="tipoLista === 'pendientes'" style="width: 40px;">
-            <input type="checkbox"
-                   (change)="seleccionarTodas($event)"
-                   [checked]="isTodasSeleccionadas()">
-          </th>
           <th>N° Letra</th>
           <th>Fecha Vencimiento</th>
           <th>Importe</th>
@@ -377,9 +394,15 @@
           <td *ngIf="tipoLista === 'pendientes'" data-label="Seleccionar">
             <input type="checkbox"
                    [checked]="isSeleccionada(letra.idLetra)"
+                   [disabled]="letraBloqueada(letra)"
                    (change)="toggleSeleccion(letra)">
           </td>
-          <td data-label="N° Letra">{{ letra.numeroLetra }}</td>
+          <td data-label="N° Letra">
+            {{ letra.numeroLetra }}
+            <span *ngIf="letraBloqueada(letra)" class="candado-bloqueo" title="Letra bloqueada">
+              <i class="bi bi-lock-fill"></i>
+            </span>
+          </td>
           <td data-label="Fecha Vencimiento">
             {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}
           </td>
@@ -409,10 +432,12 @@
             <div class="acciones-container">
               <button *ngIf="tipoLista === 'pendientes'"
                       class="btn-pagar"
-                      [class.btn-pagar-vencida]="letra.estadoLetra === 'VENCIDO'"
+                      [class.btn-pag-bloq]="letraBloqueada(letra)"
+                      [class.btn-pagar-vencida]="letra.estadoLetra === 'VENCIDO' && !letraBloqueada(letra)"
                       [class.btn-pagar-parcial]="letra.estadoLetra === 'PARCIAL'"
-                      (click)="abrirModalPago(letra)"
-                      [title]="getTitleBotonPagar(letra)">
+                      [disabled]="letraBloqueada(letra)"
+                      (click)="!letraBloqueada(letra) && abrirModalPago(letra)"
+                      [title]="letraBloqueada(letra) ? 'Letra bloqueada - requiere autorización' : getTitleBotonPagar(letra)">
                 <i class="bi"
                    [ngClass]="letra.estadoLetra === 'VENCIDO'
                     ? 'bi-exclamation-triangle-fill'
@@ -578,6 +603,7 @@
   [contrato]="contratoEncontrado"
   [calculoMora]="calculoMoraParaPago"
   [moraPreviamentePagada]="moraPreviamentePagada"
+  [pinAutorizacion]="getPinAutorizacion()"
   (onClose)="cerrarModalPago()"
   (onPagoExitoso)="onPagoRegistrado()">
 </app-pago-letra-form>
@@ -625,3 +651,42 @@
   (onMoraPagadaSinLetra)="onMoraPagadaSinLetra()"
   (onCancelar)="onCancelarMoraAlerta()">
 </app-mora-alerta>
+
+<!-- ── MODAL PIN DE AUTORIZACIÓN ── -->
+<div class="modal-overlay" *ngIf="pinModalAbierto" (click)="cerrarPinModal()">
+  <div class="modal-content pin-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="bi bi-shield-lock-fill"></i> Desbloquear letras anteriores
+      </h5>
+      <button type="button" class="btn-close" (click)="cerrarPinModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="contratoEncontrado">
+        Este contrato tiene pagos hasta la letra N° {{ ultimaLetraPagadaNum }}.
+        Las letras anteriores están bloqueadas.
+      </p>
+      <p class="text-muted small">Ingrese el PIN de autorización para desbloquear:</p>
+      <div class="form-group">
+        <input type="password" class="form-control" placeholder="PIN"
+               [(ngModel)]="pinIngresado" name="pinDesbloqueo"
+               (keydown.enter)="confirmarPinDesbloqueo()" autofocus>
+      </div>
+      <div *ngIf="pinError" class="alert alert-danger mt-2">{{ pinError }}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="cerrarPinModal()">Cancelar</button>
+      <button class="btn btn-save" (click)="confirmarPinDesbloqueo()">
+        <i class="bi bi-check-circle"></i> Desbloquear
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar cliente (solo email y celular) -->
+<app-cliente-editar
+  #modalEditarCliente
+  *ngIf="clienteParaEditar"
+  [soloEmailCelular]="true"
+  (datosActualizados)="onDatosClienteActualizados()">
+</app-cliente-editar>

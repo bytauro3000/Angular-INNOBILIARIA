@@ -65,6 +65,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   private maximaLetraPagada: number = 0;
 
   voucherFiles: File[] = [];
+  private ocrOperationNumbers: Map<string, string> = new Map();
   enviando: boolean = false;
 
   // ── Control de cierre limpio ───────────────────────────────────────────────
@@ -245,14 +246,15 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
     const cambios: string[] = [];
 
-    if (data.numeroOperacion) {
-      this.datosComunes.numeroOperacion = data.numeroOperacion;
-      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    if (data.numeroOperacion && data.fileName) {
+      this.ocrOperationNumbers.set(data.fileName, data.numeroOperacion);
+      this.actualizarNumeroOperacion();
+      cambios.push(`N° op: ${data.numeroOperacion}`);
     }
 
     if (data.fechaPago) {
       this.datosComunes.fechaOperacion = data.fechaPago;
-      cambios.push(`Fecha operación: ${data.fechaPago}`);
+      cambios.push(`Fecha op: ${data.fechaPago}`);
     }
 
     if (cambios.length > 0) {
@@ -262,10 +264,25 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       );
     } else {
       this.toastr.warning(
-        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        `No se pudo extraer datos del voucher "${data.fileName ?? ''}". Lláenalos manualmente.`,
         'OCR'
       );
     }
+  }
+
+  onVoucherFilesChange(files: File[]): void {
+    const nombresActuales = new Set(files.map(f => f.name));
+    for (const fileName of this.ocrOperationNumbers.keys()) {
+      if (!nombresActuales.has(fileName)) {
+        this.ocrOperationNumbers.delete(fileName);
+      }
+    }
+    this.actualizarNumeroOperacion();
+  }
+
+  private actualizarNumeroOperacion(): void {
+    const numeros = Array.from(this.ocrOperationNumbers.values());
+    this.datosComunes.numeroOperacion = numeros.length > 0 ? numeros.join(', ') : '';
   }
 
   onTipoComprobanteChange(): void {

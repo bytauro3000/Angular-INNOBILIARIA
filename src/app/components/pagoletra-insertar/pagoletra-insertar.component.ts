@@ -36,6 +36,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   @Input() contrato!: any;
   @Input() calculoMora: CalculoMoraDTO | null = null;
   @Input() moraPreviamentePagada: boolean = false;
+  @Input() pinAutorizacion?: string;
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onPagoExitoso = new EventEmitter<void>();
@@ -66,8 +67,14 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   serieEditable: string = '';
 
   voucherFiles: File[] = [];
+  private ocrOperationNumbers: Map<string, string> = new Map();
   enviando: boolean = false;
   recalculandoMora: boolean = false;
+
+  pinModalAbierto: boolean = false;
+  pinIngresado: string = '';
+  pinError: string = '';
+  pinCachePorContrato: Map<number, string> = new Map();
 
   pagarMoraTambien: boolean = false;
   moraDecisionTomada: boolean = false;
@@ -91,6 +98,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   ngOnInit(): void {
     this.pagoRequest.idLetra = this.letra.idLetra;
+    this.pagoRequest.fechaPago = obtenerFechaPeru();
     this.generarObservaciones();
 
     if (this.letra.estadoLetra === 'PARCIAL') {
@@ -252,14 +260,15 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
     const cambios: string[] = [];
 
-    if (data.numeroOperacion) {
-      this.pagoRequest.numeroOperacion = data.numeroOperacion;
-      cambios.push(`N° operación: ${data.numeroOperacion}`);
+    if (data.numeroOperacion && data.fileName) {
+      this.ocrOperationNumbers.set(data.fileName, data.numeroOperacion);
+      this.actualizarNumeroOperacion();
+      cambios.push(`N° op: ${data.numeroOperacion}`);
     }
 
     if (data.fechaPago) {
       this.pagoRequest.fechaOperacion = data.fechaPago;
-      cambios.push(`Fecha operación: ${data.fechaPago}`);
+      cambios.push(`Fecha op: ${data.fechaPago}`);
     }
 
     if (cambios.length > 0) {
@@ -269,10 +278,26 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
       );
     } else {
       this.toastr.warning(
-        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        `No se pudo extraer datos del voucher "${data.fileName ?? ''}". Lláenalos manualmente.`,
         'OCR'
       );
     }
+  }
+
+  onVoucherFilesChange(files: File[]): void {
+    // Limpiar resultados OCR de archivos que ya no existen
+    const nombresActuales = new Set(files.map(f => f.name));
+    for (const fileName of this.ocrOperationNumbers.keys()) {
+      if (!nombresActuales.has(fileName)) {
+        this.ocrOperationNumbers.delete(fileName);
+      }
+    }
+    this.actualizarNumeroOperacion();
+  }
+
+  private actualizarNumeroOperacion(): void {
+    const numeros = Array.from(this.ocrOperationNumbers.values());
+    this.pagoRequest.numeroOperacion = numeros.length > 0 ? numeros.join(', ') : '';
   }
 
   /**
@@ -453,6 +478,17 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     }
 
     this.pagoRequest.esPagoAcuenta = this.modoPagoAcuenta;
+
+    // Incluir PIN (prioridad: input del padre, luego cache local)
+    if (this.pinAutorizacion) {
+      this.pagoRequest.pin = this.pinAutorizacion;
+    } else {
+      const idContrato = this.letra?.contrato?.idContrato;
+      if (idContrato && this.pinCachePorContrato.has(idContrato)) {
+        this.pagoRequest.pin = this.pinCachePorContrato.get(idContrato);
+      }
+    }
+
     this.enviando = true;
 
     this.pagoService.registrarPago(this.pagoRequest, this.voucherFiles).subscribe({
@@ -464,9 +500,23 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
         }
       },
       error: (err) => {
-        const mensaje = err.error?.message || 'Error al registrar el pago';
-        this.toastr.error(mensaje, 'Error');
+        const mensaje = err.error?.message || err.error?.error || 'Error al registrar el pago';
         this.enviando = false;
+
+        // Detectar FUERA_DE_ORDEN: pedir PIN
+        if (mensaje.startsWith('FUERA_DE_ORDEN:')) {
+          const textoLimpio = mensaje.replace('FUERA_DE_ORDEN:', '');
+          if (this.pagoRequest.pin) {
+            // Ya se intentó con PIN, mostrar error
+            this.toastr.error('PIN incorrecto. ' + textoLimpio, 'Error');
+          }
+          this.pinModalAbierto = true;
+          this.pinIngresado = '';
+          this.pinError = '';
+          return;
+        }
+
+        this.toastr.error(mensaje, 'Error');
         if (this.pagoRequest.tipoComprobante && mensaje.includes('correlativa')) {
           this.modoManualComprobante = false;
           this.numeroComprobanteManual = '';
@@ -476,6 +526,27 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
         }
       }
     });
+  }
+
+  confirmarPin(): void {
+    if (!this.pinIngresado.trim()) {
+      this.pinError = 'Ingrese el PIN';
+      return;
+    }
+    this.pinError = '';
+    const idContrato = this.letra?.contrato?.idContrato;
+    if (idContrato) {
+      this.pinCachePorContrato.set(idContrato, this.pinIngresado.trim());
+    }
+    this.pagoRequest.pin = this.pinIngresado.trim();
+    this.pinModalAbierto = false;
+    this.guardarPago();
+  }
+
+  cerrarPinModal(): void {
+    this.pinModalAbierto = false;
+    this.pinIngresado = '';
+    this.pinError = '';
   }
 
   private registrarPagoMoraTrasLetra(letraResponse: PagoLetraResponse): void {

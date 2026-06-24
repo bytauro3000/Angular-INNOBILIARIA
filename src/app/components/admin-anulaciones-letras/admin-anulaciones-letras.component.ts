@@ -161,6 +161,17 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
         this.mostrarNotificacion(res.mensaje || 'Nota de crédito emitida correctamente', 'success');
         this.cerrarModalNotaCredito();
         this.cargarPagos();
+        if (res.idNotaCredito) {
+          if (res.serieNC?.startsWith('BB')) {
+            this.anulacionesService.descargarPdfNotaCredito(res.idNotaCredito).subscribe({
+              next: (blob) => window.open(URL.createObjectURL(blob), '_blank')
+            });
+          } else {
+            this.anulacionesService.descargarPdfNotaCreditoRecibo(res.idNotaCredito).subscribe({
+              next: (blob) => window.open(URL.createObjectURL(blob), '_blank')
+            });
+          }
+        }
       },
       error: (err) => {
         const msg = err.error?.error || 'Error al emitir nota de crédito';
@@ -190,6 +201,33 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
       },
       error: () => this.mostrarNotificacion('Error al descargar comprobante', 'error')
     });
+  }
+
+  descargarNotaCredito(pago: PagoLetraResponse): void {
+    const descargar = (idNc: number) => {
+      const obs = pago.numeroComprobante?.startsWith('B')
+        ? this.anulacionesService.descargarPdfNotaCredito(idNc)
+        : this.anulacionesService.descargarPdfNotaCreditoRecibo(idNc);
+      obs.subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.download = `nc-${idNc}.pdf`; a.href = url;
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+        error: () => this.mostrarNotificacion('Error al descargar nota de crédito', 'error')
+      });
+    };
+
+    if (pago.idNotaCredito) {
+      descargar(Number(pago.idNotaCredito));
+    } else if (pago.idComprobante) {
+      this.anulacionesService.buscarNotaCreditoPorOriginal(pago.idComprobante).subscribe({
+        next: (res) => { if (res.idNotaCredito) descargar(res.idNotaCredito); },
+        error: () => this.mostrarNotificacion('No se encontró nota de crédito', 'error')
+      });
+    }
   }
 
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error'): void {

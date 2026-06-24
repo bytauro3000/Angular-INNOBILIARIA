@@ -33,6 +33,10 @@ export class PagoLetraService {
     );
   }
 
+  validarPin(pin: string): Observable<{ valido: boolean }> {
+    return this.http.post<{ valido: boolean }>(`${this.apiUrl}/validar-pin`, { pin });
+  }
+
   registrarPago(pago: PagoLetraRequest, vouchers?: File[]): Observable<PagoLetraResponse> {
     const formData = new FormData();
     formData.append('pago', new Blob([JSON.stringify(pago)], { type: 'application/json' }));

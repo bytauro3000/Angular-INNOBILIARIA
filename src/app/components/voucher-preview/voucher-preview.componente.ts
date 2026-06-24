@@ -55,7 +55,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   ocrProcessed: boolean = false;
 
   private ocrService = inject(OcrVoucherService);
-  private ocrDoneForFileName: string | null = null;
+  private ocrDoneForFileNames: Set<string> = new Set();
 
   private onChange: (value: File[]) => void = () => {};
   private onTouched: () => void = () => {};
@@ -69,8 +69,8 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
         this.files.push(fileEntry);
         this.emitChange();
 
-        if (this.enableOcr && this.ocrDoneForFileName !== file.name) {
-          this.ocrDoneForFileName = file.name;
+        if (this.enableOcr && !this.ocrDoneForFileNames.has(file.name)) {
+          this.ocrDoneForFileNames.add(file.name);
           this.runOcr(fileEntry);
         }
       };
@@ -82,9 +82,8 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const removed = this.files[index];
     this.files.splice(index, 1);
     this.emitChange();
-    if (removed && this.ocrDoneForFileName === removed.file.name) {
-      this.ocrDoneForFileName = null;
-      this.ocrProcessed = false;
+    if (removed) {
+      this.ocrDoneForFileNames.delete(removed.file.name);
     }
   }
 
@@ -101,10 +100,10 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     this.ocrProcessed = false;
     try {
       const data = await this.ocrService.extractFromImage(fileEntry.url);
-      this.ocrData.emit(data);
+      this.ocrData.emit({ ...data, fileName: fileEntry.file.name });
     } catch (err) {
       console.error('OCR error:', err);
-      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, rawText: '', confidence: 0 });
+      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, rawText: '', confidence: 0, fileName: fileEntry.file.name });
     } finally {
       this.ocrProcessing = false;
       this.ocrProcessed = true;
@@ -126,7 +125,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     // Caso típico: cambio de medioPago a EFECTIVO, o botón "quitar voucher" en el padre.
     if (obj === null || obj === undefined || (Array.isArray(obj) && obj.length === 0)) {
       this.files = [];
-      this.ocrDoneForFileName = null;
+      this.ocrDoneForFileNames.clear();
       this.ocrProcessed = false;
     }
   }

@@ -128,7 +128,8 @@
                                 name="vouchers"
                                 [disabled]="enviando"
                                 [enableOcr]="request.medioPago !== 'EFECTIVO'"
-                                (ocrData)="onVoucherOcr($event)">
+                                (ocrData)="onVoucherOcr($event)"
+                                (filesChange)="onVoucherFilesChange($event)">
                             </app-voucher-preview>
                         </div>
                     </div>

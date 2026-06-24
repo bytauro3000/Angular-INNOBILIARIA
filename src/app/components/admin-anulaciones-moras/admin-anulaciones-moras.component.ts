@@ -105,6 +105,12 @@ export class AdminAnulacionesMorasComponent implements OnInit {
         this.mostrarNotificacion(res.mensaje || 'Nota de crédito emitida', 'success');
         this.cerrarModalNotaCredito();
         this.cargarPagos();
+        if (res.idNotaCredito) {
+          const obs = res.serieNC?.startsWith('BB')
+            ? this.anulacionesService.descargarPdfNotaCredito(res.idNotaCredito)
+            : this.anulacionesService.descargarPdfNotaCreditoRecibo(res.idNotaCredito);
+          obs.subscribe({ next: (blob) => window.open(URL.createObjectURL(blob), '_blank') });
+        }
       },
       error: (err) => {
         const msg = err.error?.error || 'Error al emitir nota de crédito';
@@ -129,6 +135,29 @@ export class AdminAnulacionesMorasComponent implements OnInit {
         URL.revokeObjectURL(url);
       },
       error: () => this.mostrarNotificacion('Error al descargar comprobante', 'error')
+    });
+  }
+
+  descargarNotaCredito(pago: PagoMoraResponse): void {
+    if (!pago.idComprobante) return;
+    this.anulacionesService.buscarNotaCreditoPorOriginal(pago.idComprobante).subscribe({
+      next: (res) => {
+        if (!res.idNotaCredito) return;
+        const obs = res.serie?.startsWith('BB')
+          ? this.anulacionesService.descargarPdfNotaCredito(res.idNotaCredito)
+          : this.anulacionesService.descargarPdfNotaCreditoRecibo(res.idNotaCredito);
+        obs.subscribe({
+          next: (blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `nc-${res.idNotaCredito}.pdf`; a.href = url;
+            a.click();
+            URL.revokeObjectURL(url);
+          },
+          error: () => this.mostrarNotificacion('Error al descargar nota de crédito', 'error')
+        });
+      },
+      error: () => this.mostrarNotificacion('No se encontró nota de crédito', 'error')
     });
   }
 

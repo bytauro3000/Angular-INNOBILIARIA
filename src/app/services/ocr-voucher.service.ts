@@ -4,6 +4,7 @@ import { extractVoucherData, VoucherFields } from '../utils/voucher-parser';
 export interface VoucherOcrData extends VoucherFields {
   rawText: string;
   confidence: number;
+  fileName?: string;
 }
 
 type TesseractWorker = {

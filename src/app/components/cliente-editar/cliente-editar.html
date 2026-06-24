@@ -4,7 +4,9 @@
 
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="bi bi-pencil-square"></i> Editar Información del Cliente
+          <i class="bi bi-pencil-square"></i>
+          <ng-container *ngIf="!soloEmailCelular">Editar Información del Cliente</ng-container>
+          <ng-container *ngIf="soloEmailCelular">Registrar datos del Cliente</ng-container>
         </h5>
         <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Cerrar"></button>
       </div>
@@ -22,146 +24,262 @@
         <form id="formEditar" [formGroup]="clienteForm" (ngSubmit)="onSubmit()" [class.form-oculto]="cargandoDatos">
           <div class="form-wrapper-modal">
 
-            <!-- Nombre y Apellidos -->
-            <div class="form-row form-2-col">
-              <div class="form-group">
-                <label for="nombre"><i class="bi bi-person"></i> Nombre</label>
-                <input type="text" id="nombre" formControlName="nombre"
-                  (input)="formatearTexto($event, 'nombre')"
-                  placeholder="Nombres del cliente">
-              </div>
-              <div class="form-group">
-                <label for="apellidos"><i class="bi bi-person-fill"></i> Apellidos</label>
-                <input type="text" id="apellidos" formControlName="apellidos"
-                  (input)="formatearTexto($event, 'apellidos')"
-                  placeholder="Apellidos del cliente">
-              </div>
-            </div>
+            <!-- ============================================= -->
+            <!-- MODO SOLO EMAIL/CELULAR (campos bloqueados) -->
+            <!-- ============================================= -->
+            <ng-container *ngIf="soloEmailCelular">
 
-            <!-- Tipo doc | N° Doc | País (solo CE) | Género -->
-            <div class="form-row" [class.form-4-col]="esCarnetExtranjeria" [class.form-3-col]="!esCarnetExtranjeria">
+              <!-- Datos personales (bloqueados) -->
+              <fieldset class="fieldset-bloqueado">
+                <legend>Datos personales</legend>
 
-              <div class="form-group">
-                <label for="tipoCliente"><i class="bi bi-card-list"></i> Tipo de Documento</label>
-                <select id="tipoCliente" formControlName="tipoCliente">
-                  <option value="NATURAL">DNI</option>
-                  <option value="JURIDICO">RUC</option>
-                  <option value="CE">C.E.</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="numDoc">
-                  <ng-container *ngIf="!esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° Documento</ng-container>
-                  <ng-container *ngIf="esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° C.E.</ng-container>
-                </label>
-                <input type="text" id="numDoc" formControlName="numDoc"
-                  [placeholder]="esCarnetExtranjeria ? 'Número C.E.' : 'Número de documento'">
-              </div>
-
-              <div class="form-group" *ngIf="esCarnetExtranjeria">
-                <label><i class="bi bi-globe-americas"></i> País de Origen</label>
-                <div class="pais-dropdown" [class.open]="dropdownPaisAbierto">
-                  <button type="button" class="pais-trigger"
-                    [class.is-invalid]="clienteForm.get('nacionalidad')?.invalid && clienteForm.get('nacionalidad')?.touched"
-                    (click)="dropdownPaisAbierto = !dropdownPaisAbierto">
-                    <ng-container *ngIf="paisSeleccionado; else sinPais">
-                      <img [src]="paisSeleccionado.bandera" class="pais-flag" alt="" />
-                      <span>{{ paisSeleccionado.nombre }}</span>
-                    </ng-container>
-                    <ng-template #sinPais><span class="placeholder-text">Seleccione</span></ng-template>
-                    <i class="bi bi-chevron-down pais-chevron"></i>
-                  </button>
-                  <ul class="pais-list" *ngIf="dropdownPaisAbierto">
-                    <li *ngFor="let p of paises" (click)="seleccionarPais(p)">
-                      <img [src]="p.bandera" class="pais-flag" alt="" />
-                      <span>{{ p.nombre }}</span>
-                    </li>
-                  </ul>
+                <div class="form-row form-2-col">
+                  <div class="form-group">
+                    <label for="nombre"><i class="bi bi-person"></i> Nombre</label>
+                    <input type="text" id="nombre" formControlName="nombre"
+                      (input)="formatearTexto($event, 'nombre')"
+                      placeholder="Nombres del cliente" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label for="apellidos"><i class="bi bi-person-fill"></i> Apellidos</label>
+                    <input type="text" id="apellidos" formControlName="apellidos"
+                      (input)="formatearTexto($event, 'apellidos')"
+                      placeholder="Apellidos del cliente" readonly>
+                  </div>
                 </div>
-                <span class="error-msg"
-                  *ngIf="clienteForm.get('nacionalidad')?.invalid && clienteForm.get('nacionalidad')?.touched">
-                  Selecciona el país
-                </span>
+
+                <div class="form-row" [class.form-4-col]="esCarnetExtranjeria" [class.form-3-col]="!esCarnetExtranjeria">
+                  <div class="form-group">
+                    <label for="tipoCliente"><i class="bi bi-card-list"></i> Tipo de Documento</label>
+                    <select id="tipoCliente" formControlName="tipoCliente" [disabled]="soloEmailCelular">
+                      <option value="NATURAL">DNI</option>
+                      <option value="JURIDICO">RUC</option>
+                      <option value="CE">C.E.</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="numDoc">
+                      <ng-container *ngIf="!esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° Documento</ng-container>
+                      <ng-container *ngIf="esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° C.E.</ng-container>
+                    </label>
+                    <input type="text" id="numDoc" formControlName="numDoc"
+                      [placeholder]="esCarnetExtranjeria ? 'Número C.E.' : 'Número de documento'" readonly>
+                  </div>
+                  <div class="form-group" *ngIf="esCarnetExtranjeria">
+                    <label><i class="bi bi-globe-americas"></i> País de Origen</label>
+                    <input type="text" [value]="paisSeleccionado?.nombre || ''" readonly class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="genero"><i class="bi bi-gender-ambiguous"></i> Género</label>
+                    <select id="genero" formControlName="genero" [disabled]="soloEmailCelular">
+                      <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row form-3-col">
+                  <div class="form-group">
+                    <label for="estadoCivil"><i class="bi bi-hearts"></i> Estado Civil</label>
+                    <select id="estadoCivil" formControlName="estadoCivil" [disabled]="soloEmailCelular">
+                      <option *ngFor="let ec of estadosCiviles" [value]="ec">{{ ec }}</option>
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+
+              <!-- Datos de contacto (editables) -->
+              <fieldset class="fieldset-activo">
+                <legend>Datos de contacto</legend>
+                <div class="form-row form-3-col">
+                  <div class="form-group">
+                    <label for="celular"><i class="bi bi-phone"></i> Celular</label>
+                    <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999" (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)">
+                  </div>
+                  <div class="form-group">
+                    <label for="email"><i class="bi bi-envelope"></i> Email</label>
+                    <input type="email" id="email" formControlName="email" placeholder="correo@ejemplo.com">
+                  </div>
+                </div>
+              </fieldset>
+
+              <!-- Dirección y otros (bloqueados) -->
+              <fieldset class="fieldset-bloqueado">
+                <legend>Dirección y otros datos</legend>
+                <div class="form-row">
+                  <div class="form-group width-100">
+                    <label for="direccion"><i class="bi bi-geo-alt"></i> Dirección Completa</label>
+                    <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Av., Mz y Lote..." readonly>
+                  </div>
+                </div>
+                <div class="form-row form-3-col">
+                  <div class="form-group">
+                    <label for="departamento"><i class="bi bi-geo-alt-fill"></i> Departamento</label>
+                    <input type="text" [value]="departamentoSeleccionado" readonly class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="provincia"><i class="bi bi-geo"></i> Provincia</label>
+                    <input type="text" [value]="provinciaSeleccionada" readonly class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
+                    <input type="text" [value]="distritosFiltrados[0]?.nombre || ''" readonly class="form-control">
+                  </div>
+                </div>
+                <div class="form-row form-2-col">
+                  <div class="form-group">
+                    <label for="estado"><i class="bi bi-toggle-on"></i> Estado del Cliente</label>
+                    <select id="estado" formControlName="estado" [disabled]="soloEmailCelular">
+                      <option *ngFor="let e of estadosCliente" [value]="e">{{ e | titlecase }}</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="telefono"><i class="bi bi-telephone"></i> Teléfono Fijo</label>
+                    <input type="tel" id="telefono" formControlName="telefono" placeholder="Número fijo" readonly>
+                  </div>
+                </div>
+              </fieldset>
+
+            </ng-container>
+
+            <!-- ============================================= -->
+            <!-- MODO NORMAL (todos los campos editables) -->
+            <!-- ============================================= -->
+            <ng-container *ngIf="!soloEmailCelular">
+
+              <!-- Nombre y Apellidos -->
+              <div class="form-row form-2-col">
+                <div class="form-group">
+                  <label for="nombre"><i class="bi bi-person"></i> Nombre</label>
+                  <input type="text" id="nombre" formControlName="nombre"
+                    (input)="formatearTexto($event, 'nombre')"
+                    placeholder="Nombres del cliente">
+                </div>
+                <div class="form-group">
+                  <label for="apellidos"><i class="bi bi-person-fill"></i> Apellidos</label>
+                  <input type="text" id="apellidos" formControlName="apellidos"
+                    (input)="formatearTexto($event, 'apellidos')"
+                    placeholder="Apellidos del cliente">
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="genero"><i class="bi bi-gender-ambiguous"></i> Género</label>
-                <select id="genero" formControlName="genero">
-                  <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
-                </select>
+              <!-- Tipo doc | N° Doc | País (solo CE) | Género -->
+              <div class="form-row" [class.form-4-col]="esCarnetExtranjeria" [class.form-3-col]="!esCarnetExtranjeria">
+                <div class="form-group">
+                  <label for="tipoCliente"><i class="bi bi-card-list"></i> Tipo de Documento</label>
+                  <select id="tipoCliente" formControlName="tipoCliente">
+                    <option value="NATURAL">DNI</option>
+                    <option value="JURIDICO">RUC</option>
+                    <option value="CE">C.E.</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="numDoc">
+                    <ng-container *ngIf="!esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° Documento</ng-container>
+                    <ng-container *ngIf="esCarnetExtranjeria"><i class="bi bi-person-vcard"></i> N° C.E.</ng-container>
+                  </label>
+                  <input type="text" id="numDoc" formControlName="numDoc"
+                    [placeholder]="esCarnetExtranjeria ? 'Número C.E.' : 'Número de documento'">
+                </div>
+                <div class="form-group" *ngIf="esCarnetExtranjeria">
+                  <label><i class="bi bi-globe-americas"></i> País de Origen</label>
+                  <div class="pais-dropdown" [class.open]="dropdownPaisAbierto">
+                    <button type="button" class="pais-trigger"
+                      [class.is-invalid]="clienteForm.get('nacionalidad')?.invalid && clienteForm.get('nacionalidad')?.touched"
+                      (click)="dropdownPaisAbierto = !dropdownPaisAbierto">
+                      <ng-container *ngIf="paisSeleccionado; else sinPais">
+                        <img [src]="paisSeleccionado.bandera" class="pais-flag" alt="" />
+                        <span>{{ paisSeleccionado.nombre }}</span>
+                      </ng-container>
+                      <ng-template #sinPais><span class="placeholder-text">Seleccione</span></ng-template>
+                      <i class="bi bi-chevron-down pais-chevron"></i>
+                    </button>
+                    <ul class="pais-list" *ngIf="dropdownPaisAbierto">
+                      <li *ngFor="let p of paises" (click)="seleccionarPais(p)">
+                        <img [src]="p.bandera" class="pais-flag" alt="" />
+                        <span>{{ p.nombre }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="genero"><i class="bi bi-gender-ambiguous"></i> Género</label>
+                  <select id="genero" formControlName="genero">
+                    <option *ngFor="let g of generos" [value]="g">{{ g }}</option>
+                  </select>
+                </div>
               </div>
 
-            </div>
+              <!-- Estado Civil, Celular, Email -->
+              <div class="form-row form-3-col">
+                <div class="form-group">
+                  <label for="estadoCivil"><i class="bi bi-hearts"></i> Estado Civil</label>
+                  <select id="estadoCivil" formControlName="estadoCivil">
+                    <option *ngFor="let ec of estadosCiviles" [value]="ec">{{ ec }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="celular"><i class="bi bi-phone"></i> Celular</label>
+                  <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999" (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)">
+                </div>
+                <div class="form-group">
+                  <label for="email"><i class="bi bi-envelope"></i> Email <span class="label-opcional">(Opcional)</span></label>
+                  <input type="email" id="email" formControlName="email" placeholder="correo@ejemplo.com">
+                </div>
+              </div>
 
-            <!-- Estado Civil, Celular, Email -->
-            <div class="form-row form-3-col">
-              <div class="form-group">
-                <label for="estadoCivil"><i class="bi bi-hearts"></i> Estado Civil</label>
-                <select id="estadoCivil" formControlName="estadoCivil">
-                  <option *ngFor="let ec of estadosCiviles" [value]="ec">{{ ec }}</option>
-                </select>
+              <!-- Dirección -->
+              <div class="form-row">
+                <div class="form-group width-100">
+                  <label for="direccion"><i class="bi bi-geo-alt"></i> Dirección Completa</label>
+                  <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Av., Mz y Lote...">
+                </div>
               </div>
-              <div class="form-group">
-                <label for="celular"><i class="bi bi-phone"></i> Celular</label>
-                <input type="tel" id="celular" formControlName="celular" placeholder="999-999-999" (input)="formatearCelular($event)" (keydown)="manejarBackspace($event)">
-              </div>
-              <div class="form-group">
-                <label for="email"><i class="bi bi-envelope"></i> Email <span class="label-opcional">(Opcional)</span></label>
-                <input type="email" id="email" formControlName="email" placeholder="correo@ejemplo.com">
-              </div>
-            </div>
 
-            <!-- Dirección -->
-            <div class="form-row">
-              <div class="form-group width-100">
-                <label for="direccion"><i class="bi bi-geo-alt"></i> Dirección Completa</label>
-                <input type="text" id="direccion" formControlName="direccion" placeholder="Calle, Av., Mz y Lote...">
+              <!-- Departamento, Provincia, Distrito -->
+              <div class="form-row form-3-col">
+                <div class="form-group">
+                  <label for="departamento"><i class="bi bi-geo-alt-fill"></i> Departamento</label>
+                  <select id="departamento" (change)="onDepartamentoChange($event)">
+                    <option value="">Seleccione departamento</option>
+                    <option *ngFor="let dpt of departamentos" [value]="dpt" [selected]="dpt === departamentoSeleccionado">{{ dpt }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="provincia"><i class="bi bi-geo"></i> Provincia</label>
+                  <select id="provincia" (change)="onProvinciaChange($event)">
+                    <option value="">Seleccione provincia</option>
+                    <option *ngFor="let prv of provincias" [value]="prv" [selected]="prv === provinciaSeleccionada">{{ prv }}</option>
+                  </select>
+                </div>
+                <div class="form-group" formGroupName="distrito">
+                  <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
+                  <select id="idDistrito" formControlName="idDistrito">
+                    <option value="">Seleccione distrito</option>
+                    <option *ngFor="let d of distritosFiltrados" [value]="d.idDistrito">{{ d.nombre }}</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <!-- Departamento, Provincia, Distrito -->
-            <div class="form-row form-3-col">
-              <div class="form-group">
-                <label for="departamento"><i class="bi bi-geo-alt-fill"></i> Departamento</label>
-                <select id="departamento" (change)="onDepartamentoChange($event)">
-                  <option value="">Seleccione departamento</option>
-                  <option *ngFor="let dpt of departamentos" [value]="dpt" [selected]="dpt === departamentoSeleccionado">{{ dpt }}</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="provincia"><i class="bi bi-geo"></i> Provincia</label>
-                <select id="provincia" (change)="onProvinciaChange($event)">
-                  <option value="">Seleccione provincia</option>
-                  <option *ngFor="let prv of provincias" [value]="prv" [selected]="prv === provinciaSeleccionada">{{ prv }}</option>
-                </select>
-              </div>
-              <div class="form-group" formGroupName="distrito">
-                <label for="idDistrito"><i class="bi bi-map"></i> Distrito</label>
-                <select id="idDistrito" formControlName="idDistrito">
-                  <option value="">Seleccione distrito</option>
-                  <option *ngFor="let d of distritosFiltrados" [value]="d.idDistrito">{{ d.nombre }}</option>
-                </select>
-              </div>
-            </div>
 
-            <!-- Estado, Teléfono fijo -->
-            <div class="form-row form-2-col">
-              <div class="form-group">
-                <label for="estado"><i class="bi bi-toggle-on"></i> Estado del Cliente</label>
-                <select id="estado" formControlName="estado">
-                  <option *ngFor="let e of estadosCliente" [value]="e">{{ e | titlecase }}</option>
-                </select>
+              <!-- Estado, Teléfono fijo -->
+              <div class="form-row form-2-col">
+                <div class="form-group">
+                  <label for="estado"><i class="bi bi-toggle-on"></i> Estado del Cliente</label>
+                  <select id="estado" formControlName="estado">
+                    <option *ngFor="let e of estadosCliente" [value]="e">{{ e | titlecase }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="telefono"><i class="bi bi-telephone"></i> Teléfono Fijo <span class="label-opcional">(Opcional)</span></label>
+                  <input type="tel" id="telefono" formControlName="telefono" placeholder="Número fijo">
+                </div>
               </div>
-              <div class="form-group">
-                <label for="telefono"><i class="bi bi-telephone"></i> Teléfono Fijo <span class="label-opcional">(Opcional)</span></label>
-                <input type="tel" id="telefono" formControlName="telefono" placeholder="Número fijo">
-              </div>
-            </div>
+
+            </ng-container>
 
             <!-- Botones -->
             <div class="form-botones">
               <button type="submit" class="btn btn-save" [disabled]="!clienteForm.valid">
-                <i class="bi bi-check-circle"></i> Actualizar
+                <i class="bi bi-check-circle"></i> {{ soloEmailCelular ? 'Guardar' : 'Actualizar' }}
               </button>
               <button type="button" class="btn btn-cancel" (click)="cerrarModal()">
                 Cancelar
