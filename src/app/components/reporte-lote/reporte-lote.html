@@ -4,6 +4,14 @@
     <i class="bi bi-file-earmark-text"></i>
     <span>Reporte de Lotes por Programa</span>
   </div>
+  <div class="toolbar-filtros">
+    <select [(ngModel)]="filtroEstado" (change)="aplicarFiltro()" class="filtro-estado-select">
+      <option value="">Todos los estados</option>
+      <option value="Disponible">Disponible</option>
+      <option value="Separado">Separado</option>
+      <option value="Vendido">Vendido</option>
+    </select>
+  </div>
   <button class="btn-imprimir" (click)="imprimir()" [disabled]="cargando">
     <i class="bi bi-printer"></i>
     Imprimir / Exportar PDF
@@ -31,7 +39,10 @@
     <div class="reporte-meta">
       <h2 class="reporte-titulo">LISTADO DE LOTES</h2>
       <p class="reporte-fecha">Fecha: {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}</p>
-      <p class="reporte-total">Total de lotes: <strong>{{ totalLotes }}</strong></p>
+      <p class="reporte-total">Total de lotes: <strong>{{ totalLotes }}</strong>
+        <span *ngIf="filtroEstado"> ({{ filtroEstado }})</span>
+      </p>
+      <p class="reporte-area" *ngIf="filtroEstado">Área total filtrada: <strong>{{ totalesFiltrados.area | number:'1.2-2' }} m²</strong></p>
     </div>
   </div>
   <hr class="reporte-divider screen-only" />
@@ -58,7 +69,7 @@
         <td colspan="2" class="cuerpo-envolvente">
 
           <!-- GRUPOS POR PROGRAMA -->
-          <div class="programa-bloque" *ngFor="let grupo of grupos; let first = first; let last = last"
+          <div class="programa-bloque" *ngFor="let grupo of gruposFiltrados; let first = first; let last = last"
                [class.ultimo-bloque]="last">
 
             <!-- ══════════════════════════════════════════════
@@ -68,7 +79,7 @@
             <div class="titulo-reporte-print">
               <div class="titulo-reporte-texto">LISTADO DE LOTES</div>
               <div class="titulo-reporte-sub">
-                Fecha: {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}&nbsp;&nbsp;|&nbsp;&nbsp;Total lotes: {{ totalLotes }}
+                Fecha: {{ fechaReporte | date:'dd/MM/yyyy HH:mm' }}&nbsp;&nbsp;|&nbsp;&nbsp;Total lotes: {{ totalLotes }}<span *ngIf="filtroEstado"> ({{ filtroEstado }})</span>
               </div>
             </div>
 

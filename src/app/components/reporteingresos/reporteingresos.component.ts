@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReporteIngresosService } from '../../services/reporteingresos.service';
+import { AdminAnulacionesService } from '../../services/admin-anulaciones.service';
 import {
   ResumenIngresosRangoDTO,
   ResumenIngresoItemDTO
@@ -32,6 +33,7 @@ export class ReporteIngresosComponent implements OnInit {
 
   constructor(
     private reporteIngresosService: ReporteIngresosService,
+    private adminAnulacionesService: AdminAnulacionesService,
     private toastr: ToastrService
   ) {}
 
@@ -112,7 +114,7 @@ export class ReporteIngresosComponent implements OnInit {
       LETRA:                'Letra',
       MORA:                 'Mora',
       INICIAL:              'Inicial',
-      INSCRIPCION_SERVICIO: 'Inscripción Servicio'
+      INSCRIPCION_SERVICIO: 'INSCRIPCIÓN SB'
     };
     return mapa[tipo] ?? tipo;
   }
@@ -148,5 +150,43 @@ export class ReporteIngresosComponent implements OnInit {
 
   get totalFiltrado(): number {
     return this.detalleFiltrado.reduce((acc, i) => acc + Number(i.importePagado ?? 0), 0);
+  }
+
+  descargarComprobante(item: ResumenIngresoItemDTO): void {
+    if (!item.numeroComprobante) return;
+
+    const idPago = item.idPago;
+    const idContrato = item.idContrato;
+
+    let obs: import('rxjs').Observable<Blob>;
+
+    switch (item.tipoIngreso) {
+      case 'LETRA':
+        obs = this.adminAnulacionesService.descargarComprobanteLetra(idPago!);
+        break;
+      case 'MORA':
+        obs = this.adminAnulacionesService.descargarComprobanteMora(idPago!);
+        break;
+      case 'INSCRIPCION_SERVICIO':
+        obs = this.adminAnulacionesService.descargarComprobanteInscripcion(idPago!);
+        break;
+      case 'INICIAL':
+        obs = this.adminAnulacionesService.descargarComprobanteInicial(idContrato!);
+        break;
+      default:
+        return;
+    }
+
+    obs.subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `comprobante-${item.numeroComprobante}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.toastr.error('Error al descargar comprobante.', 'Error')
+    });
   }
 }

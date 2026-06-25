@@ -158,11 +158,11 @@
             <th>Fecha</th>
             <th>Cliente</th>
             <th>Referencia</th>
-            <th>Comprobante</th>
             <th>Medio de Pago</th>
             <th>N° Operación</th>
             <th class="col-monto">Importe (USD)</th>
             <th>Observaciones</th>
+            <th>Comprobante</th>
           </tr>
         </thead>
         <tbody>
@@ -176,23 +176,31 @@
             <td class="col-fecha">{{ formatFecha(item.fechaPago) }}</td>
             <td class="col-cliente">{{ item.nombreCliente ?? '—' }}</td>
             <td class="col-ref">{{ item.referencia ?? '—' }}</td>
-            <td class="col-comp">{{ item.numeroComprobante ?? '—' }}</td>
             <td class="col-medio">{{ formatMedioPago(item.medioPago) }}</td>
-            <td class="col-op">{{ item.numeroOperacion ?? '—' }}</td>
+            <td class="col-op">{{ item.numeroOperacion || '' }}</td>
             <td class="col-monto">{{ formatMonto(item.importePagado) }}</td>
             <td class="col-obs">{{ item.observaciones ?? '—' }}</td>
+            <td class="col-comp">
+              <div class="comp-cell">
+                <span>{{ item.numeroComprobante ?? '—' }}</span>
+                <button
+                  *ngIf="item.numeroComprobante"
+                  class="btn-descargar-comp"
+                  (click)="descargarComprobante(item)"
+                  title="Descargar comprobante PDF">
+                  <i class="bi bi-file-earmark-pdf-fill"></i>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
         <tfoot *ngIf="detalleFiltrado.length > 0">
           <tr class="fila-total">
-            <td colspan="8" class="total-label">
+            <td colspan="10" class="total-label">
               <i class="bi bi-calculator"></i>
-              Total {{ filtroTipo !== 'TODOS' ? '(' + etiquetaTipo(filtroTipo) + ')' : 'General' }}
-            </td>
-            <td class="col-monto total-valor">
+              Total {{ filtroTipo !== 'TODOS' ? '(' + etiquetaTipo(filtroTipo) + ')' : 'General' }}:
               {{ formatMonto(totalFiltrado) }}
             </td>
-            <td></td>
           </tr>
         </tfoot>
       </table>

@@ -713,3 +713,176 @@ $border-color: #e9ecef;
   .empty-title   { font-size: 0.95rem; font-weight: 600; color: #64748b; margin: 0; }
   .empty-subtitle { font-size: 0.82rem; color: #94a3b8; margin: 0; }
 }
+
+// ============================================
+// MODO OSCURO
+// ============================================
+:host-context(body.dark-mode) {
+
+  // ── Contenedor principal ─────────────────
+  .contratos-container {
+    h2 { color: #e2e8f0; }
+  }
+
+  // ── Botones de filtro toggle ─────────────
+  .filtros-header {
+    .selector-busqueda {
+      background: #0f1f36;
+      border-color: rgba(99, 179, 237, 0.2);
+
+      .btn-toggle {
+        color: #94a3b8;
+        background: transparent;
+
+        &.active {
+          background: #1a3a5c;
+          color: #60a5fa;
+          font-weight: 600;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        &:hover:not(.active) {
+          background: rgba(96, 165, 250, 0.1);
+          color: #e2e8f0;
+        }
+      }
+    }
+
+    // ── Search box (buscar por ID) ──────────
+    .search-box {
+      background: #0f1f36;
+      border-color: rgba(99, 179, 237, 0.2);
+
+      input {
+        color: #e2e8f0;
+        &::placeholder { color: #4a6080; }
+      }
+      .search-icon { color: #4a6080; }
+
+      &:focus-within {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      }
+    }
+
+    // ── Select Programa + Input Lote ────────
+    .busqueda-lote {
+
+      .select-programa {
+        background-color: #0f1f36;
+        color: #e2e8f0;
+        border-color: rgba(99, 179, 237, 0.2);
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 15px;
+
+        option {
+          background: #0f1f36;
+          color: #e2e8f0;
+        }
+
+        &:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+          background-color: #152b45;
+        }
+      }
+
+      // Es un <input type="text"> — solo limpiar, sin tocar appearance
+      .input-lote {
+        background-color: #0f1f36 !important;
+        color: #e2e8f0 !important;
+        border-color: rgba(99, 179, 237, 0.2) !important;
+        background-image: none !important;   // ← quita la V del SVG anterior
+
+        &::placeholder { color: #4a6080; }
+
+        &:focus {
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+          background-color: #152b45 !important;
+        }
+      }
+    }
+  }
+
+  // ── Tabla wrapper ────────────────────────
+  .tabla-wrapper {
+    background: #0f1f36;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .table-custom {
+    td {
+      color: #e2e8f0;
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+
+    tbody tr:hover td { background-color: rgba(6, 182, 212, 0.08); }
+
+    // ── Líneas punteadas: visibles pero sutiles ──
+    .multi-item-container {
+      div:not(:last-child) {
+        border-bottom: 1px dashed rgba(148, 163, 184, 0.35) !important;
+      }
+    }
+
+    .id-service-wrapper .id-number { color: #60a5fa; }
+  }
+
+  // ── Loading dots ─────────────────────────
+  .loading-dots-wrapper-inline {
+    background: #0f1f36;
+  }
+  .loading-text { color: #4a6080; }
+
+  // ── Empty state ──────────────────────────
+  .empty-state {
+    background: #0f1f36;
+    i { color: #1e3a5f; }
+    .empty-title    { color: #4a6080; }
+    .empty-subtitle { color: #2d4a6a; }
+  }
+
+  // ── Dropdown de estado ───────────────────
+  .estado-dropdown {
+    .btn-estado-menu {
+      border-color: rgba(99, 179, 237, 0.2);
+      color: #94a3b8;
+      &:hover { color: #60a5fa; background: #152b45; border-color: #3b82f6; }
+    }
+
+    .estado-menu {
+      background: #152b45;
+      border-color: rgba(99, 179, 237, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+      .estado-menu-item {
+        color: #e2e8f0;
+        &:hover { background: #1a3a5c; color: #60a5fa; }
+      }
+    }
+  }
+
+  // ── Paginación ───────────────────────────
+  .paginacion-controles {
+    .btn-paginacion {
+      background: #0f1f36;
+      border-color: rgba(99, 179, 237, 0.2);
+      color: #94a3b8;
+      box-shadow: none;
+
+      &:hover:not(:disabled) {
+        background: #023e8a;
+        color: #e2e8f0;
+        border-color: #3b82f6;
+      }
+      &.active {
+        background: linear-gradient(135deg, #023e8a, #0353a4);
+        color: white;
+        border-color: #0353a4;
+      }
+    }
+  }
+}

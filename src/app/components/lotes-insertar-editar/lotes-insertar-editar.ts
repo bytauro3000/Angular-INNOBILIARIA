@@ -354,7 +354,12 @@ export class LotesInsertarEditar implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const data = this.loteForm.value;
+    const raw = this.loteForm.value;
+    const data = {
+      ...raw,
+      idPrograma: raw.programa?.idPrograma ?? null,
+      programa: undefined
+    };
     Swal.fire({ title: 'Procesando...', didOpen: () => Swal.showLoading() });
 
     const request = this.isEditMode
