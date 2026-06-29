@@ -236,7 +236,7 @@ export class ContratoEditarComponent implements OnInit {
         this.contratoForm.patchValue({
           modalidadContrato: res.separacion ? 'SEPARACION' : 'DIRECTO',
           tipoContrato: res.tipoContrato,
-          fechaContrato: res.fechaContrato ? new Date(res.fechaContrato).toISOString().split('T')[0] : '',
+          fechaContrato: res.fechaContrato || '',
           montoTotal: res.montoTotal || 0,
           inicial: res.inicial || 0,
           cantidadLetras: res.cantidadLetras,

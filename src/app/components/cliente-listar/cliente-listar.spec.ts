@@ -23,7 +23,7 @@ class MockClienteService {
         celular: '1234567890',
         direccion: 'Calle Ficticia 123',
         email: 'test@mock.com',
-        fechaRegistro: new Date(),
+        fechaRegistro: new Date().toISOString(),
         estado: EstadoCliente.ACTIVO,
         distrito: { idDistrito: 1, nombre: 'Distrito Ficticio' } as Distrito
       }
@@ -73,7 +73,7 @@ describe('ClientesComponent', () => {
         celular: '1234567890',
         direccion: 'Calle Ficticia 123',
         email: 'test@mock.com',
-        fechaRegistro: new Date(),
+        fechaRegistro: new Date().toISOString(),
         estado: EstadoCliente.ACTIVO,
         distrito: { idDistrito: 1, nombre: 'Distrito Ficticio' } as Distrito
       }

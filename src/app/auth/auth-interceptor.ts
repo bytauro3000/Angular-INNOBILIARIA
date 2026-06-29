@@ -12,44 +12,43 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   const loginService = inject(LoginService);
   const router = inject(Router);
 
+  // Las peticiones de auth usan withCredentials para enviar/recibir cookies
+  const reqWithCredentials = req.clone({ withCredentials: true });
+
   if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
-    return next(req);
+    return next(reqWithCredentials);
   }
 
   const token = tokenService.getToken();
   const clonedRequest = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+    ? reqWithCredentials.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : reqWithCredentials;
 
   return next(clonedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !isRefreshing) {
         isRefreshing = true;
-        const refreshToken = tokenService.getRefreshToken();
 
-        if (refreshToken) {
-          return loginService.refreshToken(refreshToken).pipe(
-            switchMap((response) => {
-              isRefreshing = false;
-              tokenService.setToken(response.token);
-              tokenService.setRefreshToken(response.refreshToken);
-              const retryRequest = req.clone({
-                setHeaders: { Authorization: `Bearer ${response.token}` }
-              });
-              return next(retryRequest);
-            }),
-            catchError((refreshError) => {
-              isRefreshing = false;
-              tokenService.removeToken();
-              router.navigate(['/login']);
-              return throwError(() => refreshError);
-            })
-          );
-        }
-
-        isRefreshing = false;
-        tokenService.removeToken();
-        router.navigate(['/login']);
+        // El refresh token viaja automáticamente en la cookie HttpOnly
+        return loginService.refreshToken().pipe(
+          switchMap((response) => {
+            isRefreshing = false;
+            tokenService.setToken(response.token);
+            const retryRequest = reqWithCredentials.clone({
+              setHeaders: { Authorization: `Bearer ${response.token}` }
+            });
+            return next(retryRequest);
+          }),
+          catchError((refreshError) => {
+            isRefreshing = false;
+            tokenService.removeToken();
+            loginService.logout().subscribe({
+              error: () => {} // ignorar error de logout
+            });
+            router.navigate(['/login']);
+            return throwError(() => refreshError);
+          })
+        );
       }
 
       if (error.status === 403) {

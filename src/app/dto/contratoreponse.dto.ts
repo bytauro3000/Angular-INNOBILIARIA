@@ -8,7 +8,7 @@ import { PagoInicialResponseDTO } from './pagoinicialresponse.dto';
 
 export interface ContratoResponseDTO {
   idContrato: number;
-  fechaContrato: Date;
+  fechaContrato: string;
   tipoContrato: string;
   estadoContrato: EstadoContrato;
   montoTotal: number;

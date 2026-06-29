@@ -14,12 +14,10 @@ export class LogoutService {
   ) { }
 
   logout(): void {
-    const refreshToken = this.tokenService.getRefreshToken();
-    if (refreshToken) {
-      this.loginService.logout(refreshToken).subscribe({
-        error: () => {}
-      });
-    }
+    // El backend invalida la cookie HttpOnly del refresh token
+    this.loginService.logout().subscribe({
+      error: () => {}
+    });
     this.tokenService.removeToken();
     this.router.navigate(['/login']);
   }

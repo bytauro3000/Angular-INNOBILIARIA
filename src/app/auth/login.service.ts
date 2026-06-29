@@ -15,15 +15,23 @@ export class LoginService {
   constructor(private http: HttpClient) { }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.URL_AUTH}/login`, credentials);
+    return this.http.post<LoginResponse>(`${this.URL_AUTH}/login`, credentials, {
+      withCredentials: true
+    });
   }
 
-  refreshToken(refreshToken: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.URL_AUTH}/refresh`, { refreshToken });
+  refreshToken(): Observable<LoginResponse> {
+    // El refresh token se envía automáticamente en la cookie HttpOnly
+    return this.http.post<LoginResponse>(`${this.URL_AUTH}/refresh`, {}, {
+      withCredentials: true
+    });
   }
 
-  logout(refreshToken: string): Observable<void> {
-    return this.http.post<void>(`${this.URL_AUTH}/logout`, { refreshToken });
+  logout(): Observable<void> {
+    // El refresh token se envía automáticamente en la cookie HttpOnly
+    return this.http.post<void>(`${this.URL_AUTH}/logout`, {}, {
+      withCredentials: true
+    });
   }
 }
 

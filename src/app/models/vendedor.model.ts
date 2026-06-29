@@ -9,7 +9,7 @@ export interface Vendedor{
   celular?: string;
   email?: string;
   direccion?: string;   // 👈 importante
-  fechaNacimiento?: Date | null;
+  fechaNacimiento?: string;
   genero?: Genero;
   comision?: number | null;
   distrito: Distrito;

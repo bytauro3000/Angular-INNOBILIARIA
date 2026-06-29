@@ -1,28 +1,34 @@
 // src/app/services/distrito.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { Distrito } from '../models/distrito.model';
 import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'
 })
 export class DistritoService {
-  // ✅ URL base actualizada
-  private readonly apiUrl = `${environment.apiUrl}/api/distritos`;
+  // ✅ URL base actualizada
+  private readonly apiUrl = `${environment.apiUrl}/api/distritos`;
 
-  constructor(private http: HttpClient) {}
+  /** Cache de distritos: se carga una sola vez y se reutiliza en toda la aplicación */
+  private distritos$?: Observable<Distrito[]>;
 
-  // 🔹 Listar todos los distritos
-  listarDistritos(): Observable<Distrito[]> {
-    //Endpoint actualizado
-    return this.http.get<Distrito[]>(`${this.apiUrl}/listar`);
-  }
+  constructor(private http: HttpClient) {}
 
-  // 🔹 Obtener un distrito por ID
-  obtenerDistritoPorId(id: number): Observable<Distrito> {
-    //Endpoint actualizado
-    return this.http.get<Distrito>(`${this.apiUrl}/obtener/${id}`);
-  }
+  // 🔹 Listar todos los distritos (con cache)
+  listarDistritos(): Observable<Distrito[]> {
+    if (!this.distritos$) {
+      this.distritos$ = this.http.get<Distrito[]>(`${this.apiUrl}/listar`).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.distritos$;
+  }
+
+  // 🔹 Obtener un distrito por ID
+  obtenerDistritoPorId(id: number): Observable<Distrito> {
+    return this.http.get<Distrito>(`${this.apiUrl}/obtener/${id}`);
+  }
 }

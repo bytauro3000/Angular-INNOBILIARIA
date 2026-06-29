@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
 
         const token = response.token;
         this.tokenService.setToken(token);
-        this.tokenService.setRefreshToken(response.refreshToken);
+        // El refresh token se guarda en cookie HttpOnly por el backend
 
         const decodedToken: any = jwtDecode(token);
         const userRole = decodedToken.rol;

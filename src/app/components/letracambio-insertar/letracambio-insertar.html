@@ -72,9 +72,14 @@
         <div class="form-row form-3-col">
 
           <div class="form-group">
-            <label for="idDistrito"><i class="bi bi-geo-alt"></i> Distrito de Giro</label>
-            <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required>
-              <option value="0" disabled>-- Seleccione un distrito --</option>
+            <label for="idDistrito">
+              <i class="bi bi-geo-alt"></i> Distrito de Giro
+              <span *ngIf="cargandoDistritos" class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
+            </label>
+            <select id="idDistrito" [(ngModel)]="generarLetrasRequest.idDistrito" name="idDistrito" required [disabled]="cargandoDistritos">
+              <option value="0" disabled>
+                {{ cargandoDistritos ? 'Cargando distritos...' : '-- Seleccione un distrito --' }}
+              </option>
               <option *ngFor="let distrito of distritos" [value]="distrito.idDistrito">
                 {{ distrito.nombre }}
               </option>

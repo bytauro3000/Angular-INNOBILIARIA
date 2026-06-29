@@ -5,6 +5,7 @@ import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { LogoutService } from '../../auth/logout.service';
 import { ThemeService } from '../../services/theme.service';
+import { DistritoService } from '../../services/distrito.service';
 
 type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios' | 'reportes';
 
@@ -34,10 +35,15 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         private tokenService: TokenService,
         private logoutService: LogoutService,
         private router: Router,
-        protected themeSvc: ThemeService
+        protected themeSvc: ThemeService,
+        private distritoService: DistritoService
     ) { }
 
     ngOnInit(): void {
+        // Precargar distritos en cache para que estén disponibles
+        // inmediatamente en vistas como registro de letras de cambio
+        this.distritoService.listarDistritos().subscribe();
+
         const token = this.tokenService.getToken();
         if (token) {
             try {

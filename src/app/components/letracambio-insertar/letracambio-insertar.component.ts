@@ -12,6 +12,7 @@ import { ContratoService } from '../../services/contrato.service';
 import { Moneda } from '../../dto/moneda.enum';
 import { Router } from '@angular/router';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
+import { obtenerFechaPeru } from '../../utils/fecha-peru';
 
 @Component({
   selector: 'app-letracambio-insertar',
@@ -34,6 +35,7 @@ export class LetracambioInsertarComponent implements OnInit {
 
   generarLetrasRequest: GenerarLetrasRequest = this.crearRequestConFechaLocal();
   distritos: Distrito[] = [];
+  cargandoDistritos = false;
   cargando = false;
   success: string | null = null;
 
@@ -75,10 +77,10 @@ export class LetracambioInsertarComponent implements OnInit {
         this.cantidadLetrasContrato = contrato.cantidadLetras || 0;
         this.saldoContrato = contrato.saldo || 0;
 
-        // Usar la fecha del contrato como fecha de giro (emisión)
+        // La fecha de giro debe coincidir con la fecha del contrato;
+        // la fecha de vencimiento inicial permanece con la fecha actual de Perú
         if (contrato.fechaContrato) {
-          const fechaStr = String(contrato.fechaContrato).substring(0, 10);
-          this.generarLetrasRequest.fechaGiro = fechaStr;
+          this.generarLetrasRequest.fechaGiro = contrato.fechaContrato;
         }
       },
       error: () => {
@@ -99,23 +101,26 @@ export class LetracambioInsertarComponent implements OnInit {
   }
 
   cargarDistritos(): void {
+    this.cargandoDistritos = true;
     this.distritoService.listarDistritos().subscribe({
-      next: (data) => (this.distritos = data),
-      error: (err) => console.error(err),
+      next: (data) => {
+        this.distritos = data;
+        this.cargandoDistritos = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.cargandoDistritos = false;
+      },
     });
   }
 
   crearRequestConFechaLocal(): GenerarLetrasRequest {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const day = today.getDate().toString().padStart(2, '0');
-    const todayString = `${year}-${month}-${day}`;
+    const fechaHoyPeru = obtenerFechaPeru();
 
     return {
       idDistrito: 8,
-      fechaGiro: todayString,
-      fechaVencimientoInicial: todayString,
+      fechaGiro: fechaHoyPeru,
+      fechaVencimientoInicial: fechaHoyPeru,
       importe: '',
       importeLetras: '',
       modoAutomatico: true,

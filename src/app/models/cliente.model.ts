@@ -16,7 +16,7 @@ export interface Cliente {
   direccion: string;
   email?: string;
   genero: Genero;
-  fechaRegistro?: Date | string;
+  fechaRegistro?: string;
   estado: EstadoCliente;
   distrito: Distrito;
   nacionalidad?: string;
