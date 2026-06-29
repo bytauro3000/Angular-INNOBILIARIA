@@ -246,6 +246,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   onMedioPagoChange(): void {
     if (this.pagoRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoRequest.numeroOperacion = '';
+      this.pagoRequest.fechaOperacion = undefined;
       this.voucherFiles = [];
     }
   }

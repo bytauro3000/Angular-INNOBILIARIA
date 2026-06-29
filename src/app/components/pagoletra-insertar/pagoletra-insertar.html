@@ -148,9 +148,14 @@
                      [placeholder]="pagoRequest.medioPago === 'EFECTIVO' ? 'N/A' : 'Ingrese N° operación'">
             </div>
             <div class="form-group">
-              <label for="fechaOperacion">Fecha Operación (voucher)</label>
+              <label for="fechaOperacion">
+                Fecha Operación (voucher)
+                <span *ngIf="pagoRequest.medioPago !== 'EFECTIVO'">*</span>
+              </label>
               <input type="date" id="fechaOperacion" class="form-control"
-                     [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion">
+                     [(ngModel)]="pagoRequest.fechaOperacion" name="fechaOperacion"
+                     [disabled]="pagoRequest.medioPago === 'EFECTIVO'"
+                     [placeholder]="pagoRequest.medioPago === 'EFECTIVO' ? 'N/A' : ''">
             </div>
           </div>
 
