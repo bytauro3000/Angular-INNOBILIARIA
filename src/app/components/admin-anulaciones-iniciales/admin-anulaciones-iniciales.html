@@ -75,7 +75,7 @@
           </td>
           <td data-label="Contrato" class="contrato-id">{{ pago.idContrato || '—' }}</td>
           <td data-label="Cliente" class="nombre-cliente">{{ pago.nombreCliente || '—' }}</td>
-          <td data-label="Fecha Pago">{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Fecha Pago">{{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</td>
           <td data-label="Importe" class="monto">{{ pago.moneda === 'USD' ? '$' : 'S/.' }} {{ pago.importePagado | number:'1.2-2' }}</td>
           <td data-label="Medio Pago">{{ pago.medioPago || '—' }}</td>
           <td data-label="Estado">
@@ -138,7 +138,7 @@
         </div>
         <div class="card-item">
           <span class="card-label">Fecha Pago</span>
-          <span class="card-value">{{ pago.fechaPago | date:'dd/MM/yyyy' }}</span>
+          <span class="card-value">{{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</span>
         </div>
         <div class="card-item">
           <span class="card-label">Medio Pago</span>

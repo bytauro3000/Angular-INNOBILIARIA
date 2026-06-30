@@ -47,8 +47,8 @@
           </td>
 
           <td>{{ s.nomVendedor }}</td>
-          <td class="text-center">{{ s.fechaSepara | date:'dd/MM/yyyy' }}</td>
-          <td class="text-center">{{ s.fechaLimite | date:'dd/MM/yyyy' }}</td>
+          <td class="text-center">{{ s.fechaSepara | date:'dd/MM/yyyy' : 'UTC' }}</td>
+          <td class="text-center">{{ s.fechaLimite | date:'dd/MM/yyyy' : 'UTC' }}</td>
           <td class="text-end">{{ s.monto | currency:'USD':'symbol':'1.2-2' }}</td>
 
           <td class="text-center">

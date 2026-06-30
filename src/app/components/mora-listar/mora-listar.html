@@ -56,8 +56,8 @@
                 'row-anulado':   mora.estadoMora === 'ANULADO'
               }">
                 <td data-label="Letra">{{ obtenerNumeroLetra(mora.numeroLetra) }}</td>
-                <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' }}</td>
-                <td data-label="F. Pago">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' }}</td>
+                <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' : 'UTC' }}</td>
+                <td data-label="F. Pago">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td data-label="Días" class="text-center">
                   <span class="dias-chip">{{ mora.diasMora }}</span>
                 </td>
@@ -81,7 +81,7 @@
                   <ng-container *ngIf="mora.pagos && mora.pagos.length > 0; else sinPagos">
                     <div *ngFor="let pago of mora.pagos" class="pago-mora-item" [ngClass]="{'pago-anulado': pago.anulado}">
                       <span class="pago-monto">{{ simboloMoneda }} {{ pago.montoPagado | number:'1.2-2' }}</span>
-                      <span class="pago-fecha">{{ pago.fechaPago | date:'dd/MM/yy' }}</span>
+                      <span class="pago-fecha">{{ pago.fechaPago | date:'dd/MM/yy' : 'UTC' }}</span>
                       <span *ngIf="pago.anulado" class="pago-badge-anulado" [title]="'Motivo: ' + (pago.motivoAnulacion || '-') + ' | Por: ' + (pago.anuladoPor || '-')">
                         ANULADO
                       </span>

@@ -53,8 +53,8 @@
                 <td class="text-center">{{ r.lecturaActual }}</td>
                 <td class="text-center">{{ r.consumoMes }}</td>
                 <td class="text-center">S/ {{ r.importeTotal | number:'1.2-2' }}</td>
-                <td class="text-center">{{ r.fechaGiro | date:'dd/MM/yyyy' }}</td>
-                <td class="text-center">{{ r.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ r.fechaGiro | date:'dd/MM/yyyy' : 'UTC' }}</td>
+                <td class="text-center">{{ r.fechaVencimiento | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td class="estado-cell">
                     <span [ngClass]="{
                         'estado-pendiente': r.estado === 'PENDIENTE',

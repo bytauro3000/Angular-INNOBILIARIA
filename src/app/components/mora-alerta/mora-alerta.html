@@ -28,7 +28,7 @@
             <div class="mora-detalle">
                 <div class="detalle-row">
                     <span class="detalle-label">Fecha de vencimiento</span>
-                    <span class="detalle-valor">{{ calculo.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+                    <span class="detalle-valor">{{ calculo.fechaVencimiento | date:'dd/MM/yyyy' : 'UTC' }}</span>
                 </div>
                 <div class="detalle-row">
                     <span class="detalle-label">Días vencida</span>

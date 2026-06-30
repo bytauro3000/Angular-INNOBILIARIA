@@ -61,7 +61,7 @@
       </div>
       <div>
         <strong>Fecha contrato:</strong>
-        {{ contratoEncontrado.fechaContrato | date:'dd/MM/yyyy' }}
+        {{ contratoEncontrado.fechaContrato | date:'dd/MM/yyyy' : 'UTC' }}
       </div>
       <div>
         <strong>Total:</strong>
@@ -90,7 +90,7 @@
               class="badge-anulado"
               [title]="'Motivo: ' + (contratoEncontrado.pagoInicial.motivoAnulacion || '-') +
                        ' | Por: ' + (contratoEncontrado.pagoInicial.anuladoPor || '-') +
-                       ' | Fecha: ' + (contratoEncontrado.pagoInicial.fechaAnulacion | date:'dd/MM/yyyy HH:mm')">
+                       ' | Fecha: ' + (contratoEncontrado.pagoInicial.fechaAnulacion | date:'dd/MM/yyyy HH:mm' : 'UTC')">
           <i class="bi bi-slash-circle"></i> ANULADO
         </span>
         <span *ngIf="!contratoEncontrado.pagoInicial.anulado" class="badge-vigente">
@@ -106,7 +106,7 @@
         </span>
         <span *ngIf="contratoEncontrado.pagoInicial.fechaPago">
           <strong>Fecha:</strong>
-          {{ contratoEncontrado.pagoInicial.fechaPago | date:'dd/MM/yyyy' }}
+          {{ contratoEncontrado.pagoInicial.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}
         </span>
         <span *ngIf="contratoEncontrado.pagoInicial.medioPago">
           <strong>Medio:</strong> {{ contratoEncontrado.pagoInicial.medioPago }}
@@ -311,7 +311,7 @@
             </span>
             <span class="parcial-grupo-vencimiento">
               <i class="bi bi-calendar3"></i>
-              Vence: {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}
+              Vence: {{ letra.fechaVencimiento | date:'dd/MM/yyyy' : 'UTC' }}
             </span>
             <span class="parcial-grupo-importe">
               Importe: {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
@@ -347,7 +347,7 @@
             <tbody>
               <tr *ngFor="let abono of getAbonosPorLetra(letra.idLetra); let i = index">
                 <td>{{ i + 1 }}</td>
-                <td>{{ abono.fechaPago | date:'dd/MM/yyyy' }}</td>
+                <td>{{ abono.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td class="abono-importe">
                   {{ contratoEncontrado?.moneda === 'PEN' ? 'S/.' : '$' }}
                   {{ abono.importePagado | number:'1.2-2' }}
@@ -404,7 +404,7 @@
             </span>
           </td>
           <td data-label="Fecha Vencimiento">
-            {{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}
+            {{ letra.fechaVencimiento | date:'dd/MM/yyyy' : 'UTC' }}
           </td>
           <td data-label="Importe">
             <div class="importe-cell">

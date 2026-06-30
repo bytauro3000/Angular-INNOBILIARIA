@@ -84,7 +84,7 @@
         </div>
         <div class="data-item">
           <label>Fecha de Registro:</label>
-          <span>{{ cliente.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span>{{ cliente.fechaRegistro | date:'dd/MM/yyyy HH:mm' : 'UTC' }}</span>
         </div>
       </div>
     </div>

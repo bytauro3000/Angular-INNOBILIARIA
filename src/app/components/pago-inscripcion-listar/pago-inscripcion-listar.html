@@ -93,7 +93,7 @@
             </td>
 
             <td class="text-center" data-label="Fecha Pago">
-              {{ pago.fechaPago | date:'dd/MM/yyyy' }}
+              {{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}
             </td>
 
             <td class="text-center" data-label="Medio de Pago">

@@ -67,7 +67,7 @@
         <tr *ngFor="let letra of paginatedLetras; let i = index">
           <td class="col-num text-center" data-label="#">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
           <td class="col-letra" data-label="NÚMERO">{{ letra.numeroLetra }}</td>
-          <td class="col-fecha-giro hide-md text-center" data-label="FECHA GIRO">{{ letra.fechaGiro | date: 'dd/MM/yyyy' }}</td>
+          <td class="col-fecha-giro hide-md text-center" data-label="FECHA GIRO">{{ letra.fechaGiro | date: 'dd/MM/yyyy' : 'UTC' }}</td>
           <td class="col-fecha-ven text-center" data-label="FECHA VENCIMIENTO" (dblclick)="iniciarEdicion(letra, 'fechaVencimiento')">
             <input
               *ngIf="editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento'"
@@ -81,7 +81,7 @@
               autofocus
             />
             <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento')">
-              {{ letra.fechaVencimiento | date: 'dd/MM/yyyy' }}
+              {{ letra.fechaVencimiento | date: 'dd/MM/yyyy' : 'UTC' }}
             </span>
           </td>
 

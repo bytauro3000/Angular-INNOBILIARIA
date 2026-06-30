@@ -36,7 +36,7 @@
             <tbody>
               <tr *ngFor="let pago of pagos" [ngClass]="{'row-anulado': pago.anulado}">
                 <td>{{ getNumeroLetraLimpio(pago.numeroLetra) }}</td>
-                <td>{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
+                <td>{{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td>{{ monedaContrato === 'PEN' ? 'S/.' : '$' }} {{ pago.importePagado | number:'1.2-2' }}</td>
                 <td>{{ pago.medioPago }}</td>
                 <td>

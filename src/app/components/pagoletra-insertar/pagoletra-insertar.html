@@ -35,7 +35,7 @@
           <div class="summary-divider"></div>
           <div class="summary-col">
             <span class="summary-label">Vencimiento</span>
-            <span class="summary-value">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' }}</span>
+            <span class="summary-value">{{ letra.fechaVencimiento | date:'dd/MM/yyyy' : 'UTC' }}</span>
           </div>
           <div class="summary-divider" *ngIf="esParcial || cargandoSaldo"></div>
           <div class="summary-col highlight" *ngIf="esParcial || cargandoSaldo">

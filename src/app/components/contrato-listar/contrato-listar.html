@@ -130,7 +130,7 @@
             </td>
 
             <!-- Fecha -->
-            <td class="col-fecha text-center hide-md" data-label="Fecha C.">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' }}</td>
+            <td class="col-fecha text-center hide-md" data-label="Fecha C.">{{ contrato.fechaContrato | date: 'dd/MM/yyyy' : 'UTC' }}</td>
 
             <!-- Tipo -->
             <td class="col-tipo text-center hide-md" data-label="Tipo">{{ contrato.tipoContrato }}</td>

@@ -86,7 +86,7 @@
             <span class="comprobante-badge">{{ pago.numeroComprobante || '—' }}</span>
           </td>
           <td>{{ pago.numeroLetra || '—' }}</td>
-          <td>{{ pago.fechaPago | date:'dd/MM/yyyy' }}</td>
+          <td>{{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</td>
           <td class="monto">{{ pago.moneda === 'USD' ? '$' : 'S/' }} {{ pago.importePagado | number:'1.2-2' }}</td>
           <td>{{ pago.medioPago || '—' }}</td>
           <td>
@@ -155,7 +155,7 @@
         </div>
         <div class="card-item">
           <span class="card-label">Fecha Pago</span>
-          <span class="card-value">{{ pago.fechaPago | date:'dd/MM/yyyy' }}</span>
+          <span class="card-value">{{ pago.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</span>
         </div>
         <div class="card-item">
           <span class="card-label">Medio Pago</span>
@@ -208,7 +208,7 @@
         </div>
         <div class="info-row">
           <span class="label">Fecha Pago:</span>
-          <span class="value">{{ pagoSeleccionado.fechaPago | date:'dd/MM/yyyy' }}</span>
+          <span class="value">{{ pagoSeleccionado.fechaPago | date:'dd/MM/yyyy' : 'UTC' }}</span>
         </div>
       </div>
       <div class="form-group mt-3">
