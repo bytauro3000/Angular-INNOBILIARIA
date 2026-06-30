@@ -527,8 +527,21 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
       gap: 14px;
     }
 
-    // Tipo y comprobante: label visible, contenido centrado y sin salto de línea
-    &:nth-child(2) { text-align: center; white-space: nowrap; }
+    // Tipo: sin grid, los badges usan su ancho natural
+    &:nth-child(2) {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      border: none;
+      padding: 9px 14px;
+      grid-template-columns: none;
+      text-align: left;
+
+      &::before {
+        flex-shrink: 0;
+      }
+    }
 
     &.col-comp {
       text-align: center;
