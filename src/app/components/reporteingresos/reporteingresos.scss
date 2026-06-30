@@ -407,15 +407,188 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
 }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
-  .ri-container { padding: 16px; }
-  .ri-filtros-row { flex-direction: column; }
-  .ri-actions { width: 100%; justify-content: stretch; button { flex: 1; } }
-  .ri-tabla-header { flex-direction: column; align-items: flex-start; }
-  .ri-totales-grid { grid-template-columns: 1fr 1fr; }
+
+// Monitores medianos (1024px - 1366px)
+@media (max-width: 1200px) {
+  .ri-container { padding: 20px; max-width: 100%; }
+  .ri-totales-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+// Tablets (768px - 1024px)
+@media (max-width: 1024px) {
+  .ri-container { padding: 18px; }
+  .ri-totales-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .ri-titulo { font-size: 1.3rem; }
+  .ri-filtros-row { gap: 12px; }
+  .ri-tabla { font-size: 0.8rem; }
+  .ri-tabla th, .ri-tabla td { padding: 9px 10px; }
+
+  // Ocultar columnas menos relevantes en tablets
+  .ri-tabla .col-obs { display: none; }
+  .ri-tabla .col-medio { display: none; }
+  .ri-tabla .col-op { display: none; }
+}
+
+// Tablets pequeñas y teléfonos grandes (480px - 768px)
+@media (max-width: 768px) {
+  .ri-container { padding: 14px; }
+  .ri-filtros-card { padding: 16px; }
+  .ri-filtros-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .ri-field { width: 100%; max-width: 320px; }
+  .ri-actions { width: 100%; max-width: 320px; button { flex: 1; } }
+
+  .ri-tabla-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .ri-totales-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .ri-total-card { padding: 14px 16px 12px; }
+  .ri-total-card .tc-monto { font-size: 1rem; }
+  .ri-total-card .tc-monto-grande { font-size: 1.15rem; }
+
+  .ri-titulo { font-size: 1.15rem; }
+  .ri-subtitulo { font-size: 0.78rem; }
+
+  // ── Tabla → Tarjetas ──
+  .ri-tabla,
+  .ri-tabla thead,
+  .ri-tabla tbody,
+  .ri-tabla tfoot,
+  .ri-tabla tr,
+  .ri-tabla td {
+    display: block;
+  }
+
+  .ri-tabla thead { display: none; }
+
+  .ri-tabla tbody tr {
+    background: #fff;
+    border: 1px solid #e2e6ef;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    position: relative;
+
+    &.anulado {
+      background: #fff8f8;
+      border-color: #fecaca;
+    }
+  }
+
+  .ri-tabla td {
+    border: none;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: normal;
+    font-size: 0.8rem;
+
+    &::before {
+      content: attr(data-label);
+      font-weight: 700;
+      font-size: 0.68rem;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      min-width: 72px;
+      flex-shrink: 0;
+    }
+
+    &.col-num { display: none; }
+
+    &.col-monto {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1d3557;
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  .ri-tabla tbody tr.anulado td {
+    opacity: 0.7;
+  }
+
+  .ri-tabla td .comp-cell {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ri-tabla-wrap {
+    margin: 0 -14px;
+    border-radius: 0;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .ri-tabla-section {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .ri-tabla tfoot .fila-total {
+    background: #f0f2f5;
+    border-radius: 12px;
+    margin-top: 4px;
+    td {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 16px;
+      border: none;
+      font-size: 0.9rem;
+    }
+  }
+
+  .comp-cell span { font-size: 0.72rem; }
+  .btn-descargar-comp { width: 22px; height: 22px; }
+  .btn-descargar-comp i { font-size: 0.78rem; }
+}
+
+// Teléfonos (< 480px)
 @media (max-width: 480px) {
-  .ri-totales-grid { grid-template-columns: 1fr; }
+  .ri-container { padding: 10px; }
+  .ri-filtros-card { padding: 12px; border-radius: 10px; }
+  .ri-field label { font-size: 0.7rem; }
+  .ri-input-fecha { height: 36px; font-size: 0.82rem; }
+  .btn-buscar, .btn-limpiar { height: 36px; padding: 0 14px; font-size: 0.8rem; }
+
+  .ri-totales-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ri-total-card { padding: 12px 14px 10px; border-radius: 10px; }
+  .ri-total-card .tc-icon { font-size: 1.1rem; margin-bottom: 4px; }
+  .ri-total-card .tc-label { font-size: 0.65rem; }
+  .ri-total-card .tc-monto { font-size: 0.9rem; }
+  .ri-total-card .tc-monto-grande { font-size: 1rem; }
+  .ri-total-card .tc-qty { font-size: 0.7rem; }
+  .ri-total-card .tc-barra { height: 3px; margin-top: 6px; }
+
+  .ri-tabla-section { border-radius: 10px; }
+  .ri-tabla-header { padding: 12px 14px; }
+  .ri-tabla-titulo { font-size: 0.85rem; }
+  .ri-badge-total { font-size: 0.68rem; padding: 1px 6px; }
+  .ri-filtro-tipo { font-size: 0.72rem; gap: 4px; flex-wrap: wrap; }
+  .ri-select-tipo { height: 30px; font-size: 0.78rem; padding: 0 8px; }
+
+  .ri-tabla { font-size: 0.7rem; }
+  .ri-tabla th, .ri-tabla td { padding: 6px; }
+  .ri-tabla th { font-size: 0.62rem; letter-spacing: 0.2px; }
+
+  .ri-tabla .col-cliente { display: none; }
+
+  .ri-badge { font-size: 0.6rem; padding: 2px 7px; }
+
+  .ri-tabla tbody tr { padding: 10px 12px; margin-bottom: 8px; }
+  .ri-tabla td { font-size: 0.75rem; padding: 4px 0; }
+  .ri-tabla td::before { font-size: 0.62rem; min-width: 60px; }
+  .ri-tabla td.col-monto { font-size: 0.9rem; }
+  .ri-tabla tfoot .fila-total td { padding: 8px 10px; font-size: 0.8rem; }
+
+  .ri-vacio, .ri-inicial { padding: 40px 16px; }
+  .ri-vacio i, .ri-inicial i { font-size: 2.2rem; }
+  .ri-vacio p, .ri-inicial p { font-size: 0.85rem; }
 }
 
 // ── Celda comprobante (número + botón PDF apilados) ───────────────────────────
@@ -551,6 +724,30 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     tbody tr.anulado {
       background: rgba(239, 68, 68, 0.04);
       td { opacity: 0.6; }
+    }
+
+    // Dark mode: tarjetas en mobile
+    @media (max-width: 768px) {
+      .ri-tabla tbody tr {
+        background: #0f1f36;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+        &.anulado {
+          background: rgba(239, 68, 68, 0.04);
+          border-color: rgba(239, 68, 68, 0.15);
+        }
+      }
+
+      .ri-tabla td {
+        &::before { color: #64748b; }
+        &.col-monto { color: #f1f5f9; }
+      }
+
+      .ri-tabla tfoot .fila-total {
+        background: linear-gradient(135deg, #023e8a, #0353a4);
+        td { color: #f1f5f0; }
+      }
     }
 
     tfoot .fila-total {
