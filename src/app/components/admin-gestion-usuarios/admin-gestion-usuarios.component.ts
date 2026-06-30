@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../../services/usuario.service';
 import { UsuarioListadoDTO } from '../../dto/UsuarioListadoDTO';
@@ -24,6 +24,13 @@ export class AdminGestionUsuariosComponent implements OnInit {
   modoAccion: 'registrar' | 'editar' | 'ver' = 'registrar';
   usuarioSeleccionadoId?: number;
 
+  // Visibilidad de contraseñas
+  mostrarContrasena = false;
+  mostrarConfirmarContrasena = false;
+  mostrarContrasenaActual = false;
+  mostrarNuevaContrasena = false;
+  mostrarConfirmarNuevaContrasena = false;
+
   toast = { mostrar: false, mensaje: '', tipo: 'success' };
 
   constructor(
@@ -36,17 +43,42 @@ export class AdminGestionUsuariosComponent implements OnInit {
     this.cargarUsuarios();
   }
 
+  private confirmarContrasenaValidator(form: AbstractControl): ValidationErrors | null {
+    const contrasena = form.get('contrasena')?.value;
+    const confirmar = form.get('confirmarContrasena')?.value;
+    if (contrasena && confirmar && contrasena !== confirmar) {
+      return { contrasenasNoCoinciden: true };
+    }
+    return null;
+  }
+
+  private confirmarNuevaContrasenaValidator(form: AbstractControl): ValidationErrors | null {
+    const nueva = form.get('nuevaContrasena')?.value;
+    const confirmar = form.get('confirmarNuevaContrasena')?.value;
+    if (nueva && confirmar && nueva !== confirmar) {
+      return { nuevasContrasenasNoCoinciden: true };
+    }
+    return null;
+  }
+
   inicializarFormulario(): void {
     this.usuarioForm = this.fb.group({
       nombres:    ['', Validators.required],
       apellidos:  ['', Validators.required],
       correo:     ['', [Validators.required, Validators.email]],
       contrasena: ['', Validators.required],
+      confirmarContrasena: ['', Validators.required],
       dni:        ['', [Validators.required, Validators.maxLength(8)]],
       telefono:   [''],
       direccion:  [''],
       idRol:      ['', Validators.required],
-      estado:     ['activo', Validators.required]
+      estado:     ['activo', Validators.required],
+      // Edición
+      contrasenaActual: [''],
+      nuevaContrasena: [''],
+      confirmarNuevaContrasena: ['']
+    }, {
+      validators: [this.confirmarContrasenaValidator, this.confirmarNuevaContrasenaValidator]
     });
   }
 
@@ -78,9 +110,9 @@ export class AdminGestionUsuariosComponent implements OnInit {
 
   guardarUsuario(): void {
     if (this.usuarioForm.invalid) return;
-    const dto: UsuarioRegistroDTO = this.usuarioForm.getRawValue();
 
     if (this.modoAccion === 'registrar') {
+      const { confirmarContrasena, contrasenaActual, nuevaContrasena, confirmarNuevaContrasena, ...dto } = this.usuarioForm.getRawValue();
       this.usuarioService.registrarUsuario(dto).subscribe({
         next: () => {
           this.mostrarNotificacion('Usuario registrado correctamente', 'success');
@@ -90,6 +122,18 @@ export class AdminGestionUsuariosComponent implements OnInit {
         error: () => this.mostrarNotificacion('Error al registrar usuario', 'error')
       });
     } else if (this.modoAccion === 'editar' && this.usuarioSeleccionadoId) {
+      const raw = this.usuarioForm.getRawValue();
+      const dto: UsuarioRegistroDTO = {
+        nombres: raw.nombres,
+        apellidos: raw.apellidos,
+        correo: raw.correo,
+        contrasena: raw.nuevaContrasena || raw.contrasena || '',
+        dni: raw.dni,
+        telefono: raw.telefono,
+        direccion: raw.direccion,
+        idRol: raw.idRol,
+        estado: raw.estado
+      };
       this.usuarioService.editarUsuario(this.usuarioSeleccionadoId, dto).subscribe({
         next: () => {
           this.mostrarNotificacion('Usuario actualizado correctamente', 'success');
@@ -117,8 +161,17 @@ export class AdminGestionUsuariosComponent implements OnInit {
     this.tituloModal = 'Registrar Nuevo Usuario';
     this.usuarioForm.reset({ estado: 'activo' });
     this.usuarioForm.enable();
+    this.usuarioForm.get('correo')?.enable();
     this.usuarioForm.get('contrasena')?.setValidators(Validators.required);
     this.usuarioForm.get('contrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('confirmarContrasena')?.setValidators(Validators.required);
+    this.usuarioForm.get('confirmarContrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('contrasenaActual')?.clearValidators();
+    this.usuarioForm.get('contrasenaActual')?.updateValueAndValidity();
+    this.usuarioForm.get('nuevaContrasena')?.clearValidators();
+    this.usuarioForm.get('nuevaContrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('confirmarNuevaContrasena')?.clearValidators();
+    this.usuarioForm.get('confirmarNuevaContrasena')?.updateValueAndValidity();
     this.mostrarModal = true;
   }
 
@@ -139,6 +192,14 @@ export class AdminGestionUsuariosComponent implements OnInit {
     this.usuarioForm.get('correo')?.disable();
     this.usuarioForm.get('contrasena')?.clearValidators();
     this.usuarioForm.get('contrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('confirmarContrasena')?.clearValidators();
+    this.usuarioForm.get('confirmarContrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('contrasenaActual')?.clearValidators();
+    this.usuarioForm.get('contrasenaActual')?.updateValueAndValidity();
+    this.usuarioForm.get('nuevaContrasena')?.clearValidators();
+    this.usuarioForm.get('nuevaContrasena')?.updateValueAndValidity();
+    this.usuarioForm.get('confirmarNuevaContrasena')?.clearValidators();
+    this.usuarioForm.get('confirmarNuevaContrasena')?.updateValueAndValidity();
     this.mostrarModal = true;
   }
 
@@ -165,5 +226,23 @@ export class AdminGestionUsuariosComponent implements OnInit {
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'error'): void {
     this.toast = { mostrar: true, mensaje, tipo };
     setTimeout(() => { this.toast.mostrar = false; }, 3000);
+  }
+
+  get contrasenasNoCoinciden(): boolean {
+    const form = this.usuarioForm;
+    if (this.modoAccion === 'registrar') {
+      return (form.hasError('contrasenasNoCoinciden') ?? false) &&
+             ((form.get('confirmarContrasena')?.touched || form.get('confirmarContrasena')?.dirty) ?? false);
+    }
+    return false;
+  }
+
+  get nuevasContrasenasNoCoinciden(): boolean {
+    const form = this.usuarioForm;
+    if (this.modoAccion === 'editar') {
+      return (form.hasError('nuevasContrasenasNoCoinciden') ?? false) &&
+             ((form.get('confirmarNuevaContrasena')?.touched || form.get('confirmarNuevaContrasena')?.dirty) ?? false);
+    }
+    return false;
   }
 }

@@ -121,11 +121,68 @@
             <label>CORREO ELECTRÓNICO</label>
             <input type="email" class="form-control dark-input" formControlName="correo" autocomplete="off">
           </div>
-          <div class="col-md-6 form-group">
-            <label>CONTRASEÑA
-              <span *ngIf="modoAccion === 'editar'" class="label-hint">(Dejar en blanco para no cambiar)</span>
+
+          <!-- REGISTRAR: Contraseña + Confirmar -->
+          <ng-container *ngIf="modoAccion === 'registrar'">
+            <div class="col-md-3 form-group">
+              <label>CONTRASEÑA</label>
+              <div class="password-wrapper">
+                <input [type]="mostrarContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="contrasena" autocomplete="new-password">
+                <button type="button" class="password-toggle" (click)="mostrarContrasena = !mostrarContrasena" tabindex="-1">
+                  <i class="fas" [ngClass]="mostrarContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3 form-group">
+              <label>CONFIRMAR CONTRASEÑA</label>
+              <div class="password-wrapper">
+                <input [type]="mostrarConfirmarContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarContrasena" autocomplete="new-password"
+                       [ngClass]="{'is-invalid': contrasenasNoCoinciden}">
+                <button type="button" class="password-toggle" (click)="mostrarConfirmarContrasena = !mostrarConfirmarContrasena" tabindex="-1">
+                  <i class="fas" [ngClass]="mostrarConfirmarContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+              <small class="text-danger" *ngIf="contrasenasNoCoinciden">Las contraseñas no coinciden</small>
+            </div>
+          </ng-container>
+
+          <!-- EDITAR: Contraseña actual + Nueva + Confirmar nueva -->
+          <ng-container *ngIf="modoAccion === 'editar'">
+            <div class="col-md-6 form-group">
+              <label>CONTRASEÑA ACTUAL</label>
+              <div class="password-wrapper">
+                <input [type]="mostrarContrasenaActual ? 'text' : 'password'" class="form-control dark-input" formControlName="contrasenaActual" autocomplete="current-password">
+                <button type="button" class="password-toggle" (click)="mostrarContrasenaActual = !mostrarContrasenaActual" tabindex="-1">
+                  <i class="fas" [ngClass]="mostrarContrasenaActual ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- EDITAR: Nueva contraseña + Confirmar (segunda fila) -->
+        <div class="row mb-3" *ngIf="modoAccion === 'editar'">
+          <div class="col-md-3 form-group">
+            <label>NUEVA CONTRASEÑA
+              <span class="label-hint">(Dejar en blanco para no cambiar)</span>
             </label>
-            <input type="password" class="form-control dark-input" formControlName="contrasena" autocomplete="new-password">
+            <div class="password-wrapper">
+              <input [type]="mostrarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="nuevaContrasena" autocomplete="new-password">
+              <button type="button" class="password-toggle" (click)="mostrarNuevaContrasena = !mostrarNuevaContrasena" tabindex="-1">
+                <i class="fas" [ngClass]="mostrarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3 form-group">
+            <label>CONFIRMAR NUEVA CONTRASEÑA</label>
+            <div class="password-wrapper">
+              <input [type]="mostrarConfirmarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarNuevaContrasena" autocomplete="new-password"
+                     [ngClass]="{'is-invalid': nuevasContrasenasNoCoinciden}">
+              <button type="button" class="password-toggle" (click)="mostrarConfirmarNuevaContrasena = !mostrarConfirmarNuevaContrasena" tabindex="-1">
+                <i class="fas" [ngClass]="mostrarConfirmarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+            <small class="text-danger" *ngIf="nuevasContrasenasNoCoinciden">Las contraseñas no coinciden</small>
           </div>
         </div>
 
