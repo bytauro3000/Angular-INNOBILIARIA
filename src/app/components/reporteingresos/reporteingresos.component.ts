@@ -149,7 +149,9 @@ export class ReporteIngresosComponent implements OnInit {
   }
 
   get totalFiltrado(): number {
-    return this.detalleFiltrado.reduce((acc, i) => acc + Number(i.importePagado ?? 0), 0);
+    return this.detalleFiltrado
+      .filter(i => !i.anulado)
+      .reduce((acc, i) => acc + Number(i.importePagado ?? 0), 0);
   }
 
   descargarComprobante(item: ResumenIngresoItemDTO): void {
