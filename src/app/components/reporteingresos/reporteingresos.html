@@ -166,12 +166,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of detalleFiltrado; let i = index">
+          <tr *ngFor="let item of detalleFiltrado; let i = index" [class.anulado]="item.anulado">
             <td class="col-num">{{ i + 1 }}</td>
             <td>
               <span class="ri-badge" [ngClass]="claseTipo(item.tipoIngreso)">
                 {{ etiquetaTipo(item.tipoIngreso) }}
               </span>
+              <span class="ri-badge badge-anulado" *ngIf="item.anulado">ANULADO</span>
             </td>
             <td class="col-fecha">{{ formatFecha(item.fechaPago) }}</td>
             <td class="col-cliente">{{ item.nombreCliente ?? '—' }}</td>

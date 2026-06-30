@@ -19,6 +19,7 @@ export interface ResumenIngresoItemDTO {
   idContrato: number | null;
   nombreCliente: string | null;
   observaciones: string | null;
+  anulado?: boolean;
 }
 
 export interface ResumenIngresosRangoDTO {

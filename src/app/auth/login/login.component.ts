@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from '../token.service';
+import { IdleTimeoutService } from '../idle-timeout.service';
 import { ToastrService } from 'ngx-toastr';
 import { Title } from '@angular/platform-browser';
 
@@ -27,6 +28,7 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private router: Router,
     private tokenService: TokenService,
+    private idleTimeoutService: IdleTimeoutService,
     private toastr: ToastrService,
     private titleService: Title
   ) {this.titleService.setTitle('Iniciar Sesión | Inmobiliaria Ivan');  }
@@ -57,6 +59,9 @@ export class LoginComponent implements OnInit {
         const token = response.token;
         this.tokenService.setToken(token);
         // El refresh token se guarda en cookie HttpOnly por el backend
+
+        // Iniciar control de inactividad (1 hora)
+        this.idleTimeoutService.startWatching();
 
         const decodedToken: any = jwtDecode(token);
         const userRole = decodedToken.rol;

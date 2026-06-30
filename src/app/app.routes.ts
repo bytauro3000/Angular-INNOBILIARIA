@@ -22,6 +22,7 @@ import { AdminAnulacionesLetrasComponent } from './components/admin-anulaciones-
 import { AdminAnulacionesMorasComponent } from './components/admin-anulaciones-moras/admin-anulaciones-moras.component';
 import { AdminAnulacionesInicialesComponent } from './components/admin-anulaciones-iniciales/admin-anulaciones-iniciales.component';
 import { AdminAnulacionesInscripcionesComponent } from './components/admin-anulaciones-inscripciones/admin-anulaciones-inscripciones.component';
+import { AdminSesionesComponent } from './components/admin-sesiones/admin-sesiones.component';
 
 // Clientes
 import { ClientesComponent } from './components/cliente-listar/cliente-listar.component';
@@ -148,6 +149,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard',          component: AdminDashboardComponent },
       { path: 'gestion-usuarios',   component: AdminGestionUsuariosComponent },
+      { path: 'sesiones',           component: AdminSesionesComponent },
       { path: 'anulaciones/letras',         component: AdminAnulacionesLetrasComponent },
       { path: 'anulaciones/moras',          component: AdminAnulacionesMorasComponent },
       { path: 'anulaciones/iniciales',      component: AdminAnulacionesInicialesComponent },

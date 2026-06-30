@@ -68,6 +68,19 @@
           </a>
         </li>
 
+        <!-- Sesiones Activas -->
+        <li class="nav-item">
+          <a
+            routerLink="sesiones"
+            routerLinkActive="active"
+            [attr.data-tooltip]="'Sesiones Activas'"
+            (click)="cerrarSidebarMovil()">
+            <span class="nav-icon"><i class="fas fa-user-check"></i></span>
+            <span class="nav-label">Sesiones Activas</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+
         <!-- Anulaciones (submenu) -->
         <li class="nav-item has-submenu" [class.open]="anulacionesExpandido">
           <a

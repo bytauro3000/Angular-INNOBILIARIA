@@ -1,0 +1,116 @@
+<div class="sesiones-page">
+
+  <!-- HERO HEADER -->
+  <header class="hero-header">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="dot"></span>
+          <span>Monitor en vivo</span>
+        </div>
+        <h1>{{ saludo }}, <span class="hero-name">Administrador</span></h1>
+        <p class="hero-sub">Usuarios conectados al sistema en tiempo real.</p>
+      </div>
+      <div class="hero-right">
+        <button class="btn-refresh" (click)="cargar()" [disabled]="cargando" title="Actualizar">
+          <i class="fas fa-sync-alt" [class.spinning]="cargando"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ERROR -->
+  <div class="error-banner" *ngIf="error">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>No se pudieron cargar las sesiones.</span>
+    <button (click)="cargar()">Reintentar</button>
+  </div>
+
+  <!-- KPI CARDS -->
+  <section class="section" *ngIf="!cargando && resumen">
+    <div class="kpi-grid">
+      <article class="kpi-card users">
+        <div class="kpi-icon"><i class="fas fa-users"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-label">Usuarios activos</span>
+          <span class="kpi-value">{{ resumen.usuariosActivos }}</span>
+        </div>
+      </article>
+      <article class="kpi-card visits">
+        <div class="kpi-icon"><i class="fas fa-signal"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-label">Visitas hoy</span>
+          <span class="kpi-value">{{ resumen.visitasHoy }}</span>
+        </div>
+      </article>
+      <article class="kpi-card refresh">
+        <div class="kpi-icon"><i class="fas fa-sync-alt"></i></div>
+        <div class="kpi-body">
+          <span class="kpi-label">Auto‑actualización</span>
+          <span class="kpi-value">30s</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Cargando sesiones activas...</p>
+  </div>
+
+  <!-- TABLE -->
+  <section class="section" *ngIf="!cargando && resumen">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon"><i class="fas fa-users"></i></span>
+        <div>
+          <h2>Sesiones Activas</h2>
+          <p *ngIf="resumen.sesiones.length > 0">
+            {{ resumen.sesiones.length }} usuario{{ resumen.sesiones.length !== 1 ? 's' : '' }} conectado{{ resumen.sesiones.length !== 1 ? 's' : '' }}
+          </p>
+          <p *ngIf="resumen.sesiones.length === 0">
+            No hay usuarios conectados en este momento.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container" *ngIf="resumen.sesiones.length > 0">
+      <table class="sesiones-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>IP</th>
+            <th>Conectado desde</th>
+            <th>Última actividad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of resumen.sesiones; trackBy: trackBySesionId">
+            <td class="cell-user">
+              <span class="user-avatar"><i class="fas fa-user-circle"></i></span>
+              <span>{{ s.nombre }}</span>
+            </td>
+            <td class="cell-email">{{ s.correo }}</td>
+            <td class="cell-ip">{{ s.ip }}</td>
+            <td class="cell-desde">
+              <span class="time-label">{{ formatearFecha(s.desde) }}</span>
+              <span class="time-ago">{{ tiempoDesde(s.desde) }}</span>
+            </td>
+            <td class="cell-refresh">
+              <span class="time-label">{{ formatearFecha(s.ultimoRefresh) }}</span>
+              <span class="time-ago">{{ tiempoDesde(s.ultimoRefresh) }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
