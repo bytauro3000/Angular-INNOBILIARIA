@@ -162,7 +162,7 @@
 
         <!-- EDITAR: Nueva contraseña + Confirmar (segunda fila) -->
         <div class="row mb-3" *ngIf="modoAccion === 'editar'">
-          <div class="col-md-3 form-group">
+          <div class="col-md-6 form-group">
             <label>NUEVA CONTRASEÑA
               <span class="label-hint">(Dejar en blanco para no cambiar)</span>
             </label>
@@ -173,7 +173,7 @@
               </button>
             </div>
           </div>
-          <div class="col-md-3 form-group">
+          <div class="col-md-6 form-group">
             <label>CONFIRMAR NUEVA CONTRASEÑA</label>
             <div class="password-wrapper">
               <input [type]="mostrarConfirmarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarNuevaContrasena" autocomplete="new-password"

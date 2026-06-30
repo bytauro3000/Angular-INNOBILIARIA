@@ -1,0 +1,98 @@
+<div class="rc-container">
+
+  <!-- Encabezado -->
+  <div class="rc-header">
+    <div class="rc-header-left">
+      <h2 class="rc-titulo">
+        <i class="bi bi-cash-stack"></i>
+        Reporte de Caja
+      </h2>
+      <p class="rc-subtitulo">Arqueo diario de ingresos — Efectivo y Depósitos</p>
+    </div>
+  </div>
+
+  <!-- Filtro -->
+  <div class="rc-filtros-card">
+    <div class="rc-filtros-row">
+      <div class="rc-field">
+        <label for="fechaCaja"><i class="bi bi-calendar-event"></i> Fecha</label>
+        <input id="fechaCaja" type="date" [(ngModel)]="fecha" class="rc-input-fecha" (change)="cargar()" />
+      </div>
+      <div class="rc-actions">
+        <button class="btn-actualizar" (click)="cargar()" [disabled]="cargando">
+          <i class="bi bi-arrow-clockwise" [class.spin]="cargando"></i>
+          Actualizar
+        </button>
+        <button class="btn-pdf" (click)="generarPdf()" [disabled]="!resumen || items.length === 0">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+          Generar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="rc-loading" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Cargando reporte del día...</p>
+  </div>
+
+  <!-- Tabla -->
+  <div class="rc-tabla-section" *ngIf="!cargando && resumen">
+    <div class="rc-tabla-header">
+      <h3 class="rc-tabla-titulo">
+        <i class="bi bi-table"></i>
+        Ingresos del {{ formatearFecha(fecha) }}
+        <span class="rc-badge-total">{{ items.length }}</span>
+      </h3>
+    </div>
+
+    <div class="rc-vacio" *ngIf="items.length === 0">
+      <i class="bi bi-inbox"></i>
+      <p>No se registraron ingresos en esta fecha.</p>
+    </div>
+
+    <div class="rc-tabla-wrap" *ngIf="items.length > 0">
+      <table class="rc-tabla">
+        <thead>
+          <tr>
+            <th class="col-num">N°</th>
+            <th class="col-obs">OBSERVACIONES</th>
+            <th class="col-comp">N° COMPROBANTE</th>
+            <th class="col-efectivo">EFECTIVO</th>
+            <th class="col-deposito">DEPÓSITO</th>
+            <th class="col-fecop">FECHA OP.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items; let i = index" [class.anulado]="item.anulado" [class.oculto]="item.anulado">
+            <td class="col-num">{{ i + 1 }}</td>
+            <td class="col-obs">{{ item.observaciones || item.nombreCliente + ' - ' + item.referencia || '—' }}</td>
+            <td class="col-comp">{{ item.numeroComprobante || '—' }}</td>
+            <td class="col-efectivo">{{ esEfectivo(item.medioPago) ? formatMonto(item.importePagado) : '' }}</td>
+            <td class="col-deposito">{{ esDeposito(item.medioPago) ? formatMonto(item.importePagado) : '' }}</td>
+            <td class="col-fecop">{{ esDeposito(item.medioPago) ? formatearFecha(item.fechaOperacion) : '' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="fila-total">
+            <td colspan="6" class="total-label">
+              <div class="totales-row">
+                <span class="total-item">
+                  <i class="bi bi-cash"></i> Total Efectivo: <strong>{{ formatMonto(totalEfectivo) }}</strong>
+                </span>
+                <span class="total-item">
+                  <i class="bi bi-bank"></i> Total Depósito: <strong>{{ formatMonto(totalDeposito) }}</strong> 
+                </span>
+                <span class="total-item total-general">
+                  <i class="bi bi-calculator"></i> Total General: <strong>{{ formatMonto(totalGeneral) }}</strong>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
