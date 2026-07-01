@@ -362,15 +362,16 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (!this.pagoRequest.tipoComprobante) return;
     this.modoManualComprobante = !this.modoManualComprobante;
     if (this.modoManualComprobante) {
-      this.serieEditable = 'EB01';
-      this.numeroComprobanteManual = 'EB01-';
+      const serie = this.pagoRequest.tipoComprobante === 'BOLETA' ? 'EB01' : 'RB01';
+      this.serieEditable = serie;
+      this.numeroComprobanteManual = serie + '-';
       this.pagoRequest.numeroComprobantePersonalizado = undefined;
-      this.pagoRequest.seriePersonalizada = 'EB01';
+      this.pagoRequest.seriePersonalizada = serie;
       setTimeout(() => {
         const input = this.numeroComprobanteInput?.nativeElement;
         if (!input) return;
         input.focus();
-        input.setSelectionRange(5, 5);
+        input.setSelectionRange(serie.length + 1, serie.length + 1);
       }, 0);
     } else {
       this.numeroComprobanteManual = '';
@@ -383,11 +384,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   onNumeroManualChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     let valor = input.value;
-    if (!valor.startsWith('EB01-')) {
-      valor = 'EB01-';
+    const serie = this.pagoRequest.tipoComprobante === 'BOLETA' ? 'EB01' : 'RB01';
+    const prefijo = serie + '-';
+    if (!valor.startsWith(prefijo)) {
+      valor = prefijo;
     } else {
-      const soloDigitos = valor.substring(5).replace(/\D/g, '');
-      valor = 'EB01-' + soloDigitos;
+      const soloDigitos = valor.substring(prefijo.length).replace(/\D/g, '');
+      valor = prefijo + soloDigitos;
     }
     input.value = valor;
     this.numeroComprobanteManual = valor;
