@@ -15,6 +15,7 @@ import { HistorialMorasPdf } from '../../utils/historial-moras-pdf';
 export class HistorialMorasPdfComponent implements OnInit {
 
   @Input() idContrato!: number;
+  @Input() fechaCalculo?: string;
   @Output() cerrar = new EventEmitter<void>();
 
   loading = false;
@@ -33,11 +34,11 @@ export class HistorialMorasPdfComponent implements OnInit {
 
   cargar(): void {
     this.loading = true;
-    this.reporteSvc.cargar(this.idContrato).subscribe({
+    this.reporteSvc.cargar(this.idContrato, this.fechaCalculo).subscribe({
       next: (data) => {
         this.data = data;
         this.loading = false;
-        if (data.bloqueA.length === 0 && data.bloqueB.length === 0 && data.bloqueAAnuladas.length === 0) {
+        if (data.bloqueA.length === 0 && data.bloqueAPagadas.length === 0 && data.bloqueB.length === 0 && data.bloqueAAnuladas.length === 0) {
           this.toastr.info('Este contrato no tiene moras para mostrar.', 'Sin datos');
         }
       },
@@ -98,6 +99,6 @@ export class HistorialMorasPdfComponent implements OnInit {
     return this.data?.bloqueB.reduce((s, i) => s + (i.montoMoraTotal || 0), 0) ?? 0;
   }
   get hayContenido(): boolean {
-    return !!this.data && (this.data.bloqueA.length > 0 || this.data.bloqueB.length > 0 || this.data.bloqueAAnuladas.length > 0);
+    return !!this.data && (this.data.bloqueA.length > 0 || this.data.bloqueAPagadas.length > 0 || this.data.bloqueB.length > 0 || this.data.bloqueAAnuladas.length > 0);
   }
 }

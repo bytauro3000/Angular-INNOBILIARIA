@@ -80,7 +80,7 @@ export const routes: Routes = [
     path: 'secretaria-menu',
     component: SecretariaMenuComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ROLE_SECRETARIA'] },
+    data: { roles: ['ROLE_SECRETARIA', 'ROLE_SOPORTE'] },
     children: [
       { path: '', component: SecretariaDashboard },
 

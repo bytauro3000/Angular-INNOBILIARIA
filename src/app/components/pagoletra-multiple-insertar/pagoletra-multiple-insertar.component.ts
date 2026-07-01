@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import * as bootstrap from 'bootstrap';
+import { TokenService } from '../../auth/token.service';
 
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoLetraService } from '../../services/pagoletra.service';
@@ -42,6 +43,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   datosComunes = {
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
+    fechaPago: '',
     fechaOperacion: '',
     tipoComprobante: undefined as TipoComprobante | undefined,
     observaciones: ''
@@ -95,10 +97,16 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   constructor(
     private pagoService: PagoLetraService,
     private toastr: ToastrService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private tokenSvc: TokenService
   ) {}
 
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
+
   ngOnInit(): void {
+    this.datosComunes.fechaPago = obtenerFechaPeru();
     this.generarObservaciones();
     this.cargarTipoComprobanteSugerido();
   }
@@ -446,6 +454,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       importePagado: (l.saldoPendiente != null && l.saldoPendiente > 0) ? l.saldoPendiente : l.importe,
       medioPago: this.datosComunes.medioPago,
       numeroOperacion: this.datosComunes.numeroOperacion || undefined,
+      fechaPago: this.datosComunes.fechaPago || obtenerFechaPeru(),
       fechaOperacion: this.datosComunes.fechaOperacion,
       tipoComprobante: this.datosComunes.tipoComprobante,
       numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual

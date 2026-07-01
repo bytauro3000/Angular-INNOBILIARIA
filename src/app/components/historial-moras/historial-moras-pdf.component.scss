@@ -206,6 +206,7 @@ $gray-500:    #64748b;
   color:         $white;
   &.banda-azul    { background: $blue; }
   &.banda-naranja { background: $orange; }
+  &.banda-verde   { background: $green; }
 }
 
 .doc-tabla {
@@ -236,6 +237,7 @@ $gray-500:    #64748b;
   td.strong { font-weight: 700; }
   td.empty { color: $gray-500; font-style: italic; padding: 12px; }
   &.anuladas { opacity: 0.65; th { background: $gray-200; color: $text-muted; } }
+  &.pagadas { th { background: #dcfce7; color: $green; } }
 }
 .doc-subtitulo-anuladas {
   text-align:  center;
@@ -270,6 +272,7 @@ $gray-500:    #64748b;
     font-size:     12px;
     font-weight:   600;
     &.chip-blue   { background: #dbeafe; color: $blue; }
+    &.chip-green  { background: #dcfce7; color: $green; }
     &.chip-orange { background: #fed7aa; color: $orange; }
     &.chip-gray   { background: $gray-200; color: $text-muted; }
     &.chip-total  { background: #fef2f2; color: $red; margin-left: auto; }
@@ -306,7 +309,8 @@ $gray-500:    #64748b;
   td.num { text-align: right; }
   td.strong { font-weight: 700; }
   tr.row-pendiente td { background: #fff7ed; }
-  tr.row-anulada td    { background: $gray-100; color: $text-muted; }
+  tr.row-pagada td    { background: #f0fdf4; }
+  tr.row-anulada td   { background: $gray-100; color: $text-muted; }
 }
 .badge {
   display:      inline-block;
@@ -316,6 +320,7 @@ $gray-500:    #64748b;
   font-weight:  700;
   color:        $white;
   &.bg-blue   { background: $blue; }
+  &.bg-green  { background: $green; }
   &.bg-orange { background: $orange; }
   &.bg-gray   { background: $gray-500; }
 }

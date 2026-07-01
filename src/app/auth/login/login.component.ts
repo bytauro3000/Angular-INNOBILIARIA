@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/secretaria-menu']);
             break;
           case 'ROLE_SOPORTE':
-            this.router.navigate(['/soporte-menu']);
+            this.router.navigate(['/secretaria-menu']);
             break;
           case 'ROLE_ADMINISTRADOR':
             this.router.navigate(['/admin-menu']);

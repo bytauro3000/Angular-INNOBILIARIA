@@ -78,11 +78,54 @@ export class HistorialMorasPdf {
     // ── Bloque cliente ────────────────────────────────────
     const clienteY = this.drawClienteBlock(doc, data.contrato, 48);
 
-    // ── Tabla bloque A (moras registradas) ─────────────────
     let cursorY = clienteY + 6;
 
-    // Micro-banda azul
-    cursorY = this.drawMicroBanda(doc, 'MORAS REGISTRADAS', [30, 64, 175], 14, cursorY, pageW - 28);
+    // ── Tabla bloque A pagadas ────────────────────────────────
+    if (data.bloqueAPagadas.length > 0) {
+      cursorY = this.drawMicroBanda(doc, 'MORAS PAGADAS (no suman al total)', [22, 163, 74], 14, cursorY, pageW - 28);
+
+      autoTable(doc, {
+        startY: cursorY,
+        margin: { left: 14, right: 14 },
+        tableWidth: 182,
+        head: [
+          [
+            { content: 'LETRAS', colSpan: 4,
+              styles: { fillColor: [219, 234, 254], textColor: [30, 64, 175],
+                        fontStyle: 'bold', halign: 'center', fontSize: 9 } },
+            { content: 'MORAS', colSpan: 4,
+              styles: { fillColor: [220, 252, 231], textColor: [22, 163, 74],
+                        fontStyle: 'bold', halign: 'center', fontSize: 9 } }
+          ],
+          [
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
+            this.th('COMPROBANTE'),
+            this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
+            this.th('MORA')
+          ]
+        ],
+        body: data.bloqueAPagadas.map(i => this.rowItem(i, data.simboloMoneda)),
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1 },
+        headStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], halign: 'center', fontStyle: 'bold' },
+        bodyStyles: { halign: 'center' },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 16 },
+          1: { halign: 'center', cellWidth: 22 },
+          2: { halign: 'center', cellWidth: 22 },
+          3: { halign: 'center', cellWidth: 32 },
+          4: { halign: 'center', cellWidth: 18 },
+          5: { halign: 'right',  cellWidth: 20 },
+          6: { halign: 'right',  cellWidth: 24 },
+          7: { halign: 'right',  cellWidth: 28 }
+        },
+        didDrawPage: (d) => this.drawFooterPagina(doc, d.pageNumber, pageW)
+      });
+      cursorY = (doc as any).lastAutoTable.finalY + 4;
+    }
+
+    // ── Tabla bloque A (moras registradas pendientes) ──────
+    cursorY = this.drawMicroBanda(doc, 'MORAS REGISTRADAS PENDIENTES', [30, 64, 175], 14, cursorY, pageW - 28);
 
     if (data.bloqueA.length > 0) {
       autoTable(doc, {
@@ -106,10 +149,6 @@ export class HistorialMorasPdf {
           ]
         ],
         body: data.bloqueA.map(i => this.rowItem(i, data.simboloMoneda)),
-        foot: data.bloqueAAnuladas.length > 0
-          ? [[{ content: '— ANULADAS (no suman) —', colSpan: 8,
-                styles: { halign: 'center', fontStyle: 'italic', textColor: [148, 163, 184] } }]]
-          : undefined,
         theme: 'grid',
         styles: { fontSize: 8, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1 },
         headStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], halign: 'center', fontStyle: 'bold' },
@@ -126,58 +165,58 @@ export class HistorialMorasPdf {
         },
         didDrawPage: (d) => this.drawFooterPagina(doc, d.pageNumber, pageW)
       });
-      // @ts-ignore — lastAutoTable está inyectado en doc
       cursorY = (doc as any).lastAutoTable.finalY + 4;
-
-      // Tabla de anuladas (si las hay)
-      if (data.bloqueAAnuladas.length > 0) {
-        autoTable(doc, {
-          startY: cursorY,
-          margin: { left: 14, right: 14 },
-          tableWidth: 182,
-          head: [
-            [
-              { content: 'LETRAS', colSpan: 4,
-                styles: { fillColor: [219, 234, 254], textColor: [30, 64, 175],
-                          fontStyle: 'bold', halign: 'center', fontSize: 9 } },
-              { content: 'MORAS', colSpan: 4,
-                styles: { fillColor: [254, 215, 170], textColor: [194, 65, 12],
-                          fontStyle: 'bold', halign: 'center', fontSize: 9 } }
-            ],
-            [
-              this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
-              this.th('COMPROBANTE'),
-              this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
-              this.th('MORA')
-            ]
-          ],
-          body: data.bloqueAAnuladas.map(i => this.rowItem(i, data.simboloMoneda, true)),
-          theme: 'grid',
-          styles: { fontSize: 8, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1,
-                    textColor: [148, 163, 184] },
-          headStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], halign: 'center', fontStyle: 'bold' },
-          bodyStyles: { halign: 'center', fontStyle: 'italic' },
-          columnStyles: {
-            0: { halign: 'center', cellWidth: 16 },
-            1: { halign: 'center', cellWidth: 22 },
-            2: { halign: 'center', cellWidth: 22 },
-            3: { halign: 'center', cellWidth: 32 },
-            4: { halign: 'center', cellWidth: 18 },
-            5: { halign: 'right',  cellWidth: 20 },
-            6: { halign: 'right',  cellWidth: 24 },
-            7: { halign: 'right',  cellWidth: 28 }
-          },
-          didDrawPage: (d) => this.drawFooterPagina(doc, d.pageNumber, pageW)
-        });
-        // @ts-ignore
-        cursorY = (doc as any).lastAutoTable.finalY + 4;
-      }
     } else {
       doc.setFontSize(9);
       doc.setTextColor(148, 163, 184);
       doc.setFont('helvetica', 'italic');
-      doc.text('(No hay moras registradas para este contrato)', 14, cursorY + 5);
+      doc.text('(No hay moras pendientes registradas)', 14, cursorY + 5);
       cursorY += 10;
+    }
+
+    // ── Tabla de anuladas (si las hay) ────────────────────────
+    if (data.bloqueAAnuladas.length > 0) {
+      cursorY = this.drawMicroBanda(doc, 'ANULADAS (no suman al total)', [148, 163, 184], 14, cursorY, pageW - 28);
+
+      autoTable(doc, {
+        startY: cursorY,
+        margin: { left: 14, right: 14 },
+        tableWidth: 182,
+        head: [
+          [
+            { content: 'LETRAS', colSpan: 4,
+              styles: { fillColor: [219, 234, 254], textColor: [30, 64, 175],
+                        fontStyle: 'bold', halign: 'center', fontSize: 9 } },
+            { content: 'MORAS', colSpan: 4,
+              styles: { fillColor: [226, 232, 240], textColor: [100, 116, 139],
+                        fontStyle: 'bold', halign: 'center', fontSize: 9 } }
+          ],
+          [
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
+            this.th('COMPROBANTE'),
+            this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
+            this.th('MORA')
+          ]
+        ],
+        body: data.bloqueAAnuladas.map(i => this.rowItem(i, data.simboloMoneda, true)),
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1,
+                  textColor: [148, 163, 184] },
+        headStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], halign: 'center', fontStyle: 'bold' },
+        bodyStyles: { halign: 'center', fontStyle: 'italic' },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 16 },
+          1: { halign: 'center', cellWidth: 22 },
+          2: { halign: 'center', cellWidth: 22 },
+          3: { halign: 'center', cellWidth: 32 },
+          4: { halign: 'center', cellWidth: 18 },
+          5: { halign: 'right',  cellWidth: 20 },
+          6: { halign: 'right',  cellWidth: 24 },
+          7: { halign: 'right',  cellWidth: 28 }
+        },
+        didDrawPage: (d) => this.drawFooterPagina(doc, d.pageNumber, pageW)
+      });
+      cursorY = (doc as any).lastAutoTable.finalY + 4;
     }
 
     // ── Tabla bloque B (moras calculadas pendientes) ───────

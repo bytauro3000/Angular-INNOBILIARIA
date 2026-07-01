@@ -44,6 +44,9 @@ export interface HistorialMorasItem {
   /** Si la mora está anulada o sus pagos están anulados (tachada, no suma) */
   anulada: boolean;
 
+  /** Si la mora ya fue pagada por el cliente (se muestra en sección aparte) */
+  pagada: boolean;
+
   /** idMora original (null si es pendiente calculada) */
   idMora: number | null;
 }

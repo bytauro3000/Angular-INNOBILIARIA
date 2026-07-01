@@ -14,10 +14,11 @@ import { calcularMora } from '../utils/mora-calculator';
 
 export interface HistorialMorasData {
   contrato:   ContratoResponseDTO;
-  bloqueA:    HistorialMorasItem[];   // Moras REGISTRADAS (no anuladas)
+  bloqueA:    HistorialMorasItem[];   // Moras REGISTRADAS pendientes (estadoMora = PENDIENTE, no anuladas)
+  bloqueAPagadas: HistorialMorasItem[]; // Moras REGISTRADAS pagadas (estadoMora = PAGADO, no suman al total)
   bloqueAAnuladas: HistorialMorasItem[]; // Moras REGISTRADAS pero ANULADAS (tachadas, no suman)
   bloqueB:    HistorialMorasItem[];   // Moras CALCULADAS pendientes
-  totalMora:  number;                 // bloqueA activas + bloqueB calculadas; anuladas excluidas
+  totalMora:  number;                 // solo pendientes: bloqueA (registradas) + bloqueB (calculadas)
   simboloMoneda: '$' | 'S/';
   fechaEmision: Date;
   kardex:     number;                 // = contrato.idContrato
@@ -36,12 +37,13 @@ export class ReporteMorasService {
   /**
    * Carga todos los datos del reporte HISTORIAL DE MORAS para un contrato.
    * - 4 forkJoin: contrato, pagosLetra, moras, letras
-   * - Calcula bloque A (registradas) + bloque B (calculadas pendientes)
+   * - Calcula bloque A (registradas pendientes) + bloque A pagadas + bloque B (calculadas pendientes)
    * - Aplica filtros: pagos a cuenta no cuentan para "letra más alta pagada"
    *                    moras anuladas tachadas y NO suman
    *                    bloque B excluye letras que ya tienen mora registrada
+   * @param fechaCalculo Fecha ISO (YYYY-MM-DD) para calcular moras pendientes. Por defecto: hoy.
    */
-  cargar(idContrato: number): Observable<HistorialMorasData> {
+  cargar(idContrato: number, fechaCalculo?: string): Observable<HistorialMorasData> {
     return forkJoin({
       contrato:  this.contratoService.obtenerContratoPorId(idContrato),
       pagos:     this.pagoLetraService.listarPorContrato(idContrato).pipe(catchError(() => of([] as PagoLetraResponse[]))),
@@ -49,7 +51,7 @@ export class ReporteMorasService {
       letras:    this.letrasService.listarPorContrato(idContrato).pipe(catchError(() => of([] as LetraCambio[])))
     }).pipe(
       map(({ contrato, pagos, moras, letras }) =>
-        this.construirHistorial(contrato, pagos, moras, letras)
+        this.construirHistorial(contrato, pagos, moras, letras, fechaCalculo)
       )
     );
   }
@@ -58,9 +60,10 @@ export class ReporteMorasService {
     contrato: ContratoResponseDTO,
     pagos:    PagoLetraResponse[],
     moras:    MoraResponse[],
-    letras:   LetraCambio[]
+    letras:   LetraCambio[],
+    fechaCalculo?: string
   ): HistorialMorasData {
-    const hoy = new Date();
+    const fechaRef = fechaCalculo ? new Date(fechaCalculo + 'T00:00:00') : new Date();
     const simbolo = contrato.moneda === 'USD' ? '$' : 'S/';
 
     // ── 1) Letra más alta PAGADA (sin pagos a cuenta) ─────────────────────
@@ -79,16 +82,12 @@ export class ReporteMorasService {
     const idsLetrasConMoraRegistrada = new Set<number>();
     for (const m of moras) idsLetrasConMoraRegistrada.add(m.idLetra);
 
-    // ── 3) Bloque A: moras registradas (separar activas vs anuladas) ──────
+    // ── 3) Bloque A: moras registradas (separar pendientes, pagadas, anuladas) ──
     const bloqueA: HistorialMorasItem[] = [];
+    const bloqueAPagadas: HistorialMorasItem[] = [];
     const bloqueAAnuladas: HistorialMorasItem[] = [];
 
     for (const m of moras) {
-      // ── F. Pago y Comprobante vienen de la LETRA (no de la mora).
-      //    La mora se calcula entre fechaVencimiento de la letra y la
-      //    fecha en que se pagó esa misma letra (fecha de operación).
-      //    Por eso en Bloque A la "F. Pago" refleja el pago de la LETRA.
-      //    El link lo entrega la propia mora en `idPagoLetra`.
       const pagoLetra = m.idPagoLetra != null
         ? pagos.find(p => p.idPago === m.idPagoLetra && !p.anulado)
         : null;
@@ -96,14 +95,10 @@ export class ReporteMorasService {
       const tipoComp       = pagoLetra?.tipoComprobante  ?? null;
       const numComp        = pagoLetra?.numeroComprobante ?? null;
 
-      // ── Anulada se evalúa sobre los pagos DE LA MORA (no de la letra).
-      // ⚠️ OJO: [].every(...) === true en JS. Solo marcamos como anulada si
-      // (a) la mora misma está ANULADA, o
-      // (b) TIENE pagos y TODOS están anulados.
-      // Si no tiene pagos todavía (PENDIENTE sin pagar) NO es anulada.
       const pagosMoraValidos = m.pagos ?? [];
       const todosPagosAnulados = pagosMoraValidos.length > 0 && pagosMoraValidos.every(p => p.anulado);
       const anulada = m.estadoMora === 'ANULADO' || todosPagosAnulados;
+      const pagada = !anulada && m.estadoMora === 'PAGADO';
 
       const item: HistorialMorasItem = {
         bloque:           'REGISTRADA',
@@ -117,32 +112,37 @@ export class ReporteMorasService {
         tipoComprobante:  tipoComp,
         numeroComprobante: numComp,
         anulada,
+        pagada,
         idMora:           m.idMora
       };
 
-      if (anulada) bloqueAAnuladas.push(item);
-      else         bloqueA.push(item);
+      if (anulada) {
+        bloqueAAnuladas.push(item);
+      } else if (pagada) {
+        bloqueAPagadas.push(item);
+      } else {
+        bloqueA.push(item);
+      }
     }
 
-    // Ordenar ambos por numeroLetra ascendente
     bloqueA.sort((a, b) => this.compararNumero(a.numeroLetra, b.numeroLetra));
+    bloqueAPagadas.sort((a, b) => this.compararNumero(a.numeroLetra, b.numeroLetra));
     bloqueAAnuladas.sort((a, b) => this.compararNumero(a.numeroLetra, b.numeroLetra));
 
     // ── 4) Bloque B: letras vencidas SIN mora registrada ──────────────────
-    //        y cuyo numeroLetra > highestPaidNumero
     const bloqueB: HistorialMorasItem[] = [];
 
     if (highestPaidNumero !== null) {
       for (const l of letras) {
         const num = this.parseNumeroLetra(l.numeroLetra);
         if (num === null) continue;
-        if (num <= highestPaidNumero) continue;                      // solo letras DESPUÉS
-        if (idsLetrasConMoraRegistrada.has(l.idLetra)) continue;    // ya registrada → no recalcular
+        if (num <= highestPaidNumero) continue;
+        if (idsLetrasConMoraRegistrada.has(l.idLetra)) continue;
         if (!l.fechaVencimiento) continue;
         const venc = new Date(l.fechaVencimiento + 'T00:00:00');
-        if (venc >= hoy) continue;                                    // solo vencidas
+        if (venc >= fechaRef) continue;
 
-        const calc = calcularMora(l.importe, l.fechaVencimiento, hoy);
+        const calc = calcularMora(l.importe, l.fechaVencimiento, fechaRef);
 
         bloqueB.push({
           bloque:           'PENDIENTE',
@@ -156,6 +156,7 @@ export class ReporteMorasService {
           tipoComprobante:  null,
           numeroComprobante: null,
           anulada:          false,
+          pagada:           false,
           idMora:           null
         });
       }
@@ -163,8 +164,7 @@ export class ReporteMorasService {
 
     bloqueB.sort((a, b) => this.compararNumero(a.numeroLetra, b.numeroLetra));
 
-    // ── 5) Total: bloqueA (activas) + bloqueB (pendientes calculadas) ────
-    //       Las anuladas NO suman. Total = toda la deuda por mora.
+    // ── 5) Total: solo pendientes (bloqueA registradas + bloqueB calculadas) ──
     const totalBloqueA = bloqueA.reduce((s, i) => s + (i.montoMoraTotal || 0), 0);
     const totalBloqueB = bloqueB.reduce((s, i) => s + (i.montoMoraTotal || 0), 0);
     const totalMora    = totalBloqueA + totalBloqueB;
@@ -172,11 +172,12 @@ export class ReporteMorasService {
     return {
       contrato,
       bloqueA,
+      bloqueAPagadas,
       bloqueAAnuladas,
       bloqueB,
       totalMora,
       simboloMoneda: simbolo,
-      fechaEmision:  hoy,
+      fechaEmision:  fechaRef,
       kardex:        contrato.idContrato
     };
   }

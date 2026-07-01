@@ -120,8 +120,37 @@
             </div>
           </div>
 
-          <!-- Bloque A: Moras registradas -->
-          <div class="doc-banda banda-azul">MORAS REGISTRADAS</div>
+          <!-- Pagadas -->
+          <ng-container *ngIf="data.bloqueAPagadas.length > 0">
+            <div class="doc-banda banda-verde">MORAS PAGADAS (no suman al total)</div>
+            <table class="doc-tabla pagadas">
+              <thead>
+                <tr class="grupo-row">
+                  <th colspan="4" class="grupo-lbl grupo-l">LETRAS</th>
+                  <th colspan="4" class="grupo-lbl grupo-m">MORAS</th>
+                </tr>
+                <tr>
+                  <th>N° LETRA</th><th>F. VENC.</th><th>F. PAGO</th><th>COMPROBANTE</th>
+                  <th>D. ATRAS</th><th>MORA 5%</th><th>MORA DIARIA</th><th>MORA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of data.bloqueAPagadas">
+                  <td>{{ i.numeroLetra }}</td>
+                  <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                  <td>{{ fmtFecha(i.fechaPago) }}</td>
+                  <td>{{ comprobante(i) }}</td>
+                  <td>{{ i.diasMora }}</td>
+                  <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoPorcentaje) }}</td>
+                  <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoDiario) }}</td>
+                  <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+
+          <!-- Bloque A: Moras registradas PENDIENTES -->
+          <div class="doc-banda banda-azul">MORAS REGISTRADAS PENDIENTES</div>
           <table class="doc-tabla">
             <thead>
               <tr class="grupo-row">
@@ -151,7 +180,7 @@
                 <td class="num strong">{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</td>
               </tr>
               <tr *ngIf="data.bloqueA.length === 0">
-                <td colspan="8" class="empty">— Sin moras registradas —</td>
+                <td colspan="8" class="empty">— Sin moras pendientes registradas —</td>
               </tr>
             </tbody>
           </table>
@@ -230,8 +259,9 @@
         <!-- ==================== VISTA TABLA (compacta) ==================== -->
         <div *ngIf="tab === 'tabla'" class="tabla-vista">
           <div class="resumen">
-            <span class="chip chip-blue">{{ data.bloqueA.length }} registradas</span>
-            <span class="chip chip-orange">{{ data.bloqueB.length }} pendientes</span>
+            <span *ngIf="data.bloqueAPagadas.length" class="chip chip-green">{{ data.bloqueAPagadas.length }} pagadas</span>
+            <span class="chip chip-blue">{{ data.bloqueA.length }} pendientes</span>
+            <span class="chip chip-orange">{{ data.bloqueB.length }} calculadas</span>
             <span *ngIf="data.bloqueAAnuladas.length" class="chip chip-gray">{{ data.bloqueAAnuladas.length }} anuladas</span>
             <span class="chip chip-total">TOTAL: {{ data.simboloMoneda }} {{ fmtNumero(data.totalMora) }}</span>
           </div>
@@ -254,6 +284,17 @@
               </tr>
             </thead>
             <tbody>
+              <tr *ngFor="let i of data.bloqueAPagadas" class="row-pagada">
+                <td><span class="badge bg-green">P</span></td>
+                <td>{{ i.numeroLetra }}</td>
+                <td>{{ fmtFecha(i.fechaVencimiento) }}</td>
+                <td>{{ fmtFecha(i.fechaPago) }}</td>
+                <td>{{ comprobante(i) }}</td>
+                <td>{{ i.diasMora }}</td>
+                <td class="num">{{ fmtNumero(i.montoPorcentaje) }}</td>
+                <td class="num">{{ fmtNumero(i.montoDiario) }}</td>
+                <td class="num">{{ fmtNumero(i.montoMoraTotal) }}</td>
+              </tr>
               <tr *ngFor="let i of data.bloqueA">
                 <td><span class="badge bg-blue">A</span></td>
                 <td>{{ i.numeroLetra }}</td>

@@ -22,6 +22,17 @@ export class TokenService {
     localStorage.removeItem('jwt_token');
   }
 
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.rol || null;
+    } catch {
+      return null;
+    }
+  }
+
   isTokenExpired(): boolean {
     const token = this.getToken();
     if (!token) return true;

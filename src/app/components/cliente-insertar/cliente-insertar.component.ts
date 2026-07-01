@@ -1,4 +1,6 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, HostListener } from '@angular/core';
+import { Subject, Subscription, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -41,7 +43,8 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
   Generos = Object.values(Genero);
   EstadosCiviles = Object.values(EstadoCivil);
   cargandoDni: boolean = false;
-  SearchCountryField = SearchCountryField;
+  private dniCheck$ = new Subject<string>();
+  private dniCheckSub?: Subscription;
   CountryISO = CountryISO;
   preferredCountries: CountryISO[] = [CountryISO.Peru, CountryISO.UnitedStates, CountryISO.Mexico, CountryISO.Colombia];
 
@@ -88,6 +91,53 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
       },
       error: (err) => console.error('Error al cargar distritos:', err)
     });
+
+    this.dniCheckSub = this.dniCheck$.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(dni => {
+        if (!dni || dni.length < 8) {
+          return of({ tipo: 'invalid' as const });
+        }
+        return this.clienteService.obtenerClientePorNumDoc(dni).pipe(
+          map(cliente => ({ tipo: 'found' as const, cliente, dni })),
+          catchError(err => {
+            if (err.status === 404) {
+              return of({ tipo: 'notFound' as const, dni });
+            }
+            return of({ tipo: 'error' as const });
+          })
+        );
+      })
+    ).subscribe({
+      next: (result) => {
+        if (result.tipo === 'found') {
+          this.toastr.warning(`Este DNI ya está registrado: ${result.cliente.nombre} ${result.cliente.apellidos || ''}`.trim(), 'Cliente existente');
+          this.cargandoDni = false;
+        } else if (result.tipo === 'notFound') {
+          const tipo = this.clienteForm.get('tipoCliente')?.value;
+          if (tipo === TipoCliente.NATURAL) {
+            this.cargandoDni = true;
+            this.clienteService.consultarDniExterno(result.dni).subscribe({
+              next: (res) => {
+                if (res && res.success) {
+                  this.clienteForm.patchValue({
+                    nombre: res.first_name,
+                    apellidos: `${res.first_last_name} ${res.second_last_name}`.trim()
+                  });
+                  this.toastr.success('Datos recuperados de RENIEC');
+                }
+                this.cargandoDni = false;
+              },
+              error: () => {
+                this.cargandoDni = false;
+                this.toastr.info('No se pudo autocompletar. Ingrese los datos manualmente.');
+              }
+            });
+          }
+        }
+      }
+    });
   }
 
   onDepartamentoChange(event: Event): void {
@@ -115,6 +165,7 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
 
   ngOnDestroy(): void {
     this.tooltipInstances.forEach(instance => instance.dispose());
+    this.dniCheckSub?.unsubscribe();
   }
 
   private initProgrammaticTooltips(): void {
@@ -249,27 +300,12 @@ export class ClienteInsertarComponent implements OnInit, AfterViewInit, OnDestro
 
   public onDniInput(): void {
     const dni = this.clienteForm.get('numDoc')?.value;
-    const tipo = this.clienteForm.get('tipoCliente')?.value;
 
-    if (tipo === TipoCliente.NATURAL && dni && dni.length === 8) {
-      this.cargandoDni = true;
-      this.clienteService.consultarDniExterno(dni).subscribe({
-        next: (res) => {
-          if (res && res.success) {
-            this.clienteForm.patchValue({
-              nombre: res.first_name,
-              apellidos: `${res.first_last_name} ${res.second_last_name}`.trim()
-            });
-            this.toastr.success('Datos recuperados de RENIEC');
-          }
-          this.cargandoDni = false;
-        },
-        error: () => {
-          this.cargandoDni = false;
-          this.toastr.info('No se pudo autocompletar. Ingrese los datos manualmente.');
-        }
-      });
+    if (!dni || dni.length < 8) {
+      return;
     }
+
+    this.dniCheck$.next(dni);
   }
 
   public abrirModalCliente(cliente?: Cliente): void {

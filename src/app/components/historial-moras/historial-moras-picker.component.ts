@@ -29,6 +29,9 @@ export class HistorialMorasPickerComponent implements OnInit {
 
   mostrarReporte: boolean = false;
 
+  /** Fecha para calcular moras pendientes (YYYY-MM-DD). Por defecto: hoy. */
+  fechaCalculo: string = new Date().toISOString().slice(0, 10);
+
   constructor(
     private programaService:  ProgramaService,
     private contratoService:  ContratoService,
@@ -78,8 +81,11 @@ export class HistorialMorasPickerComponent implements OnInit {
   }
 
   limpiar(): void {
-    this.contrato = null;
-    this.numeroLote = '';
+    this.contrato     = null;
+    this.programaSel   = null;
+    this.manzana       = '';
+    this.numeroLote    = '';
+    this.fechaCalculo  = new Date().toISOString().slice(0, 10);
     setTimeout(() => this.inputManzana?.nativeElement?.focus(), 50);
   }
 }

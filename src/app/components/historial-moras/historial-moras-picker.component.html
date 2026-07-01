@@ -1,78 +1,120 @@
 <div class="picker-page">
-  <div class="picker-card">
-    <div class="picker-header">
-      <h2><i class="bi bi-file-earmark-pdf-fill"></i> Historial de Moras</h2>
-      <p>Seleccione un contrato para generar el reporte PDF de moras registradas y calculadas pendientes.</p>
-    </div>
 
-    <form class="picker-form" (ngSubmit)="buscarContrato()">
-      <div class="form-row">
-        <div class="form-group flex-2">
-          <label>Programa <span class="req">*</span></label>
-          <select class="form-control" [(ngModel)]="programaSel" name="programa" required>
-            <option [ngValue]="null">— Seleccione programa —</option>
-            <option *ngFor="let p of programas" [ngValue]="p.idPrograma ?? null">{{ p.nombrePrograma }}</option>
-          </select>
+  <!-- Header centrado -->
+  <div class="page-header">
+    <div class="page-icon">
+      <i class="bi bi-file-earmark-pdf-fill"></i>
+    </div>
+    <h1>Historial de Moras</h1>
+    <p>Seleccione un contrato para generar el reporte PDF con moras pendientes, pagadas y calculadas.</p>
+  </div>
+
+  <!-- Card principal -->
+  <div class="picker-card">
+
+    <!-- Formulario de búsqueda -->
+    <div class="form-section">
+      <div class="section-label">Datos del contrato</div>
+      <form (ngSubmit)="buscarContrato()">
+
+        <!-- Row 1: Programa + Fecha cálculo -->
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>Programa <span class="req">*</span></label>
+            <select class="form-control" [(ngModel)]="programaSel" name="programa" required>
+              <option [ngValue]="null">— Seleccione programa —</option>
+              <option *ngFor="let p of programas" [ngValue]="p.idPrograma ?? null">{{ p.nombrePrograma }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de cálculo</label>
+            <input class="form-control" type="date" [(ngModel)]="fechaCalculo" name="fechaCalculo" />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Manzana <span class="req">*</span></label>
-          <input #inputManzana class="form-control" type="text" [(ngModel)]="manzana" name="manzana" required
-                 placeholder="Ej: A2" autocomplete="off" />
-        </div>
-        <div class="form-group">
-          <label>Lote <span class="req">*</span></label>
-          <input class="form-control" type="text" [(ngModel)]="numeroLote" name="numeroLote" required
-                 placeholder="Ej: 06" autocomplete="off" />
-        </div>
-        <div class="form-group form-actions">
+
+        <!-- Row 2: MZ + LT + Buscar + Limpiar -->
+        <div class="form-row row-inline">
+          <div class="form-group">
+            <label>Manzana <span class="req">*</span></label>
+            <input #inputManzana class="form-control" type="text" [(ngModel)]="manzana" name="manzana" required
+                   placeholder="Ej: A2" autocomplete="off" />
+          </div>
+
+          <div class="form-group">
+            <label>Lote <span class="req">*</span></label>
+            <input class="form-control" type="text" [(ngModel)]="numeroLote" name="numeroLote" required
+                   placeholder="Ej: 06" autocomplete="off" />
+          </div>
+
           <button type="submit" class="btn btn-primary" [disabled]="buscando">
             <i class="bi bi-search"></i>
-            {{ buscando ? 'Buscando…' : 'Buscar contrato' }}
+            {{ buscando ? 'Buscando…' : 'Buscar' }}
           </button>
+
           <button type="button" class="btn btn-ghost" (click)="limpiar()" *ngIf="contrato">
-            <i class="bi bi-x-lg"></i> Limpiar
+            <i class="bi bi-x-lg"></i>
+            Limpiar
           </button>
         </div>
-      </div>
-    </form>
+
+      </form>
+    </div>
 
     <!-- Resultado de búsqueda -->
     <div *ngIf="contrato" class="contrato-card">
-      <div class="contrato-titulo">
-        <i class="bi bi-check2-circle"></i>
-        Contrato #{{ contrato.idContrato }} encontrado
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="bi bi-check2"></i>
+        </div>
+        <span class="card-title">Contrato encontrado</span>
+        <span class="card-badge">#{{ contrato.idContrato }}</span>
       </div>
+
       <div class="contrato-grid">
-        <div><span class="lbl">Cliente(s):</span>
-          <span class="val">
+        <div class="grid-item">
+          <span class="item-label">Cliente(s)</span>
+          <span class="item-value cliente-names">
             <ng-container *ngFor="let c of contrato.clientes; let last = last">
               {{ c.nombre }} {{ c.apellidos }}<span *ngIf="!last"> · </span>
             </ng-container>
           </span>
         </div>
-        <div><span class="lbl">Programa:</span>           <span class="val">{{ contrato.lotes[0]?.nombrePrograma }}</span></div>
-        <div><span class="lbl">Manzana / Lote:</span>
-          <span class="val">{{ contrato.lotes[0]?.manzana }} - {{ contrato.lotes[0]?.numeroLote }}</span>
+        <div class="grid-item">
+          <span class="item-label">Programa</span>
+          <span class="item-value">{{ contrato.lotes[0]?.nombrePrograma }}</span>
         </div>
-        <div><span class="lbl">Precio:</span>
-          <span class="val">{{ contrato.moneda === 'USD' ? '$' : 'S/' }} {{ contrato.montoTotal | number:'1.2-2' }}</span>
+        <div class="grid-item">
+          <span class="item-label">Ubicación</span>
+          <span class="item-value">MZ {{ contrato.lotes[0]?.manzana }} · LT {{ contrato.lotes[0]?.numeroLote }}</span>
         </div>
-        <div><span class="lbl">Saldo:</span>
-          <span class="val">{{ contrato.moneda === 'USD' ? '$' : 'S/' }} {{ contrato.saldo | number:'1.2-2' }}</span>
+        <div class="grid-item">
+          <span class="item-label">Precio de venta</span>
+          <span class="item-value mono">{{ contrato.moneda === 'USD' ? '$' : 'S/' }} {{ contrato.montoTotal | number:'1.2-2' }}</span>
         </div>
-        <div><span class="lbl">Cant. letras:</span> <span class="val">{{ contrato.cantidadLetras }}</span></div>
+        <div class="grid-item">
+          <span class="item-label">Saldo pendiente</span>
+          <span class="item-value mono">{{ contrato.moneda === 'USD' ? '$' : 'S/' }} {{ contrato.saldo | number:'1.2-2' }}</span>
+        </div>
+        <div class="grid-item">
+          <span class="item-label">Cant. letras</span>
+          <span class="item-value mono">{{ contrato.cantidadLetras }}</span>
+        </div>
       </div>
+
       <button class="btn btn-pdf" (click)="abrirReporte()">
-        <i class="bi bi-file-earmark-pdf"></i>
+        <i class="bi bi-file-earmark-pdf-fill"></i>
         Generar Reporte de Historial de Moras
       </button>
     </div>
+
   </div>
 </div>
 
-<!-- Modal del reporte -->
+<!-- Modal del reporte PDF -->
 <app-historial-moras-pdf
   *ngIf="mostrarReporte && contrato"
   [idContrato]="contrato.idContrato"
+  [fechaCalculo]="fechaCalculo"
   (cerrar)="cerrarReporte()">
 </app-historial-moras-pdf>

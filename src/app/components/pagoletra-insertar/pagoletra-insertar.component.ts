@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import * as bootstrap from 'bootstrap';
+import { TokenService } from '../../auth/token.service';
 
 import { LetraCambio } from '../../models/letra-cambio.model';
 import { PagoLetraService } from '../../services/pagoletra.service';
@@ -90,8 +91,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   constructor(
     private pagoService: PagoLetraService,
     private moraService: MoraService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tokenSvc: TokenService
   ) {}
+
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
 
   // Fecha con la que se calculó la mora originalmente (para detectar si cambió)
   private fechaCalculoMora: string = '';
