@@ -6,12 +6,11 @@ import { Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil, switchMap } from 'rxjs/operators';
 import { ContratoService } from '../../services/contrato.service';
 import { ProgramaService } from '../../services/programa.service';
-import { ContratoResponseDTO } from '../../dto/contratoreponse.dto';
+import { ContratoListItemDTO } from '../../dto/contrato-list-item.dto';
 import { Programa } from '../../models/programa.model';
 import { TipoContrato } from '../../enums/tipocontrato.enum';
 import { EstadoContrato } from '../../enums/Estadocontrato.enum';
 import { ToastrService } from 'ngx-toastr';
-import { LetrasCambioService } from '../../services/letracambio.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,9 +27,9 @@ import Swal from 'sweetalert2';
 })
 export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  contratos: ContratoResponseDTO[] = [];
-  contratosFiltrados: ContratoResponseDTO[] = [];
-  paginatedContratos: ContratoResponseDTO[] = [];
+  contratos: ContratoListItemDTO[] = [];
+  contratosFiltrados: ContratoListItemDTO[] = [];
+  paginatedContratos: ContratoListItemDTO[] = [];
 
   // 3 pestañas de búsqueda
   tipoBusqueda: 'ID' | 'LOTE' | 'CLIENTE' = 'ID';
@@ -61,9 +60,6 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
 
   isCargando: boolean = false;
   dropdownEstadoAbierto: number | null = null;
-
-  /** Mapa idContrato → true/false indicando si ya tiene letras generadas en BD */
-  letrasExistenMap: Map<number, boolean> = new Map();
   dropdownPos: { top: number; left: number } = { top: 0, left: 0 };
 
   // ─── DEBOUNCE: Subject que recibe cada tecla y espera 400ms ──────────
@@ -76,8 +72,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     private programaService: ProgramaService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
-    private letrasService: LetrasCambioService
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -100,7 +95,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
           return of(null); // emite null para no romper el pipe, switchMap cancela la anterior
         }
         this.buscandoCliente = true;
-        return this.contratoService.buscarPorNombreCliente(termino);
+        return this.contratoService.buscarPorNombreClienteResumen(termino);
       }),
       takeUntil(this.destroy$)
     ).subscribe({
@@ -135,14 +130,12 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
   // ─── CARGA INICIAL ────────────────────────────────────────────────────
   cargarContratos(): void {
     this.isCargando = true;
-    this.contratoService.listarContrato().subscribe({
+    this.contratoService.listarContratosResumen().subscribe({
       next: (data) => {
         this.isCargando = false;
         this.contratos = [...data];
         this.filtrarContratos();
         this.cdr.markForCheck();
-        // Verificar existencia de letras para contratos FINANCIADOS
-        this.verificarLetrasParaContratos(data);
       },
       error: (error) => {
         this.isCargando = false;
@@ -151,30 +144,6 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
         this.cdr.detectChanges();
       }
     });
-  }
-
-  verificarLetrasParaContratos(contratos: ContratoResponseDTO[]): void {
-  const financiados = contratos
-    .filter(c => c.tipoContrato === 'FINANCIADO' && c.idContrato)
-    .map(c => c.idContrato);
-
-  if (financiados.length === 0) return;
-
-  this.letrasService.existenLetrasBatch(financiados).subscribe({
-    next: (mapa: { [id: number]: boolean }) => {
-      Object.entries(mapa).forEach(([id, existe]) => {
-        this.letrasExistenMap.set(Number(id), existe);
-      });
-      this.cdr.markForCheck();
-    },
-    error: () => {
-      financiados.forEach(id => this.letrasExistenMap.set(id, false));
-    }
-  });
-}
-  /** True si el contrato ya tiene letras generadas en BD */
-  tieneLetrasGeneradas(idContrato: number): boolean {
-    return this.letrasExistenMap.get(idContrato) ?? false;
   }
 
   cargarProgramas(): void {
@@ -277,7 +246,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     }
   }
 
-  getTransicionesDisponibles(contrato: ContratoResponseDTO): { estado: EstadoContrato | 'RENUNCIA_ACTION' | 'TRANSFERENCIA_ACTION'; label: string }[] {
+  getTransicionesDisponibles(contrato: ContratoListItemDTO): { estado: EstadoContrato | 'RENUNCIA_ACTION' | 'TRANSFERENCIA_ACTION'; label: string }[] {
     const estado = contrato.estadoContrato;
     switch (estado) {
       case EstadoContrato.ACTIVO:
@@ -340,13 +309,13 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
   }
   cerrarDropdowns(): void { this.dropdownEstadoAbierto = null; }
 
-  ejecutarTransicion(contrato: ContratoResponseDTO, accion: EstadoContrato | string): void {
+  ejecutarTransicion(contrato: ContratoListItemDTO, accion: EstadoContrato | string): void {
     if (accion === 'RENUNCIA_ACTION') this.confirmarRenuncia(contrato);
     else if (accion === 'TRANSFERENCIA_ACTION') this.confirmarTransferencia(contrato);
     else this.cambiarEstado(contrato, accion as EstadoContrato);
   }
 
-  confirmarRenuncia(contrato: ContratoResponseDTO): void {
+  confirmarRenuncia(contrato: ContratoListItemDTO): void {
     this.dropdownEstadoAbierto = null;
     Swal.fire({
       title: '¿Registrar Renuncia?',
@@ -358,9 +327,11 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     }).then(result => {
       if (result.isConfirmed) {
         this.contratoService.registrarRenuncia(contrato.idContrato).subscribe({
-          next: (actualizado) => {
+          next: () => {
             const idx = this.contratos.findIndex(c => c.idContrato === contrato.idContrato);
-            if (idx !== -1) this.contratos[idx] = actualizado;
+            if (idx !== -1) {
+              this.contratos[idx] = { ...this.contratos[idx], estadoContrato: EstadoContrato.RENUNCIA };
+            }
             this.filtrarContratos();
             this.toastr.success('Renuncia registrada. Lote liberado.', 'Éxito');
             this.cdr.markForCheck();
@@ -371,7 +342,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
-  confirmarTransferencia(contrato: ContratoResponseDTO): void {
+  confirmarTransferencia(contrato: ContratoListItemDTO): void {
     this.dropdownEstadoAbierto = null;
     Swal.fire({
       title: '¿Transferir contrato?',
@@ -386,7 +357,9 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
           next: (datos) => {
             this.toastr.info('Redirigiendo al formulario de nuevo contrato...', 'Transferencia');
             const idx = this.contratos.findIndex(c => c.idContrato === contrato.idContrato);
-            if (idx !== -1) this.contratos[idx].estadoContrato = EstadoContrato.TRANSFERIDO;
+            if (idx !== -1) {
+              this.contratos[idx] = { ...this.contratos[idx], estadoContrato: EstadoContrato.TRANSFERIDO };
+            }
             this.filtrarContratos();
             this.cdr.markForCheck();
             this.router.navigate(['/secretaria-menu/contratos/registrar'], {
@@ -404,7 +377,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
-  cambiarEstado(contrato: ContratoResponseDTO, nuevoEstado: EstadoContrato): void {
+  cambiarEstado(contrato: ContratoListItemDTO, nuevoEstado: EstadoContrato): void {
     this.dropdownEstadoAbierto = null;
     const config = this.getEstadoConfig(nuevoEstado);
     const textoExtra = nuevoEstado === EstadoContrato.RESUELTO
@@ -419,9 +392,11 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     }).then(result => {
       if (result.isConfirmed) {
         this.contratoService.cambiarEstado(contrato.idContrato, nuevoEstado).subscribe({
-          next: (actualizado) => {
+          next: () => {
             const idx = this.contratos.findIndex(c => c.idContrato === contrato.idContrato);
-            if (idx !== -1) this.contratos[idx] = actualizado;
+            if (idx !== -1) {
+              this.contratos[idx] = { ...this.contratos[idx], estadoContrato: nuevoEstado };
+            }
             this.filtrarContratos();
             this.toastr.success(`Estado actualizado a: ${config.label}`, 'Éxito');
             this.cdr.markForCheck();
@@ -433,8 +408,8 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   // ─── IMPRESIÓN ───────────────────────────────────────────────────────
-  imprimirContrato(contrato: ContratoResponseDTO): void {
-    if (contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)) {
+  imprimirContrato(contrato: ContratoListItemDTO): void {
+    if (contrato.tipoContrato === 'FINANCIADO' && !contrato.tieneLetras) {
       this.toastr.warning('Primero debe generar las letras de cambio.', 'Atención');
       return;
     }
@@ -514,5 +489,5 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
-  trackById(index: number, contrato: ContratoResponseDTO): number { return contrato.idContrato!; }
+  trackById(index: number, contrato: ContratoListItemDTO): number { return contrato.idContrato!; }
 }

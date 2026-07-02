@@ -188,14 +188,14 @@
                 </button>
 
                 <!-- Si NO tiene letras generadas → botón generar -->
-                <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && (!contrato.letras || contrato.letras.length === 0)"
+                <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && !contrato.tieneLetras"
                   [routerLink]="['/secretaria-menu/letras/insertar', contrato.idContrato]"
                   [queryParams]="{tieneLetras: '0'}" class="btn-action btn-letras" title="Generar letras">
                   <i class="fas fa-file-pen"></i>
                 </a>
 
                 <!-- Si YA tiene letras generadas → botón ver -->
-                <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && contrato.letras && contrato.letras.length > 0"
+                <a *ngIf="contrato.tipoContrato === 'FINANCIADO' && contrato.tieneLetras"
                   [routerLink]="['/secretaria-menu/letras/listar', contrato.idContrato]"
                   class="btn-action btn-ver-letras" title="Ver letras de cambio">
                   <i class="fas fa-file-invoice-dollar"></i>

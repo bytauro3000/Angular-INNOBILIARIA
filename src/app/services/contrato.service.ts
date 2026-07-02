@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ContratoResponseDTO } from '../dto/contratoreponse.dto';
+import { ContratoListItemDTO } from '../dto/contrato-list-item.dto';
 import { TransferenciaResponseDTO } from '../dto/Transferenciaresponse.dto';
 import { ContratoRequestDTO } from '../dto/contratorequest.dto';
 import { environment } from '../../environments/environment';
@@ -26,6 +27,10 @@ export class ContratoService {
     return this.http.get<ContratoResponseDTO[]>(`${this.apiUrl}/listar`);
   }
 
+  listarContratosResumen(): Observable<ContratoListItemDTO[]> {
+    return this.http.get<ContratoListItemDTO[]>(`${this.apiUrl}/listar-resumen`);
+  }
+
   obtenerContratoPorId(id: number): Observable<ContratoResponseDTO> {
     return this.http.get<ContratoResponseDTO>(`${this.apiUrl}/${id}`);
   }
@@ -40,6 +45,12 @@ export class ContratoService {
 
   buscarPorNombreCliente(termino: string): Observable<ContratoResponseDTO[]> {
     return this.http.get<ContratoResponseDTO[]>(`${this.apiUrl}/buscar-por-cliente`, {
+      params: new HttpParams().set('termino', termino)
+    });
+  }
+
+  buscarPorNombreClienteResumen(termino: string): Observable<ContratoListItemDTO[]> {
+    return this.http.get<ContratoListItemDTO[]>(`${this.apiUrl}/buscar-por-cliente-resumen`, {
       params: new HttpParams().set('termino', termino)
     });
   }
