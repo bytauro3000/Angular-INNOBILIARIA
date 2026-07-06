@@ -254,6 +254,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
       this.pagoRequest.numeroOperacion = '';
       this.pagoRequest.fechaOperacion = undefined;
       this.voucherFiles = [];
+    } else if (!this.pagoRequest.fechaOperacion) {
+      this.pagoRequest.fechaOperacion = obtenerFechaPeru();
     }
   }
 
@@ -479,6 +481,10 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (this.pagoRequest.medioPago !== MedioPago.EFECTIVO) {
       if (!this.pagoRequest.numeroOperacion?.trim()) {
         this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
+        return;
+      }
+      if (!this.pagoRequest.fechaOperacion) {
+        this.toastr.warning('La fecha de operación es obligatoria para este medio de pago', 'Validación');
         return;
       }
       if (this.voucherFiles.length === 0) {

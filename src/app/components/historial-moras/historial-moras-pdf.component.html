@@ -43,80 +43,122 @@
                    alt="Logo" />
             </div>
           </div>
-          <div class="doc-titulo">HISTORIAL DE MORAS</div>
-          <div class="doc-kardex">KARDEX N°: <strong>{{ data.kardex }}</strong></div>
-          <div class="doc-emision">EMISION: <strong>{{ fmtFechaHora(data.fechaEmision) }}</strong></div>
-          <hr class="doc-sep" />
+          <div class="doc-header-center">
+            <div class="doc-titulo">HISTORIAL DE MORAS</div>
+            <div class="doc-kardex">KARDEX N°: <strong>{{ data.kardex }}</strong></div>
+            <div class="doc-emision">EMISION: <strong>{{ fmtFechaHora(data.fechaEmision) }}</strong></div>
+          </div>
 
-          <!-- Bloque cliente (2 columnas: pares label/valor lado a lado) -->
+          <!-- Bloque cliente -->
           <div class="doc-cliente">
-            <ng-container *ngIf="data.contrato.clientes?.length === 2; else unCliente">
-              <div class="pair">
-                <span class="lbl">CLIENTE 1:</span>
-                <span class="val">{{ data.contrato.clientes[0].nombre }} {{ data.contrato.clientes[0].apellidos }}</span>
+            <!-- ROW 1: PROGRAMA -->
+            <div class="doc-row">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">PROGRAMA:</span>
+                  <span class="val">{{ data.contrato.lotes[0]?.nombrePrograma || '—' }}</span>
+                </div>
               </div>
-              <div class="pair">
-                <span class="lbl">DNI:</span>
-                <span class="val">{{ data.contrato.clientes[0].numDoc || '—' }}</span>
-              </div>
-              <div class="pair">
-                <span class="lbl">CLIENTE 2:</span>
-                <span class="val">{{ data.contrato.clientes[1].nombre }} {{ data.contrato.clientes[1].apellidos }}</span>
-              </div>
-              <div class="pair">
-                <span class="lbl">DNI:</span>
-                <span class="val">{{ data.contrato.clientes[1].numDoc || '—' }}</span>
-              </div>
-            </ng-container>
-            <ng-template #unCliente>
-              <div class="pair">
-                <span class="lbl">CLIENTE:</span>
-                <span class="val">{{ data.contrato.clientes[0]?.nombre }} {{ data.contrato.clientes[0]?.apellidos }}</span>
-              </div>
-              <div class="pair">
-                <span class="lbl">DNI:</span>
-                <span class="val">{{ data.contrato.clientes[0]?.numDoc || '—' }}</span>
-              </div>
-            </ng-template>
-
-            <div class="pair">
-              <span class="lbl">DIRECCION:</span>
-              <span class="val">{{ data.contrato.clientes[0]?.direccion }}, {{ data.contrato.clientes[0]?.distrito?.nombre }}</span>
-            </div>
-            <div class="pair">
-              <span class="lbl">TELEFONO:</span>
-              <span class="val">{{ data.contrato.clientes[0]?.celular || '—' }}</span>
             </div>
 
-            <div class="pair">
-              <span class="lbl">PROGRAMA:</span>
-              <span class="val">{{ data.contrato.lotes[0]?.nombrePrograma || '—' }}</span>
-            </div>
-            <div class="pair">
-              <span class="lbl">AREA:</span>
-              <span class="val">{{ data.contrato.lotes[0]?.area ? fmtNumero(data.contrato.lotes[0]!.area) + ' m²' : '—' }}</span>
+            <!-- ROW 2: CLIENTE | DNI -->
+            <div class="doc-row">
+              <div class="group-left">
+                <ng-container *ngIf="data.contrato.clientes?.length === 2; else unCliente">
+                  <div class="pair">
+                    <span class="lbl">CLIENTE 1:</span>
+                    <span class="val">{{ data.contrato.clientes[0].nombre }} {{ data.contrato.clientes[0].apellidos }}</span>
+                  </div>
+                  <div class="pair">
+                    <span class="lbl">CLIENTE 2:</span>
+                    <span class="val">{{ data.contrato.clientes[1].nombre }} {{ data.contrato.clientes[1].apellidos }}</span>
+                  </div>
+                </ng-container>
+                <ng-template #unCliente>
+                  <div class="pair">
+                    <span class="lbl">CLIENTE:</span>
+                    <span class="val">{{ data.contrato.clientes[0]?.nombre }} {{ data.contrato.clientes[0]?.apellidos }}</span>
+                  </div>
+                </ng-template>
+              </div>
+              <div class="group-right">
+                <ng-container *ngIf="data.contrato.clientes?.length === 2; else unClienteDni">
+                  <div class="pair">
+                    <span class="lbl">DNI:</span>
+                    <span class="val">{{ data.contrato.clientes[0].numDoc || '—' }}</span>
+                  </div>
+                  <div class="pair">
+                    <span class="lbl">DNI:</span>
+                    <span class="val">{{ data.contrato.clientes[1].numDoc || '—' }}</span>
+                  </div>
+                </ng-container>
+                <ng-template #unClienteDni>
+                  <div class="pair">
+                    <span class="lbl">DNI:</span>
+                    <span class="val">{{ data.contrato.clientes[0]?.numDoc || '—' }}</span>
+                  </div>
+                </ng-template>
+              </div>
             </div>
 
-            <div class="pair">
-              <span class="lbl">MANZANA:</span>
-              <span class="val">{{ data.contrato.lotes[0]?.manzana || '—' }}</span>
-            </div>
-            <div class="pair">
-              <span class="lbl">LOTE:</span>
-              <span class="val">{{ data.contrato.lotes[0]?.numeroLote || '—' }}</span>
-            </div>
-            <div class="pair">
-              <span class="lbl">PRECIO:</span>
-              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.montoTotal) }}</span>
-            </div>
-            <div class="pair">
-              <span class="lbl">SALDO:</span>
-              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.saldo) }}</span>
+            <!-- ROW 3: DIRECCION | DISTRITO -->
+            <div class="doc-row">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">DIRECCION:</span>
+                  <span class="val">{{ data.contrato.clientes[0]?.direccion || '—' }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">DISTRITO:</span>
+                  <span class="val">{{ abreviarDistrito(data.contrato.clientes[0]?.distrito?.nombre || '—') }}</span>
+                </div>
+              </div>
             </div>
 
-            <div class="pair">
-              <span class="lbl">INICIAL:</span>
-              <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.inicial) }}</span>
+            <!-- ROW 4: PRECIO | INICIAL | SALDO -->
+            <div class="doc-row">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">PRECIO:</span>
+                  <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.montoTotal) }}</span>
+                </div>
+                <div class="pair">
+                  <span class="lbl">INICIAL:</span>
+                  <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.inicial) }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">SALDO:</span>
+                  <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.saldo) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ROW 5: MZ | LT | AREA | CELULAR -->
+            <div class="doc-row">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">MANZANA:</span>
+                  <span class="val">{{ data.contrato.lotes[0]?.manzana || '—' }}</span>
+                </div>
+                <div class="pair">
+                  <span class="lbl">LOTE:</span>
+                  <span class="val">{{ data.contrato.lotes[0]?.numeroLote || '—' }}</span>
+                </div>
+                <div class="pair">
+                  <span class="lbl">AREA:</span>
+                  <span class="val">{{ data.contrato.lotes[0]?.area ? fmtNumero(data.contrato.lotes[0]!.area) + ' m²' : '—' }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">CELULAR:</span>
+                  <span class="val">{{ data.contrato.clientes[0]?.celular || '—' }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -275,7 +317,7 @@
               <tr>
                 <th>N°</th>
                 <th>F. Venc</th>
-                <th>F. Pago / Actual</th>
+                <th>F. Referencia</th>
                 <th>Comprobante</th>
                 <th>Días</th>
                 <th>5%</th>

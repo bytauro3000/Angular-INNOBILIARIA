@@ -241,7 +241,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   onMedioPagoChange(): void {
     if (this.datosComunes.medioPago === MedioPago.EFECTIVO) {
       this.datosComunes.numeroOperacion = '';
+      this.datosComunes.fechaOperacion = '';
       this.voucherFiles = [];
+    } else if (!this.datosComunes.fechaOperacion) {
+      this.datosComunes.fechaOperacion = obtenerFechaPeru();
     }
   }
 
@@ -420,6 +423,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
     if (this.datosComunes.medioPago !== MedioPago.EFECTIVO) {
       if (!this.datosComunes.numeroOperacion?.trim()) {
         this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
+        return;
+      }
+      if (!this.datosComunes.fechaOperacion) {
+        this.toastr.warning('La fecha de operación es obligatoria para este medio de pago', 'Validación');
         return;
       }
       if (this.voucherFiles.length === 0) {

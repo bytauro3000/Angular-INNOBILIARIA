@@ -101,4 +101,21 @@ export class HistorialMorasPdfComponent implements OnInit {
   get hayContenido(): boolean {
     return !!this.data && (this.data.bloqueA.length > 0 || this.data.bloqueAPagadas.length > 0 || this.data.bloqueB.length > 0 || this.data.bloqueAAnuladas.length > 0);
   }
+  abreviarDistrito(nombre: string): string {
+    const mapa: Record<string, string> = {
+      'SAN MARTIN DE PORRES': 'S.M.P.',
+      'SAN JUAN DE LURIGANCHO': 'S.J.L.',
+      'VILLA MARIA DEL TRIUNFO': 'V.M.T.',
+      'VILLA EL SALVADOR': 'V.E.S.',
+      'SANTIAGO DE SURCO': 'SURCO',
+      'SAN JUAN DE MIRAFLORES': 'S.J.M.',
+      'ATE VITARTE': 'ATE',
+      'MAGDALENA DEL MAR': 'MAGDALENA',
+    };
+    const up = nombre.toUpperCase().trim();
+    for (const [key, val] of Object.entries(mapa)) {
+      if (up.includes(key)) return val;
+    }
+    return nombre;
+  }
 }

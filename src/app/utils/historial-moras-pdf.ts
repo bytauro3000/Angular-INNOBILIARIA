@@ -4,10 +4,9 @@
  * Layout: A4 portrait
  *   ┌────────────────────────────────────────────────────────┐
  *   │  EMPRESA (izq)              LOGO (der)                 │  ← header
- *   │                                                        │
- *   │  HISTORIAL DE MORAS                                    │
- *   │  KARDEX N°: 1105                                       │
- *   │  EMISION: 06/06/2026 17:20                             │
+ *   │              HISTORIAL DE MORAS                        │  ← centrado
+ *   │              KARDEX N°: 1105                           │  ← centrado
+ *   │              EMISION: 06/06/2026 17:20                 │  ← centrado
  *   │  ───────────────────────────────────────────            │
  *   │  CLIENTE 1: FALCON LOPEZ JANETH       DNI: ___         │  ← bloque cliente
  *   │  DIRECCION: CALLE S/N MZ.51 LT.14 ...                  │
@@ -30,8 +29,7 @@ import { HistorialMorasData } from '../services/reporte-moras.service';
 import { HistorialMorasItem } from '../dto/historial-moras-item.dto';
 import { ContratoResponseDTO } from '../dto/contratoreponse.dto';
 
-const LOGO_URL = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_400,h_400/v1773723460/logo_y1ygeg.png';
-const EMPRESA  = 'INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.';
+
 
 export class HistorialMorasPdf {
 
@@ -42,43 +40,50 @@ export class HistorialMorasPdf {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
 
-    // Logo (async, fetch + embed)
+    // ── Header empresa + logo ─────────────────────────────
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text('INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.', 14, 18);
+
     try {
-      const logoDataUrl = await this.fetchAsDataUrl(LOGO_URL);
-      // Top-right: 26x26 mm @ (pageW - 40, 10) — alineado al margen derecho (14mm)
-      doc.addImage(logoDataUrl, 'PNG', pageW - 40, 10, 26, 26);
+      const resp = await fetch('https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_400,h_400/v1773723460/logo_y1ygeg.png');
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const logoDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload  = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        });
+        doc.addImage(logoDataUrl, 'PNG', pageW - 38, 11, 18, 18);
+      }
     } catch (e) {
       console.warn('No se pudo cargar el logo:', e);
     }
 
-    // ── Header ──────────────────────────────────────────────
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(15, 23, 42); // slate-900
-    doc.text(EMPRESA, 14, 18);
+    // ── Titulo centrado ────────────────────────────────────
+    const centerX = pageW / 2;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
-    doc.text('HISTORIAL DE MORAS', 14, 30);
+    doc.setTextColor(2, 62, 138);
+    doc.text('HISTORIAL DE MORAS', centerX, 34, { align: 'center' });
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`KARDEX N°:  ${data.kardex}`, 14, 36);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`KARDEX N°:  ${data.kardex}`, centerX, 41, { align: 'center' });
 
     const emisionStr = this.formatFechaEmision(data.fechaEmision);
     doc.setFontSize(9);
-    doc.setTextColor(71, 85, 105); // slate-600
-    doc.text(`EMISION:  ${emisionStr}`, 14, 41);
-
-    // Línea separadora
-    doc.setDrawColor(203, 213, 225); // slate-300
-    doc.setLineWidth(0.3);
-    doc.line(14, 44, pageW - 14, 44);
+    doc.setTextColor(71, 85, 105);
+    doc.text(`EMISION:  ${emisionStr}`, centerX, 46, { align: 'center' });
 
     // ── Bloque cliente ────────────────────────────────────
-    const clienteY = this.drawClienteBlock(doc, data.contrato, 48);
+    const clienteY = this.drawClienteBlock(doc, data.contrato, 54);
 
-    let cursorY = clienteY + 6;
+    let cursorY = clienteY + 1;
 
     // ── Tabla bloque A pagadas ────────────────────────────────
     if (data.bloqueAPagadas.length > 0) {
@@ -98,7 +103,7 @@ export class HistorialMorasPdf {
                         fontStyle: 'bold', halign: 'center', fontSize: 9 } }
           ],
           [
-            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. REF.'),
             this.th('COMPROBANTE'),
             this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
             this.th('MORA')
@@ -142,7 +147,7 @@ export class HistorialMorasPdf {
                         fontStyle: 'bold', halign: 'center', fontSize: 9 } }
           ],
           [
-            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. REF.'),
             this.th('COMPROBANTE'),
             this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
             this.th('MORA')
@@ -192,7 +197,7 @@ export class HistorialMorasPdf {
                         fontStyle: 'bold', halign: 'center', fontSize: 9 } }
           ],
           [
-            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. PAGO'),
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. REF.'),
             this.th('COMPROBANTE'),
             this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
             this.th('MORA')
@@ -237,7 +242,7 @@ export class HistorialMorasPdf {
                         fontStyle: 'bold', halign: 'center', fontSize: 9 } }
           ],
           [
-            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. ACTUAL'),
+            this.th('N° LETRA'), this.th('F. VENC.'), this.th('F. REF.'),
             this.th('COMPROBANTE'),
             this.th('D. ATRAS'), this.th('MORA 5%'), this.th('MORA DIARIA'),
             this.th('MORA')
@@ -306,7 +311,7 @@ export class HistorialMorasPdf {
     fechaActual?: Date
   ) {
     const comp = (i.tipoComprobante || '') + (i.numeroComprobante ? ' ' + i.numeroComprobante : '');
-    // F. Pago/Actual: muestra la fecha del pago si existe; si no y es una
+    // F. REF.: muestra la fecha del pago si existe; si no y es una
     // mora PENDIENTE (Bloque B), muestra la fecha actual del reporte.
     let fechaPagoStr: string;
     if (i.fechaPago) {
@@ -355,7 +360,7 @@ export class HistorialMorasPdf {
       doc.setFont(valOpts.font, valOpts.style);
       doc.setFontSize(valOpts.size);
       doc.setTextColor(...valOpts.color);
-      doc.text(text, x, y);
+      doc.text(text.toUpperCase(), x, y);
     };
 
     const clientes = c.clientes || [];
@@ -366,51 +371,50 @@ export class HistorialMorasPdf {
     let y = yStart;
     const rowH = 5;
 
-    // ── 1) Filas de clientes ──────────────────────────────
-    const mostrarDosFilas = clientes.length === 2;
+    // ── 1) PROGRAMA ─────────────────────────────────────────
+    setLabel(14, y, 'PROGRAMA:');
+    setVal(36, y, lote?.nombrePrograma || '—');
+    y += rowH;
+
+    // ── 2) CLIENTE / DNI ────────────────────────────────────
+    const colDerLabel = 160;
+    const colDerVal   = 178;
     clientes.forEach((cli, idx) => {
-      const etiqueta = mostrarDosFilas
-        ? `CLIENTE ${idx + 1}:`
-        : (idx === 0 ? 'CLIENTE:' : '');
+      const etiqueta = clientes.length === 2 ? `CLIENTE ${idx + 1}:` : (idx === 0 ? 'CLIENTE:' : '');
       const nombreFull = `${cli.nombre ?? ''} ${cli.apellidos ?? ''}`.trim();
       setLabel(14, y, etiqueta);
-      setVal(40, y, nombreFull);
-      setLabel(120, y, `DNI:`);
-      setVal(132, y, cli.numDoc || '—');
+      setVal(36, y, nombreFull || '—');
+      setLabel(colDerLabel, y, 'DNI:');
+      setVal(colDerVal, y, cli.numDoc || '—');
       y += rowH;
     });
 
-    // ── 2) Dirección ───────────────────────────────────────
+    // ── 3) DIRECCION / DISTRITO ─────────────────────────────
     setLabel(14, y, 'DIRECCION:');
-    const dirParts = [clientes[0]?.direccion, lote ? `MZ.${lote.manzana} LT.${lote.numeroLote}` : '',
-                       clientes[0]?.distrito?.nombre].filter(Boolean);
-    setVal(40, y, dirParts.join(' '));
-    setLabel(140, y, 'TELEFONO:');
-    setVal(160, y, clientes[0]?.celular || '—');
+    setVal(36, y, clientes[0]?.direccion || '—');
+    setLabel(colDerLabel, y, 'DISTRITO:');
+    setVal(colDerVal, y, this.abreviarDistrito(clientes[0]?.distrito?.nombre || '—'));
     y += rowH;
 
-    // ── 3) Programa / Manzana / Lote / Area ────────────────
-    setLabel(14, y, 'PROGRAMA:');
-    setVal(40, y, lote?.nombrePrograma || '—');
-    setLabel(140, y, 'AREA:');
-    setVal(150, y, lote?.area ? `${this.fmtNumero(lote.area)} m²` : '—');
+    // ── 4) PRECIO / INICIAL / SALDO ─────────────────────────
+    setLabel(14, y, 'PRECIO:');
+    setVal(36, y, fmtMonto(c.montoTotal || 0));
+    setLabel(78, y, 'INICIAL:');
+    setVal(90, y, fmtMonto(c.inicial || 0));
+    setLabel(colDerLabel, y, 'SALDO:');
+    setVal(colDerVal, y, fmtMonto(c.saldo || 0));
     y += rowH;
 
-    // ── 4) Manzana / Lote / Precio / Saldo ────────────────
+    // ── 5) MZ / LT / AREA / CELULAR ─────────────────────────
     setLabel(14, y, 'MANZANA:');
     setVal(36, y, lote?.manzana || '—');
-    setLabel(58, y, 'LOTE:');
+    setLabel(66, y, 'LOTE:');
     setVal(75, y, lote?.numeroLote || '—');
-    setLabel(95, y, 'PRECIO:');
-    setVal(113, y, fmtMonto(c.montoTotal || 0));
-    setLabel(148, y, 'SALDO:');
-    setVal(162, y, fmtMonto(c.saldo || 0));
+    setLabel(102, y, 'AREA:');
+    setVal(112, y, lote?.area ? `${this.fmtNumero(lote.area)} m²` : '—');
+    setLabel(colDerLabel, y, 'CELULAR:');
+    setVal(colDerVal, y, clientes[0]?.celular || '—');
     y += rowH;
-
-    // ── 5) Inicial ─────────────────────────────────────────
-    setLabel(14, y, 'INICIAL:');
-    setVal(40, y, fmtMonto(c.inicial || 0));
-    y += rowH + 2;
 
     return y;
   }
@@ -440,7 +444,7 @@ export class HistorialMorasPdf {
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
     doc.text(`Página ${pageNumber}`, pageW - 14, pageH - 6, { align: 'right' });
-    doc.text(EMPRESA, 14, pageH - 6);
+    doc.text('INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.', 14, pageH - 6);
   }
 
   private static fmtNumero(n: number): string {
@@ -456,6 +460,25 @@ export class HistorialMorasPdf {
     return `${dd}/${mm}/${d.getFullYear()}`;
   }
 
+  static abreviarDistrito(nombre: string): string {
+    const mapa: Record<string, string> = {
+      'SAN MARTIN DE PORRES': 'S.M.P.',
+      'SAN JUAN DE LURIGANCHO': 'S.J.L.',
+      'VILLA MARIA DEL TRIUNFO': 'V.M.T.',
+      'VILLA EL SALVADOR': 'V.E.S.',
+      'SANTIAGO DE SURCO': 'SURCO',
+      'SAN JUAN DE MIRAFLORES': 'S.J.M.',
+      'ATE VITARTE': 'ATE',
+      'MAGDALENA DEL MAR': 'MAGDALENA',
+      'DISTRITO DE': '',
+    };
+    const up = nombre.toUpperCase().trim();
+    for (const [key, val] of Object.entries(mapa)) {
+      if (up.includes(key)) return val;
+    }
+    return nombre;
+  }
+
   private static formatFechaEmision(d: Date): string {
     const dd = String(d.getDate()).padStart(2, '0');
     const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -465,15 +488,4 @@ export class HistorialMorasPdf {
     return `${dd}/${mm}/${yy}  ${hh}:${mi}`;
   }
 
-  private static async fetchAsDataUrl(url: string): Promise<string> {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const blob = await resp.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload  = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(blob);
-    });
-  }
 }

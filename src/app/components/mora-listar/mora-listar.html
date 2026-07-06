@@ -39,7 +39,7 @@
               <tr>
                 <th>Letra</th>
                 <th>F. Vencimiento</th>
-                <th>F. Pago</th>
+                <th>F. Referencia</th>
                 <th>Días</th>
                 <th>Mora 5%</th>
                 <th>Mora Diaria</th>
@@ -57,7 +57,7 @@
               }">
                 <td data-label="Letra">{{ obtenerNumeroLetra(mora.numeroLetra) }}</td>
                 <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' : 'UTC' }}</td>
-                <td data-label="F. Pago">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' : 'UTC' }}</td>
+                <td data-label="F. Referencia">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td data-label="Días" class="text-center">
                   <span class="dias-chip">{{ mora.diasMora }}</span>
                 </td>

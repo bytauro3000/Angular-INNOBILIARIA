@@ -16,6 +16,13 @@ export const PORCENTAJE_MORA = 0.05;
 export const MONTO_DIARIO    = 1.00;
 
 /** Redondea a 2 decimales con HALF_UP (replica Java BigDecimal.setScale(2, HALF_UP)) */
+/** Si el vencimiento cae domingo, se traslada al lunes (día de gracia). */
+export function aplicarGraciaDominical(fecha: string | Date): Date {
+  const d = (typeof fecha === 'string') ? new Date(fecha + 'T00:00:00') : new Date(fecha);
+  if (d.getDay() !== 0) return d;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+}
+
 export function round2HalfUp(value: number): number {
   if (!isFinite(value)) return 0;
   // Truco equivalente a toFixed pero sin toString:
@@ -57,6 +64,12 @@ export function calcularMora(
   fechaReferencia?: string | Date
 ): MoraCalculada {
   const ref  = fechaReferencia ?? new Date();
+  const fechaVencEfectiva = aplicarGraciaDominical(fechaVencimiento);
+
+  if (diasCalendario(fechaVencEfectiva, ref) <= 0) {
+    return { diasMora: 0, montoPorcentaje: 0, montoDiario: 0, montoMoraTotal: 0 };
+  }
+
   const dias = diasCalendario(fechaVencimiento, ref);
 
   const montoPct  = round2HalfUp(importeLetra * PORCENTAJE_MORA);
