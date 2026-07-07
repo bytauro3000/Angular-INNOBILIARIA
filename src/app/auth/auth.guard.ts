@@ -6,14 +6,12 @@ export const authGuard: CanActivateFn = () => {
   const tokenService = inject(TokenService);
   const router = inject(Router);
 
-  // Verifica que el token exista Y que no haya expirado.
-  // Sin esta comprobación, un token vencido pasa el guard pero
-  // cada request devuelve 401, dejando al usuario con pantallas en blanco.
-  if (!tokenService.isTokenExpired()) {
+  // Solo verifica que exista un token.
+  // La expiración y el refresh los maneja el AuthInterceptor (401 → refresh → retry).
+  if (tokenService.getToken()) {
     return true;
   }
 
-  tokenService.removeToken();
   router.navigate(['/login']);
   return false;
 };

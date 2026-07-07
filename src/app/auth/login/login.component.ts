@@ -6,6 +6,7 @@ import { LoginService, LoginRequest } from '../login.service';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from '../token.service';
 import { IdleTimeoutService } from '../idle-timeout.service';
+import { TokenRefreshService } from '../token-refresh.service';
 import { ToastrService } from 'ngx-toastr';
 import { Title } from '@angular/platform-browser';
 
@@ -30,7 +31,8 @@ export class LoginComponent implements OnInit {
     private tokenService: TokenService,
     private idleTimeoutService: IdleTimeoutService,
     private toastr: ToastrService,
-    private titleService: Title
+    private titleService: Title,
+    private tokenRefreshService: TokenRefreshService
   ) {this.titleService.setTitle('Iniciar Sesión | Inmobiliaria Ivan');  }
 
   ngOnInit(): void {
@@ -59,6 +61,9 @@ export class LoginComponent implements OnInit {
         const token = response.token;
         this.tokenService.setToken(token);
         // El refresh token se guarda en cookie HttpOnly por el backend
+
+        // Iniciar refresh proactivo del JWT antes de que expire
+        this.tokenRefreshService.scheduleNext();
 
         // Iniciar control de inactividad (1 hora)
         this.idleTimeoutService.startWatching();

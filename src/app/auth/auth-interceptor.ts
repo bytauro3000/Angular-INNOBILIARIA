@@ -1,18 +1,20 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { TokenService } from './token.service';
 import { LoginService } from './login.service';
+import { TokenRefreshService } from './token-refresh.service';
 
 let isRefreshing = false;
+const refreshSubject = new BehaviorSubject<string | null>(null);
 
 export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
   const tokenService = inject(TokenService);
   const loginService = inject(LoginService);
+  const refreshService = inject(TokenRefreshService);
   const router = inject(Router);
 
-  // Las peticiones de auth usan withCredentials para enviar/recibir cookies
   const reqWithCredentials = req.clone({ withCredentials: true });
 
   if (req.url.includes('/auth/refresh') || req.url.includes('/auth/login')) {
@@ -26,14 +28,19 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 
   return next(clonedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !isRefreshing) {
-        isRefreshing = true;
+      if (error.status !== 401) {
+        return throwError(() => error);
+      }
 
-        // El refresh token viaja automáticamente en la cookie HttpOnly
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshSubject.next(null);
         return loginService.refreshToken().pipe(
           switchMap((response) => {
             isRefreshing = false;
             tokenService.setToken(response.token);
+            refreshService.scheduleNext();
+            refreshSubject.next(response.token);
             const retryRequest = reqWithCredentials.clone({
               setHeaders: { Authorization: `Bearer ${response.token}` }
             });
@@ -41,21 +48,26 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
           }),
           catchError((refreshError) => {
             isRefreshing = false;
+            refreshSubject.error(refreshError);
+            console.error('[Auth] Refresh falló, redirigiendo a login:', refreshError);
             tokenService.removeToken();
-            loginService.logout().subscribe({
-              error: () => {} // ignorar error de logout
-            });
+            loginService.logout().subscribe({ error: () => {} });
             router.navigate(['/login']);
             return throwError(() => refreshError);
           })
         );
       }
 
-      if (error.status === 403) {
-        console.warn('Acceso denegado (403) en:', req.url);
-      }
-
-      return throwError(() => error);
+      return refreshSubject.pipe(
+        filter(token => token !== null),
+        take(1),
+        switchMap((newToken) => {
+          const retryRequest = reqWithCredentials.clone({
+            setHeaders: { Authorization: `Bearer ${newToken}` }
+          });
+          return next(retryRequest);
+        })
+      );
     })
   );
 };

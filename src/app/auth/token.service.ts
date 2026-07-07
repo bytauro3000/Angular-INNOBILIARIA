@@ -33,16 +33,19 @@ export class TokenService {
     }
   }
 
-  isTokenExpired(): boolean {
+  getExpiresAt(): number | null {
     const token = this.getToken();
-    if (!token) return true;
-
+    if (!token) return null;
     try {
       const decoded: { exp: number } = jwtDecode(token);
-      const ahora = Math.floor(Date.now() / 1000);
-      return decoded.exp < ahora;
+      return decoded.exp * 1000;
     } catch {
-      return true;
+      return null;
     }
+  }
+
+  isTokenExpired(): boolean {
+    const exp = this.getExpiresAt();
+    return exp == null || exp < Date.now();
   }
 }
