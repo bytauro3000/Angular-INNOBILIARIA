@@ -32,6 +32,7 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   cargando = true;
   moraParaPagar: MoraResponse | null = null;
   esAdministrador = false;
+  esSoporte = false;
 
   constructor(
     private moraService: MoraService,
@@ -58,8 +59,10 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
     try {
       const decoded: { rol: string } = jwtDecode(token);
       this.esAdministrador = decoded.rol === 'ROLE_ADMINISTRADOR';
+      this.esSoporte = decoded.rol === 'ROLE_SOPORTE';
     } catch {
       this.esAdministrador = false;
+      this.esSoporte = false;
     }
   }
 

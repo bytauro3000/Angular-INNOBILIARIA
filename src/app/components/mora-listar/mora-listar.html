@@ -119,8 +119,8 @@
                             title="Registrar pago de esta mora">
                       <i class="bi bi-cash-coin"></i>
                     </button>
-                    <!-- Solo admin puede anular mora -->
-                    <button *ngIf="esAdministrador && mora.estadoMora === 'PENDIENTE'"
+                    <!-- Admin y Soporte pueden anular mora -->
+                    <button *ngIf="(esAdministrador || esSoporte) && mora.estadoMora === 'PENDIENTE'"
                             class="btn-accion btn-anular"
                             (click)="anularMora(mora)"
                             title="Anular mora">
