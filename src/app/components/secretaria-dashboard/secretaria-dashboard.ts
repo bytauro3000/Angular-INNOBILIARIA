@@ -175,12 +175,40 @@ export class SecretariaDashboard implements OnInit {
     ]
   };
 
-  // ── Último mes disponible para resumen ────────────────────────────────────
-  get ultimoMes(): IngresoMensualDTO | null {
-    return this.ingresosMensuales.length > 0
-      ? this.ingresosMensuales[this.ingresosMensuales.length - 1]
-      : null;
-  }
+  // ── Gráfico de Ingresos Mensuales Total ───────────────────────────────────
+  public totalMensualChartOptions: ChartConfiguration<'line'>['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: { line: { tension: 0.3, borderWidth: 2 }, point: { radius: 3, hoverRadius: 5 } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => 'Total: $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      }
+    }
+  };
+
+  public totalMensualChartData: ChartData<'line'> = {
+    labels: [],
+    datasets: [{
+      data: [],
+      label: 'Total Ingresos',
+      borderColor: '#059669',
+      backgroundColor: 'rgba(5, 150, 105, 0.1)',
+      fill: true,
+      tension: 0.3
+    }]
+  };
 
   constructor(
     private dashboardService: DashboardService,
@@ -258,6 +286,18 @@ export class SecretariaDashboard implements OnInit {
             { data: data.map(d => d.totalEfectivo), label: 'Efectivo', borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.15)', fill: true, tension: 0.3 },
             { data: data.map(d => d.totalBancario), label: 'Bancario', borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.15)', fill: true, tension: 0.3 }
           ]
+        };
+
+        this.totalMensualChartData = {
+          labels,
+          datasets: [{
+            data: data.map(d => d.totalGeneral),
+            label: 'Total Ingresos',
+            borderColor: '#059669',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
         };
       },
       error: () => {
