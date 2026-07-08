@@ -282,6 +282,7 @@ export class InscripcionServiciosInsertarComponent {
   }
 
   confirmarAbono(): void {
+    if (this.loading) return;
     if (!this.montoAbono || this.montoAbono <= 0) {
       this.toastr.warning('El monto debe ser mayor a cero.', 'Validación');
       return;

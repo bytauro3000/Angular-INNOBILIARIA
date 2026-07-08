@@ -206,6 +206,7 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   }
 
   guardarPago(): void {
+    if (this.enviando) return;
     if (!this.request.medioPago) {
       this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
       return;

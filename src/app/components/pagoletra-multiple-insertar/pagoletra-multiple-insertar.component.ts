@@ -408,6 +408,7 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
   }
 
   guardar(): void {
+    if (this.enviando) return;
     if (this.letras.length === 0) {
       this.toastr.warning('No hay letras seleccionadas', 'Validación');
       return;

@@ -452,6 +452,7 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
   }
 
   guardarPago(): void {
+    if (this.enviando) return;
     if (!this.pagoRequest.importePagado || this.pagoRequest.importePagado <= 0) {
       this.toastr.warning('El importe pagado debe ser mayor a cero', 'Validación');
       return;
