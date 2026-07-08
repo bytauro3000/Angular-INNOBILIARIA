@@ -89,7 +89,7 @@ export class SecretariaDashboard implements OnInit {
     datasets: [{ data: [], backgroundColor: ['#3498db', '#9b59b6'], hoverOffset: 15 }]
   };
 
-  // ── Gráfico de Ingresos Mensuales — Compobante ────────────────────────────
+  // ── Gráfico de Ingresos Mensuales — Comprobante ──────────────────────────
   public comprobanteChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -106,7 +106,19 @@ export class SecretariaDashboard implements OnInit {
       legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
       tooltip: {
         callbacks: {
-          label: (ctx) => ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+          beforeBody: (items) => {
+            const idx = items[0].dataIndex;
+            const datasets = items[0].chart.data.datasets;
+            const total = datasets.reduce((sum, ds) => sum + (ds.data[idx] as number), 0);
+            return 'Total del mes: $ ' + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          },
+          label: (ctx) => {
+            const idx = ctx.dataIndex;
+            const datasets = ctx.chart.data.datasets;
+            const total = datasets.reduce((sum, ds) => sum + (ds.data[idx] as number), 0);
+            const pct = total > 0 ? ((ctx.raw as number) / total * 100) : 0;
+            return ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '  (' + pct.toFixed(0) + '%)';
+          }
         }
       }
     }
@@ -137,7 +149,19 @@ export class SecretariaDashboard implements OnInit {
       legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
       tooltip: {
         callbacks: {
-          label: (ctx) => ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+          beforeBody: (items) => {
+            const idx = items[0].dataIndex;
+            const datasets = items[0].chart.data.datasets;
+            const total = datasets.reduce((sum, ds) => sum + (ds.data[idx] as number), 0);
+            return 'Total del mes: $ ' + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          },
+          label: (ctx) => {
+            const idx = ctx.dataIndex;
+            const datasets = ctx.chart.data.datasets;
+            const total = datasets.reduce((sum, ds) => sum + (ds.data[idx] as number), 0);
+            const pct = total > 0 ? ((ctx.raw as number) / total * 100) : 0;
+            return ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 }) + '  (' + pct.toFixed(0) + '%)';
+          }
         }
       }
     }
@@ -151,21 +175,11 @@ export class SecretariaDashboard implements OnInit {
     ]
   };
 
-  // ── Totales acumulados del período (para resumen de charts) ──────────────
-  get totalAcumulado(): number {
-    return this.ingresosMensuales.reduce((s, m) => s + m.totalGeneral, 0);
-  }
-  get totalBoletaAcumulado(): number {
-    return this.ingresosMensuales.reduce((s, m) => s + m.totalBoleta, 0);
-  }
-  get totalReciboAcumulado(): number {
-    return this.ingresosMensuales.reduce((s, m) => s + m.totalRecibo, 0);
-  }
-  get totalEfectivoAcumulado(): number {
-    return this.ingresosMensuales.reduce((s, m) => s + m.totalEfectivo, 0);
-  }
-  get totalBancarioAcumulado(): number {
-    return this.ingresosMensuales.reduce((s, m) => s + m.totalBancario, 0);
+  // ── Último mes disponible para resumen ────────────────────────────────────
+  get ultimoMes(): IngresoMensualDTO | null {
+    return this.ingresosMensuales.length > 0
+      ? this.ingresosMensuales[this.ingresosMensuales.length - 1]
+      : null;
   }
 
   constructor(
