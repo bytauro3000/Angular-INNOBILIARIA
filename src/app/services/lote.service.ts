@@ -50,7 +50,14 @@ export class LoteService {
 
   // 🔹 Obtener un objeto Lote por Id
   obtenerLotePorId(id: number): Observable<Lote> {
-    return this.http.get<Lote>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map((lote) => ({
+        ...lote,
+        programa: lote.idPrograma != null
+          ? { idPrograma: lote.idPrograma, nombrePrograma: lote.nombrePrograma }
+          : undefined
+      }))
+    );
   }
 
   // 🔹 Obtener la entidad completa por programa
@@ -94,7 +101,7 @@ export class LoteService {
           area: lote.area,
           precioM2: lote.precioM2,
           estado: lote.estado as EstadoLote,
-          programaNombre: lote.programa?.nombrePrograma ?? 'Sin programa'
+          programaNombre: lote.nombrePrograma ?? 'Sin programa'
         }))
       )
     );
@@ -111,7 +118,7 @@ export class LoteService {
           area: lote.area,
           precioM2: lote.precioM2,
           estado: lote.estado as EstadoLote,
-          programaNombre: lote.programa?.nombrePrograma ?? 'Sin programa'
+          programaNombre: lote.nombrePrograma ?? 'Sin programa'
         }))
       )
     );
