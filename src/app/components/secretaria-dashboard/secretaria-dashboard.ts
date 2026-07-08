@@ -151,6 +151,23 @@ export class SecretariaDashboard implements OnInit {
     ]
   };
 
+  // ── Totales acumulados del período (para resumen de charts) ──────────────
+  get totalAcumulado(): number {
+    return this.ingresosMensuales.reduce((s, m) => s + m.totalGeneral, 0);
+  }
+  get totalBoletaAcumulado(): number {
+    return this.ingresosMensuales.reduce((s, m) => s + m.totalBoleta, 0);
+  }
+  get totalReciboAcumulado(): number {
+    return this.ingresosMensuales.reduce((s, m) => s + m.totalRecibo, 0);
+  }
+  get totalEfectivoAcumulado(): number {
+    return this.ingresosMensuales.reduce((s, m) => s + m.totalEfectivo, 0);
+  }
+  get totalBancarioAcumulado(): number {
+    return this.ingresosMensuales.reduce((s, m) => s + m.totalBancario, 0);
+  }
+
   constructor(
     private dashboardService: DashboardService,
     private router: Router,
