@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
-import { DashboardData} from '../../models/dashboard.model';
+import { DashboardData } from '../../models/dashboard.model';
 import { IngresoDiarioDTO } from '../../dto/ingresodiario.dto';
+import { IngresoMensualDTO } from '../../dto/ingresomensual.dto';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
@@ -37,6 +38,10 @@ export class SecretariaDashboard implements OnInit {
   ingresos: IngresoDiarioDTO | null = null;
   ingresosCargando: boolean = true;
   ingresosError: boolean = false;
+
+  // ── Ingresos mensuales ─────────────────────────────────────────────────────
+  ingresosMensuales: IngresoMensualDTO[] = [];
+  ingresosMensualesCargando: boolean = true;
 
   // ── Gráficos ───────────────────────────────────────────────────────────────
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
@@ -84,6 +89,46 @@ export class SecretariaDashboard implements OnInit {
     datasets: [{ data: [], backgroundColor: ['#3498db', '#9b59b6'], hoverOffset: 15 }]
   };
 
+  // ── Gráfico de Ingresos Mensuales (línea) ───────────────────────────────────
+  public lineChartOptions: ChartConfiguration<'line'>['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: { line: { tension: 0.3, borderWidth: 2 }, point: { radius: 4, hoverRadius: 6 } },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 11 } }
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: {
+          callback: (value) => '$ ' + value.toLocaleString('en-US')
+        }
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => '$ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      }
+    }
+  };
+
+  public lineChartData: ChartData<'line'> = {
+    labels: [],
+    datasets: [{
+      data: [],
+      label: 'Total Ingresos',
+      borderColor: '#10b981',
+      backgroundColor: 'rgba(16, 185, 129, 0.08)',
+      fill: true,
+      tension: 0.3
+    }]
+  };
+
   constructor(
     private dashboardService: DashboardService,
     private router: Router,
@@ -94,6 +139,7 @@ export class SecretariaDashboard implements OnInit {
     this.cargarDatos();
     this.cargarTipoCambio();
     this.cargarIngresosDiarios();
+    this.cargarIngresosPorMes();
   }
 
   // ── Tipo de cambio ─────────────────────────────────────────────────────────
@@ -130,6 +176,33 @@ export class SecretariaDashboard implements OnInit {
       error: () => {
         this.ingresosError    = true;
         this.ingresosCargando = false;
+      }
+    });
+  }
+
+  // ── Ingresos mensuales ─────────────────────────────────────────────────────
+
+  cargarIngresosPorMes(): void {
+    this.ingresosMensualesCargando = true;
+    this.dashboardService.getIngresosPorMes().subscribe({
+      next: (data) => {
+        this.ingresosMensuales = data;
+        this.ingresosMensualesCargando = false;
+
+        this.lineChartData = {
+          labels: data.map(d => d.etiqueta),
+          datasets: [{
+            data: data.map(d => d.totalGeneral),
+            label: 'Total Ingresos',
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.08)',
+            fill: true,
+            tension: 0.3
+          }]
+        };
+      },
+      error: () => {
+        this.ingresosMensualesCargando = false;
       }
     });
   }

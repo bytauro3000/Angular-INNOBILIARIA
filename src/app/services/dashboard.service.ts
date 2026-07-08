@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DashboardData} from '../models/dashboard.model';
+import { DashboardData } from '../models/dashboard.model';
 import { IngresoDiarioDTO } from '../dto/ingresodiario.dto';
+import { IngresoMensualDTO } from '../dto/ingresomensual.dto';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -20,5 +21,9 @@ export class DashboardService {
   getIngresosDiarios(fecha?: string): Observable<IngresoDiarioDTO> {
     const params = fecha ? `?fecha=${fecha}` : '';
     return this.http.get<IngresoDiarioDTO>(`${this.apiUrl}/ingresos-diarios${params}`);
+  }
+
+  getIngresosPorMes(): Observable<IngresoMensualDTO[]> {
+    return this.http.get<IngresoMensualDTO[]>(`${this.apiUrl}/ingresos-por-mes`);
   }
 }
