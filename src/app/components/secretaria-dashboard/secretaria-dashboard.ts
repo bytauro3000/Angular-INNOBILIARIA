@@ -89,44 +89,66 @@ export class SecretariaDashboard implements OnInit {
     datasets: [{ data: [], backgroundColor: ['#3498db', '#9b59b6'], hoverOffset: 15 }]
   };
 
-  // ── Gráfico de Ingresos Mensuales (línea) ───────────────────────────────────
-  public lineChartOptions: ChartConfiguration<'line'>['options'] = {
+  // ── Gráfico de Ingresos Mensuales — Compobante ────────────────────────────
+  public comprobanteChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    elements: { line: { tension: 0.3, borderWidth: 2 }, point: { radius: 4, hoverRadius: 6 } },
+    elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: {
-        grid: { display: false },
-        ticks: { font: { size: 11 } }
-      },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: {
-          callback: (value) => '$ ' + value.toLocaleString('en-US')
-        }
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
       }
     },
     plugins: {
-      legend: { display: false },
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
       tooltip: {
         callbacks: {
-          label: (ctx) => '$ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+          label: (ctx) => ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
         }
       }
     }
   };
 
-  public lineChartData: ChartData<'line'> = {
+  public comprobanteChartData: ChartData<'line'> = {
     labels: [],
-    datasets: [{
-      data: [],
-      label: 'Total Ingresos',
-      borderColor: '#10b981',
-      backgroundColor: 'rgba(16, 185, 129, 0.08)',
-      fill: true,
-      tension: 0.3
-    }]
+    datasets: [
+      { data: [], label: 'Boleta', borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.15)', fill: true, tension: 0.3 },
+      { data: [], label: 'Recibo', borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.15)', fill: true, tension: 0.3 }
+    ]
+  };
+
+  // ── Gráfico de Ingresos Mensuales — Medio de Pago ─────────────────────────
+  public medioPagoChartOptions: ChartConfiguration<'line'>['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
+      }
+    },
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ctx.dataset.label + ': $ ' + Number(ctx.raw).toLocaleString('en-US', { minimumFractionDigits: 2 })
+        }
+      }
+    }
+  };
+
+  public medioPagoChartData: ChartData<'line'> = {
+    labels: [],
+    datasets: [
+      { data: [], label: 'Efectivo', borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.15)', fill: true, tension: 0.3 },
+      { data: [], label: 'Bancario', borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.15)', fill: true, tension: 0.3 }
+    ]
   };
 
   constructor(
@@ -189,16 +211,22 @@ export class SecretariaDashboard implements OnInit {
         this.ingresosMensuales = data;
         this.ingresosMensualesCargando = false;
 
-        this.lineChartData = {
-          labels: data.map(d => d.etiqueta),
-          datasets: [{
-            data: data.map(d => d.totalGeneral),
-            label: 'Total Ingresos',
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.08)',
-            fill: true,
-            tension: 0.3
-          }]
+        const labels = data.map(d => d.etiqueta);
+
+        this.comprobanteChartData = {
+          labels,
+          datasets: [
+            { data: data.map(d => d.totalBoleta), label: 'Boleta', borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.15)', fill: true, tension: 0.3 },
+            { data: data.map(d => d.totalRecibo), label: 'Recibo', borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.15)', fill: true, tension: 0.3 }
+          ]
+        };
+
+        this.medioPagoChartData = {
+          labels,
+          datasets: [
+            { data: data.map(d => d.totalEfectivo), label: 'Efectivo', borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.15)', fill: true, tension: 0.3 },
+            { data: data.map(d => d.totalBancario), label: 'Bancario', borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.15)', fill: true, tension: 0.3 }
+          ]
         };
       },
       error: () => {

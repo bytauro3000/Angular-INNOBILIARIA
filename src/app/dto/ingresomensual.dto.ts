@@ -7,4 +7,8 @@ export interface IngresoMensualDTO {
   totalPagoIniciales: number;
   totalInscripcionesServicios: number;
   totalGeneral: number;
+  totalBoleta: number;
+  totalRecibo: number;
+  totalEfectivo: number;
+  totalBancario: number;
 }
