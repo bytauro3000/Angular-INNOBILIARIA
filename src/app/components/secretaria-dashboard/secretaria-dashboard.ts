@@ -52,7 +52,7 @@ export class SecretariaDashboard implements OnInit {
       x: {
         stacked: true,
         grid: { display: false },
-        ticks: { autoSkip: false, maxRotation: 0, minRotation: 0, font: { size: 10 } }
+        ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 10 } }
       },
       y: {
         stacked: true,
@@ -326,9 +326,16 @@ export class SecretariaDashboard implements OnInit {
     const prefijos = [/Programa de Viv\. /i, /Programa de /i, /Asoc\. /i];
     prefijos.forEach(prefijo => { resultado = resultado.replace(prefijo, ''); });
     if (resultado.toLowerCase().includes(' de ')) {
-      resultado = resultado.split(/ de /i)[0];
+      const partes = resultado.split(/\s+de\s+/i);
+      const primera = partes[0].trim();
+      const resto = partes.slice(1).join(' de ');
+      const match = resto.match(/(- \d+[a-z]* Etapa)/i);
+      resultado = match ? primera + ' ' + match[1] : primera;
     }
-    return resultado.trim();
+    resultado = resultado.trim();
+    return resultado.replace(/\w\S*/g, (txt) =>
+      txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+    );
   }
 
   cargarDatos(): void {
