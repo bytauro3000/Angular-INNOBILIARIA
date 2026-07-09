@@ -104,8 +104,12 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
     Swal.fire({
       title: 'Anular mora',
       html: `
-        <p style="margin-bottom:12px">Ingrese el motivo de anulación de la mora de la letra <strong>N° ${mora.numeroLetra}</strong>:</p>
-        <textarea id="motivo-anulacion-mora" class="swal2-textarea" placeholder="Motivo obligatorio..." rows="3" style="width:100%;resize:vertical"></textarea>
+        <p style="margin-bottom:10px;font-size:14px;color:#475569">
+          Ingrese el motivo de anulación de la mora de la letra <strong>N° ${mora.numeroLetra}</strong>:
+        </p>
+        <textarea id="motivo-anulacion-mora" class="swal2-textarea"
+                  placeholder="Motivo obligatorio..." rows="2"
+                  style="width:100%;resize:none;font-size:14px;padding:10px 12px;border-radius:8px;min-height:70px;box-sizing:border-box"></textarea>
       `,
       icon: 'warning',
       showCancelButton: true,
@@ -113,6 +117,12 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, anular',
       cancelButtonText: 'Cancelar',
+      didOpen: () => {
+        setTimeout(() => {
+          const textarea = document.getElementById('motivo-anulacion-mora') as HTMLTextAreaElement;
+          if (textarea) textarea.focus();
+        }, 100);
+      },
       preConfirm: () => {
         const motivo = (document.getElementById('motivo-anulacion-mora') as HTMLTextAreaElement)?.value?.trim();
         if (!motivo) {
@@ -135,8 +145,12 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
     Swal.fire({
       title: 'Anular pago de mora',
       html: `
-        <p style="margin-bottom:12px">Ingrese el motivo de anulación del pago${numeroComprobante ? ' <strong>' + numeroComprobante + '</strong>' : ''}:</p>
-        <textarea id="motivo-anulacion-pago-mora" class="swal2-textarea" placeholder="Motivo obligatorio..." rows="3" style="width:100%;resize:vertical"></textarea>
+        <p style="margin-bottom:10px;font-size:14px;color:#475569">
+          Ingrese el motivo de anulación del pago${numeroComprobante ? ' <strong>' + numeroComprobante + '</strong>' : ''}:
+        </p>
+        <textarea id="motivo-anulacion-pago-mora" class="swal2-textarea"
+                  placeholder="Motivo obligatorio..." rows="2"
+                  style="width:100%;resize:none;font-size:14px;padding:10px 12px;border-radius:8px;min-height:70px;box-sizing:border-box"></textarea>
       `,
       icon: 'warning',
       showCancelButton: true,
@@ -144,6 +158,12 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, anular',
       cancelButtonText: 'Cancelar',
+      didOpen: () => {
+        setTimeout(() => {
+          const textarea = document.getElementById('motivo-anulacion-pago-mora') as HTMLTextAreaElement;
+          if (textarea) textarea.focus();
+        }, 100);
+      },
       preConfirm: () => {
         const motivo = (document.getElementById('motivo-anulacion-pago-mora') as HTMLTextAreaElement)?.value?.trim();
         if (!motivo) {
