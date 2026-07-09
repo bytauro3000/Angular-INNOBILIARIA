@@ -103,37 +103,23 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   anularMora(mora: MoraResponse): void {
     Swal.fire({
       title: 'Anular mora',
-      html: `
-        <p style="margin-bottom:10px;font-size:14px;color:#475569">
-          Ingrese el motivo de anulación de la mora de la letra <strong>N° ${mora.numeroLetra}</strong>:
-        </p>
-        <textarea id="motivo-anulacion-mora" class="swal2-textarea"
-                  placeholder="Motivo obligatorio..." rows="2"
-                  style="width:100%;resize:none;font-size:14px;padding:10px 12px;border-radius:8px;min-height:70px;box-sizing:border-box"></textarea>
-      `,
+      text: `Ingrese el motivo de anulación de la mora de la letra N° ${mora.numeroLetra}:`,
+      input: 'textarea',
+      inputPlaceholder: 'Motivo obligatorio...',
+      inputAttributes: { 'aria-label': 'Motivo de anulación' },
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, anular',
       cancelButtonText: 'Cancelar',
-      didOpen: () => {
-        setTimeout(() => {
-          const textarea = document.getElementById('motivo-anulacion-mora') as HTMLTextAreaElement;
-          if (textarea) textarea.focus();
-        }, 100);
-      },
-      preConfirm: () => {
-        const motivo = (document.getElementById('motivo-anulacion-mora') as HTMLTextAreaElement)?.value?.trim();
-        if (!motivo) {
-          Swal.showValidationMessage('El motivo es obligatorio');
-          return false;
-        }
-        return motivo;
+      inputValidator: (value) => {
+        if (!value?.trim()) return 'El motivo es obligatorio';
+        return null;
       }
     }).then(result => {
       if (result.isConfirmed && result.value) {
-        this.moraService.anularMora(mora.idMora, result.value).subscribe({
+        this.moraService.anularMora(mora.idMora, result.value.trim()).subscribe({
           next: () => { this.toastr.success('Mora anulada correctamente', 'Éxito'); this.cargarMoras(); },
           error: (err) => { this.toastr.error(err?.error?.message || 'No se pudo anular la mora', 'Error'); }
         });
@@ -142,39 +128,28 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   }
 
   anularPagoMora(idPagoMora: number, numeroComprobante: string | null): void {
+    const texto = numeroComprobante
+      ? `Ingrese el motivo de anulación del pago ${numeroComprobante}:`
+      : 'Ingrese el motivo de anulación del pago:';
     Swal.fire({
       title: 'Anular pago de mora',
-      html: `
-        <p style="margin-bottom:10px;font-size:14px;color:#475569">
-          Ingrese el motivo de anulación del pago${numeroComprobante ? ' <strong>' + numeroComprobante + '</strong>' : ''}:
-        </p>
-        <textarea id="motivo-anulacion-pago-mora" class="swal2-textarea"
-                  placeholder="Motivo obligatorio..." rows="2"
-                  style="width:100%;resize:none;font-size:14px;padding:10px 12px;border-radius:8px;min-height:70px;box-sizing:border-box"></textarea>
-      `,
+      text: texto,
+      input: 'textarea',
+      inputPlaceholder: 'Motivo obligatorio...',
+      inputAttributes: { 'aria-label': 'Motivo de anulación' },
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, anular',
       cancelButtonText: 'Cancelar',
-      didOpen: () => {
-        setTimeout(() => {
-          const textarea = document.getElementById('motivo-anulacion-pago-mora') as HTMLTextAreaElement;
-          if (textarea) textarea.focus();
-        }, 100);
-      },
-      preConfirm: () => {
-        const motivo = (document.getElementById('motivo-anulacion-pago-mora') as HTMLTextAreaElement)?.value?.trim();
-        if (!motivo) {
-          Swal.showValidationMessage('El motivo es obligatorio');
-          return false;
-        }
-        return motivo;
+      inputValidator: (value) => {
+        if (!value?.trim()) return 'El motivo es obligatorio';
+        return null;
       }
     }).then(result => {
       if (result.isConfirmed && result.value) {
-        this.moraService.anularPagoMora(idPagoMora, result.value).subscribe({
+        this.moraService.anularPagoMora(idPagoMora, result.value.trim()).subscribe({
           next: () => { this.toastr.success('Pago de mora anulado correctamente', 'Éxito'); this.cargarMoras(); },
           error: (err) => { this.toastr.error(err?.error?.message || 'No se pudo anular el pago de mora', 'Error'); }
         });
