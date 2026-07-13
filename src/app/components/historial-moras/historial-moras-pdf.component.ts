@@ -53,7 +53,13 @@ export class HistorialMorasPdfComponent implements OnInit {
     if (!this.data) return;
     try {
       this.toastr.info('Generando PDF…', 'Por favor espere');
-      await HistorialMorasPdf.generar(this.data);
+      const d = this.data;
+      const lote = d.contrato.lotes?.[0];
+      const mz = lote?.manzana || '';
+      const lt = lote?.numeroLote || '';
+      const prog = lote?.nombrePrograma || '';
+      const filename = `HISTORIAL DE MORA DE LA ${mz} LT. ${lt} - ${prog}`.trim();
+      await HistorialMorasPdf.generar(this.data, filename);
       this.toastr.success('PDF generado correctamente.', 'Éxito');
     } catch (e) {
       console.error(e);

@@ -36,7 +36,7 @@ export class HistorialMorasPdf {
   /**
    * Genera el PDF en memoria y lo abre en nueva pestaña.
    */
-  static async generar(data: HistorialMorasData): Promise<void> {
+  static async generar(data: HistorialMorasData, filename?: string): Promise<void> {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
 
@@ -289,11 +289,15 @@ export class HistorialMorasPdf {
     const textW = doc.getTextWidth(totalText);
     doc.text(totalText, pageW - 14 - textW, footerY);
 
-    // ── Abrir en nueva pestaña ──────────────────────────────
-    const blob = doc.output('blob');
-    const url  = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    // ── Descargar o abrir PDF ──────────────────────────────
+    if (filename) {
+      doc.save(filename);
+    } else {
+      const blob = doc.output('blob');
+      const url  = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    }
   }
 
   // ──────────────────────────────────────────────────────────
