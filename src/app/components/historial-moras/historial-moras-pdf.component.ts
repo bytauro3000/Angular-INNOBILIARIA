@@ -62,6 +62,85 @@ export class HistorialMorasPdfComponent implements OnInit {
   }
 
   imprimir(): void {
+    const styleId = 'print-historial-moras';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        @media print {
+          @page { margin: 0; }
+          html, body { margin: 0 !important; padding: 0 !important; height: auto !important; }
+          * { visibility: hidden !important; }
+          .print-document { visibility: visible !important; }
+          .print-document * { visibility: visible !important; }
+          .modal-overlay {
+            position:        absolute !important;
+            top:             0 !important;
+            left:            0 !important;
+            background:      #fff !important;
+            padding:         0 !important;
+            backdrop-filter: none !important;
+            display:         block !important;
+            width:           100% !important;
+            height:          auto !important;
+          }
+          .modal-container {
+            box-shadow:    none !important;
+            max-height:    none !important;
+            border-radius: 0 !important;
+            overflow:      visible !important;
+            display:       block !important;
+            width:         100% !important;
+            height:        auto !important;
+          }
+          .modal-body {
+            overflow:      visible !important;
+            background:    #fff !important;
+            padding:       0 !important;
+            max-height:    none !important;
+            height:        auto !important;
+          }
+          .print-document {
+            position:   static !important;
+            box-shadow: none !important;
+            padding:    0.2in 0.5in !important;
+            width:      auto !important;
+            margin:     0 !important;
+          }
+          .modal-header, .tabs-bar, .modal-footer, .tabla-vista, .loading-skeleton {
+            display: none !important;
+          }
+          .doc-total-mora {
+            color: #000 !important;
+            background: none !important;
+            border: none !important;
+            font-weight: 700 !important;
+          }
+          .doc-total-mora strong {
+            font-weight: 400 !important;
+          }
+          .doc-banda.banda-azul {
+            background: #1e4db7 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .doc-banda.banda-naranja {
+            background: #ea580c !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .doc-banda.banda-verde {
+            background: #16a34a !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
     window.print();
   }
 

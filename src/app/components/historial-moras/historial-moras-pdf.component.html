@@ -61,43 +61,49 @@
               </div>
             </div>
 
-            <!-- ROW 2: CLIENTE | DNI -->
-            <div class="doc-row">
+            <!-- ROW 2: CLIENTE | DNI (1 cliente) -->
+            <div class="doc-row" *ngIf="data.contrato.clientes?.length !== 2">
               <div class="group-left">
-                <ng-container *ngIf="data.contrato.clientes?.length === 2; else unCliente">
-                  <div class="pair">
-                    <span class="lbl">CLIENTE 1:</span>
-                    <span class="val">{{ data.contrato.clientes[0].nombre }} {{ data.contrato.clientes[0].apellidos }}</span>
-                  </div>
-                  <div class="pair">
-                    <span class="lbl">CLIENTE 2:</span>
-                    <span class="val">{{ data.contrato.clientes[1].nombre }} {{ data.contrato.clientes[1].apellidos }}</span>
-                  </div>
-                </ng-container>
-                <ng-template #unCliente>
-                  <div class="pair">
-                    <span class="lbl">CLIENTE:</span>
-                    <span class="val">{{ data.contrato.clientes[0]?.nombre }} {{ data.contrato.clientes[0]?.apellidos }}</span>
-                  </div>
-                </ng-template>
+                <div class="pair">
+                  <span class="lbl">CLIENTE:</span>
+                  <span class="val">{{ data.contrato.clientes[0]?.nombre }} {{ data.contrato.clientes[0]?.apellidos }}</span>
+                </div>
               </div>
               <div class="group-right">
-                <ng-container *ngIf="data.contrato.clientes?.length === 2; else unClienteDni">
-                  <div class="pair">
-                    <span class="lbl">DNI:</span>
-                    <span class="val">{{ data.contrato.clientes[0].numDoc || '—' }}</span>
-                  </div>
-                  <div class="pair">
-                    <span class="lbl">DNI:</span>
-                    <span class="val">{{ data.contrato.clientes[1].numDoc || '—' }}</span>
-                  </div>
-                </ng-container>
-                <ng-template #unClienteDni>
-                  <div class="pair">
-                    <span class="lbl">DNI:</span>
-                    <span class="val">{{ data.contrato.clientes[0]?.numDoc || '—' }}</span>
-                  </div>
-                </ng-template>
+                <div class="pair">
+                  <span class="lbl">DNI:</span>
+                  <span class="val">{{ data.contrato.clientes[0]?.numDoc || '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- ROW 2a: CLIENTE 1 | DNI 1 (2 clientes) -->
+            <div class="doc-row" *ngIf="data.contrato.clientes?.length === 2">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">CLIENTE 1:</span>
+                  <span class="val">{{ data.contrato.clientes[0].nombre }} {{ data.contrato.clientes[0].apellidos }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">DNI:</span>
+                  <span class="val">{{ data.contrato.clientes[0].numDoc || '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- ROW 2b: CLIENTE 2 | DNI 2 (2 clientes) -->
+            <div class="doc-row" *ngIf="data.contrato.clientes?.length === 2">
+              <div class="group-left">
+                <div class="pair">
+                  <span class="lbl">CLIENTE 2:</span>
+                  <span class="val">{{ data.contrato.clientes[1].nombre }} {{ data.contrato.clientes[1].apellidos }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">DNI:</span>
+                  <span class="val">{{ data.contrato.clientes[1].numDoc || '—' }}</span>
+                </div>
               </div>
             </div>
 
@@ -117,7 +123,7 @@
               </div>
             </div>
 
-            <!-- ROW 4: PRECIO | INICIAL | SALDO -->
+            <!-- ROW 4: PRECIO | INICIAL | SALDO | N° LETRA -->
             <div class="doc-row">
               <div class="group-left">
                 <div class="pair">
@@ -128,11 +134,15 @@
                   <span class="lbl">INICIAL:</span>
                   <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.inicial) }}</span>
                 </div>
-              </div>
-              <div class="group-right">
                 <div class="pair">
                   <span class="lbl">SALDO:</span>
                   <span class="val">{{ data.simboloMoneda }} {{ fmtNumero(data.contrato.saldo) }}</span>
+                </div>
+              </div>
+              <div class="group-right">
+                <div class="pair">
+                  <span class="lbl">N° LETRA:</span>
+                  <span class="val">{{ data.contrato.cantidadLetras }}</span>
                 </div>
               </div>
             </div>

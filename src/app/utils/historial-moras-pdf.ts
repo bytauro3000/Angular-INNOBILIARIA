@@ -396,13 +396,15 @@ export class HistorialMorasPdf {
     setVal(colDerVal, y, this.abreviarDistrito(clientes[0]?.distrito?.nombre || '—'));
     y += rowH;
 
-    // ── 4) PRECIO / INICIAL / SALDO ─────────────────────────
+    // ── 4) PRECIO / INICIAL / SALDO / N° LETRA ──────────────
     setLabel(14, y, 'PRECIO:');
     setVal(36, y, fmtMonto(c.montoTotal || 0));
     setLabel(78, y, 'INICIAL:');
     setVal(90, y, fmtMonto(c.inicial || 0));
-    setLabel(colDerLabel, y, 'SALDO:');
-    setVal(colDerVal, y, fmtMonto(c.saldo || 0));
+    setLabel(102, y, 'SALDO:');
+    setVal(112, y, fmtMonto(c.saldo || 0));
+    setLabel(colDerLabel, y, 'N° LETRA:');
+    setVal(colDerVal, y, String(c.cantidadLetras ?? '—'));
     y += rowH;
 
     // ── 5) MZ / LT / AREA / CELULAR ─────────────────────────
