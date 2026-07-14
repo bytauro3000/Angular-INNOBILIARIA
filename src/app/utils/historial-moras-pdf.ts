@@ -366,6 +366,17 @@ export class HistorialMorasPdf {
       doc.setTextColor(...valOpts.color);
       doc.text(text.toUpperCase(), x, y);
     };
+    const setPair = (labelX: number, valX: number, y: number, label: string, val: string) => {
+      setLabel(labelX, y, label);
+      setVal(valX, y, val);
+    };
+    const setPairClose = (labelX: number, y: number, label: string, val: string) => {
+      doc.setFont(labelOpts.font, labelOpts.style);
+      doc.setFontSize(labelOpts.size);
+      const labelW = doc.getTextWidth(label);
+      setLabel(labelX, y, label);
+      setVal(labelX + labelW + 2, y, val);
+    };
 
     const clientes = c.clientes || [];
     const lote     = c.lotes?.[0];
@@ -376,50 +387,36 @@ export class HistorialMorasPdf {
     const rowH = 5;
 
     // ── 1) PROGRAMA ─────────────────────────────────────────
-    setLabel(14, y, 'PROGRAMA:');
-    setVal(36, y, lote?.nombrePrograma || '—');
+    setPairClose(14, y, 'PROGRAMA:', lote?.nombrePrograma || '—');
     y += rowH;
 
     // ── 2) CLIENTE / DNI ────────────────────────────────────
-    const colDerLabel = 160;
-    const colDerVal   = 178;
+    const colDerLabel = 150;
     clientes.forEach((cli, idx) => {
       const etiqueta = clientes.length === 2 ? `CLIENTE ${idx + 1}:` : (idx === 0 ? 'CLIENTE:' : '');
       const nombreFull = `${cli.nombre ?? ''} ${cli.apellidos ?? ''}`.trim();
-      setLabel(14, y, etiqueta);
-      setVal(36, y, nombreFull || '—');
-      setLabel(colDerLabel, y, 'DNI:');
-      setVal(colDerVal, y, cli.numDoc || '—');
+      setPairClose(14, y, etiqueta, nombreFull || '—');
+      setPairClose(colDerLabel, y, 'DNI:', cli.numDoc || '—');
       y += rowH;
     });
 
     // ── 3) DIRECCION / DISTRITO ─────────────────────────────
-    setLabel(14, y, 'DIRECCION:');
-    setVal(36, y, clientes[0]?.direccion || '—');
-    setLabel(colDerLabel, y, 'DISTRITO:');
-    setVal(colDerVal, y, this.abreviarDistrito(clientes[0]?.distrito?.nombre || '—'));
+    setPairClose(14, y, 'DIRECCION:', clientes[0]?.direccion || '—');
+    setPairClose(colDerLabel, y, 'DISTRITO:', this.abreviarDistrito(clientes[0]?.distrito?.nombre || '—'));
     y += rowH;
 
     // ── 4) PRECIO / INICIAL / SALDO / N° LETRA ──────────────
-    setLabel(14, y, 'PRECIO:');
-    setVal(36, y, fmtMonto(c.montoTotal || 0));
-    setLabel(78, y, 'INICIAL:');
-    setVal(90, y, fmtMonto(c.inicial || 0));
-    setLabel(102, y, 'SALDO:');
-    setVal(112, y, fmtMonto(c.saldo || 0));
-    setLabel(colDerLabel, y, 'N° LETRA:');
-    setVal(colDerVal, y, String(c.cantidadLetras ?? '—'));
+    setPairClose(14, y, 'PRECIO:', fmtMonto(c.montoTotal || 0));
+    setPairClose(55, y, 'INICIAL:', fmtMonto(c.inicial || 0));
+    setPairClose(96, y, 'SALDO:', fmtMonto(c.saldo || 0));
+    setPairClose(colDerLabel, y, 'N° LETRA:', String(c.cantidadLetras ?? '—'));
     y += rowH;
 
     // ── 5) MZ / LT / AREA / CELULAR ─────────────────────────
-    setLabel(14, y, 'MANZANA:');
-    setVal(36, y, lote?.manzana || '—');
-    setLabel(66, y, 'LOTE:');
-    setVal(75, y, lote?.numeroLote || '—');
-    setLabel(102, y, 'AREA:');
-    setVal(112, y, lote?.area ? `${this.fmtNumero(lote.area)} m²` : '—');
-    setLabel(colDerLabel, y, 'CELULAR:');
-    setVal(colDerVal, y, clientes[0]?.celular || '—');
+    setPairClose(14, y, 'MANZANA:', lote?.manzana || '—');
+    setPairClose(55, y, 'LOTE:', lote?.numeroLote || '—');
+    setPairClose(96, y, 'AREA:', lote?.area ? `${this.fmtNumero(lote.area)} m²` : '—');
+    setPairClose(colDerLabel, y, 'CELULAR:', clientes[0]?.celular || '—');
     y += rowH;
 
     return y;

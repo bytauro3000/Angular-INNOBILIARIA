@@ -164,11 +164,19 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     this.cargando = true;
     this.letrasService.descargarPdfLetrasBackend(this.idContrato).subscribe({
       next: (blob: Blob) => {
+        const lote = this.contratoLotes?.[0];
+        const mz = lote?.manzana || '';
+        const lt = lote?.numeroLote || '';
+        const prog = lote?.nombrePrograma || '';
+        const filename = `LETRA DE CAMBIO DE LA MZ. ${mz} LT. ${lt} - ${prog}.pdf`.replace(/\s+/g, ' ');
+        this.toastr.info('Generando PDF…', 'Por favor espere');
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open(url, '_blank');
-        if (pdfWindow) {
-          setTimeout(() => URL.revokeObjectURL(url), 100);
-        }
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.toastr.success('PDF generado correctamente.', 'Éxito');
         this.cargando = false;
       },
       error: () => {
@@ -459,10 +467,14 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
           doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
         }
 
-        const blob = doc.output('blob');
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 100);
+        this.toastr.info('Generando PDF…', 'Por favor espere');
+        const lote = this.contratoLotes?.[0];
+        const mz = lote?.manzana || '';
+        const lt = lote?.numeroLote || '';
+        const prog = lote?.nombrePrograma || '';
+        const filename = `CRONOGRAMA DE PAGOS DE LA MZ. ${mz} LT. ${lt} - ${prog}.pdf`.replace(/\s+/g, ' ');
+        doc.save(filename);
+        this.toastr.success('PDF generado correctamente.', 'Éxito');
         this.cargando = false;
       },
       error: () => {

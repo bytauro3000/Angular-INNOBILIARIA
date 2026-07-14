@@ -58,7 +58,7 @@ export class HistorialMorasPdfComponent implements OnInit {
       const mz = lote?.manzana || '';
       const lt = lote?.numeroLote || '';
       const prog = lote?.nombrePrograma || '';
-      const filename = `HISTORIAL DE MORA DE LA ${mz} LT. ${lt} - ${prog}`.trim();
+      const filename = `HISTORIAL DE MORA DE LA MZ. ${mz} LT. ${lt} - ${prog}.pdf`.replace(/\s+/g, ' ');
       await HistorialMorasPdf.generar(this.data, filename);
       this.toastr.success('PDF generado correctamente.', 'Éxito');
     } catch (e) {

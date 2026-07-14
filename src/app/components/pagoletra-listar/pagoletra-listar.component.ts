@@ -150,6 +150,7 @@ export class PagoletraListarComponent implements OnInit {
 
   letraBloqueada(letra: LetraCambioConSeleccion): boolean {
     if (this.pinValidado) return false;
+    if (this.esSoporte) return false;
     if (letra.estadoLetra === 'PAGADO' || letra.estadoLetra === 'PARCIAL') return false;
     if (this.ultimaLetraPagadaNum <= 0) return false;
     return this.extraerNumeroLetra(letra.numeroLetra) < this.ultimaLetraPagadaNum;
@@ -277,6 +278,7 @@ export class PagoletraListarComponent implements OnInit {
 
   // ── PAGO INICIAL ────────────────────────────────────────────────────────────
   esAdministrador: boolean = false;
+  esSoporte: boolean = false;
   anulandoPagoInicial: boolean = false;
 
   // ── MODAL EDITAR CLIENTE ────────────────────────────────────────────────────
@@ -307,8 +309,10 @@ export class PagoletraListarComponent implements OnInit {
     try {
       const decoded: { rol: string } = jwtDecode(token);
       this.esAdministrador = decoded.rol === 'ROLE_ADMINISTRADOR';
+      this.esSoporte = decoded.rol === 'ROLE_SOPORTE';
     } catch {
       this.esAdministrador = false;
+      this.esSoporte = false;
     }
   }
 
@@ -650,6 +654,7 @@ formatearNumeroLote(): void {
   }
 
   private validarLetraParaPago(letra: LetraCambio): string | null {
+    if (this.esSoporte) return null;
     const numLetra = this.extraerNumeroLetra(letra.numeroLetra);
     const maxPagado = this.maxNumeroLetraPagado();
     if (maxPagado === 0) return null;
@@ -661,6 +666,7 @@ formatearNumeroLote(): void {
   }
 
   private validarLetrasMultipleParaPago(letras: LetraCambio[]): string | null {
+    if (this.esSoporte) return null;
     const maxPagado = this.maxNumeroLetraPagado();
     if (maxPagado === 0) return null;
     const numeros = letras.map(l => this.extraerNumeroLetra(l.numeroLetra)).sort((a, b) => a - b);

@@ -212,8 +212,12 @@ $gray-500:    #64748b;
 
 .group-right {
   justify-content: flex-start;
+  .pair {
+    column-gap: 2px;
+  }
   .lbl {
     flex-shrink: 0;
+    min-width: 0;
   }
 }
 
