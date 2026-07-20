@@ -87,17 +87,17 @@
   </div>
 
   <div *ngIf="totalPages > 1" class="paginacion-controles">
-    <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-paginacion">
+    <button (click)="previousPage()" [disabled]="currentPage === 0" class="btn-paginacion">
       Anterior
     </button>
     <ng-container *ngFor="let page of getPagesArray()">
       <button *ngIf="page !== '...'" (click)="goToPage($any(page))" class="btn-paginacion"
         [class.active]="page === currentPage">
-        {{ page }}
+        {{ page + 1 }}
       </button>
       <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
     </ng-container>
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-paginacion">
+    <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1" class="btn-paginacion">
       Siguiente
     </button>
   </div>

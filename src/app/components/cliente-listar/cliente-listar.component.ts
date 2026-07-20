@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ClienteService } from '../../services/cliente.service';
 import { FormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente.model';
+import { Page } from '../../models/page.model';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2'; 
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
-import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.component'; // 👈 IMPORTACIÓN AÑADIDA
+import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.component';
 import { Title } from '@angular/platform-browser';
 
 
@@ -30,14 +31,14 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   @ViewChild('editarModal') editarModal!: ClienteEditarComponent; // 👈 REFERENCIA AL MODAL EDITAR
 
   clientes: Cliente[] = [];
-  clientesFiltrados: Cliente[] = [];
   paginatedClientes: Cliente[] = [];
+  totalElementos: number = 0;
 
   terminoBusqueda: string = '';
   tipoFiltro: string = 'nombres';
 
   pageSize: number = 7;
-  currentPage: number = 1;
+  currentPage: number = 0;
   totalPages: number = 0;
 
   isCargando: boolean = false;
@@ -53,12 +54,10 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   ) { this.titleService.setTitle('Clientes | Inmobiliaria Ivan'); }
 
 
-  // Abre el modal de inserción
   abrirModal(cliente?: Cliente) {
     this.registroModal.abrirModalCliente(cliente); 
   }
 
-  // Abre el modal de edición por ID (nueva funcionalidad)
   abrirModalEditar(id: number) {
     this.editarModal.abrirModal(id);
   }
@@ -83,73 +82,66 @@ export class ClientesComponent implements OnInit, AfterViewInit {
     const nuevaPageSize = Math.max(3, Math.floor(available / this.ROW_HEIGHT_PX));
     if (nuevaPageSize !== this.pageSize) {
       this.pageSize = nuevaPageSize;
-      this.currentPage = 1;
-      this.aplicarPaginacion();
+      this.currentPage = 0;
+      this.cargarClientes();
     }
   }
 
   cargarClientes(): void {
-  this.isCargando = true;
-  this.clienteService.listarClientes().subscribe({
-    next: (data) => {
-      this.isCargando = false;
-      this.clientes = data;
-      this.clientesFiltrados = [...this.clientes];
-      this.aplicarPaginacion();
-    },
-    error: (error) => {
-      this.isCargando = false;
-      console.error('Error al cargar clientes:', error);
-    }
-  });
-}
-
-filtrarClientes(): void {
-  const termino = this.terminoBusqueda.trim();
-  const tipo = this.tipoFiltro; // Este valor viene del [(ngModel)] de tu <select>
-
-  // Si el buscador está vacío, cargamos la lista completa original
-  if (!termino) {
-    this.cargarClientes();
-    return;
+    this.isCargando = true;
+    this.clienteService.listarClientesPaginado(this.currentPage, this.pageSize).subscribe({
+      next: (page: Page<Cliente>) => {
+        this.isCargando = false;
+        this.paginatedClientes = page.content;
+        this.totalPages = page.totalPages;
+        this.totalElementos = page.totalElements;
+      },
+      error: (error) => {
+        this.isCargando = false;
+        console.error('Error al cargar clientes:', error);
+      }
+    });
   }
 
-  // Llamada al servicio con el término y el tipo de filtro (nombres o documento)
-  this.clienteService.buscarClientesPorFiltro(termino, tipo).subscribe({
-    next: (data) => {
-      this.clientesFiltrados = data;
-      this.currentPage = 1; // Reiniciamos a la primera página tras la búsqueda
-      this.aplicarPaginacion();
-    },
-    error: (error) => {
-      console.error('Error al filtrar clientes desde el servidor:', error);
-      this.toastr.error('No se pudo realizar la búsqueda.', 'Error');
-    }
-  });
-}
+  filtrarClientes(): void {
+    const termino = this.terminoBusqueda.trim();
+    const tipo = this.tipoFiltro;
 
-  aplicarPaginacion(): void {
-    this.totalPages = Math.ceil(this.clientesFiltrados.length / this.pageSize);
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedClientes = this.clientesFiltrados.slice(startIndex, endIndex);
+    if (!termino) {
+      this.currentPage = 0;
+      this.cargarClientes();
+      return;
+    }
+
+    this.clienteService.buscarClientesPorFiltro(termino, tipo).subscribe({
+      next: (data) => {
+        this.paginatedClientes = data;
+        this.totalPages = 1;
+        this.currentPage = 0;
+        this.totalElementos = data.length;
+      },
+      error: (error) => {
+        console.error('Error al filtrar clientes desde el servidor:', error);
+        this.toastr.error('No se pudo realizar la búsqueda.', 'Error');
+      }
+    });
   }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 0 && page < this.totalPages) {
       this.currentPage = page;
-      this.aplicarPaginacion();
+      this.cargarClientes();
     }
   }
 
   previousPage(): void {
-    if (this.currentPage > 1) {
+    if (this.currentPage > 0) {
       this.goToPage(this.currentPage - 1);
     }
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages) {
+    if (this.currentPage < this.totalPages - 1) {
       this.goToPage(this.currentPage + 1);
     }
   }
@@ -159,37 +151,30 @@ filtrarClientes(): void {
   const current = this.currentPage;
   const pages: (number | string)[] = [];
 
-  // Si hay 7 páginas o menos, se muestran todas normalmente
   if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i);
+    for (let i = 0; i < total; i++) pages.push(i);
   } else {
-    // Siempre mostramos la página 1
-    pages.push(1);
+    pages.push(0);
 
-    // Lógica de elipsis inicial
     if (current > 3) {
       pages.push('...');
     }
 
-    // Rango central dinámico (alrededor de la actual)
-    let start = Math.max(2, current - 1);
-    let end = Math.min(total - 1, current + 1);
+    let start = Math.max(1, current - 1);
+    let end = Math.min(total - 2, current + 1);
 
-    // Ajustes para mantener siempre 3 números en el centro si es posible
     if (current <= 3) end = 4;
-    if (current >= total - 2) start = total - 3;
+    if (current >= total - 3) start = total - 4;
 
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
 
-    // Lógica de elipsis final
-    if (current < total - 2) {
+    if (current < total - 3) {
       pages.push('...');
     }
 
-    // Siempre mostramos la última página
-    pages.push(total);
+    pages.push(total - 1);
   }
   return pages;
 }

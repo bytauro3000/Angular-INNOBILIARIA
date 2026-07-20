@@ -60,6 +60,10 @@ export class TokenRefreshService implements OnDestroy {
     });
   }
 
+  private retryCount = 0;
+  private static readonly MAX_RETRIES = 2;
+  private static readonly RETRY_DELAY_MS = 15_000;
+
   private doRefresh(): void {
     if (this.isRefreshing) return;
     this.isRefreshing = true;
@@ -67,12 +71,25 @@ export class TokenRefreshService implements OnDestroy {
     this.loginService.refreshToken().subscribe({
       next: (response) => {
         this.isRefreshing = false;
+        this.retryCount = 0;
         this.tokenService.setToken(response.token);
         this.scheduleNext();
       },
       error: (err) => {
         this.isRefreshing = false;
-        console.error('[TokenRefresh] Error al renovar token:', err);
+        this.retryCount++;
+        console.error(`[TokenRefresh] Error (intento ${this.retryCount}):`, err);
+
+        if (this.retryCount < TokenRefreshService.MAX_RETRIES) {
+          this.ngZone.runOutsideAngular(() => {
+            this.pendingTimer = setTimeout(() => {
+              this.ngZone.run(() => this.doRefresh());
+            }, TokenRefreshService.RETRY_DELAY_MS);
+          });
+          return;
+        }
+
+        this.retryCount = 0;
         this.tokenService.removeToken();
         this.loginService.logout().subscribe({ error: () => {} });
         this.router.navigate(['/login']);

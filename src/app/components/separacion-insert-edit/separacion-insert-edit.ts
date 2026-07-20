@@ -103,7 +103,8 @@ export class SeparacionInsertEdit implements OnInit {
   }
 
   cargarDatosMaestros() {
-    this.clienteService.listarClientes().subscribe(v => { this.clientes = v; this.clientesFiltrados = [...v]; });
+    this.clientes = [];
+    this.clientesFiltrados = [];
     this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; });
     this.programaService.listarProgramas().subscribe(v => { this.programas = v; this.programasFiltrados = [...v]; });
   }
@@ -124,12 +125,16 @@ export class SeparacionInsertEdit implements OnInit {
   abrirModalPrograma() { this.programaModal.abrirModal(); }
 
   filtrarClientes() {
-    const f = this.filtroCliente.toLowerCase();
-    this.clientesFiltrados = this.clientes.filter(c => 
-      (`${c.nombre} ${c.apellidos}`.toLowerCase().includes(f) || c.numDoc.includes(f)) &&
-      !this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente)
-    );
-    this.mostrarClientes = true;
+    const f = this.filtroCliente.trim();
+    if (f.length < 2) {
+      this.clientesFiltrados = [];
+      this.mostrarClientes = true;
+      return;
+    }
+    this.clienteService.buscarClientesPorFiltro(f, /^\d+$/.test(f) ? 'documento' : 'nombres').subscribe(data => {
+      this.clientesFiltrados = data.filter(c => !this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente));
+      this.mostrarClientes = true;
+    });
   }
 
   seleccionarCliente(c: Cliente) {

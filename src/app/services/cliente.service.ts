@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Cliente } from '../models/cliente.model';
+import { Page } from '../models/page.model';
 import { ConsultaDniDTO } from '../dto/consultadni.dto'; 
-import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -15,9 +16,15 @@ export class ClienteService {
 
   constructor(private http: HttpClient) { }
 
-  // 🔹 Listar todos los clientes
+  // 🔹 Listar todos los clientes (sin paginación - para dropdowns)
   listarClientes(): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(`${this.apiUrl}/listar`);
+  }
+
+  // 🔹 Listar clientes con paginación
+  listarClientesPaginado(page: number, size: number): Observable<Page<Cliente>> {
+    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    return this.http.get<Page<Cliente>>(`${this.apiUrl}/listar`, { params });
   }
 
   // ✅ Nuevo: Obtener cliente por ID para la edición

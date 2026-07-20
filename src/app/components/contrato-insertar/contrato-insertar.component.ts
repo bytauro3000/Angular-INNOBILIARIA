@@ -511,13 +511,11 @@ export class ContratoInsertarComponent implements OnInit {
 
   abrirListaClientes() {
     if (this.filtroCliente.trim().length < 2) {
-      this.clienteService.listarClientes().subscribe(data => {
-        this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
-        this.mostrarClientes = true;
-      });
-    } else {
-      this.filtrarClientes();
+      this.clientesFiltrados = [];
+      this.mostrarClientes = true;
+      return;
     }
+    this.filtrarClientes();
   }
 
   private generarObservacion(): string {
@@ -713,7 +711,7 @@ export class ContratoInsertarComponent implements OnInit {
   abrirModalLote() { this.loteModalContrato.abrirModal(); }
 
   recargarVendedores() { this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; }); }
-  RecargarClientes() { this.clienteService.listarClientes().subscribe(c => { this.clientes = c; }); }
+  RecargarClientes() { this.clienteService.listarClientesPaginado(0, 200).subscribe(p => { this.clientes = p.content; }); }
   RecargarProgramas() { this.programaService.listarProgramas().subscribe(p => { this.programas = p; this.programasFiltrados = [...p]; }); }
   RecargarLotes() {
     const id = this.contratoForm.get('idPrograma')?.value;
