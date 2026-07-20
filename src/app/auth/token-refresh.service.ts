@@ -1,5 +1,6 @@
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, filter, switchMap, take, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from './token.service';
 import { LoginService } from './login.service';
@@ -9,8 +10,10 @@ import { LoginService } from './login.service';
 })
 export class TokenRefreshService implements OnDestroy {
   private static readonly SAFETY_MARGIN_MS = 30_000;
+
   private pendingTimer: ReturnType<typeof setTimeout> | null = null;
   private isRefreshing = false;
+  private refreshSubject = new BehaviorSubject<string | null>(null);
 
   constructor(
     private tokenService: TokenService,
@@ -31,6 +34,34 @@ export class TokenRefreshService implements OnDestroy {
     this.stop();
   }
 
+  /** Refresca el token si es necesario, o se suscribe a uno en curso. */
+  refreshToken(): Observable<string> {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshSubject.next(null);
+      this.loginService.refreshToken().pipe(
+        tap({
+          next: (response) => {
+            this.isRefreshing = false;
+            this.tokenService.setToken(response.token);
+            this.refreshSubject.next(response.token);
+            this.scheduleNext();
+          },
+          error: () => {
+            this.isRefreshing = false;
+            this.refreshSubject.error(null);
+            this.refreshSubject = new BehaviorSubject<string | null>(null);
+          }
+        })
+      ).subscribe();
+    }
+
+    return this.refreshSubject.pipe(
+      filter(token => token !== null),
+      take(1)
+    );
+  }
+
   scheduleNext(): void {
     this.clearTimer();
 
@@ -49,52 +80,21 @@ export class TokenRefreshService implements OnDestroy {
     const delay = expMs - now - TokenRefreshService.SAFETY_MARGIN_MS;
 
     if (delay <= 0) {
-      this.doRefresh();
+      this.refreshToken().subscribe({ error: () => this.logout() });
       return;
     }
 
     this.ngZone.runOutsideAngular(() => {
       this.pendingTimer = setTimeout(() => {
-        this.ngZone.run(() => this.doRefresh());
+        this.ngZone.run(() => this.refreshToken().subscribe({ error: () => this.logout() }));
       }, delay);
     });
   }
 
-  private retryCount = 0;
-  private static readonly MAX_RETRIES = 2;
-  private static readonly RETRY_DELAY_MS = 15_000;
-
-  private doRefresh(): void {
-    if (this.isRefreshing) return;
-    this.isRefreshing = true;
-
-    this.loginService.refreshToken().subscribe({
-      next: (response) => {
-        this.isRefreshing = false;
-        this.retryCount = 0;
-        this.tokenService.setToken(response.token);
-        this.scheduleNext();
-      },
-      error: (err) => {
-        this.isRefreshing = false;
-        this.retryCount++;
-        console.error(`[TokenRefresh] Error (intento ${this.retryCount}):`, err);
-
-        if (this.retryCount < TokenRefreshService.MAX_RETRIES) {
-          this.ngZone.runOutsideAngular(() => {
-            this.pendingTimer = setTimeout(() => {
-              this.ngZone.run(() => this.doRefresh());
-            }, TokenRefreshService.RETRY_DELAY_MS);
-          });
-          return;
-        }
-
-        this.retryCount = 0;
-        this.tokenService.removeToken();
-        this.loginService.logout().subscribe({ error: () => {} });
-        this.router.navigate(['/login']);
-      }
-    });
+  private logout(): void {
+    this.tokenService.removeToken();
+    this.loginService.logout().subscribe({ error: () => {} });
+    this.router.navigate(['/login']);
   }
 
   private clearTimer(): void {
