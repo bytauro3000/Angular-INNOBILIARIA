@@ -74,8 +74,8 @@ export class AdminGestionUsuariosComponent implements OnInit {
           this.consultandoDni = false;
           if (data.success) {
             this.usuarioForm.patchValue({
-              nombres: data.full_name?.split(' ')[0] || data.first_name || '',
-              apellidos: (data.first_last_name || '') + ' ' + (data.second_last_name || '')
+            nombres: data.first_name || '',
+            apellidos: ((data.first_last_name || '') + ' ' + (data.second_last_name || '')).trim()
             });
             this.toastr.success('Datos obtenidos desde RENIEC.', 'DNI');
           } else {
