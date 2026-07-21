@@ -124,7 +124,10 @@ export class LoteService {
     );
   }
 
-  // Agrega este método dentro de tu clase LoteService
+  obtenerPrecioVenta(idLote: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/precio-venta/${idLote}`);
+  }
+
   validarLoteExistente(idPrograma: number, manzana: string, numeroLote: string): Observable<boolean> {
     const params = new HttpParams()
       .set('idPrograma', idPrograma.toString())

@@ -250,6 +250,30 @@
   letter-spacing: 0.08em;
   color: #fff;
   background: #1a2332;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manzana-resumen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+
+  .mz-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+
+    &.disp { background: #2ecc71; }
+    &.sep  { background: #f39c12; }
+    &.ven  { background: #e74c3c; }
+  }
 }
 
 .manzana-grid {
@@ -268,18 +292,66 @@
   min-height: 70px;
   border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
   user-select: none;
-}
+  transform: perspective(600px) rotateX(3deg);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease-out,
+              border-color 0.2s;
 
-.lote:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  // Brillo superior (luz 3D desde arriba)
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 45%);
+    pointer-events: none;
+  }
+
+  // Sombra inferior (profundidad 3D)
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 4px;
+    right: 4px;
+    height: 6px;
+    border-radius: 0 0 6px 6px;
+    background: rgba(0, 0, 0, 0.1);
+    filter: blur(3px);
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  &:hover {
+    transform: perspective(600px) rotateX(0deg) translateY(-5px);
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.16),
+      0 4px 8px rgba(0, 0, 0, 0.08);
+
+    &::after {
+      opacity: 0.6;
+      bottom: -6px;
+      height: 10px;
+    }
+  }
+
+  &:active {
+    transform: perspective(600px) rotateX(1deg) translateY(-2px);
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.14),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .lote.selected {
-  transform: translateY(-3px);
-  box-shadow: 0 0 0 3px #1a2332, 0 4px 14px rgba(0, 0, 0, 0.12);
+  transform: perspective(600px) rotateX(0deg) translateY(-5px);
+  box-shadow:
+    0 0 0 3px #1a2332,
+    0 12px 24px rgba(0, 0, 0, 0.16);
 }
 
 .lote.disponible {
@@ -299,13 +371,18 @@
   font-weight: 800;
   color: #fff;
   letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .lote-area {
   font-size: 0.7rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   margin-top: 2px;
+  position: relative;
+  z-index: 1;
 }
 
 .empty {
@@ -395,6 +472,91 @@
   font-size: 1.05rem;
 }
 
+// ── SIMULACIÓN DE CUOTAS ──
+.simulacion-divider {
+  height: 1px;
+  background: #eaeef4;
+  margin: 16px 0;
+}
+
+.simulacion-section {
+  margin-top: 4px;
+}
+
+.simulacion-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7a8a9e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.simulacion-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.simulacion-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #dde3ec;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a2332;
+  outline: none;
+  min-width: 0;
+
+  &:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.1);
+  }
+}
+
+.btn-pdf {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+
+  i { font-size: 0.9rem; }
+
+  &:hover:not(:disabled) {
+    background: #c0392b;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 .detalle-label {
   color: #7a8a9e;
   font-weight: 500;
@@ -424,6 +586,15 @@
 
   .lote {
     min-height: 56px;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &::before, &::after { display: none; }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
   }
 
   .lote-area { display: none; }

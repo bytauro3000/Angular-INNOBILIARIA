@@ -67,7 +67,14 @@
 
   <div class="grid-container" *ngIf="!cargando">
     <div class="manzana" *ngFor="let mz of manzanas">
-      <div class="manzana-header">Manzana {{ mz.manzana }}</div>
+      <div class="manzana-header">
+        <span>Manzana {{ mz.manzana }}</span>
+        <span class="manzana-resumen">
+          <span class="mz-dot disp"></span> {{ getResumenPorManzana(mz.lotes).disponibles }}
+          <span class="mz-dot sep"></span> {{ getResumenPorManzana(mz.lotes).separados }}
+          <span class="mz-dot ven"></span> {{ getResumenPorManzana(mz.lotes).vendidos }}
+        </span>
+      </div>
       <div class="manzana-grid">
         <div *ngFor="let lote of mz.lotes"
              class="lote"
@@ -86,6 +93,7 @@
     </div>
   </div>
 
+  <!-- Panel detalle -->
   <aside class="detalle-panel" *ngIf="loteSeleccionado">
     <div class="detalle-header">
       <h3>Lote {{ loteSeleccionado.manzana }} - {{ loteSeleccionado.numeroLote }}</h3>
@@ -95,7 +103,7 @@
     </div>
     <div class="detalle-body">
       <div class="detalle-estado" [class]="getEstadoColor(loteSeleccionado.estado)">
-        <i [class]="'bi ' + getEstadoIcon(loteSeleccionado.estado)"></i>
+        <i class="bi bi-circle-fill"></i>
         <span>{{ getEstadoLabel(loteSeleccionado.estado) }}</span>
       </div>
       <div class="detalle-row">
@@ -109,6 +117,23 @@
       <div class="detalle-row total">
         <span class="detalle-label">Precio Total</span>
         <span class="detalle-value">{{ getPrecioTotal(loteSeleccionado) }}</span>
+      </div>
+
+      <div class="simulacion-divider"></div>
+      <div class="simulacion-section">
+        <label class="simulacion-label">Proforma</label>
+        <div class="simulacion-input-row">
+          <input type="number" class="simulacion-input" placeholder="Inicial $" min="0"
+                 [(ngModel)]="inicialSimulacion">
+          <input type="number" class="simulacion-input" placeholder="N° letras" min="1"
+                 [(ngModel)]="cantidadLetrasSimulacion">
+          <button class="btn-pdf" (click)="descargarProforma()"
+                  [disabled]="generandoPdf || loteSeleccionado.estado !== 'Disponible'"
+                  [title]="loteSeleccionado.estado !== 'Disponible' ? 'Solo disponible para lotes disponibles' : 'Generar proforma'">
+            <i class="bi" [ngClass]="generandoPdf ? 'bi-arrow-repeat spin' : 'bi-file-earmark-pdf'"></i>
+            {{ generandoPdf ? 'Generando...' : 'Proforma' }}
+          </button>
+        </div>
       </div>
     </div>
   </aside>
