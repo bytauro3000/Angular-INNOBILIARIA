@@ -298,6 +298,238 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
 @keyframes pageEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes rowEnter  { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
 
+// ── DNI AUTO SEARCH ──
+.dni-wrapper {
+  position: relative;
+
+  .dark-input {
+    width: 100%;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+
+  .dni-input {
+    padding-right: 36px;
+    letter-spacing: 3px;
+    font-size: 0.95rem;
+  }
+
+  .dni-spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f766e;
+    font-size: 1rem;
+  }
+}
+
+// ── EMAIL + PIN BUTTON (pegados) ──
+.email-pin-group {
+  display: flex;
+  align-items: stretch;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #3a5a6a;
+  background: #1a3a4a;
+
+  .email-input {
+    border: none !important;
+    background: transparent !important;
+    flex: 1;
+    min-width: 0;
+    border-radius: 0 !important;
+
+    &.is-valid {
+      border-color: transparent !important;
+      background: transparent !important;
+    }
+  }
+
+  &:focus-within {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+  }
+}
+
+.btn-pin {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  flex-shrink: 0;
+
+  i { font-size: 0.8rem; }
+
+  &:hover:not(:disabled) { background: #27ae60; }
+  &:active:not(:disabled) { transform: scale(0.97); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.email-verified {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(46, 204, 113, 0.12);
+  color: #2ecc71;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  i { font-size: 1rem; }
+}
+
+// ── MODAL PIN ──
+.pin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.pin-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pin-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 0;
+  h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a2332;
+    i { color: #2ecc71; margin-right: 8px; }
+  }
+}
+
+.pin-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  &:hover { color: #1a2332; }
+}
+
+.pin-modal-body {
+  padding: 20px 24px 8px;
+  text-align: center;
+  p {
+    margin: 0 0 4px;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+}
+
+.pin-email {
+  font-weight: 700;
+  color: #1a2332 !important;
+  font-size: 1rem !important;
+  margin-bottom: 12px !important;
+}
+
+.pin-input-row {
+  margin-bottom: 12px;
+}
+
+.pin-input {
+  width: 200px;
+  padding: 14px 20px;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 12px;
+  text-align: center;
+  border: 2px solid #dde3ec;
+  border-radius: 12px;
+  outline: none;
+  font-family: 'Courier New', monospace;
+  color: #1a2332;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.12);
+  }
+}
+
+.btn-pin-verify {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 0;
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) { background: #27ae60; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.pin-modal-footer {
+  padding: 8px 24px 20px;
+  text-align: center;
+
+  .btn-cancelar {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #dde3ec;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: #f1f5f9;
+      color: #1a2332;
+    }
+  }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+// ── SELECT GUARD (captura clicks en selects deshabilitados) ──
+.select-guard {
+  position: relative;
+}
+
+select.dark-input:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
 /* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,

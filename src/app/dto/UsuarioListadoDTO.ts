@@ -4,8 +4,12 @@ export interface UsuarioListadoDTO {
   apellidos: string;
   correo: string;
   telefono: string;
-  dni: string;      
-  direccion: string; 
+  dni: string;
+  direccion: string;
   rol: string;
   estado: string;
+  idDistrito?: number;
+  distritoNombre?: string;
+  provincia?: string;
+  departamento?: string;
 }

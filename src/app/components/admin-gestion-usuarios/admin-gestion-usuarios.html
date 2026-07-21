@@ -105,26 +105,115 @@
     <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" autocomplete="off">
       <div class="modal-body">
 
+        <!-- Fila 1: DNI | Nombres | Apellidos -->
         <div class="row mb-3">
-          <div class="col-md-6 form-group">
+          <div class="col-md-3 form-group">
+            <label>DNI</label>
+            <div class="dni-wrapper">
+              <input type="text" class="form-control dark-input dni-input" formControlName="dni" maxlength="8"
+                     (input)="onDniInput()" placeholder="8 dígitos">
+              <div *ngIf="consultandoDni" class="dni-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+            </div>
+          </div>
+          <div class="col-md-4 form-group">
             <label>NOMBRES</label>
             <input type="text" class="form-control dark-input" formControlName="nombres">
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-5 form-group">
             <label>APELLIDOS</label>
             <input type="text" class="form-control dark-input" formControlName="apellidos">
           </div>
         </div>
 
+        <!-- Fila 2: Dirección -->
         <div class="row mb-3">
-          <div class="col-md-6 form-group">
-            <label>CORREO ELECTRÓNICO</label>
-            <input type="email" class="form-control dark-input" formControlName="correo" autocomplete="off">
+          <div class="col-md-12 form-group">
+            <label>DIRECCIÓN</label>
+            <input type="text" class="form-control dark-input" formControlName="direccion">
           </div>
+        </div>
 
-          <!-- REGISTRAR: Contraseña + Confirmar -->
-          <ng-container *ngIf="modoAccion === 'registrar'">
-            <div class="col-md-3 form-group">
+        <!-- Fila 3: Departamento | Provincia | Distrito -->
+        <div class="row mb-3">
+          <div class="col-md-4 form-group">
+            <label>DEPARTAMENTO</label>
+            <select class="form-control dark-input" [(ngModel)]="departamentoSel" [ngModelOptions]="{standalone: true}"
+                    (change)="onDepartamentoChange()" [disabled]="modoAccion === 'ver'">
+              <option value="" disabled>Seleccionar</option>
+              <option *ngFor="let d of departamentos" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+          <div class="col-md-4 form-group">
+            <label>PROVINCIA</label>
+            <div class="select-guard" (click)="onProvinciaClick()">
+              <select class="form-control dark-input select-provincia" [(ngModel)]="provinciaSel" [ngModelOptions]="{standalone: true}"
+                      (change)="onProvinciaChange()" [disabled]="!departamentoSel || modoAccion === 'ver'">
+                <option value="" disabled>Seleccionar</option>
+                <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4 form-group">
+            <label>DISTRITO</label>
+            <div class="select-guard" (click)="onDistritoClick()">
+              <select class="form-control dark-input select-distrito" formControlName="idDistrito">
+                <option [ngValue]="null" disabled>Seleccionar</option>
+                <option *ngFor="let d of distritos" [ngValue]="d.idDistrito">{{ d.nombre }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 4: Celular | Rol | Correo -->
+        <div class="row mb-3">
+          <div class="col-md-3 form-group">
+            <label>CELULAR</label>
+            <input type="text" class="form-control dark-input" formControlName="celular">
+          </div>
+          <div class="col-md-4 form-group">
+            <label>ROL DEL USUARIO</label>
+            <select class="form-control dark-input" formControlName="idRol">
+              <option *ngFor="let rol of roles" [ngValue]="rol.idRolUsuario">
+                {{ rol.rolUsuario }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-5 form-group">
+            <label>CORREO ELECTRÓNICO</label>
+            <div class="email-pin-group">
+              <input type="email" class="form-control dark-input email-input" formControlName="correo" autocomplete="off"
+                     placeholder="correo@ejemplo.com"
+                     [class.is-valid]="emailVerificado"
+                     [readonly]="emailVerificado || modoAccion === 'ver'"
+                     (input)="emailVerificado = false; pinEnviado = false">
+              <button type="button" class="btn-pin"
+                      *ngIf="modoAccion === 'registrar' && !emailVerificado"
+                      (click)="enviarPin()" [disabled]="enviandoPin || !usuarioForm.get('correo')?.valid">
+                <i class="fas" [ngClass]="enviandoPin ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+                {{ enviandoPin ? 'Enviando...' : 'Enviar PIN' }}
+              </button>
+              <span class="verified-badge email-verified" *ngIf="emailVerificado">
+                <i class="fas fa-check-circle"></i> Verificado
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado (solo editar/ver) -->
+        <div class="row mb-3" *ngIf="modoAccion !== 'registrar'">
+          <div class="col-md-6 form-group">
+            <label>ESTADO</label>
+            <select class="form-control dark-input" formControlName="estado">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contraseñas (registrar) -->
+        <ng-container *ngIf="modoAccion === 'registrar'">
+          <div class="row mb-3">
+            <div class="col-md-6 form-group">
               <label>CONTRASEÑA</label>
               <div class="password-wrapper">
                 <input [type]="mostrarContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="contrasena" autocomplete="new-password">
@@ -133,7 +222,7 @@
                 </button>
               </div>
             </div>
-            <div class="col-md-3 form-group">
+            <div class="col-md-6 form-group">
               <label>CONFIRMAR CONTRASEÑA</label>
               <div class="password-wrapper">
                 <input [type]="mostrarConfirmarContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarContrasena" autocomplete="new-password"
@@ -144,80 +233,34 @@
               </div>
               <small class="text-danger" *ngIf="contrasenasNoCoinciden">Las contraseñas no coinciden</small>
             </div>
-          </ng-container>
+          </div>
+        </ng-container>
 
-          <!-- EDITAR: Contraseña actual + Nueva + Confirmar nueva -->
-          <ng-container *ngIf="modoAccion === 'editar'">
+        <!-- Contraseñas (editar) -->
+        <ng-container *ngIf="modoAccion === 'editar'">
+          <div class="row mb-3">
             <div class="col-md-6 form-group">
-              <label>CONTRASEÑA ACTUAL</label>
+              <label>NUEVA CONTRASEÑA <span class="label-hint">(Dejar en blanco para no cambiar)</span></label>
               <div class="password-wrapper">
-                <input [type]="mostrarContrasenaActual ? 'text' : 'password'" class="form-control dark-input" formControlName="contrasenaActual" autocomplete="current-password">
-                <button type="button" class="password-toggle" (click)="mostrarContrasenaActual = !mostrarContrasenaActual" tabindex="-1">
-                  <i class="fas" [ngClass]="mostrarContrasenaActual ? 'fa-eye-slash' : 'fa-eye'"></i>
+                <input [type]="mostrarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="nuevaContrasena" autocomplete="new-password">
+                <button type="button" class="password-toggle" (click)="mostrarNuevaContrasena = !mostrarNuevaContrasena" tabindex="-1">
+                  <i class="fas" [ngClass]="mostrarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
                 </button>
               </div>
             </div>
-          </ng-container>
-        </div>
-
-        <!-- EDITAR: Nueva contraseña + Confirmar (segunda fila) -->
-        <div class="row mb-3" *ngIf="modoAccion === 'editar'">
-          <div class="col-md-6 form-group">
-            <label>NUEVA CONTRASEÑA
-              <span class="label-hint">(Dejar en blanco para no cambiar)</span>
-            </label>
-            <div class="password-wrapper">
-              <input [type]="mostrarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="nuevaContrasena" autocomplete="new-password">
-              <button type="button" class="password-toggle" (click)="mostrarNuevaContrasena = !mostrarNuevaContrasena" tabindex="-1">
-                <i class="fas" [ngClass]="mostrarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
-              </button>
+            <div class="col-md-6 form-group">
+              <label>CONFIRMAR NUEVA CONTRASEÑA</label>
+              <div class="password-wrapper">
+                <input [type]="mostrarConfirmarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarNuevaContrasena" autocomplete="new-password"
+                       [ngClass]="{'is-invalid': nuevasContrasenasNoCoinciden}">
+                <button type="button" class="password-toggle" (click)="mostrarConfirmarNuevaContrasena = !mostrarConfirmarNuevaContrasena" tabindex="-1">
+                  <i class="fas" [ngClass]="mostrarConfirmarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+              <small class="text-danger" *ngIf="nuevasContrasenasNoCoinciden">Las contraseñas no coinciden</small>
             </div>
           </div>
-          <div class="col-md-6 form-group">
-            <label>CONFIRMAR NUEVA CONTRASEÑA</label>
-            <div class="password-wrapper">
-              <input [type]="mostrarConfirmarNuevaContrasena ? 'text' : 'password'" class="form-control dark-input" formControlName="confirmarNuevaContrasena" autocomplete="new-password"
-                     [ngClass]="{'is-invalid': nuevasContrasenasNoCoinciden}">
-              <button type="button" class="password-toggle" (click)="mostrarConfirmarNuevaContrasena = !mostrarConfirmarNuevaContrasena" tabindex="-1">
-                <i class="fas" [ngClass]="mostrarConfirmarNuevaContrasena ? 'fa-eye-slash' : 'fa-eye'"></i>
-              </button>
-            </div>
-            <small class="text-danger" *ngIf="nuevasContrasenasNoCoinciden">Las contraseñas no coinciden</small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-4 form-group">
-            <label>DNI</label>
-            <input type="text" class="form-control dark-input" formControlName="dni">
-          </div>
-          <div class="col-md-4 form-group">
-            <label>TELÉFONO</label>
-            <input type="text" class="form-control dark-input" formControlName="telefono">
-          </div>
-          <div class="col-md-4 form-group">
-            <label>DIRECCIÓN</label>
-            <input type="text" class="form-control dark-input" formControlName="direccion">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 form-group">
-            <label>ROL DEL USUARIO</label>
-            <select class="form-control dark-input" formControlName="idRol">
-              <option *ngFor="let rol of roles" [ngValue]="rol.idRolUsuario">
-                {{ rol.rolUsuario }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-6 form-group">
-            <label>ESTADO</label>
-            <select class="form-control dark-input" formControlName="estado">
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-        </div>
+        </ng-container>
 
       </div>
       <div class="modal-footer" *ngIf="modoAccion !== 'ver'">
@@ -228,5 +271,36 @@
         <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal PIN -->
+<div class="pin-modal-overlay" *ngIf="mostrarModalPin">
+  <div class="pin-modal">
+    <div class="pin-modal-header">
+      <h4><i class="fas fa-shield-alt"></i> Verificar Correo</h4>
+      <button type="button" class="pin-close" (click)="cerrarModalPin()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="pin-modal-body">
+      <p>Ingresa el código de 6 dígitos enviado a:</p>
+      <p class="pin-email">{{ usuarioForm.get('correo')?.value }}</p>
+      <div class="pin-input-row">
+        <input type="text" class="pin-input" placeholder="000000"
+               [(ngModel)]="pinInput" [ngModelOptions]="{standalone: true}"
+               maxlength="6" inputmode="numeric"
+               (keyup.enter)="verificarPin()"
+               autofocus>
+      </div>
+      <button type="button" class="btn-pin-verify" (click)="verificarPin()"
+              [disabled]="verificandoPin || pinInput.length < 4">
+        <i class="fas" [ngClass]="verificandoPin ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+        {{ verificandoPin ? 'Verificando...' : 'Verificar Código' }}
+      </button>
+    </div>
+    <div class="pin-modal-footer">
+      <button type="button" class="btn-cancelar" (click)="cerrarModalPin()">Cancelar</button>
+    </div>
   </div>
 </div>

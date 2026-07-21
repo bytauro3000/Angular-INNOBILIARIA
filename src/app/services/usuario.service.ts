@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UsuarioRegistroDTO} from '../dto/UsuarioRegistroDTO';
 import { UsuarioListadoDTO } from '../dto/UsuarioListadoDTO';
 import { RolUsuario } from '../models/rolusuario.model';
-import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
+import { Distrito } from '../models/distrito.model';
+import { ConsultaDniDTO } from '../dto/consultadni.dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +39,31 @@ export class UsuarioService {
 
   listarRoles(): Observable<RolUsuario[]> {
     return this.http.get<RolUsuario[]>(`${this.apiUrl}/roles`);
+  }
+
+  enviarPinVerificacion(correo: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/enviar-pin`, { correo });
+  }
+
+  verificarPin(correo: string, pin: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verificar-pin`, { correo, pin });
+  }
+
+  consultarDni(dni: string): Observable<ConsultaDniDTO> {
+    return this.http.get<ConsultaDniDTO>(`${this.apiUrl}/consultar-dni/${dni}`);
+  }
+
+  listarDepartamentos(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/departamentos`);
+  }
+
+  listarProvincias(departamento: string): Observable<string[]> {
+    const params = new HttpParams().set('departamento', departamento);
+    return this.http.get<string[]>(`${this.apiUrl}/provincias`, { params });
+  }
+
+  listarDistritos(departamento: string, provincia: string): Observable<Distrito[]> {
+    const params = new HttpParams().set('departamento', departamento).set('provincia', provincia);
+    return this.http.get<Distrito[]>(`${this.apiUrl}/distritos`, { params });
   }
 }

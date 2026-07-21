@@ -3,9 +3,10 @@ export interface UsuarioRegistroDTO {
   apellidos: string;
   correo: string;
   contrasena: string;
-  telefono: string;
-  direccion: string;
-  dni: string;
-  idRol: number; // 1: Secretaria, 2: Soporte, 3: Administrador
-  estado: string; // 'activo' o 'inactivo'
+  telefono?: string;
+  direccion?: string;
+  dni?: string;
+  idRol: number;
+  estado?: string;
+  idDistrito?: number | null;
 }
