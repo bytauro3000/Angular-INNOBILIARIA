@@ -205,9 +205,9 @@
           <div class="col-md-6 form-group">
             <label>ROL DEL USUARIO</label>
             <select class="form-control dark-input" formControlName="idRol">
-              <option [ngValue]="1">Secretaria</option>
-              <option [ngValue]="2">Soporte</option>
-              <option [ngValue]="3">Administrador</option>
+              <option *ngFor="let rol of roles" [ngValue]="rol.idRolUsuario">
+                {{ rol.rolUsuario }}
+              </option>
             </select>
           </div>
           <div class="col-md-6 form-group">

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UsuarioRegistroDTO} from '../dto/UsuarioRegistroDTO';
 import { UsuarioListadoDTO } from '../dto/UsuarioListadoDTO';
+import { RolUsuario } from '../models/rolusuario.model';
 import { environment } from '../../environments/environment'; // Importamos el environment para usar la URL base
 
 @Injectable({
@@ -32,5 +33,9 @@ export class UsuarioService {
   // Enviamos un cuerpo vacío {} porque el ID ya va en la URL
   cambiarEstado(id: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/cambiar-estado/${id}`, {});
+  }
+
+  listarRoles(): Observable<RolUsuario[]> {
+    return this.http.get<RolUsuario[]>(`${this.apiUrl}/roles`);
   }
 }

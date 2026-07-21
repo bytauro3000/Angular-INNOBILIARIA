@@ -83,6 +83,9 @@ export class LoginComponent implements OnInit {
           case 'ROLE_ADMINISTRADOR':
             this.router.navigate(['/admin-menu']);
             break;
+          case 'ROLE_VENDEDOR':
+            this.router.navigate(['/vendedor-menu']);
+            break;
           default:
             this.router.navigate(['/']);
         }

@@ -55,6 +55,9 @@ function redirectSegunRol(rol: string, router: Router): void {
     case 'ROLE_SOPORTE':
       router.navigate(['/soporte-menu']);
       break;
+    case 'ROLE_VENDEDOR':
+      router.navigate(['/vendedor-menu']);
+      break;
     default:
       router.navigate(['/login']);
   }

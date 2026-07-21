@@ -11,6 +11,8 @@ import { MensajeriaComponent } from './components/mensajeria/mensajeria.componen
 import { SecretariaMenuComponent } from './components/menu-secretaria/secretaria-menu.component';
 import { SoporteMenuComponent } from './components/menu-soporte/soporte-menu.component';
 import { AdminMenuComponent } from './components/menu-admin/admin-menu.component';
+import { VendedorMenuComponent } from './components/menu-vendedor/vendedor-menu.component';
+import { VendedorPanelLotesComponent } from './components/vendedor-panel-lotes/vendedor-panel-lotes.component';
 
 // Importa los dashboards para los menús
 import { SecretariaDashboard } from './components/secretaria-dashboard/secretaria-dashboard';
@@ -156,6 +158,17 @@ export const routes: Routes = [
       { path: 'anulaciones/moras',          component: AdminAnulacionesMorasComponent },
       { path: 'anulaciones/iniciales',      component: AdminAnulacionesInicialesComponent },
       { path: 'anulaciones/inscripciones',  component: AdminAnulacionesInscripcionesComponent }
+    ]
+  },
+
+  // ── Vendedor ──────────────────────────────────────────────────────────────
+  {
+    path: 'vendedor-menu',
+    component: VendedorMenuComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ROLE_VENDEDOR'] },
+    children: [
+      { path: '', component: VendedorPanelLotesComponent }
     ]
   }
 ];

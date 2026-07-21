@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../../services/usuario.service';
 import { UsuarioListadoDTO } from '../../dto/UsuarioListadoDTO';
 import { UsuarioRegistroDTO } from '../../dto/UsuarioRegistroDTO';
+import { RolUsuario } from '../../models/rolusuario.model';
 
 @Component({
   selector: 'app-admin-gestion-usuarios',
@@ -16,6 +17,7 @@ export class AdminGestionUsuariosComponent implements OnInit {
 
   usuarios: UsuarioListadoDTO[] = [];
   usuariosFiltrados: UsuarioListadoDTO[] = [];
+  roles: RolUsuario[] = [];
   cargando = false;
 
   usuarioForm!: FormGroup;
@@ -41,6 +43,7 @@ export class AdminGestionUsuariosComponent implements OnInit {
   ngOnInit(): void {
     this.inicializarFormulario();
     this.cargarUsuarios();
+    this.cargarRoles();
   }
 
   private confirmarContrasenaValidator(form: AbstractControl): ValidationErrors | null {
@@ -94,6 +97,13 @@ export class AdminGestionUsuariosComponent implements OnInit {
         this.mostrarNotificacion('Error al cargar usuarios', 'error');
         this.cargando = false;
       }
+    });
+  }
+
+  cargarRoles(): void {
+    this.usuarioService.listarRoles().subscribe({
+      next: (data) => { this.roles = data; },
+      error: () => { console.error('Error al cargar roles'); }
     });
   }
 
@@ -206,10 +216,8 @@ export class AdminGestionUsuariosComponent implements OnInit {
   cerrarModal(): void { this.mostrarModal = false; }
 
   llenarFormulario(usuario: UsuarioListadoDTO): void {
-    let idRolSelect = 3;
-    if (usuario.rol === 'Secretaria')    idRolSelect = 1;
-    if (usuario.rol === 'Soporte')       idRolSelect = 2;
-    if (usuario.rol === 'Administrador') idRolSelect = 3;
+    const rolEncontrado = this.roles.find(r => r.rolUsuario === usuario.rol);
+    const idRolSelect = rolEncontrado ? rolEncontrado.idRolUsuario : null;
 
     this.usuarioForm.patchValue({
       nombres:   usuario.nombres,

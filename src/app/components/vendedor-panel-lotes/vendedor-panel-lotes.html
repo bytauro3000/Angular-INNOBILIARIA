@@ -1,0 +1,115 @@
+<div class="panel-lotes">
+  <header class="panel-header">
+    <div class="panel-header-left">
+      <h1 class="panel-title">Panel de Lotes</h1>
+      <p class="panel-subtitle">Estado de disponibilidad en tiempo real</p>
+    </div>
+    <button class="btn-plano" (click)="togglePlano()">
+      <i class="bi bi-image"></i>
+      <span>{{ mostrarPlano ? 'Ocultar plano' : 'Ver plano original' }}</span>
+    </button>
+  </header>
+
+  <div class="panel-controls">
+    <div class="programa-selector">
+      <label for="programa">Programa</label>
+      <select id="programa" [(ngModel)]="programaSeleccionado" (change)="onProgramaChange()">
+        <option *ngFor="let p of programas" [value]="p.idPrograma">{{ p.nombrePrograma }}</option>
+      </select>
+    </div>
+
+    <div class="resumen" *ngIf="manzanas.length > 0">
+      <div class="resumen-item disponible">
+        <span class="resumen-dot"></span>
+        <span class="resumen-count">{{ getResumen().disponibles }}</span>
+        <span class="resumen-label">Disponibles</span>
+      </div>
+      <div class="resumen-item separado">
+        <span class="resumen-dot"></span>
+        <span class="resumen-count">{{ getResumen().separados }}</span>
+        <span class="resumen-label">Separados</span>
+      </div>
+      <div class="resumen-item vendido">
+        <span class="resumen-dot"></span>
+        <span class="resumen-count">{{ getResumen().vendidos }}</span>
+        <span class="resumen-label">Vendidos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="leyenda">
+    <div class="leyenda-item">
+      <span class="leyenda-swatch disponible"></span> Disponible
+    </div>
+    <div class="leyenda-item">
+      <span class="leyenda-swatch separado"></span> Separado
+    </div>
+    <div class="leyenda-item">
+      <span class="leyenda-swatch vendido"></span> Vendido
+    </div>
+  </div>
+
+  <div class="plano-referencia" *ngIf="mostrarPlano">
+    <div class="plano-container">
+      <img src="assets/planos/plano-la-florida.jpg" alt="Plano original" class="plano-img"
+           (error)="planoError = true" />
+      <div class="plano-fallback" *ngIf="planoError">
+        <i class="bi bi-image"></i>
+        <p>Coloca la imagen del plano en<br><code>src/assets/planos/plano-la-florida.jpg</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="cargando">
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+    <p>Cargando lotes...</p>
+  </div>
+
+  <div class="grid-container" *ngIf="!cargando">
+    <div class="manzana" *ngFor="let mz of manzanas">
+      <div class="manzana-header">Manzana {{ mz.manzana }}</div>
+      <div class="manzana-grid">
+        <div *ngFor="let lote of mz.lotes"
+             class="lote"
+             [class]="getEstadoColor(lote.estado)"
+             [class.selected]="loteSeleccionado?.idLote === lote.idLote"
+             (click)="seleccionarLote(lote)">
+          <span class="lote-numero">{{ lote.numeroLote }}</span>
+          <span class="lote-area">{{ lote.area }}m²</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty" *ngIf="manzanas.length === 0">
+      <i class="bi bi-inbox"></i>
+      <p>No hay lotes registrados para este programa.</p>
+    </div>
+  </div>
+
+  <aside class="detalle-panel" *ngIf="loteSeleccionado">
+    <div class="detalle-header">
+      <h3>Lote {{ loteSeleccionado.manzana }} - {{ loteSeleccionado.numeroLote }}</h3>
+      <button class="detalle-close" (click)="loteSeleccionado = null">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <div class="detalle-body">
+      <div class="detalle-estado" [class]="getEstadoColor(loteSeleccionado.estado)">
+        <i [class]="'bi ' + getEstadoIcon(loteSeleccionado.estado)"></i>
+        <span>{{ getEstadoLabel(loteSeleccionado.estado) }}</span>
+      </div>
+      <div class="detalle-row">
+        <span class="detalle-label">Área</span>
+        <span class="detalle-value">{{ loteSeleccionado.area }} m²</span>
+      </div>
+      <div class="detalle-row" *ngIf="loteSeleccionado.precioM2">
+        <span class="detalle-label">Precio m²</span>
+        <span class="detalle-value">${{ loteSeleccionado.precioM2 }}</span>
+      </div>
+      <div class="detalle-row total">
+        <span class="detalle-label">Precio Total</span>
+        <span class="detalle-value">{{ getPrecioTotal(loteSeleccionado) }}</span>
+      </div>
+    </div>
+  </aside>
+</div>

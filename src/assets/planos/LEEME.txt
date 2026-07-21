@@ -1,0 +1,4 @@
+Coloca aquí la imagen del plano físico con el nombre:
+  plano-la-florida.jpg
+
+Esta imagen se mostrará cuando el vendedor haga clic en "Ver plano original".
