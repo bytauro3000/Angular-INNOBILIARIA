@@ -106,35 +106,71 @@
         <i class="bi bi-circle-fill"></i>
         <span>{{ getEstadoLabel(loteSeleccionado.estado) }}</span>
       </div>
-      <div class="detalle-row">
-        <span class="detalle-label">Área</span>
-        <span class="detalle-value">{{ loteSeleccionado.area }} m²</span>
-      </div>
-      <div class="detalle-row" *ngIf="loteSeleccionado.precioM2">
-        <span class="detalle-label">Precio m²</span>
-        <span class="detalle-value">${{ loteSeleccionado.precioM2 }}</span>
-      </div>
-      <div class="detalle-row total">
-        <span class="detalle-label">Precio Total</span>
-        <span class="detalle-value">{{ getPrecioTotal(loteSeleccionado) }}</span>
-      </div>
 
-      <div class="simulacion-divider"></div>
-      <div class="simulacion-section">
-        <label class="simulacion-label">Proforma</label>
-        <div class="simulacion-input-row">
-          <input type="number" class="simulacion-input" placeholder="Inicial $" min="0"
-                 [(ngModel)]="inicialSimulacion">
-          <input type="number" class="simulacion-input" placeholder="N° letras" min="1"
-                 [(ngModel)]="cantidadLetrasSimulacion">
-          <button class="btn-pdf" (click)="descargarProforma()"
-                  [disabled]="generandoPdf || loteSeleccionado.estado !== 'Disponible'"
-                  [title]="loteSeleccionado.estado !== 'Disponible' ? 'Solo disponible para lotes disponibles' : 'Generar proforma'">
-            <i class="bi" [ngClass]="generandoPdf ? 'bi-arrow-repeat spin' : 'bi-file-earmark-pdf'"></i>
-            {{ generandoPdf ? 'Generando...' : 'Proforma' }}
-          </button>
+      <!-- VENDIDO: mostrar compradores y detalle del contrato -->
+      <ng-container *ngIf="loteSeleccionado.estado === 'Vendido' && detalleVenta">
+        <div class="detalle-row">
+          <span class="detalle-label">Comprador(es)</span>
+          <span class="detalle-value detalle-clientes">
+            <span *ngFor="let cl of detalleVenta.clientes; let i = index">
+              {{ cl }}<br *ngIf="i < detalleVenta.clientes.length - 1">
+            </span>
+          </span>
         </div>
-      </div>
+        <div class="detalle-row">
+          <span class="detalle-label">Área</span>
+          <span class="detalle-value">{{ loteSeleccionado.area }} m²</span>
+        </div>
+        <div class="detalle-row">
+          <span class="detalle-label">Precio venta</span>
+          <span class="detalle-value">$ {{ detalleVenta.montoTotal?.toLocaleString('en-US') }}</span>
+        </div>
+        <div class="detalle-row" *ngIf="detalleVenta.cantidadLetras">
+          <span class="detalle-label">Cuotas</span>
+          <span class="detalle-value">{{ detalleVenta.cantidadLetras }} letras</span>
+        </div>
+        <div class="detalle-row" *ngIf="detalleVenta.lotes && detalleVenta.lotes.length > 1">
+          <span class="detalle-label">Lotes del contrato</span>
+          <span class="detalle-value detalle-clientes">
+            <span *ngFor="let lt of detalleVenta.lotes; let i = index">
+              {{ lt }}<br *ngIf="i < detalleVenta.lotes.length - 1">
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
+      <!-- DISPONIBLE / SEPARADO: información normal + proforma -->
+      <ng-container *ngIf="loteSeleccionado.estado !== 'Vendido'">
+        <div class="detalle-row">
+          <span class="detalle-label">Área</span>
+          <span class="detalle-value">{{ loteSeleccionado.area }} m²</span>
+        </div>
+        <div class="detalle-row" *ngIf="loteSeleccionado.precioM2">
+          <span class="detalle-label">Precio m²</span>
+          <span class="detalle-value">${{ loteSeleccionado.precioM2 }}</span>
+        </div>
+        <div class="detalle-row total">
+          <span class="detalle-label">Precio Total</span>
+          <span class="detalle-value">{{ getPrecioTotal(loteSeleccionado) }}</span>
+        </div>
+
+        <div class="simulacion-divider"></div>
+        <div class="simulacion-section">
+          <label class="simulacion-label">Proforma</label>
+          <div class="simulacion-input-row">
+            <input type="number" class="simulacion-input" placeholder="Inicial $" min="0"
+                   [(ngModel)]="inicialSimulacion">
+            <input type="number" class="simulacion-input" placeholder="N° letras" min="1"
+                   [(ngModel)]="cantidadLetrasSimulacion">
+            <button class="btn-pdf" (click)="descargarProforma()"
+                    [disabled]="generandoPdf || loteSeleccionado.estado !== 'Disponible'"
+                    [title]="loteSeleccionado.estado !== 'Disponible' ? 'Solo disponible para lotes disponibles' : 'Generar proforma'">
+              <i class="bi" [ngClass]="generandoPdf ? 'bi-arrow-repeat spin' : 'bi-file-earmark-pdf'"></i>
+              {{ generandoPdf ? 'Generando...' : 'Proforma' }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </aside>
 </div>

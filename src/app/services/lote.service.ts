@@ -128,6 +128,10 @@ export class LoteService {
     return this.http.get<number>(`${this.apiUrl}/precio-venta/${idLote}`);
   }
 
+  obtenerDetalleVenta(idLote: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/detalle-venta/${idLote}`);
+  }
+
   validarLoteExistente(idPrograma: number, manzana: string, numeroLote: string): Observable<boolean> {
     const params = new HttpParams()
       .set('idPrograma', idPrograma.toString())

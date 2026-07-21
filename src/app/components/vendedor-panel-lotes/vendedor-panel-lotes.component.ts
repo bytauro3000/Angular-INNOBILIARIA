@@ -44,6 +44,7 @@ export class VendedorPanelLotesComponent implements OnInit {
   inicialSimulacion: number | null = null;
   generandoPdf = false;
   precioVentaReal: number | null = null;
+  detalleVenta: any = null;
 
   cargando = false;
   mostrarPlano = false;
@@ -69,8 +70,9 @@ export class VendedorPanelLotesComponent implements OnInit {
       next: (data) => {
         this.programas = data;
         if (data.length > 0) {
-          this.programaSeleccionado = data[0].idPrograma!;
-          this.programaNombre = data[0].nombrePrograma;
+          const defaultProg = data.find(p => p.idPrograma === 4);
+          this.programaSeleccionado = defaultProg?.idPrograma || data[0].idPrograma!;
+          this.programaNombre = defaultProg?.nombrePrograma || data[0].nombrePrograma;
           this.cargarLotes();
         }
       },
@@ -137,9 +139,13 @@ export class VendedorPanelLotesComponent implements OnInit {
     this.cantidadLetrasSimulacion = null;
     this.inicialSimulacion = null;
     this.precioVentaReal = null;
+    this.detalleVenta = null;
     if (lote.estado === EstadoLote.Vendido && lote.idLote) {
-      this.loteService.obtenerPrecioVenta(lote.idLote).subscribe({
-        next: (precio) => { this.precioVentaReal = precio; },
+      this.loteService.obtenerDetalleVenta(lote.idLote).subscribe({
+        next: (detalle) => {
+          this.detalleVenta = detalle;
+          this.precioVentaReal = detalle.montoTotal;
+        },
         error: () => {}
       });
     }
