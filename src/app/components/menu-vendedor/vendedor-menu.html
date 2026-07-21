@@ -1,34 +1,89 @@
-<div class="vendedor-layout">
-  <aside class="vendedor-sidebar">
-    <div class="vendedor-brand">
-      <img src="img/logo.png" alt="Logo" class="vendedor-logo">
-      <span class="vendedor-brand-name">Inmobiliaria Ivan</span>
-    </div>
+<div class="vendedor-layout" [class.colapsado]="sidebarColapsado && !isMobile" [class.mobile-open]="mobileAbierto">
 
-    <div class="vendedor-user">
-      <div class="vendedor-user-avatar">{{ usuarioLogueado?.nombre?.charAt(0) || '?' }}</div>
-      <div class="vendedor-user-info">
-        <span class="vendedor-user-name">{{ usuarioLogueado?.nombre }}</span>
-        <span class="vendedor-user-role">Vendedor</span>
+  <!-- Botón hamburguesa flotante (solo móvil) -->
+  <button
+    type="button"
+    class="mobile-toggle"
+    *ngIf="isMobile"
+    (click)="toggleSidebar()"
+    [class.is-open]="mobileAbierto"
+    aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay para móvil -->
+  <div class="sidebar-overlay" *ngIf="isMobile && mobileAbierto" (click)="cerrarSidebarMovil()"></div>
+
+  <aside class="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="header-logo" *ngIf="!sidebarColapsado">
+        <div class="logo-icon">
+          <i class="fas fa-home"></i>
+        </div>
+        <div class="header-text">
+          <h3>Panel Vendedor</h3>
+          <span class="header-subtitle">Inmobiliaria Ivan</span>
+        </div>
       </div>
+
+      <div class="header-collapsed" *ngIf="sidebarColapsado">
+        <div class="logo-icon logo-icon--sm">
+          <i class="fas fa-home"></i>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="toggle-btn"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarColapsado ? 'Expandir menú' : 'Colapsar menú'"
+        [title]="sidebarColapsado ? 'Expandir menú' : 'Colapsar menú'">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
 
-    <nav class="vendedor-nav">
-      <a [routerLink]="['/vendedor-menu/']" routerLinkActive="active">
-        <i class="bi bi-grid-3x3-gap-fill"></i>
-        <span>Panel de Lotes</span>
-      </a>
+    <!-- Navegación -->
+    <nav class="nav-menu" aria-label="Menú principal">
+      <ul>
+        <li class="nav-item">
+          <a
+            routerLink="/vendedor-menu/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}"
+            [attr.data-tooltip]="'Panel de Lotes'"
+            (click)="cerrarSidebarMovil()">
+            <span class="nav-icon"><i class="fas fa-th"></i></span>
+            <span class="nav-label">Panel de Lotes</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+      </ul>
     </nav>
 
-    <div class="vendedor-nav-footer">
-      <a (click)="onLogout()" class="vendedor-logout">
-        <i class="bi bi-box-arrow-right"></i>
-        <span>Cerrar Sesión</span>
-      </a>
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ usuarioLogueado?.nombre || 'Vendedor' }}</span>
+          <span class="user-role">Vendedor</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn-logout"
+        (click)="cerrarSesion()"
+        data-tooltip="Cerrar Sesión">
+        <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+        <span class="nav-label">Cerrar Sesión</span>
+      </button>
     </div>
   </aside>
 
-  <main class="vendedor-content">
+  <main class="main-content">
     <router-outlet></router-outlet>
   </main>
 </div>

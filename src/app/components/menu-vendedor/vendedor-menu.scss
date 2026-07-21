@@ -1,151 +1,537 @@
+$collapsed-w:  64px;
+$expanded-w:   272px;
+
+// ── Paleta Verde Bosque + Cobre (lotes / inmobiliario) ──
+$forest-deep:     #0f1f18;
+$forest-mid:      #152b20;
+$forest-light:    #1a3729;
+$emerald:         #2ecc71;
+$emerald-light:   #58d68d;
+$emerald-glow:    rgba(46, 204, 113, 0.3);
+$emerald-subtle:  rgba(46, 204, 113, 0.08);
+$copper:          #d4833e;
+$copper-light:    #e89f5a;
+$danger:          #ef4444;
+$text-primary:    #f1f5f9;
+$text-secondary:  #94a3b8;
+$text-muted:      #64748b;
+$border-subtle:   rgba(255, 255, 255, 0.05);
+$hover-bg:        rgba(255, 255, 255, 0.03);
+
+$ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+
+// ── LAYOUT ──
 .vendedor-layout {
   display: flex;
-  min-height: 100vh;
-  background: #f0f2f5;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  height: 100vh;
+  background: linear-gradient(135deg, #f4f6fb 0%, #e8ecf4 100%);
+  overflow: hidden;
+  position: relative;
 }
 
-.vendedor-sidebar {
-  width: 240px;
-  background: #1a2332;
-  color: #cfd8e3;
+.sidebar-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15, 31, 24, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  animation: fadeIn 0.25s ease-out;
+}
+
+// ── SIDEBAR ──
+.sidebar {
+  width: $expanded-w;
+  min-width: $expanded-w;
+  background:
+    radial-gradient(ellipse 600px 300px at 0% 30%, rgba(46, 204, 113, 0.06), transparent 60%),
+    linear-gradient(180deg, $forest-deep 0%, $forest-mid 100%);
+  color: $text-primary;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  box-shadow: 3px 0 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 999;
+  transition: width 0.35s cubic-bezier(0.23, 1, 0.32, 1), min-width 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: width, min-width;
+  box-shadow: 4px 0 32px rgba(15, 31, 24, 0.2);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(46, 204, 113, 0.2), transparent);
+    pointer-events: none;
+  }
 }
 
-.vendedor-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.vendedor-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: white;
-  padding: 4px;
-}
-
-.vendedor-brand-name {
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-}
-
-.vendedor-user {
+// ── HEADER ──
+.sidebar-header {
+  padding: 16px 18px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.vendedor-user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #2ecc71;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #fff;
+  border-bottom: 1px solid $border-subtle;
   flex-shrink: 0;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 18px; right: 18px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, $emerald, transparent);
+    opacity: 0.3;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .logo-icon {
+    width: 42px; height: 42px;
+    min-width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, $emerald 0%, $emerald-light 100%);
+    color: $forest-deep;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 10px $emerald-glow, inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: transform 0.3s $ease-out;
+
+    &--sm {
+      width: 32px; height: 32px; min-width: 32px; font-size: 0.9rem;
+    }
+
+    &:hover { transform: scale(1.05) rotate(-3deg); }
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    transition: opacity 0.2s;
+
+    h3 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      color: $text-primary;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .header-subtitle {
+      font-size: 0.65rem;
+      color: $emerald;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+  }
+
+  .toggle-btn {
+    width: 30px; height: 30px;
+    min-width: 30px;
+    border-radius: 8px;
+    border: 1px solid $border-subtle;
+    background: transparent;
+    color: $text-secondary;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+    margin-left: auto;
+
+    i { font-size: 0.75rem; }
+
+    &:hover {
+      background: $hover-bg;
+      color: $emerald-light;
+      border-color: rgba(46, 204, 113, 0.25);
+    }
+
+    &:active { transform: scale(0.92); }
+  }
 }
 
-.vendedor-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-}
-
-.vendedor-user-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.vendedor-user-role {
-  font-size: 0.75rem;
-  color: #6b7d99;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.vendedor-nav {
-  flex-grow: 1;
+// ── NAVEGACIÓN ──
+.nav-menu {
+  flex: 1;
   padding: 16px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+.nav-item {
+  animation: navFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+  &:nth-child(1) { animation-delay: 0.03s; }
+
+  > a {
+    color: $text-secondary;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 14px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s, color 0.2s;
+    overflow: hidden;
+    white-space: nowrap;
+
+    .nav-icon {
+      width: 22px; min-width: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: $text-muted;
+      transition: color 0.2s;
+    }
+
+    .nav-label {
+      flex: 1;
+      transition: opacity 0.2s;
+    }
+
+    .nav-indicator {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%) scaleY(0);
+      width: 3px;
+      height: 50%;
+      background: linear-gradient(180deg, $emerald, $emerald-light);
+      border-radius: 0 3px 3px 0;
+      transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    &:hover {
+      background: $emerald-subtle;
+      color: $text-primary;
+      .nav-icon { color: $emerald-light; }
+    }
+
+    &.active {
+      background: linear-gradient(90deg, rgba(46, 204, 113, 0.12), transparent);
+      color: $text-primary;
+
+      .nav-icon {
+        color: $emerald-light;
+        filter: drop-shadow(0 0 6px $emerald-glow);
+      }
+      .nav-indicator { transform: translateY(-50%) scaleY(1); }
+    }
+  }
+}
+
+// ── FOOTER ──
+.sidebar-footer {
+  padding: 12px 14px 14px;
+  border-top: 1px solid $border-subtle;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  flex-shrink: 0;
+  animation: navFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0.2s backwards;
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: $hover-bg;
+    border: 1px solid $border-subtle;
+    overflow: hidden;
+    white-space: nowrap;
+
+    .user-avatar {
+      width: 34px; height: 34px;
+      min-width: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, $emerald 0%, $emerald-light 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $forest-deep;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 8px $emerald-glow;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: opacity 0.2s;
+
+      .user-name {
+        font-size: 0.83rem;
+        font-weight: 600;
+        color: $text-primary;
+        line-height: 1.2;
+      }
+      .user-role {
+        font-size: 0.65rem;
+        color: $emerald;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 1px;
+      }
+    }
+  }
+
+  .btn-logout {
+    width: 100%;
+    background: transparent;
+    color: $danger;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+
+    .nav-icon {
+      width: 20px; min-width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+    .nav-label { transition: opacity 0.2s; }
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    &:active { transform: scale(0.97); }
+  }
 }
 
-.vendedor-nav a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  text-decoration: none;
-  color: #cfd8e3;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
-  cursor: pointer;
-}
-
-.vendedor-nav a:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-}
-
-.vendedor-nav a.active {
-  background: #2ecc71;
-  color: #fff;
-}
-
-.vendedor-nav a i {
-  font-size: 1.1rem;
-  width: 20px;
-  text-align: center;
-}
-
-.vendedor-nav-footer {
-  padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.vendedor-logout {
-  display: flex !important;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  text-decoration: none;
-  color: #e57373 !important;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background 0.2s;
-  cursor: pointer;
-}
-
-.vendedor-logout:hover {
-  background: rgba(231, 76, 60, 0.1);
-}
-
-.vendedor-content {
-  flex-grow: 1;
-  padding: 24px;
+// ── MAIN ──
+.main-content {
+  flex: 1;
   overflow-y: auto;
+  background: linear-gradient(135deg, #f4f6fb 0%, #e8ecf4 100%);
+  min-width: 0;
+}
+
+// ── COLAPSADO ──
+.vendedor-layout.colapsado {
+  .sidebar {
+    width: $collapsed-w;
+    min-width: $collapsed-w;
+
+    .sidebar-header {
+      padding: 14px 6px;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+
+      .header-logo { justify-content: center; }
+      .header-text { opacity: 0; width: 0; position: absolute; pointer-events: none; }
+
+      .toggle-btn { margin-left: 0; }
+    }
+
+    .nav-menu {
+      padding: 14px 6px;
+
+      .nav-item > a {
+        justify-content: center;
+        padding: 10px 0;
+        gap: 0;
+
+        .nav-label { opacity: 0; width: 0; flex: 0; pointer-events: none; }
+        .nav-indicator { display: none; }
+      }
+    }
+
+    .sidebar-footer {
+      padding: 10px 6px;
+      align-items: center;
+
+      .user-card {
+        justify-content: center;
+        padding: 6px;
+        .user-info { opacity: 0; width: 0; position: absolute; pointer-events: none; }
+      }
+      .btn-logout {
+        justify-content: center;
+        padding: 10px 0;
+        gap: 0;
+        .nav-label { opacity: 0; width: 0; position: absolute; pointer-events: none; }
+      }
+    }
+  }
+}
+
+// ── TOOLTIPS COLAPSADO ──
+.vendedor-layout.colapsado {
+  .nav-item > a[data-tooltip],
+  .btn-logout[data-tooltip] {
+    position: relative;
+
+    &::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 14px);
+      top: 50%;
+      transform: translateY(-50%) translateX(-6px);
+      background: $forest-deep;
+      color: $text-primary;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.2s $ease-out, opacity 0.2s $ease-out;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 1100;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: calc(100% + 8px);
+      top: 50%;
+      transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-right-color: $forest-deep;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 1100;
+    }
+
+    &:hover::before,
+    &:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+}
+
+// ── RESPONSIVE ──
+.mobile-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1001;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    border: 1px solid $border-subtle;
+    background: $forest-deep;
+    color: $text-primary;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 16px rgba(15, 31, 24, 0.4);
+    transition: background 0.2s, left 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    &:hover { background: $forest-mid; }
+    &:active { transform: scale(0.95); }
+
+    &.is-open {
+      left: 14px;
+      background: $emerald;
+      color: $forest-deep;
+    }
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .vendedor-layout.mobile-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .main-content { width: 100%; }
+}
+
+// ── ANIMACIONES ──
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes navFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .nav-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
