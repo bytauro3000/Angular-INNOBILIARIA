@@ -70,8 +70,8 @@ export class VendedorPanelLotesComponent implements OnInit {
       next: (data) => {
         this.programas = data;
         if (data.length > 0) {
-          const defaultProg = data.find(p => p.idPrograma === 4);
-          this.programaSeleccionado = defaultProg?.idPrograma || data[0].idPrograma!;
+          const defaultProg = data.find(p => p.idPrograma != null && +p.idPrograma === 4);
+          this.programaSeleccionado = defaultProg?.idPrograma ?? data[0].idPrograma!;
           this.programaNombre = defaultProg?.nombrePrograma || data[0].nombrePrograma;
           this.cargarLotes();
         }
