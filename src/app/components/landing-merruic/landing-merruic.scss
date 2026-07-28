@@ -73,7 +73,7 @@ html { scroll-behavior: smooth; }
     &.open { z-index: 998; pointer-events: auto; opacity: 1; }
   }
   &-mobile {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 280px; max-width: 85vw;
+    position: fixed; top: 0; right: 0; bottom: 0; width: 220px; max-width: 70vw;
     background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(24px);
     border-left: 1px solid rgba(255,255,255,0.12);
     flex-direction: column; align-items: center; justify-content: center; gap: 28px;
@@ -117,13 +117,18 @@ html { scroll-behavior: smooth; }
 .btn-whatsapp-nav { background: #25D366; color: white; padding: 8px 20px; font-size: 0.85rem; border-radius: 50px; text-decoration: none; font-weight: 600; transition: $transition; cursor: pointer; border: none; &:hover { background: #1DA851; transform: translateY(-1px); } }
 .btn-outline-nav { padding: 8px 20px; font-size: 0.85rem; border-radius: 50px; text-decoration: none; font-weight: 600; color: $text; border: 2px solid $primary; transition: $transition; cursor: pointer; &:hover { background: $primary; color: white; } }
 .btn-card { background: $primary; color: white; padding: 10px 22px; font-size: 0.9rem; border-radius: 50px; text-decoration: none; font-weight: 600; transition: $transition; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; &:hover { background: $primary-dark; transform: translateX(4px); } }
-.btn-login-mobile { display: inline-flex; align-items: center; gap: 8px; padding: 12px 36px; background: $primary; color: white !important; border-radius: 50px; font-family: $font-body !important; font-size: 1rem !important; text-decoration: none; transition: $transition; &:hover { background: $primary-dark; } }
+.btn-login-mobile { display: inline-flex; align-items: center; gap: 8px; padding: 14px 48px; background: $primary; color: white !important; border-radius: 50px; font-family: $font-body !important; font-size: 1rem !important; text-decoration: none; transition: $transition; &:hover { background: $primary-dark; } }
 
 @media (max-width: 900px) {
   .navbar-links, .btn-outline-nav { display: none; }
   .navbar-actions .btn-whatsapp-nav { padding: 8px 16px; font-size: 0.8rem; }
   .navbar-toggle { display: flex; }
   .navbar-mobile { display: flex; }
+  .navbar.scrolled {
+    background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(24px);
+    box-shadow: 0 1px 12px rgba(0,0,0,0.2);
+  }
+  .navbar.scrolled .navbar-toggle span { background: white; }
 }
 
 .hero {
