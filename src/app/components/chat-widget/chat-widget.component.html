@@ -1,0 +1,56 @@
+<div class="chat-widget" [class.open]="abierto()">
+  <button class="chat-fab" (click)="toggle()" [title]="abierto() ? 'Cerrar chat' : 'Chat con nosotros'">
+    <i class="fas" [ngClass]="abierto() ? 'fa-times' : 'fa-comment-dots'"></i>
+  </button>
+
+  <div class="chat-panel" *ngIf="abierto()">
+    <div class="chat-panel-header">
+      <div class="header-icon">
+        <i class="fas fa-comment-dots"></i>
+      </div>
+      <div>
+        <h3>Chat Inmobiliaria</h3>
+        <p>Déjanos tu mensaje y te responderemos a la brevedad</p>
+      </div>
+    </div>
+
+    <div class="chat-panel-body">
+      <ng-container *ngIf="!enviado; else gracias">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="form.nombres" name="nombres" placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" [(ngModel)]="form.correo" name="correo" placeholder="tu@correo.com" />
+        </div>
+        <div class="form-group">
+          <label>Mensaje</label>
+          <textarea [(ngModel)]="form.mensaje" name="mensaje" rows="3" placeholder="¿En qué podemos ayudarte?"></textarea>
+        </div>
+
+        <div class="captcha-box" (click)="onCaptchaChecked(!captchaValido)">
+          <div class="captcha-checkbox" [class.checked]="captchaValido">
+            <i class="fas fa-check" *ngIf="captchaValido"></i>
+          </div>
+          <span>No soy un robot</span>
+          <i class="fas fa-shield-alt captcha-icon"></i>
+        </div>
+
+        <button class="send-message-btn" (click)="enviarMensaje()" [disabled]="!form.nombres.trim() || !form.mensaje.trim() || !captchaValido || enviando">
+          <i class="fas fa-paper-plane" *ngIf="!enviando"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="enviando"></i>
+          {{ enviando ? 'Enviando...' : 'Enviar mensaje' }}
+        </button>
+      </ng-container>
+
+      <ng-template #gracias>
+        <div class="gracias">
+          <i class="fas fa-check-circle"></i>
+          <h4>¡Mensaje enviado!</h4>
+          <p>Gracias por contactarnos. Te responderemos pronto.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

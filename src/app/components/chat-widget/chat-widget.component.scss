@@ -1,0 +1,255 @@
+$teal: #0F766E;
+$teal-light: #14B8A6;
+$teal-lighter: #CCFBF1;
+$text: #134E4A;
+$text-muted: #64748B;
+$border: #E2E8F0;
+$white: #FFFFFF;
+$shadow: 0 4px 24px rgba(15, 118, 110, 0.15);
+
+.chat-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.chat-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: $teal;
+  border: none;
+  color: $white;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: $shadow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  position: relative;
+  z-index: 2;
+
+  &:hover {
+    background: #0B5E56;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.chat-panel {
+  position: absolute;
+  bottom: 68px;
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  background: $white;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(15, 118, 110, 0.12);
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.chat-panel-header {
+  background: $teal;
+  color: $white;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .header-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+}
+
+.chat-panel-body {
+  padding: 20px 24px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: $text;
+    margin-bottom: 4px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid $border;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: $text;
+    background: #F8FAFC;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+
+    &::placeholder {
+      color: #94A3B8;
+    }
+
+    &:focus {
+      border-color: $teal;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+    }
+  }
+
+  textarea {
+    resize: none;
+  }
+}
+
+.captcha-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #F8FAFC;
+  border: 1px solid $border;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  user-select: none;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: $teal-light;
+  }
+
+  .captcha-checkbox {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid $border;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+
+    &.checked {
+      background: $teal;
+      border-color: $teal;
+      color: $white;
+      font-size: 0.7rem;
+    }
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: $text;
+    flex: 1;
+  }
+
+  .captcha-icon {
+    font-size: 1.3rem;
+    color: #0369A1;
+  }
+}
+
+.send-message-btn {
+  width: 100%;
+  padding: 12px;
+  background: $teal;
+  color: $white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #0B5E56;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.gracias {
+  text-align: center;
+  padding: 24px 0;
+
+  i {
+    font-size: 3rem;
+    color: $teal-light;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    color: $text;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: $text-muted;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-fab {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+    border-radius: 14px;
+  }
+
+  .chat-panel {
+    bottom: 60px;
+    right: -12px;
+    max-width: calc(100vw - 24px);
+  }
+}

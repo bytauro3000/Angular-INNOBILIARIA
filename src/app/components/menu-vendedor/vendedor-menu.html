@@ -23,7 +23,7 @@
         </div>
         <div class="header-text">
           <h3>Panel Vendedor</h3>
-          <span class="header-subtitle">Inmobiliaria Ivan</span>
+          <span class="header-subtitle">{{ empresaData?.nombreComercial || 'Inmobiliaria Ivan' }}</span>
         </div>
       </div>
 
@@ -55,6 +55,17 @@
             (click)="cerrarSidebarMovil()">
             <span class="nav-icon"><i class="fas fa-th"></i></span>
             <span class="nav-label">Panel de Lotes</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="mensajeria"
+            routerLinkActive="active"
+            [attr.data-tooltip]="'Mensajes'"
+            (click)="cerrarSidebarMovil()">
+            <span class="nav-icon"><i class="fas fa-comments"></i></span>
+            <span class="nav-label">Mensajes</span>
             <span class="nav-indicator"></span>
           </a>
         </li>

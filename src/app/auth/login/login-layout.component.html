@@ -3,7 +3,7 @@
   <aside class="branding-panel">
     <!-- Logo en la esquina superior izquierda, a la misma altura que el botón "Volver al inicio" -->
     <div class="brand">
-      <img [src]="logoBranding" alt="Inmobiliaria Ivan - Constructora E.I.R.L" class="brand-logo" />
+      <img [src]="logoBranding" [alt]="empresaData?.nombreComercial || 'Inmobiliaria Ivan'" class="brand-logo" />
     </div>
 
     <!-- Botón "Volver al inicio" en la esquina superior derecha del panel -->
@@ -44,7 +44,7 @@
           <i class="fab fa-whatsapp"></i>
           ¿Necesitas ayuda? Contáctanos
         </a>
-        <p>© {{ anioActual }} Inmobiliaria Ivan · RUC 20537853108</p>
+        <p>© {{ anioActual }} {{ empresaData?.nombreComercial || 'Inmobiliaria Ivan' }} · RUC {{ empresaData?.ruc || '20537853108' }}</p>
       </div>
     </div>
 
@@ -60,7 +60,7 @@
   <main class="form-panel">
     <div class="form-wrapper">
       <div class="form-mobile-brand">
-        <img [src]="logoMobile" alt="Inmobiliaria Ivan" class="form-mobile-logo" />
+        <img [src]="logoMobile" [alt]="empresaData?.nombreComercial || 'Inmobiliaria Ivan'" class="form-mobile-logo" />
       </div>
 
       <a routerLink="/" class="form-mobile-back">

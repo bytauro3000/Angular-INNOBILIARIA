@@ -1,0 +1,178 @@
+<div class="gestion-empresa">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Gestión de Empresas</h1>
+      <p class="page-subtitle">Administra los datos de las empresas del sistema</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevo()" *ngIf="!showForm">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nueva Empresa
+    </button>
+  </div>
+
+  <!-- ── Formulario ──────────────────────────────────────── -->
+  <div class="form-card" *ngIf="showForm">
+    <h2 class="form-title">{{ editando ? 'Editar Empresa' : 'Nueva Empresa' }}</h2>
+
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Nombre Legal *</label>
+        <input type="text" [(ngModel)]="form.nombreLegal" placeholder="Ej: INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L." />
+      </div>
+      <div class="field-group">
+        <label>Nombre Comercial</label>
+        <input type="text" [(ngModel)]="form.nombreComercial" placeholder="Ej: Inmobiliaria Ivan" />
+      </div>
+      <div class="field-group">
+        <label>RUC *</label>
+        <input type="text" [(ngModel)]="form.ruc" placeholder="20537853108" maxlength="11" />
+      </div>
+      <div class="field-group">
+        <label>Dirección</label>
+        <input type="text" [(ngModel)]="form.direccion" placeholder="Dirección fiscal" />
+      </div>
+      <div class="field-group">
+        <label>Teléfono</label>
+        <input type="text" [(ngModel)]="form.telefono" placeholder="(01) 413-8679" />
+      </div>
+      <div class="field-group">
+        <label>Celular</label>
+        <input type="text" [(ngModel)]="form.celular" placeholder="+51 987-891-788" />
+      </div>
+      <div class="field-group">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="form.email" placeholder="correo@empresa.com" />
+      </div>
+      <div class="field-group">
+        <label>Página Web</label>
+        <input type="text" [(ngModel)]="form.paginaWeb" placeholder="https://..." />
+      </div>
+      <div class="field-group">
+        <label>WhatsApp</label>
+        <input type="text" [(ngModel)]="form.whatsapp" placeholder="51987891788" />
+      </div>
+      <div class="field-group">
+        <label>Representante Legal</label>
+        <input type="text" [(ngModel)]="form.representanteLegal" />
+      </div>
+      <div class="field-group">
+        <label>DNI Representante</label>
+        <input type="text" [(ngModel)]="form.representanteDni" />
+      </div>
+      <div class="field-group">
+        <label>Partida Electrónica</label>
+        <input type="text" [(ngModel)]="form.partidaElectronica" />
+      </div>
+      <div class="field-group">
+        <label>Ubigeo</label>
+        <input type="text" [(ngModel)]="form.ubigeo" />
+      </div>
+      <div class="field-group">
+        <label>Distrito</label>
+        <input type="text" [(ngModel)]="form.distrito" />
+      </div>
+      <div class="field-group">
+        <label>Provincia</label>
+        <input type="text" [(ngModel)]="form.provincia" />
+      </div>
+      <div class="field-group">
+        <label>Departamento</label>
+        <input type="text" [(ngModel)]="form.departamento" />
+      </div>
+    </div>
+
+    <!-- ── Logos ──────────────────────────────────────────── -->
+    <div class="logos-section">
+      <h3>Logos</h3>
+      <div class="logos-grid">
+        <div class="logo-upload">
+          <label>Logo Grande (Landing Page)</label>
+          <div class="upload-area" (click)="logoGrandeInput.click()">
+            <img *ngIf="logoGrandePreview" [src]="logoGrandePreview" class="logo-preview" alt="Preview" />
+            <div class="upload-placeholder" *ngIf="!logoGrandePreview">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Seleccionar imagen</span>
+            </div>
+          </div>
+          <input #logoGrandeInput type="file" accept="image/*" (change)="onLogoGrandeSelected($event)" hidden />
+          <span class="upload-status" *ngIf="subiendoLogoGrande">Subiendo...</span>
+        </div>
+
+        <div class="logo-upload">
+          <label>Logo Pequeño (Iconos)</label>
+          <div class="upload-area" (click)="logoPequenoInput.click()">
+            <img *ngIf="logoPequenoPreview" [src]="logoPequenoPreview" class="logo-preview" alt="Preview" />
+            <div class="upload-placeholder" *ngIf="!logoPequenoPreview">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Seleccionar imagen</span>
+            </div>
+          </div>
+          <input #logoPequenoInput type="file" accept="image/*" (change)="onLogoPequenoSelected($event)" hidden />
+          <span class="upload-status" *ngIf="subiendoLogoPequeno">Subiendo...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-outline" (click)="cancelarForm()">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardar()" [disabled]="cargando">
+        {{ cargando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear Empresa') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Lista ──────────────────────────────────────────── -->
+  <div class="table-card" *ngIf="!showForm">
+    <div class="loading" *ngIf="cargando">
+      <div class="spinner"></div>
+      <span>Cargando empresas...</span>
+    </div>
+
+    <div class="empty-state" *ngIf="!cargando && empresas.length === 0">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color:#cbd5e1">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+      </svg>
+      <p>No hay empresas registradas</p>
+      <button class="btn btn-primary" (click)="abrirNuevo()">Crear primera empresa</button>
+    </div>
+
+    <div class="empresa-list" *ngIf="!cargando && empresas.length > 0">
+      <div class="empresa-row" *ngFor="let emp of empresas">
+        <div class="empresa-check">
+          <label class="checkbox-wrapper" title="Usar esta empresa como activa">
+            <input type="radio" name="empresa-activa" [checked]="emp.activa" (change)="activarEmpresa(emp.id)" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="empresa-logos">
+          <img *ngIf="emp.logoSmallUrl" [src]="emp.logoSmallUrl" class="mini-logo" alt="Logo" />
+          <div class="mini-logo-placeholder" *ngIf="!emp.logoSmallUrl">?</div>
+        </div>
+        <div class="empresa-info">
+          <strong class="empresa-nombre">{{ emp.nombreComercial || emp.nombreLegal }}</strong>
+          <span class="empresa-ruc">RUC: {{ emp.ruc }}</span>
+        </div>
+        <div class="empresa-status">
+          <span class="badge" [class.badge-active]="emp.activa" [class.badge-inactive]="!emp.activa">
+            {{ emp.activa ? 'Activa' : 'Inactiva' }}
+          </span>
+        </div>
+        <div class="empresa-actions">
+          <button class="btn-icon" title="Editar" (click)="abrirEditar(emp)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="btn-icon btn-icon-danger" title="Eliminar" (click)="confirmarEliminar(emp.id, emp.nombreComercial || emp.nombreLegal)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

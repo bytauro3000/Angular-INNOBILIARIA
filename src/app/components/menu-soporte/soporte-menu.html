@@ -1,35 +1,89 @@
-<div class="menu-soporte-layout">
-  <aside class="sidebar-soporte">
-    <div class="user-profile-soporte">
-      <img src="img/logo.png" alt="Logo de la empresa" class="profile-img">
-      <h2 class="welcome-text">Hola, {{ usuarioLogueado?.nombre }}</h2>
+<div class="soporte-layout" [class.colapsado]="sidebarColapsado && !isMobile" [class.mobile-open]="mobileAbierto">
+
+  <!-- Botón hamburguesa flotante (solo móvil) -->
+  <button
+    type="button"
+    class="mobile-toggle"
+    *ngIf="isMobile"
+    (click)="toggleSidebar()"
+    [class.is-open]="mobileAbierto"
+    aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay para móvil -->
+  <div class="sidebar-overlay" *ngIf="isMobile && mobileAbierto" (click)="cerrarSidebarMovil()"></div>
+
+  <aside class="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="header-logo" *ngIf="!sidebarColapsado">
+        <div class="logo-icon">
+          <i class="fas fa-headset"></i>
+        </div>
+        <div class="header-text">
+          <h3>Panel Soporte</h3>
+          <span class="header-subtitle">{{ empresaData?.nombreComercial || 'Inmobiliaria Ivan' }}</span>
+        </div>
+      </div>
+
+      <div class="header-collapsed" *ngIf="sidebarColapsado">
+        <div class="logo-icon logo-icon--sm">
+          <i class="fas fa-headset"></i>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="toggle-btn"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarColapsado ? 'Expandir menú' : 'Colapsar menú'"
+        [title]="sidebarColapsado ? 'Expandir menú' : 'Colapsar menú'">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
-    
-    <nav class="nav-soporte">
+
+    <!-- Navegación -->
+    <nav class="nav-menu" aria-label="Menú principal">
       <ul>
-        <li>
-          <a [routerLink]="['/soporte-menu/']">Principal</a>
-        </li>
-        <li>
-          <a [routerLink]="['/soporte-menu/lotes']">Gestión de Lotes</a>
-        </li>
-        <li>
-          <a [routerLink]="['/soporte-menu/programas']">Gestion de Programas</a>
-        </li>
-        <li>
-          <a [routerLink]="['/soporte-menu/parceleros']">Gestion de Parceleros</a>
-        </li>
-         <li>
-          <a [routerLink]="['/soporte-menu/vendedores']">Gestion de Vendedores</a>
-        </li>
-        <li>
-          <a (click)="onLogout()">Cerrar Sesión</a>
+        <li class="nav-item">
+          <a
+            routerLink="/soporte-menu/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}"
+            [attr.data-tooltip]="'Empresa'"
+            (click)="cerrarSidebarMovil()">
+            <span class="nav-icon"><i class="fas fa-building"></i></span>
+            <span class="nav-label">Empresa</span>
+            <span class="nav-indicator"></span>
+          </a>
         </li>
       </ul>
     </nav>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <i class="fas fa-user-cog"></i>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ usuarioLogueado?.nombre || 'Soporte' }}</span>
+          <span class="user-role">Soporte</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn-logout"
+        (click)="cerrarSesion()"
+        data-tooltip="Cerrar Sesión">
+        <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+        <span class="nav-label">Cerrar Sesión</span>
+      </button>
+    </div>
   </aside>
 
-  <main class="content-soporte">
+  <main class="main-content">
     <router-outlet></router-outlet>
   </main>
 </div>

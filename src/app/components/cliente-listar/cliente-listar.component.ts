@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
 import { ClienteEditarComponent } from '../cliente-editar/cliente-editar.component';
 import { Title } from '@angular/platform-browser';
+import { EmpresaService } from '../../services/empresa.service';
 
 
 @Component({
@@ -50,8 +51,9 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   constructor(
     private clienteService: ClienteService,
     private toastr: ToastrService,
-    private titleService: Title
-  ) { this.titleService.setTitle('Clientes | Inmobiliaria Ivan'); }
+    private titleService: Title,
+    private empresaService: EmpresaService
+  ) {}
 
 
   abrirModal(cliente?: Cliente) {
@@ -63,6 +65,9 @@ export class ClientesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => {
+      this.titleService.setTitle('Clientes | ' + (e?.nombreComercial || 'Inmobiliaria Ivan'));
+    });
     this.cargarClientes();
   }
 

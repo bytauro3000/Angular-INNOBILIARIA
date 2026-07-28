@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { jwtDecode } from 'jwt-decode';
 import { TokenService } from '../../auth/token.service';
 import { LogoutService } from '../../auth/logout.service';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 @Component({
   selector: 'app-vendedor-menu',
@@ -18,15 +20,19 @@ export class VendedorMenuComponent implements OnInit {
   mobileAbierto = false;
   isMobile = false;
   usuarioLogueado: any;
+  empresaData: EmpresaPublic | null = null;
 
   private readonly STORAGE_KEY = 'vendedor-sidebar-colapsado';
 
   constructor(
     private tokenService: TokenService,
-    private logoutService: LogoutService
-  ) {}
+    private logoutService: LogoutService,
+    private empresaService: EmpresaService
+  ) { }
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
+
     const guardado = localStorage.getItem(this.STORAGE_KEY);
     this.sidebarColapsado = guardado === 'true';
     this.checkViewport();

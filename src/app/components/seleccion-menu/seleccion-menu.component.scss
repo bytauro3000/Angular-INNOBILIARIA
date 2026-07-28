@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
+
+.selection-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #0F766E 0%, #0369A1 100%);
+  padding: 24px;
+  font-family: 'Josefin Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(20, 184, 166, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(3, 105, 161, 0.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.selection-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 56px 48px 40px;
+  max-width: 540px;
+  width: 100%;
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
+  animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.brand-logo {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: #F0FDFA;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.15);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+}
+
+.heading {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #134E4A;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.subheading {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+
+  strong {
+    color: #0F766E;
+    font-weight: 600;
+  }
+}
+
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  background: #ffffff;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+
+    .card-arrow {
+      transform: translateX(4px);
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid #0369A1;
+    outline-offset: 2px;
+  }
+}
+
+.option-secretaria {
+  border-color: #0F766E;
+  background: linear-gradient(135deg, #F0FDFA 0%, #ffffff 100%);
+
+  &::after {
+    background: linear-gradient(135deg, rgba(15, 118, 110, 0.04) 0%, transparent 100%);
+  }
+
+  &:hover {
+    border-color: #0F766E;
+    background: linear-gradient(135deg, #ccfbf1 0%, #ffffff 100%);
+
+    &::after {
+      opacity: 1;
+    }
+
+    .card-icon {
+      color: #0F766E;
+      background: #ccfbf1;
+    }
+  }
+
+  .card-icon {
+    color: #0F766E;
+    background: #F0FDFA;
+  }
+
+  .card-title {
+    color: #0F766E;
+  }
+
+  .card-arrow {
+    color: #0F766E;
+  }
+}
+
+.option-soporte {
+  border-color: #0369A1;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+
+  &::after {
+    background: linear-gradient(135deg, rgba(3, 105, 161, 0.04) 0%, transparent 100%);
+  }
+
+  &:hover {
+    border-color: #0369A1;
+    background: linear-gradient(135deg, #dbeafe 0%, #ffffff 100%);
+
+    &::after {
+      opacity: 1;
+    }
+
+    .card-icon {
+      color: #0369A1;
+      background: #dbeafe;
+    }
+  }
+
+  .card-icon {
+    color: #0369A1;
+    background: #f0f9ff;
+  }
+
+  .card-title {
+    color: #0369A1;
+  }
+
+  .card-arrow {
+    color: #0369A1;
+  }
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.card-desc {
+  font-size: 0.84rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.card-arrow {
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: all 0.25s ease;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  color: #94a3b8;
+  font-family: 'Josefin Sans', 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+  display: flex;
+  width: fit-content;
+
+  &:hover {
+    color: #ef4444;
+    border-color: #fca5a5;
+    background: #fef2f2;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #ef4444;
+    outline-offset: 2px;
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .selection-card {
+    padding: 40px 24px 32px;
+    border-radius: 20px;
+  }
+
+  .heading {
+    font-size: 1.25rem;
+  }
+
+  .option-card {
+    padding: 18px 18px;
+    gap: 14px;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+
+    svg {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-desc {
+    font-size: 0.78rem;
+  }
+
+  .brand-logo {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection-card,
+  .option-card,
+  .brand-logo,
+  .card-arrow,
+  .logout-btn svg {
+    animation: none;
+    transition: none;
+  }
+}

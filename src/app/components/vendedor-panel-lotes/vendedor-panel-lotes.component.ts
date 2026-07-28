@@ -6,6 +6,8 @@ import { LoteService } from '../../services/lote.service';
 import { Programa } from '../../models/programa.model';
 import { EstadoLote } from '../../enums/estadolote.enum';
 import { Title } from '@angular/platform-browser';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 interface LoteVisual {
   idLote: number;
@@ -49,6 +51,7 @@ export class VendedorPanelLotesComponent implements OnInit {
   cargando = false;
   mostrarPlano = false;
   planoError = false;
+  empresaData: EmpresaPublic | null = null;
 
   EstadoLote = EstadoLote;
 
@@ -56,12 +59,15 @@ export class VendedorPanelLotesComponent implements OnInit {
     private programaService: ProgramaService,
     private loteService: LoteService,
     private cdr: ChangeDetectorRef,
-    private titleService: Title
-  ) {
-    this.titleService.setTitle('Panel de Lotes | Inmobiliaria Ivan');
-  }
+    private titleService: Title,
+    private empresaService: EmpresaService
+  ) {}
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => {
+      this.empresaData = e;
+      this.titleService.setTitle('Panel de Lotes | ' + (e?.nombreComercial || 'Inmobiliaria Ivan'));
+    });
     this.cargarProgramas();
   }
 
@@ -399,11 +405,12 @@ const tieneA2 = lote.ancho2 != null && lote.largo2 != null;
       }
 
       // ── DATOS DE CONTACTO (esquina inferior izquierda) ──
+      const emp = this.empresaData;
       normal(7.5);
-      txt('Av. Alfredo Mendiola N° 3623 3er. Piso Of. 301 - Urb. Panamericana Norte - Los Olivos', ml + 5, 178);
-      txt('+51 987-891-788', ml + 5, 185);
-      txt('inmobiliariaivan.eirl@gmail.com', ml + 5, 192);
-      txt('https://inmobiliaria-ivan.vercel.app/', ml + 5, 199);
+      txt(emp?.direccion || 'Av. Alfredo Mendiola N° 3623 3er. Piso Of. 301 - Urb. Panamericana Norte - Los Olivos', ml + 5, 178);
+      txt(emp?.celular || '+51 987-891-788', ml + 5, 185);
+      txt(emp?.email || 'inmobiliariaivan.eirl@gmail.com', ml + 5, 192);
+      txt(emp?.paginaWeb || 'https://inmobiliaria-ivan.vercel.app/', ml + 5, 199);
 
       pdf.save(`Proforma_${lote.manzana}-${lote.numeroLote}.pdf`);
     } catch (e) {

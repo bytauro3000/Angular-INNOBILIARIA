@@ -59,8 +59,10 @@ import { LoteLitarComponent } from './components/lote-listar/lote-listar.compone
 import { ReporteLotesComponent } from './components/reporte-lote/reporte-lote';
 
 // Dashboard y Letras
-import { MenuSoportePrincipal } from './components/menu-soporte-principal/menu-soporte-principal';
 import { LetracambioListarComponent } from './components/letracambio-listar/letracambios-listar.component';
+
+// Gestion de Empresa (Soporte)
+import { GestionEmpresaComponent } from './components/gestion-empresa/gestion-empresa.component';
 import { LetracambioInsertarComponent } from './components/letracambio-insertar/letracambio-insertar.component';
 
 // Reporte Mora
@@ -73,9 +75,23 @@ import { ReporteIngresosComponent } from './components/reporteingresos/reportein
 import { HistorialMorasPickerComponent } from './components/historial-moras/historial-moras-picker.component';
 import { ReporteCajaComponent } from './components/reporte-caja/reporte-caja.component';
 
+// Agenda
+import { AgendaCalendarioComponent } from './components/agenda-calendario/agenda-calendario.component';
+
+// Seleccion de menu para soporte
+import { SeleccionMenuComponent } from './components/seleccion-menu/seleccion-menu.component';
+
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginLayoutComponent },
+
+  // ── Seleccion de Menu (Soporte) ──────────────────────────────────────────
+  {
+    path: 'seleccion-menu',
+    component: SeleccionMenuComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ROLE_SOPORTE'] }
+  },
 
   // ── Secretaria ────────────────────────────────────────────────────────────
   {
@@ -128,7 +144,10 @@ export const routes: Routes = [
       { path: 'servicios-basicos/listar',              component: RecibosListarComponent },
 
       // Mensajería
-      { path: 'mensajeria', component: MensajeriaComponent }
+      { path: 'mensajeria', component: MensajeriaComponent },
+
+      // Agenda
+      { path: 'agenda', component: AgendaCalendarioComponent }
     ]
   },
 
@@ -139,7 +158,7 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ROLE_SOPORTE'] },
     children: [
-      { path: '', component: MenuSoportePrincipal }
+      { path: '', component: GestionEmpresaComponent }
     ]
   },
 
@@ -157,7 +176,8 @@ export const routes: Routes = [
       { path: 'anulaciones/letras',         component: AdminAnulacionesLetrasComponent },
       { path: 'anulaciones/moras',          component: AdminAnulacionesMorasComponent },
       { path: 'anulaciones/iniciales',      component: AdminAnulacionesInicialesComponent },
-      { path: 'anulaciones/inscripciones',  component: AdminAnulacionesInscripcionesComponent }
+      { path: 'anulaciones/inscripciones',  component: AdminAnulacionesInscripcionesComponent },
+      { path: 'mensajeria', component: MensajeriaComponent }
     ]
   },
 
@@ -168,7 +188,8 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ROLE_VENDEDOR'] },
     children: [
-      { path: '', component: VendedorPanelLotesComponent }
+      { path: '', component: VendedorPanelLotesComponent },
+      { path: 'mensajeria', component: MensajeriaComponent }
     ]
   }
 ];

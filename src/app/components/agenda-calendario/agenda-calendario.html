@@ -1,0 +1,242 @@
+<div class="agenda-container">
+  <header class="agenda-header">
+    <div class="agenda-header-left">
+      <h1 class="agenda-title">
+        <i class="bi bi-calendar3"></i>
+        Agenda
+      </h1>
+      <p class="agenda-subtitle">Registra y gestiona tus citas, pagos y recordatorios</p>
+    </div>
+    <div class="agenda-header-right">
+      <div class="agenda-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ getEventosMes() }}</span>
+          <span class="stat-label">Eventos del mes</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number pendiente">{{ getPendientesMes() }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="agenda-toolbar">
+    <div class="month-navigator">
+      <button class="nav-btn" (click)="previousMonth()" title="Mes anterior">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <h2 class="current-month">{{ months[viewDate.getMonth()] }} {{ viewDate.getFullYear() }}</h2>
+      <button class="nav-btn" (click)="nextMonth()" title="Mes siguiente">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-today" (click)="goToToday()">
+        <i class="bi bi-calendar-check"></i> Hoy
+      </button>
+      <button class="btn-new-event" (click)="openEventModal()">
+        <i class="bi bi-plus-circle"></i> Nuevo evento
+      </button>
+    </div>
+  </div>
+
+  <div class="calendar-wrapper">
+    <div class="weekdays-header">
+      <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+    </div>
+
+    <div class="loading" *ngIf="cargando">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <p>Cargando agenda...</p>
+    </div>
+
+    <div class="calendar-grid" *ngIf="!cargando">
+      <div
+        *ngFor="let day of calendarDays"
+        class="calendar-day"
+        [ngClass]="{
+          'other-month': !day.isCurrentMonth,
+          'is-today': day.isToday,
+          'is-holiday': day.isHoliday,
+          'has-events': day.events.length > 0,
+          'selected': selectedDate && day.date.getTime() === selectedDate.getTime()
+        }"
+        (click)="selectDay(day)"
+      >
+        <div class="day-number">
+          <span class="day-num">{{ day.date.getDate() }}</span>
+          <span class="holiday-badge" *ngIf="day.isHoliday" title="{{ day.holidayName }}">
+            <i class="bi bi-flag-fill"></i>
+          </span>
+        </div>
+
+        <div class="holiday-label" *ngIf="day.isHoliday && day.isCurrentMonth">
+          {{ day.holidayName }}
+        </div>
+
+        <div class="day-events" *ngIf="day.events.length > 0 && day.isCurrentMonth">
+          <div
+            *ngFor="let event of day.events.slice(0, 3)"
+            class="event-pill"
+            [ngClass]="getEstadoColor(event.estado)"
+            [title]="event.titulo"
+          >
+            <span class="event-time" *ngIf="event.hora">{{ event.hora }}</span>
+            <span class="event-title-text">{{ event.titulo }}</span>
+          </div>
+          <div class="event-more" *ngIf="day.events.length > 3">
+            +{{ day.events.length - 3 }} más
+          </div>
+        </div>
+
+        <button class="add-event-btn" *ngIf="day.isCurrentMonth" (click)="openEventModal(day); $event.stopPropagation()">
+          <i class="bi bi-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="holiday-legend">
+    <div class="legend-item">
+      <span class="legend-dot holiday-dot"></span> Feriado nacional
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot event-pendiente"></span> Pendiente
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot event-completado"></span> Completado
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot event-cancelado"></span> Cancelado
+    </div>
+  </div>
+
+  <aside class="day-detail-panel" *ngIf="selectedDate">
+    <div class="detail-header">
+      <h3>
+        {{ selectedDate | date:'EEEE d MMMM, yyyy':'':'es' }}
+      </h3>
+      <button class="close-detail" (click)="selectedDate = null">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <div class="detail-body">
+      <button class="btn-add-event" (click)="openEventModal()">
+        <i class="bi bi-plus-circle"></i> Agregar evento a este día
+      </button>
+
+      <div class="event-list" *ngIf="selectedDayEvents.length > 0; else noEvents">
+        <div
+          *ngFor="let event of selectedDayEvents"
+          class="event-card"
+          [ngClass]="getEstadoColor(event.estado)"
+        >
+          <div class="event-card-header">
+            <div class="event-card-time" *ngIf="event.hora">
+              <i class="bi bi-clock"></i> {{ event.hora }}
+            </div>
+            <div class="event-card-status">
+              <span class="status-badge" [ngClass]="getEstadoColor(event.estado)">
+                {{ getEstadoLabel(event.estado) }}
+              </span>
+            </div>
+          </div>
+          <h4 class="event-card-title">{{ event.titulo }}</h4>
+          <p class="event-card-desc" *ngIf="event.descripcion">{{ event.descripcion }}</p>
+          <div class="event-card-client" *ngIf="event.nombreCliente">
+            <i class="bi bi-person"></i> {{ event.nombreCliente }}
+            <span *ngIf="event.telefonoCliente"> &middot; {{ event.telefonoCliente }}</span>
+          </div>
+          <div class="event-card-actions">
+            <button class="action-btn complete" *ngIf="event.estado === 'PENDIENTE'"
+              (click)="cambiarEstadoEvento(event, 'COMPLETADO')" title="Marcar como completado">
+              <i class="bi bi-check2-circle"></i> Completar
+            </button>
+            <button class="action-btn cancel" *ngIf="event.estado === 'PENDIENTE'"
+              (click)="cambiarEstadoEvento(event, 'CANCELADO')" title="Cancelar evento">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+            <button class="action-btn reactivate" *ngIf="event.estado !== 'PENDIENTE'"
+              (click)="cambiarEstadoEvento(event, 'PENDIENTE')" title="Reactivar">
+              <i class="bi bi-arrow-clockwise"></i> Reactivar
+            </button>
+            <button class="action-btn edit" (click)="editEvent(event)" title="Editar">
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button class="action-btn delete" (click)="eliminarEvento(event)" title="Eliminar">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noEvents>
+        <div class="no-events">
+          <i class="bi bi-calendar-x"></i>
+          <p>No hay eventos para este día</p>
+        </div>
+      </ng-template>
+    </div>
+  </aside>
+
+  <!-- Modal de evento -->
+  <div class="modal-overlay" *ngIf="showEventModal" (click)="closeEventModal()">
+    <div class="event-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          <i class="bi bi-calendar-plus"></i>
+          {{ editingEvent ? 'Editar evento' : 'Nuevo evento' }}
+        </h3>
+        <button class="close-modal" (click)="closeEventModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Fecha <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="newEvent.fecha" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="newEvent.hora" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label>Título <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="newEvent.titulo" class="form-input"
+            placeholder="Ej: Pago de letra - Cliente Juan Pérez" />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="newEvent.descripcion" class="form-input form-textarea"
+            placeholder="Detalles del evento, Monto a pagar, etc." rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cliente</label>
+            <input type="text" [(ngModel)]="newEvent.nombreCliente" class="form-input"
+              placeholder="Nombre del cliente" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="newEvent.telefonoCliente" class="form-input"
+              placeholder="999 999 999" />
+          </div>
+        </div>
+        <div class="form-group" *ngIf="editingEvent">
+          <label>Estado</label>
+          <select [(ngModel)]="newEvent.estado" class="form-input">
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="COMPLETADO">Completado</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeEventModal()">Cancelar</button>
+        <button class="btn-save" (click)="saveEvent()">
+          <i class="bi bi-check-lg"></i> {{ editingEvent ? 'Actualizar' : 'Registrar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

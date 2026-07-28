@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoginComponent } from './login.component';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 @Component({
   selector: 'app-login-layout',
@@ -10,13 +12,31 @@ import { LoginComponent } from './login.component';
   templateUrl: './login-layout.component.html',
   styleUrls: ['./login-layout.component.scss']
 })
-export class LoginLayoutComponent {
+export class LoginLayoutComponent implements OnInit {
 
   readonly anioActual = new Date().getFullYear();
-  readonly telefonoLimpio = '51987891788';
-  readonly whatsappUrl = `https://wa.me/${this.telefonoLimpio}?text=${encodeURIComponent('Hola, necesito ayuda con el acceso al sistema.')}`;
+  empresaData: EmpresaPublic | null = null;
 
-  // Logo optimizado para Cloudinary
-  readonly logoBranding = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_280/v1773725974/logogrande_rfvxhu.png';
-  readonly logoMobile = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_160/v1773725974/logogrande_rfvxhu.png';
+  constructor(private empresaService: EmpresaService) {}
+
+  ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
+  }
+
+  get telefonoLimpio(): string {
+    return this.empresaData?.whatsapp?.replace(/[^\d]/g, '') || '51987891788';
+  }
+
+  get whatsappUrl(): string {
+    const num = this.telefonoLimpio;
+    return `https://wa.me/${num}?text=${encodeURIComponent('Hola, necesito ayuda con el acceso al sistema.')}`;
+  }
+
+  get logoBranding(): string {
+    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_280/v1773725974/logogrande_rfvxhu.png';
+  }
+
+  get logoMobile(): string {
+    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_160/v1773725974/logogrande_rfvxhu.png';
+  }
 }

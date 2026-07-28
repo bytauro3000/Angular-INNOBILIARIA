@@ -6,6 +6,8 @@ import { jwtDecode } from 'jwt-decode';
 import { LogoutService } from '../../auth/logout.service';
 import { ThemeService } from '../../services/theme.service';
 import { DistritoService } from '../../services/distrito.service';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios' | 'reportes';
 
@@ -31,15 +33,20 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     hasHoverSupport: boolean = false;
     private hoverCloseTimeout: any = null;
 
+    empresaData: EmpresaPublic | null = null;
+
     constructor(
         private tokenService: TokenService,
         private logoutService: LogoutService,
         private router: Router,
         protected themeSvc: ThemeService,
-        private distritoService: DistritoService
+        private distritoService: DistritoService,
+        private empresaService: EmpresaService
     ) { }
 
     ngOnInit(): void {
+        this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
+
         // Precargar distritos en cache para que estén disponibles
         // inmediatamente en vistas como registro de letras de cambio
         this.distritoService.listarDistritos().subscribe();

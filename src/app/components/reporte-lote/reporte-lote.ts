@@ -3,6 +3,8 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoteService } from '../../services/lote.service';
 import { Lote } from '../../models/lote.model';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 export interface GrupoPrograma {
   nombrePrograma: string;
@@ -26,10 +28,15 @@ export class ReporteLotesComponent implements OnInit {
   totalLotes = 0;
   filtroEstado: string = '';
   totalesFiltrados = { cantidad: 0, area: 0 };
+  empresaData: EmpresaPublic | null = null;
 
-  constructor(private loteService: LoteService) {}
+  constructor(
+    private loteService: LoteService,
+    private empresaService: EmpresaService
+  ) {}
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
     this.loteService.listarLotesParaReporte().subscribe({
       next: (lotes) => {
         this.grupos = this.agruparPorPrograma(lotes);

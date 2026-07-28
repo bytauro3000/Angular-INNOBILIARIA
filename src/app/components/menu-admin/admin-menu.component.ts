@@ -3,6 +3,8 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { LogoutService } from '../../auth/logout.service';
 import { ThemeService } from '../../services/theme.service';
+import { EmpresaService } from '../../services/empresa.service';
+import { EmpresaPublic } from '../../models/empresa.model';
 
 @Component({
   selector: 'app-admin-menu',
@@ -17,15 +19,19 @@ export class AdminMenuComponent implements OnInit {
   sidebarColapsado = false;
   mobileAbierto = false;
   isMobile = false;
+  empresaData: EmpresaPublic | null = null;
 
   private readonly STORAGE_KEY = 'admin-sidebar-colapsado';
 
   constructor(
     private logoutService: LogoutService,
-    protected themeSvc: ThemeService
-  ) {}
+    protected themeSvc: ThemeService,
+    private empresaService: EmpresaService
+  ) { }
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
+
     const guardado = localStorage.getItem(this.STORAGE_KEY);
     this.sidebarColapsado = guardado === 'true';
     this.checkViewport();

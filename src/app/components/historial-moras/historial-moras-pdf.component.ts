@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ReporteMorasService, HistorialMorasData } from '../../services/reporte-moras.service';
 import { HistorialMorasPdf } from '../../utils/historial-moras-pdf';
+import { EmpresaService } from '../../services/empresa.service';
 
 @Component({
   selector: 'app-historial-moras-pdf',
@@ -22,13 +23,23 @@ export class HistorialMorasPdfComponent implements OnInit {
   data:    HistorialMorasData | null = null;
   /** Pestaña activa en el modal: 'preview' | 'tabla' */
   tab:     'preview' | 'tabla' = 'preview';
+  logoUrl  = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1773723460/logo_y1ygeg.png';
+  get empresaNombrePdf(): string { return HistorialMorasPdf.empresaNombre; }
 
   constructor(
     private reporteSvc: ReporteMorasService,
-    private toastr:     ToastrService
+    private toastr:     ToastrService,
+    private empresaService: EmpresaService
   ) {}
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => {
+      if (e) {
+        HistorialMorasPdf.empresaNombre = e.nombreLegal;
+        HistorialMorasPdf.empresaLogo  = e.logoSmallUrl || e.logoUrl;
+        this.logoUrl = e.logoSmallUrl || e.logoUrl;
+      }
+    });
     if (this.idContrato) this.cargar();
   }
 

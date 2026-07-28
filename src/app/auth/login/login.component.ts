@@ -9,6 +9,7 @@ import { IdleTimeoutService } from '../idle-timeout.service';
 import { TokenRefreshService } from '../token-refresh.service';
 import { ToastrService } from 'ngx-toastr';
 import { Title } from '@angular/platform-browser';
+import { EmpresaService } from '../../services/empresa.service';
 
 @Component({
   selector: 'app-login',
@@ -32,10 +33,14 @@ export class LoginComponent implements OnInit {
     private idleTimeoutService: IdleTimeoutService,
     private toastr: ToastrService,
     private titleService: Title,
-    private tokenRefreshService: TokenRefreshService
-  ) {this.titleService.setTitle('Iniciar Sesión | Inmobiliaria Ivan');  }
+    private tokenRefreshService: TokenRefreshService,
+    private empresaService: EmpresaService
+  ) {}
 
   ngOnInit(): void {
+    this.empresaService.obtenerEmpresa().subscribe(e => {
+      this.titleService.setTitle('Iniciar Sesión | ' + (e?.nombreComercial || 'Inmobiliaria Ivan'));
+    });
     const correoGuardado = localStorage.getItem('remembered_email');
     if (correoGuardado) {
       this.loginRequest.correo = correoGuardado;
@@ -78,7 +83,7 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/secretaria-menu']);
             break;
           case 'ROLE_SOPORTE':
-            this.router.navigate(['/secretaria-menu']);
+            this.router.navigate(['/seleccion-menu']);
             break;
           case 'ROLE_ADMINISTRADOR':
             this.router.navigate(['/admin-menu']);

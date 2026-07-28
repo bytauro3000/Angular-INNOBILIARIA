@@ -3,16 +3,17 @@
   <div class="container header-container">
     <a href="#inicio" class="brand" (click)="scrollA('inicio', $event)">
       <div class="brand-circle">
-        <img [src]="logoHeader" alt="Inmobiliaria Ivan - Constructora E.I.R.L" class="brand-logo" />
+        <img [src]="logoHeader" [alt]="nombreComercial" class="brand-logo" />
       </div>
     </a>
 
     <nav class="nav-desktop">
-      <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
-      <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
-      <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
-      <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
-      <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+      <a href="#inicio" (click)="scrollA('inicio', $event)"><span class="nav-tick">01</span>Inicio</a>
+      <a href="#construccion" (click)="scrollA('construccion', $event)"><span class="nav-tick">02</span>Construcción</a>
+      <a href="#nosotros" (click)="scrollA('nosotros', $event)"><span class="nav-tick">03</span>Nosotros</a>
+      <a href="#proyectos" (click)="scrollA('proyectos', $event)"><span class="nav-tick">04</span>Proyectos</a>
+      <a href="#beneficios" (click)="scrollA('beneficios', $event)"><span class="nav-tick">05</span>Beneficios</a>
+      <a href="#contacto" (click)="scrollA('contacto', $event)"><span class="nav-tick">06</span>Contacto</a>
     </nav>
 
     <div class="header-actions">
@@ -36,6 +37,7 @@
   <!-- Menú móvil -->
   <nav class="nav-mobile" [class.open]="menuAbierto()">
     <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
+    <a href="#construccion" (click)="scrollA('construccion', $event)">Construcción</a>
     <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
     <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
     <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
@@ -53,9 +55,18 @@
          alt="Terrenos en Carabayllo" loading="eager" />
     <div class="hero-overlay"></div>
   </div>
+
+  <!-- Capa decorativa: curvas de nivel topográficas, con parallax propio -->
+  <svg class="hero-contour" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-100,180 C 200,80 400,260 700,160 S 1200,60 1560,200" />
+    <path d="M-100,340 C 220,240 460,420 760,320 S 1240,220 1560,360" />
+    <path d="M-100,520 C 260,420 480,600 780,500 S 1260,400 1560,540" />
+    <path d="M-100,700 C 240,600 500,780 800,680 S 1280,580 1560,720" />
+  </svg>
+
   <div class="container hero-content">
     <span class="hero-badge">
-      <i class="fas fa-map-marker-alt"></i> Carabayllo · Lima
+      <i class="fas fa-location-arrow"></i> 11°51′S&nbsp;77°01′O · Carabayllo, Lima
     </span>
     <h1>
       Tu nuevo hogar comienza con
@@ -76,18 +87,261 @@
     </div>
 
     <div class="hero-stats">
-      <div class="stat">
-        <strong>+15</strong>
-        <span>años de experiencia</span>
+      <div class="stat" *ngFor="let s of estadisticas">
+        <strong class="stat-num" [attr.data-valor]="s.valor" [attr.data-prefijo]="s.prefijo" [attr.data-sufijo]="s.sufijo">{{ s.prefijo }}0{{ s.sufijo }}</strong>
+        <span>{{ s.label }}</span>
       </div>
-      <div class="stat">
-        <strong>+500</strong>
-        <span>familias atendidas</span>
+    </div>
+  </div>
+
+  <div class="hero-scroll-cue" aria-hidden="true">
+    <span></span> Desplázate
+  </div>
+</section>
+
+<!-- CONSTRUCCIÓN SCROLL — de terreno a casa -->
+<section id="construccion" class="construccion">
+  <div class="construccion-sticky">
+
+    <div class="construccion-grid">
+      <!-- SVG del proceso constructivo -->
+      <div class="construccion-svg-wrapper">
+        <svg class="construccion-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+
+          <!-- Capa base: terreno (grid + límites) -->
+          <g class="layer layer-base">
+            <!-- Grid del terreno -->
+            <g class="draw-path">
+              <line class="grid-line" x1="0"   y1="500" x2="800" y2="500"/>
+              <line class="grid-line" x1="0"   y1="540" x2="800" y2="540"/>
+              <line class="grid-line" x1="0"   y1="580" x2="800" y2="580"/>
+              <line class="grid-line" x1="80"  y1="460" x2="80"  y2="600"/>
+              <line class="grid-line" x1="200" y1="460" x2="200" y2="600"/>
+              <line class="grid-line" x1="320" y1="460" x2="320" y2="600"/>
+              <line class="grid-line" x1="440" y1="460" x2="440" y2="600"/>
+              <line class="grid-line" x1="560" y1="460" x2="560" y2="600"/>
+              <line class="grid-line" x1="680" y1="460" x2="680" y2="600"/>
+              <line class="grid-line" x1="800" y1="460" x2="800" y2="600"/>
+            </g>
+            <!-- Marcadores de límite (mojones) -->
+            <circle class="boundary-marker" cx="240" cy="500" r="4"/>
+            <circle class="boundary-marker" cx="560" cy="500" r="4"/>
+            <text class="annotation" x="240" y="540" text-anchor="middle">A</text>
+            <text class="annotation" x="560" y="540" text-anchor="middle">B</text>
+            <line class="measure-line" x1="240" y1="555" x2="560" y2="555"/>
+            <text class="annotation" x="400" y="575" text-anchor="middle">12.00 m</text>
+          </g>
+
+          <!-- Capa 2: cimientos -->
+          <g class="layer layer-foundation">
+            <rect class="foundation-fill-bg draw-path" x="220" y="495" width="360" height="20"/>
+            <line class="foundation-fill" x1="220" y1="495" x2="580" y2="495"/>
+            <line class="foundation-fill" x1="220" y1="515" x2="580" y2="515"/>
+            <line class="wall-brick" x1="280" y1="495" x2="280" y2="515"/>
+            <line class="wall-brick" x1="340" y1="495" x2="340" y2="515"/>
+            <line class="wall-brick" x1="400" y1="495" x2="400" y2="515"/>
+            <line class="wall-brick" x1="460" y1="495" x2="460" y2="515"/>
+            <line class="wall-brick" x1="520" y1="495" x2="520" y2="515"/>
+            <text class="annotation" x="400" y="490" text-anchor="middle">CIMIENTO 0.20m</text>
+          </g>
+
+          <!-- Capa 3: muros (ladrillo - material noble) -->
+          <g class="layer layer-walls">
+            <!-- Relleno sutil -->
+            <rect class="wall-fill" x="230" y="380" width="340" height="120"/>
+            <!-- Contorno de muros -->
+            <path class="wall-line draw-path" d="M 230 380 L 230 495 L 570 495 L 570 380"/>
+            <!-- Líneas horizontales de ladrillo -->
+            <g class="wall-brick">
+              <line x1="230" y1="400" x2="570" y2="400"/>
+              <line x1="230" y1="420" x2="570" y2="420"/>
+              <line x1="230" y1="440" x2="570" y2="440"/>
+              <line x1="230" y1="460" x2="570" y2="460"/>
+              <line x1="230" y1="480" x2="570" y2="480"/>
+              <!-- Líneas verticales alternadas (patrón de soga) -->
+              <line x1="260" y1="380" x2="260" y2="400"/>
+              <line x1="320" y1="400" x2="320" y2="420"/>
+              <line x1="380" y1="420" x2="380" y2="440"/>
+              <line x1="440" y1="440" x2="440" y2="460"/>
+              <line x1="500" y1="460" x2="500" y2="480"/>
+              <line x1="290" y1="380" x2="290" y2="400"/>
+              <line x1="350" y1="400" x2="350" y2="420"/>
+              <line x1="410" y1="420" x2="410" y2="440"/>
+              <line x1="470" y1="440" x2="470" y2="460"/>
+              <line x1="530" y1="460" x2="530" y2="480"/>
+            </g>
+            <text class="annotation" x="180" y="440" text-anchor="end">LADRILLO</text>
+            <text class="annotation" x="180" y="455" text-anchor="end">de arcilla</text>
+          </g>
+
+          <!-- Capa 4: estructura de techo (vigas) -->
+          <g class="layer layer-roof-structure">
+            <g class="roof-beam draw-path">
+              <line x1="200" y1="380" x2="400" y2="240"/>
+              <line x1="600" y1="380" x2="400" y2="240"/>
+              <line x1="230" y1="350" x2="570" y2="350"/>
+              <line x1="280" y1="320" x2="520" y2="320"/>
+              <line x1="330" y1="290" x2="470" y2="290"/>
+              <!-- Viguetas verticales -->
+              <line x1="310" y1="335" x2="310" y2="378"/>
+              <line x1="400" y1="245" x2="400" y2="378"/>
+              <line x1="490" y1="335" x2="490" y2="378"/>
+            </g>
+            <text class="annotation" x="640" y="280">VIGAS</text>
+            <text class="annotation" x="640" y="295">de cedro</text>
+          </g>
+
+          <!-- Capa 5: techo de tejas -->
+          <g class="layer layer-roof-tiles">
+            <path class="roof-tile draw-path" d="M 200 380 L 400 240 L 600 380 Z"/>
+            <!-- Líneas de tejas -->
+            <g class="draw-path" stroke="rgba(129, 140, 248, 0.5)" stroke-width="0.7" fill="none">
+              <path d="M 200 380 L 600 380"/>
+              <path d="M 250 350 L 550 350"/>
+              <path d="M 300 320 L 500 320"/>
+              <path d="M 350 290 L 450 290"/>
+              <!-- Tejas verticales (líneas pequeñas) -->
+              <line x1="260" y1="378" x2="270" y2="372"/>
+              <line x1="320" y1="378" x2="330" y2="372"/>
+              <line x1="380" y1="378" x2="390" y2="372"/>
+              <line x1="440" y1="378" x2="450" y2="372"/>
+              <line x1="500" y1="378" x2="510" y2="372"/>
+              <line x1="290" y1="348" x2="300" y2="342"/>
+              <line x1="340" y1="348" x2="350" y2="342"/>
+              <line x1="400" y1="348" x2="410" y2="342"/>
+              <line x1="460" y1="348" x2="470" y2="342"/>
+              <line x1="330" y1="318" x2="340" y2="312"/>
+              <line x1="400" y1="318" x2="410" y2="312"/>
+              <line x1="460" y1="318" x2="470" y2="312"/>
+            </g>
+            <text class="annotation" x="640" y="340">TEJAS</text>
+            <text class="annotation" x="640" y="355">de arcilla</text>
+          </g>
+
+          <!-- Capa 6: ventanas y puerta -->
+          <g class="layer layer-openings">
+            <!-- Ventana izquierda -->
+            <rect class="window-frame draw-path" x="255" y="405" width="70" height="60"/>
+            <line class="window-cross" x1="290" y1="405" x2="290" y2="465"/>
+            <line class="window-cross" x1="255" y1="435" x2="325" y2="435"/>
+            <!-- Ventana derecha -->
+            <rect class="window-frame draw-path" x="475" y="405" width="70" height="60"/>
+            <line class="window-cross" x1="510" y1="405" x2="510" y2="465"/>
+            <line class="window-cross" x1="475" y1="435" x2="545" y2="435"/>
+            <!-- Puerta central -->
+            <path class="door-fill draw-path" d="M 375 495 L 375 425 Q 375 415 385 415 L 415 415 Q 425 415 425 425 L 425 495 Z"/>
+            <circle class="window-cross" cx="418" cy="460" r="2" fill="#fff"/>
+            <!-- Dinteles -->
+            <line class="detail-line" x1="250" y1="400" x2="330" y2="400"/>
+            <line class="detail-line" x1="470" y1="400" x2="550" y2="400"/>
+            <line class="detail-line" x1="370" y1="410" x2="430" y2="410"/>
+          </g>
+
+          <!-- Capa 7: detalles finales (porche, jardín, acabados) -->
+          <g class="layer layer-details">
+            <!-- Porche / escalones -->
+            <path class="detail-line draw-path" d="M 350 495 L 350 510 L 450 510 L 450 495"/>
+            <path class="detail-line draw-path" d="M 335 510 L 335 525 L 465 525 L 465 510"/>
+            <!-- Jardín (líneas de plantas) -->
+            <g class="detail-line draw-path">
+              <path d="M 130 495 Q 125 470 135 470 Q 145 470 140 495"/>
+              <path d="M 160 495 Q 150 460 170 460 Q 175 475 168 495"/>
+              <path d="M 620 495 Q 615 475 625 475 Q 635 475 630 495"/>
+              <path d="M 660 495 Q 650 465 670 465 Q 680 480 668 495"/>
+            </g>
+            <!-- Antena / chimenea -->
+            <rect class="detail-line draw-path" x="460" y="290" width="14" height="35" fill="rgba(248,250,252,0.08)"/>
+            <line class="detail-line draw-path" x1="467" y1="290" x2="467" y2="270"/>
+            <!-- Texto final -->
+            <text class="annotation" x="400" y="200" text-anchor="middle" style="font-size: 11px; opacity: 0.85;">HOGAR TERMINADO</text>
+          </g>
+        </svg>
       </div>
-      <div class="stat">
-        <strong>100%</strong>
-        <span>con título saneado</span>
+
+      <!-- Texto que cambia por fase -->
+      <div class="construccion-text">
+        <div class="construccion-fase" data-fase="0">
+          <span class="fase-num">FASE 01 / 07</span>
+          <h3>El terreno ideal</h3>
+          <p>Un lote con título saneado, servicios básicos y ubicación estratégica en Carabayllo. La base de todo comienza aquí.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">120 m²</span>
+            <span class="meta-chip">Título saneado</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="1">
+          <span class="fase-num">FASE 02 / 07</span>
+          <h3>Cimientos sólidos</h3>
+          <p>Cimentación de concreto armado dimensionada según estudio de suelo. La seguridad estructural es innegociable.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Concreto F'c 210</span>
+            <span class="meta-chip">0.20 m</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="2">
+          <span class="fase-num">FASE 03 / 07</span>
+          <h3>Muros de material noble</h3>
+          <p>Ladrillo de arcilla cocida asentado con mortero 1:4. Muros que perduran por generaciones y aíslan térmicamente.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Ladrillo King Kong</span>
+            <span class="meta-chip">Mortero 1:4</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="3">
+          <span class="fase-num">FASE 04 / 07</span>
+          <h3>Estructura de techo</h3>
+          <p>Vigas de cedro tratado ensambladas con precisión. Diseño arquitectónico que combina tradición y resistencia.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Cedro tratado</span>
+            <span class="meta-chip">3 pendientes</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="4">
+          <span class="fase-num">FASE 05 / 07</span>
+          <h3>Techo de tejas</h3>
+          <p>Tejas de arcilla cocida instaladas con técnica de solape. Impermeabilización natural que respira y aísla el calor.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Tejamission</span>
+            <span class="meta-chip">Impermeabilizante</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="5">
+          <span class="fase-num">FASE 06 / 07</span>
+          <h3>Vanos y acabados</h3>
+          <p>Ventanas con marco de aluminio y puerta principal de madera maciza. Cada detalle pensado para el confort.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Aluminio anodizado</span>
+            <span class="meta-chip">Cedro macizo</span>
+          </div>
+        </div>
+
+        <div class="construccion-fase" data-fase="6">
+          <span class="fase-num">FASE 07 / 07</span>
+          <h3>Tu hogar terminado</h3>
+          <p>Porche de acceso, jardín integrado y chimney de ventilación. Una casa con diseño de arquitecto, lista para vivir.</p>
+          <div class="fase-meta">
+            <span class="meta-chip">Porche</span>
+            <span class="meta-chip">Jardín</span>
+            <span class="meta-chip">Listo para habitar</span>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Indicador de progreso (puntos) -->
+    <div class="construccion-progress">
+      <span class="dot" data-dot="0"></span>
+      <span class="dot" data-dot="1"></span>
+      <span class="dot" data-dot="2"></span>
+      <span class="dot" data-dot="3"></span>
+      <span class="dot" data-dot="4"></span>
+      <span class="dot" data-dot="5"></span>
+      <span class="dot" data-dot="6"></span>
     </div>
   </div>
 </section>
@@ -96,27 +350,27 @@
 <section id="nosotros" class="nosotros section">
   <div class="container">
     <div class="section-head">
-      <span class="section-eyebrow">Sobre nosotros</span>
+      <span class="section-eyebrow">// Sobre nosotros</span>
       <h2>Más de 15 años construyendo sueños en <span class="gradient-text">Carabayllo</span></h2>
       <p class="section-sub">
-        Somos Inmobiliaria Constructora Ivan E.I.R.L, una empresa peruana especializada
+        Somos {{ empresaData?.nombreLegal || 'Inmobiliaria Constructora Ivan E.I.R.L' }}, una empresa peruana especializada
         en la venta de terrenos urbanos con documentación legal al día.
       </p>
     </div>
 
     <div class="nosotros-grid">
       <article class="nosotros-card">
-        <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+        <div class="card-seal"><i class="fas fa-bullseye"></i></div>
         <h3>Misión</h3>
         <p>Brindar a las familias peruanas acceso a terrenos con título de propiedad, en ubicaciones estratégicas, con servicios básicos y a precios justos.</p>
       </article>
       <article class="nosotros-card">
-        <div class="card-icon"><i class="fas fa-eye"></i></div>
+        <div class="card-seal"><i class="fas fa-eye"></i></div>
         <h3>Visión</h3>
         <p>Ser la inmobiliaria líder en Lima Norte, reconocida por nuestra transparencia, seriedad y compromiso con el desarrollo urbano ordenado.</p>
       </article>
       <article class="nosotros-card">
-        <div class="card-icon"><i class="fas fa-handshake"></i></div>
+        <div class="card-seal"><i class="fas fa-handshake"></i></div>
         <h3>Valores</h3>
         <p>Transparencia, compromiso, seriedad y cercanía. Cada cliente es parte de nuestra familia y merece la mejor asesoría en su inversión.</p>
       </article>
@@ -128,7 +382,7 @@
 <section id="proyectos" class="proyectos section">
   <div class="container">
     <div class="section-head">
-      <span class="section-eyebrow">Nuestros proyectos</span>
+      <span class="section-eyebrow">// Nuestros proyectos</span>
       <h2>Lotes disponibles en <span class="gradient-text">Carabayllo</span></h2>
       <p class="section-sub">
         Encuentra el lote ideal para construir la casa de tus sueños.
@@ -140,6 +394,17 @@
       <article *ngFor="let p of proyectos" class="proyecto-card">
         <div class="proyecto-img">
           <img [src]="p.imagen" [alt]="p.nombre" loading="lazy" />
+          <div class="proyecto-img-scrim"></div>
+
+          <!-- Marco de esquinas tipo estaca de agrimensor -->
+          <svg class="frame-corner corner-tl" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22,2 L2,2 L2,22" />
+          </svg>
+          <svg class="frame-corner corner-br" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2,22 L22,22 L22,2" />
+          </svg>
+
+          <span class="proyecto-codigo">{{ p.codigo }} · {{ p.coord }}</span>
           <span class="proyecto-estado" [class]="'estado-' + p.estado.toLowerCase().replace(' ', '-')">
             {{ p.estado }}
           </span>
@@ -178,7 +443,7 @@
 <section id="beneficios" class="beneficios section">
   <div class="container">
     <div class="section-head">
-      <span class="section-eyebrow">¿Por qué elegirnos?</span>
+      <span class="section-eyebrow light">// ¿Por qué elegirnos?</span>
       <h2>La mejor decisión para tu <span class="gradient-text">inversión</span></h2>
       <p class="section-sub">
         Te acompañamos en cada paso, con transparencia y seguridad.
@@ -197,38 +462,12 @@
   </div>
 </section>
 
-<!-- TESTIMONIOS -->
-<section class="testimonios section">
-  <div class="container">
-    <div class="section-head">
-      <span class="section-eyebrow">Testimonios</span>
-      <h2>Lo que dicen nuestros <span class="gradient-text">clientes</span></h2>
-    </div>
-
-    <div class="testimonios-grid">
-      <article *ngFor="let t of testimonios" class="testimonio-card">
-        <div class="testimonio-stars">
-          <i *ngFor="let _ of getEstrellas(t.calificacion)" class="fas fa-star"></i>
-        </div>
-        <p class="testimonio-texto">"{{ t.comentario }}"</p>
-        <div class="testimonio-autor">
-          <img [src]="t.imagen" [alt]="t.nombre" loading="lazy" />
-          <div>
-            <strong>{{ t.nombre }}</strong>
-            <span>{{ t.rol }}</span>
-          </div>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
 <!-- CONTACTO -->
 <section id="contacto" class="contacto section">
   <div class="container">
     <div class="contacto-grid">
       <div class="contacto-info">
-        <span class="section-eyebrow light">Contáctanos</span>
+        <span class="section-eyebrow light">// Contáctanos</span>
         <h2>¿Listo para tu <span class="gradient-text">nuevo lote</span>?</h2>
         <p>
           Escríbenos y un asesor se pondrá en contacto contigo en menos de 24 horas.
@@ -246,7 +485,7 @@
             <i class="fas fa-phone-alt"></i>
             <div>
               <strong>Teléfono</strong>
-              <span>(01) {{ telefono }}</span>
+              <span>{{ telefonoFijo }}</span>
             </div>
           </a>
           <a [href]="'mailto:' + correo" class="contacto-item">
@@ -266,41 +505,25 @@
         </div>
       </div>
 
-      <form class="contacto-form" (submit)="enviarContacto($event)">
-        <h3>Envíanos un mensaje</h3>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre completo</label>
-            <input type="text" [(ngModel)]="formContacto.nombre" name="nombre" required placeholder="Tu nombre" />
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="tel" [(ngModel)]="formContacto.telefono" name="telefono" required placeholder="987 654 321" />
-          </div>
+      <div class="contacto-mapa">
+        <h3>Nuestra Oficina</h3>
+        <p class="mapa-direccion">
+          <i class="fas fa-map-marker-alt"></i>
+          {{ empresaData?.direccion || 'Av. Alfredo Mendiola N° 3623 - 3er. Piso Of. 301 - Los Olivos, Lima' }}
+        </p>
+        <div class="mapa-iframe-wrapper">
+          <iframe
+            [src]="mapaUrl"
+            width="100%"
+            height="320"
+            style="border:0; border-radius: 4px;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Ubicación de la oficina">
+          </iframe>
         </div>
-        <div class="form-group">
-          <label>Correo electrónico</label>
-          <input type="email" [(ngModel)]="formContacto.correo" name="correo" required placeholder="tu@correo.com" />
-        </div>
-        <div class="form-group">
-          <label>Mensaje</label>
-          <textarea [(ngModel)]="formContacto.mensaje" name="mensaje" rows="4" required
-                    placeholder="¿En qué podemos ayudarte?"></textarea>
-        </div>
-
-        <button type="submit" class="btn-submit" [disabled]="enviando()">
-          <span *ngIf="!enviando() && !enviado()">
-            <i class="fas fa-paper-plane"></i> Enviar mensaje
-          </span>
-          <span *ngIf="enviando()">
-            <i class="fas fa-spinner fa-spin"></i> Enviando...
-          </span>
-          <span *ngIf="enviado()">
-            <i class="fas fa-check"></i> ¡Mensaje enviado!
-          </span>
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 </section>
@@ -311,7 +534,7 @@
     <div class="footer-grid">
       <div class="footer-col footer-brand">
         <div class="brand">
-          <img [src]="logoFooter" alt="Inmobiliaria Ivan" class="brand-logo" />
+          <img [src]="logoFooter" [alt]="nombreComercial" class="brand-logo" />
         </div>
         <p>
           Empresa peruana con RUC {{ ruc }}, dedicada a la venta de
@@ -338,15 +561,15 @@
 
       <div class="footer-col">
         <h4>Contacto</h4>
-        <a [href]="whatsappUrl" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> +51 {{ telefono }}</a>
-        <a [href]="'tel:+51' + telefonoLimpio"><i class="fas fa-phone-alt"></i> {{ telefono }}</a>
+        <a [href]="whatsappUrl" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> {{ telefono }}</a>
+        <a [href]="'tel:' + telefonoLimpio"><i class="fas fa-phone-alt"></i> {{ telefonoFijo }}</a>
         <a [href]="'mailto:' + correo"><i class="fas fa-envelope"></i> {{ correo }}</a>
         <span><i class="fas fa-map-marker-alt"></i> Carabayllo, Lima</span>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>© {{ anioActual }} Inmobiliaria Constructora Ivan E.I.R.L · RUC {{ ruc }} · Todos los derechos reservados.</p>
+      <p>© {{ anioActual }} {{ nombreComercial }} · RUC {{ ruc }} · Todos los derechos reservados.</p>
     </div>
   </div>
 </footer>
@@ -355,3 +578,6 @@
 <a [href]="whatsappUrl" target="_blank" rel="noopener" class="fab-whatsapp" title="Hablar por WhatsApp">
   <i class="fab fa-whatsapp"></i>
 </a>
+
+<!-- Widget de chat público -->
+<app-chat-widget></app-chat-widget>

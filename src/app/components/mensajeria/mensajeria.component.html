@@ -1,73 +1,130 @@
 <div class="messaging-container">
-  <aside class="chat-sidebar">
-    <div class="sidebar-header">
-      <h1>PRUEBA: EL COMPONENTE CARGA</h1>
+  <aside class="contacts-panel">
+    <div class="panel-header">
       <h2>Mensajes</h2>
-      <div class="search-box">
-        <input type="text" placeholder="Buscar cliente o vendedor...">
-      </div>
+      <span class="connection-status" [class.online]="conectado" [title]="conectado ? 'Conectado' : 'Desconectado'">
+        <i class="fas fa-circle"></i>
+      </span>
     </div>
 
-    <div class="chat-list">
-      <div *ngFor="let t of trabajadores" class="chat-item" [class.active]="chatSeleccionado?.id === t.id"
-        (click)="seleccionarChat(t)">
-        <div class="avatar">{{ t.iniciales }}</div>
-        <div class="chat-info">
-          <div class="info-header">
-            <h4>{{ t.nombres }} {{ t.apellidos }}</h4> <!-- 👈 así -->
-            <span class="chat-time">10:45 AM</span>
-          </div>
-          <p>{{ t.ultimoMsj || 'Sin mensajes recientes' }}</p>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        [(ngModel)]="busqueda"
+        (ngModelChange)="onBusquedaChange()"
+        placeholder="Buscar contacto..."
+      />
+    </div>
+
+    <div class="contacts-list">
+      <div
+        *ngFor="let c of contactosFiltrados"
+        class="contact-item"
+        [class.active]="chatSeleccionado?.id === c.id"
+        (click)="seleccionarChat(c)"
+      >
+        <div class="contact-avatar" [style.background]="getAvatarColor(c.nombres)">
+          {{ c.iniciales }}
+          <span class="online-dot" *ngIf="c.online"></span>
         </div>
+        <div class="contact-info">
+          <div class="contact-top">
+            <span class="contact-name">{{ c.nombres }} {{ c.apellidos }}</span>
+            <span class="contact-time">{{ formatearFecha(c.ultimaFecha || '') }}</span>
+          </div>
+          <div class="contact-bottom">
+            <span class="contact-preview">{{ c.ultimoMsj || 'Sin mensajes' }}</span>
+            <span class="contact-rol">{{ obtenerRolLabel(c.rol) }}</span>
+          </div>
+        </div>
+        <span class="badge-unread" *ngIf="c.noLeidos > 0">{{ c.noLeidos }}</span>
+      </div>
+
+      <div class="empty-contacts" *ngIf="contactosFiltrados.length === 0">
+        <i class="fas fa-users"></i>
+        <p>No se encontraron contactos</p>
       </div>
     </div>
   </aside>
 
-  <main class="chat-window">
+  <main class="chat-main">
     <ng-container *ngIf="chatSeleccionado; else noChat">
-      <header class="chat-window-header">
-        <div class="active-user-info">
-          <div class="avatar-sm">{{ chatSeleccionado.iniciales }}</div>
-          <div>
-            <h3>{{ chatSeleccionado.nombre }}</h3>
-            <span class="status online">En línea</span>
+      <header class="chat-header">
+        <div class="chat-header-user">
+          <div class="chat-avatar-sm" [style.background]="getAvatarColor(chatSeleccionado.nombres)">
+            {{ chatSeleccionado.iniciales }}
+          </div>
+          <div class="chat-header-info">
+            <h3>{{ chatSeleccionado.nombres }} {{ chatSeleccionado.apellidos }}</h3>
+            <span class="chat-header-rol">{{ obtenerRolLabel(chatSeleccionado.rol) }}</span>
           </div>
         </div>
-        <div class="actions">
-          <button class="action-btn">📞</button>
-          <button class="action-btn">📄</button>
+        <div class="chat-header-actions">
+          <span class="typing-indicator" *ngIf="false">
+            <i class="fas fa-ellipsis-h"></i> Escribiendo...
+          </span>
         </div>
       </header>
 
-      <div class="message-history">
-        <div *ngFor="let m of mensajes"
-          [ngClass]="{'sent': m.emisorId === usuarioLogueado.id, 'received': m.emisorId !== usuarioLogueado.id}"
-          class="message">
-          <div class="message-bubble">
-            <p>{{ m.texto }}</p>
-            <div class="message-footer">
-              <span class="time">{{ m.hora }}</span>
-              <span class="check" *ngIf="m.emisorId === usuarioLogueado.id">✓✓</span>
+      <div class="messages-container" #messageContainer>
+        <div class="messages-wrapper">
+          <div class="loading-history" *ngIf="cargandoHistorial">
+            <i class="fas fa-spinner fa-spin"></i> Cargando mensajes...
+          </div>
+
+          <div
+            *ngFor="let m of mensajes"
+            class="message-row"
+            [class.mine]="m.remitenteId === usuarioLogueado?.id"
+            [class.theirs]="m.remitenteId !== usuarioLogueado?.id"
+          >
+            <div class="message-bubble">
+              <p class="message-text">{{ m.contenido }}</p>
+              <div class="message-meta">
+                <span class="message-time">{{ formatearHoraMensaje(m.fecha) }}</span>
+                <span class="message-read" *ngIf="m.remitenteId === usuarioLogueado?.id">
+                  <i class="fas fa-check-double" [class.read]="m.estado === 'LEIDO'"></i>
+                </span>
+              </div>
             </div>
+          </div>
+
+          <div class="empty-messages" *ngIf="mensajes.length === 0 && !cargandoHistorial">
+            <i class="fas fa-comments"></i>
+            <p>No hay mensajes aún. Envía un mensaje para iniciar la conversación.</p>
           </div>
         </div>
       </div>
 
       <footer class="chat-footer">
-        <button class="attach-btn">+</button>
-        <div class="input-wrapper">
-          <input type="text" [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarMensaje()"
-            placeholder="Escribe un mensaje aquí...">
+        <div class="input-group">
+          <input
+            type="text"
+            [(ngModel)]="nuevoMensaje"
+            (keyup.enter)="enviarMensaje()"
+            placeholder="Escribe un mensaje..."
+            [disabled]="!chatSeleccionado"
+          />
         </div>
-        <button class="send-btn" (click)="enviarMensaje()">➤</button>
+        <button
+          class="send-btn"
+          (click)="enviarMensaje()"
+          [disabled]="!nuevoMensaje.trim() || !chatSeleccionado"
+          title="Enviar mensaje"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
       </footer>
     </ng-container>
 
     <ng-template #noChat>
-      <div class="empty-state">
-        <div class="logo-inm">🏢</div>
-        <h2>Inmobiliaria IVAN</h2>
-        <p>Selecciona un contacto para iniciar la gestión.</p>
+      <div class="no-chat-selected">
+        <div class="no-chat-icon">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h3>Bandeja de mensajes</h3>
+        <p>Selecciona un contacto del panel izquierdo para comenzar a chatear.</p>
       </div>
     </ng-template>
   </main>

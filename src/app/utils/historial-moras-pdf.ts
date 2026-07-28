@@ -33,6 +33,9 @@ import { ContratoResponseDTO } from '../dto/contratoreponse.dto';
 
 export class HistorialMorasPdf {
 
+  static empresaNombre = 'INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.';
+  static empresaLogo  = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1773723460/logo_y1ygeg.png';
+
   /**
    * Genera el PDF en memoria y lo abre en nueva pestaña.
    */
@@ -44,10 +47,10 @@ export class HistorialMorasPdf {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text('INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.', 14, 18);
+    doc.text(HistorialMorasPdf.empresaNombre, 14, 18);
 
     try {
-      const resp = await fetch('https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_400,h_400/v1773723460/logo_y1ygeg.png');
+      const resp = await fetch(HistorialMorasPdf.empresaLogo);
       if (resp.ok) {
         const blob = await resp.blob();
         const logoDataUrl = await new Promise<string>((resolve, reject) => {
@@ -56,7 +59,10 @@ export class HistorialMorasPdf {
           reader.onerror = () => reject(reader.error);
           reader.readAsDataURL(blob);
         });
-        doc.addImage(logoDataUrl, 'PNG', pageW - 38, 11, 18, 18);
+        doc.setFillColor(255, 255, 255);
+        doc.rect(pageW - 38, 11, 18, 18, 'F');
+        const fmt = blob.type === 'image/png' ? 'PNG' : 'JPEG';
+        doc.addImage(logoDataUrl, fmt, pageW - 38, 11, 18, 18);
       }
     } catch (e) {
       console.warn('No se pudo cargar el logo:', e);
@@ -447,7 +453,7 @@ export class HistorialMorasPdf {
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
     doc.text(`Página ${pageNumber}`, pageW - 14, pageH - 6, { align: 'right' });
-    doc.text('INMOBILIARIA CONSTRUCTORA IVAN E.I.R.L.', 14, pageH - 6);
+    doc.text(HistorialMorasPdf.empresaNombre, 14, pageH - 6);
   }
 
   private static fmtNumero(n: number): string {

@@ -133,7 +133,7 @@ $ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
       color: $emerald;
       font-weight: 600;
       letter-spacing: 1px;
-      text-transform: uppercase;
+      text-transform: none;
       margin-top: 1px;
       white-space: nowrap;
     }
@@ -306,7 +306,7 @@ $ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
         font-size: 0.65rem;
         color: $emerald;
         font-weight: 600;
-        text-transform: uppercase;
+        text-transform: none;
         letter-spacing: 0.5px;
         margin-top: 1px;
       }
