@@ -2,8 +2,7 @@
 <header class="navbar" [class.scrolled]="scrolled()">
   <div class="container navbar-inner">
     <a href="#inicio" class="navbar-brand" (click)="scrollA('inicio', $event)">
-      <img *ngIf="logoHeader" [src]="logoHeader" [alt]="nombreComercial" class="navbar-logo" />
-      <span *ngIf="!logoHeader" class="navbar-brand-text">{{ nombreComercial }}</span>
+      <img [src]="logoHeader" [alt]="nombreComercial" class="navbar-logo" />
     </a>
 
     <nav class="navbar-links">
@@ -236,7 +235,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <img *ngIf="logoFooter" [src]="logoFooter" [alt]="nombreComercial" class="footer-logo" />
+        <img [src]="logoFooter" [alt]="nombreComercial" class="footer-logo" />
         <p *ngIf="ruc">Empresa peruana con RUC {{ ruc }}, dedicada a la venta de lotes de vivienda con título de propiedad en Carabayllo.</p>
       </div>
       <div class="footer-links">

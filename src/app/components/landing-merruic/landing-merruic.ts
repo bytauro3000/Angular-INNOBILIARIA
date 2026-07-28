@@ -70,9 +70,9 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
 
   get correo(): string { return this.empresaData?.email || ''; }
 
-  get logoHeader(): string { return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || ''; }
+  get logoHeader(): string { return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png'; }
 
-  get logoFooter(): string { return this.empresaData?.logoUrl || this.empresaData?.logoSmallUrl || ''; }
+  get logoFooter(): string { return this.empresaData?.logoUrl || this.empresaData?.logoSmallUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png'; }
 
   get nombreComercial(): string { return this.empresaData?.nombreComercial || 'Inmobiliaria Merruic'; }
 
