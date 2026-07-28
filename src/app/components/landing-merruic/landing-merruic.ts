@@ -39,8 +39,8 @@ interface Estadistica {
   selector: 'app-landing-merruic',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, ChatWidgetComponent],
-  templateUrl: './landing-merruic.component.html',
-  styleUrls: ['./landing-merruic.component.scss']
+  templateUrl: './landing-merruic.html',
+  styleUrls: ['./landing-merruic.scss']
 })
 export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy {
 

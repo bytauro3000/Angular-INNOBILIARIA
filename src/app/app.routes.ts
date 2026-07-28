@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 import { LandingComponent } from './components/landing/landing.component';
-import { LandingMerruicComponent } from './components/landing-merruic/landing-merruic.component';
-import { HomeComponent } from './components/home/home.component';
+import { LandingMerruicComponent } from './components/landing-merruic/landing-merruic';
+import { HomeComponent } from './components/home/home';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
 
