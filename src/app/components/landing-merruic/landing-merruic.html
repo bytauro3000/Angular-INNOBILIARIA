@@ -88,21 +88,21 @@
 
     <div class="proyectos-grid">
       <article *ngFor="let p of proyectos" class="proyecto-card">
-        <div class="proyecto-img">
+        <div class="proyecto-card-img">
           <img [src]="p.imagen" [alt]="p.nombre" loading="lazy" />
-          <span class="proyecto-estado" [class]="'estado-' + p.estado.toLowerCase().replace(' ', '-')">
+          <span class="proyecto-card-estado" [class]="'estado-' + p.estado.toLowerCase().replace(' ', '-')">
             {{ p.estado }}
           </span>
         </div>
-        <div class="proyecto-body">
+        <div class="proyecto-card-body">
           <h3>{{ p.nombre }}</h3>
-          <p class="proyecto-ubicacion"><i class="fas fa-map-marker-alt"></i> {{ p.ubicacion }}</p>
-          <div class="proyecto-meta">
+          <p class="proyecto-card-ubicacion"><i class="fas fa-map-marker-alt"></i> {{ p.ubicacion }}</p>
+          <div class="proyecto-card-meta">
             <span><i class="fas fa-ruler-combined"></i> {{ p.area }}</span>
             <span *ngIf="p.lotes > 0"><i class="fas fa-th-large"></i> {{ p.lotes }} lotes</span>
           </div>
-          <div class="proyecto-footer">
-            <div class="proyecto-precio">
+          <div class="proyecto-card-footer">
+            <div class="proyecto-card-precio">
               <small>Desde</small>
               <strong>{{ p.precioDesde }}</strong>
             </div>
