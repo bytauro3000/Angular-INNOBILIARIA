@@ -121,9 +121,10 @@ html { scroll-behavior: smooth; }
 .stat { text-align: center; strong { display: block; font-family: $font-display; font-size: 1.8rem; color: $text-white; margin-bottom: 4px; } span { font-family: $font-body; font-size: 0.85rem; color: rgba(255,255,255,0.7); } }
 @media (max-width: 768px) { .hero-stats-inner { gap: 24px; flex-wrap: wrap; } .hero-cta-group { flex-direction: column; align-items: stretch; } .hero-cta-group .btn { justify-content: center; } }
 
-.proyectos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; }
+.proyectos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; justify-items: center; }
+@media (max-width: 400px) { .proyectos-grid { grid-template-columns: 1fr; gap: 24px; } }
 .proyecto-card {
-  background: white; border-radius: $radius; overflow: hidden; box-shadow: $shadow; transition: transform $transition, box-shadow $transition; cursor: pointer;
+  background: white; border-radius: $radius; overflow: hidden; box-shadow: $shadow; transition: transform $transition, box-shadow $transition; cursor: pointer; width: 100%;
   &:hover { transform: translateY(-6px); box-shadow: $shadow-lg; }
   &-img { position: relative; height: 220px; overflow: hidden; img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms ease; } &:hover img { transform: scale(1.08); } }
   &-estado { position: absolute; top: 16px; left: 16px; padding: 6px 16px; border-radius: 50px; font-family: $font-body; font-size: 0.8rem; font-weight: 600; color: white; background: $primary; backdrop-filter: blur(4px); &.estado-ultimas-unidades { background: #D97706; } &.estado-proximamente { background: $accent; } }
@@ -163,4 +164,4 @@ html { scroll-behavior: smooth; }
 .footer { background: $bg-dark; padding: 60px 0 0; color: $text-white; &-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.08); } &-logo { height: 40px; width: auto; margin-bottom: 16px; } &-brand p { font-family: $font-body; font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.6; } h4 { font-family: $font-display; font-size: 1rem; color: $text-white; margin-bottom: 16px; } &-links, &-contacto { display: flex; flex-direction: column; gap: 10px; a, span { font-family: $font-body; font-size: 0.9rem; color: rgba(255,255,255,0.6); text-decoration: none; transition: color $transition; cursor: pointer; i { width: 20px; color: $primary-light; } &:hover { color: $primary-light; } } } &-bottom { padding: 24px 0; text-align: center; p { font-family: $font-body; font-size: 0.85rem; color: rgba(255,255,255,0.4); } } }
 @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr; gap: 32px; } }
 
-.fab-whatsapp { position: fixed; bottom: 24px; right: 24px; z-index: 999; width: 56px; height: 56px; background: #25D366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); text-decoration: none; transition: transform $transition, box-shadow $transition; &:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37, 211, 102, 0.5); } }
+
