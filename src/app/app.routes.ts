@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginLayoutComponent } from './auth/login/login-layout.component';
 import { LandingComponent } from './components/landing/landing.component';
+import { LandingMerruicComponent } from './components/landing-merruic/landing-merruic.component';
+import { HomeComponent } from './components/home/home.component';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
 
@@ -82,7 +84,7 @@ import { AgendaCalendarioComponent } from './components/agenda-calendario/agenda
 import { SeleccionMenuComponent } from './components/seleccion-menu/seleccion-menu.component';
 
 export const routes: Routes = [
-  { path: '', component: LandingComponent },
+  { path: '', component: HomeComponent },
   { path: 'login', component: LoginLayoutComponent },
 
   // ── Seleccion de Menu (Soporte) ──────────────────────────────────────────

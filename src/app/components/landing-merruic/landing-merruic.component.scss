@@ -1,0 +1,352 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
+
+// ─── Design Tokens ───────────────────────────────────────────────
+$primary:       #0F766E;
+$primary-dark:  #0B5E57;
+$primary-light: #14B8A6;
+$accent:        #0369A1;
+$bg:            #FFFFFF;
+$bg-alt:        #F0FDFA;
+$bg-dark:       #0F172A;
+$text:          #134E4A;
+$text-light:    #64748B;
+$text-white:    #F8FAFC;
+$radius:        12px;
+$shadow:        0 4px 24px rgba(15, 118, 110, 0.10);
+$shadow-lg:     0 12px 48px rgba(15, 118, 110, 0.15);
+$font-display:  'Cinzel', serif;
+$font-body:     'Josefin Sans', sans-serif;
+$transition:    250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── Reset ────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+// ─── Container ────────────────────────────────────────────────────
+.container {
+  width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px;
+}
+
+// ─── Section ──────────────────────────────────────────────────────
+.section {
+  padding: 100px 0;
+  &-alt { background: $bg-alt; }
+  &-head {
+    text-align: center; max-width: 680px; margin: 0 auto 60px;
+    h2 { font-family: $font-display; font-size: 2.25rem; color: $text; margin-bottom: 16px; line-height: 1.25; }
+    p { font-family: $font-body; font-size: 1.1rem; color: $text-light; line-height: 1.7; }
+  }
+  &-tag {
+    display: inline-block; font-family: $font-body; font-size: 0.85rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 3px; color: $primary; margin-bottom: 12px;
+  }
+}
+
+.text-accent { color: $primary; }
+
+// ─── Navbar ───────────────────────────────────────────────────────
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 16px 0; transition: background $transition, box-shadow $transition, padding $transition;
+  &.scrolled {
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08); padding: 10px 0;
+  }
+  &-inner {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  &-logo { height: 42px; width: auto; display: block; }
+  &-brand-text { font-family: $font-display; font-size: 1.2rem; color: $primary; font-weight: 600; }
+  &-links {
+    display: flex; gap: 32px;
+    a {
+      font-family: $font-body; font-size: 0.95rem; font-weight: 500; color: $text;
+      text-decoration: none; transition: color $transition; cursor: pointer;
+      &:hover { color: $primary; }
+    }
+  }
+  &-actions {
+    display: flex; align-items: center; gap: 12px;
+  }
+  &-toggle {
+    display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px;
+    span { display: block; width: 24px; height: 2px; background: $text; border-radius: 2px; transition: $transition; }
+    &.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    &.active span:nth-child(2) { opacity: 0; }
+    &.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+  }
+  &-mobile {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.98); backdrop-filter: blur(16px);
+    flex-direction: column; align-items: center; justify-content: center; gap: 28px; z-index: -1;
+    opacity: 0; transition: opacity $transition;
+    &.open { opacity: 1; z-index: 999; display: flex; }
+    a {
+      font-family: $font-display; font-size: 1.3rem; color: $text; text-decoration: none;
+      transition: color $transition; cursor: pointer;
+      &:hover { color: $primary; }
+    }
+  }
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px;
+  font-family: $font-body; font-size: 0.95rem; font-weight: 600; border-radius: 50px;
+  text-decoration: none; cursor: pointer; transition: all $transition; border: 2px solid transparent;
+  i { font-size: 1.1rem; }
+}
+.btn-primary {
+  background: $primary; color: white; border-color: $primary;
+  &:hover { background: $primary-dark; border-color: $primary-dark; transform: translateY(-2px); box-shadow: $shadow-lg; }
+}
+.btn-whatsapp {
+  background: #25D366; color: white; border-color: #25D366;
+  &:hover { background: #1DA851; border-color: #1DA851; transform: translateY(-2px); box-shadow: $shadow-lg; }
+}
+.btn-whatsapp-nav {
+  background: #25D366; color: white; padding: 8px 20px; font-size: 0.85rem; border-radius: 50px; text-decoration: none;
+  font-weight: 600; transition: $transition; cursor: pointer; border: none;
+  &:hover { background: #1DA851; transform: translateY(-1px); }
+}
+.btn-outline-nav {
+  padding: 8px 20px; font-size: 0.85rem; border-radius: 50px; text-decoration: none; font-weight: 600;
+  color: $text; border: 2px solid $primary; transition: $transition; cursor: pointer;
+  &:hover { background: $primary; color: white; }
+}
+.btn-card {
+  background: $primary; color: white; padding: 10px 22px; font-size: 0.9rem; border-radius: 50px;
+  text-decoration: none; font-weight: 600; transition: $transition; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  &:hover { background: $primary-dark; transform: translateX(4px); }
+}
+.btn-login-mobile {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 36px;
+  background: $primary; color: white !important; border-radius: 50px; font-family: $font-body !important;
+  font-size: 1rem !important; text-decoration: none; transition: $transition;
+  &:hover { background: $primary-dark; }
+}
+
+@media (max-width: 900px) {
+  .navbar-links, .btn-outline-nav { display: none; }
+  .navbar-actions .btn-whatsapp-nav { padding: 8px 16px; font-size: 0.8rem; span { display: none; } }
+  .navbar-toggle { display: flex; }
+  .navbar-mobile { display: flex; }
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────
+.hero {
+  position: relative; min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; overflow: hidden;
+  &-bg {
+    position: absolute; inset: 0; z-index: 0;
+    img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+  }
+  &-overlay {
+    position: absolute; inset: 0; background: linear-gradient(135deg,
+      rgba(15, 118, 110, 0.85) 0%, rgba(3, 105, 161, 0.55) 100%);
+    z-index: 1;
+  }
+  &-pattern {
+    position: absolute; inset: 0; z-index: 1;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  &-content {
+    position: relative; z-index: 2; padding: 120px 24px 80px; max-width: 800px;
+  }
+  &-badge {
+    display: inline-block; padding: 8px 20px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+    border-radius: 50px; font-family: $font-body; font-size: 0.9rem; color: $text-white;
+    margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2);
+  }
+  h1 {
+    font-family: $font-display; font-size: clamp(2.2rem, 5vw, 3.8rem); color: $text-white;
+    line-height: 1.15; margin-bottom: 20px;
+  }
+  &-highlight {
+    background: linear-gradient(135deg, #5EEAD4, #2DD4BF); -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  &-subtitle {
+    font-family: $font-body; font-size: 1.15rem; color: rgba(255,255,255,0.85);
+    line-height: 1.7; margin-bottom: 36px; max-width: 600px;
+  }
+  &-cta-group {
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  &-stats {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
+    background: rgba(255,255,255,0.06); backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    &-inner { display: flex; justify-content: center; gap: 60px; padding: 24px 0; }
+  }
+}
+
+.stat {
+  text-align: center;
+  strong {
+    display: block; font-family: $font-display; font-size: 1.8rem; color: $text-white; margin-bottom: 4px;
+  }
+  span { font-family: $font-body; font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+}
+
+@media (max-width: 768px) {
+  .hero-stats-inner { gap: 24px; flex-wrap: wrap; }
+  .hero-cta-group { flex-direction: column; align-items: stretch; }
+  .hero-cta-group .btn { justify-content: center; }
+}
+
+// ─── Proyectos ────────────────────────────────────────────────────
+.proyectos-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px;
+}
+
+.proyecto-card {
+  background: white; border-radius: $radius; overflow: hidden;
+  box-shadow: $shadow; transition: transform $transition, box-shadow $transition; cursor: pointer;
+  &:hover { transform: translateY(-6px); box-shadow: $shadow-lg; }
+  &-img {
+    position: relative; height: 220px; overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms ease; }
+    &:hover img { transform: scale(1.08); }
+  }
+  &-estado {
+    position: absolute; top: 16px; left: 16px; padding: 6px 16px; border-radius: 50px;
+    font-family: $font-body; font-size: 0.8rem; font-weight: 600; color: white;
+    background: $primary; backdrop-filter: blur(4px);
+    &.estado-ultimas-unidades { background: #D97706; }
+    &.estado-proximamente { background: $accent; }
+  }
+  &-body { padding: 24px; }
+  h3 { font-family: $font-display; font-size: 1.2rem; color: $text; margin-bottom: 8px; }
+  &-ubicacion { font-family: $font-body; font-size: 0.9rem; color: $text-light; margin-bottom: 12px; i { margin-right: 4px; color: $primary; } }
+  &-meta { display: flex; gap: 20px; margin-bottom: 16px; font-family: $font-body; font-size: 0.85rem; color: $text-light; i { margin-right: 4px; color: $primary; } }
+  &-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #E2E8F0; }
+  &-precio {
+    small { display: block; font-family: $font-body; font-size: 0.8rem; color: $text-light; }
+    strong { font-family: $font-display; font-size: 1.3rem; color: $primary; }
+  }
+}
+
+// ─── Beneficios ───────────────────────────────────────────────────
+.beneficios-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;
+}
+
+.beneficio-card {
+  background: white; padding: 36px 28px; border-radius: $radius;
+  box-shadow: $shadow; transition: transform $transition, box-shadow $transition; cursor: pointer;
+  text-align: center;
+  &:hover { transform: translateY(-4px); box-shadow: $shadow-lg; }
+  h3 { font-family: $font-display; font-size: 1.1rem; color: $text; margin-bottom: 12px; }
+  p { font-family: $font-body; font-size: 0.95rem; color: $text-light; line-height: 1.6; }
+  &-icon {
+    width: 60px; height: 60px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, $primary-light, $primary); border-radius: 16px; font-size: 1.5rem; color: white;
+  }
+}
+
+// ─── Nosotros ─────────────────────────────────────────────────────
+.nosotros-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+
+.nosotros-content {
+  h2 { font-family: $font-display; font-size: 2rem; color: $text; margin-bottom: 20px; line-height: 1.25; }
+  p { font-family: $font-body; font-size: 1.05rem; color: $text-light; line-height: 1.7; margin-bottom: 16px; }
+}
+
+.nosotros-valores {
+  display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;
+  .valor {
+    display: flex; align-items: center; gap: 8px; font-family: $font-body; font-weight: 500; color: $text;
+    i { color: $primary; font-size: 1.1rem; }
+  }
+}
+
+.nosotros-image {
+  border-radius: $radius; overflow: hidden; box-shadow: $shadow-lg;
+  img { width: 100%; height: 400px; object-fit: cover; display: block; }
+}
+
+@media (max-width: 768px) {
+  .nosotros-grid { grid-template-columns: 1fr; gap: 40px; }
+  .nosotros-image { img { height: 280px; } }
+}
+
+// ─── Contacto ─────────────────────────────────────────────────────
+.contacto-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
+}
+
+.contacto-info {
+  h2 { font-family: $font-display; font-size: 2rem; color: $text; margin-bottom: 12px; line-height: 1.25; }
+  p { font-family: $font-body; font-size: 1.05rem; color: $text-light; margin-bottom: 32px; }
+}
+
+.contacto-items {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.contacto-item {
+  display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+  background: white; border-radius: $radius; box-shadow: $shadow; text-decoration: none;
+  transition: transform $transition, box-shadow $transition; cursor: pointer;
+  &:hover { transform: translateX(4px); box-shadow: $shadow-lg; }
+  strong { display: block; font-family: $font-body; font-weight: 600; color: $text; font-size: 0.95rem; }
+  span { font-family: $font-body; font-size: 0.85rem; color: $text-light; }
+  &-icon {
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    background: $bg-alt; border-radius: 12px; font-size: 1.2rem; color: $primary; flex-shrink: 0;
+  }
+}
+
+.contacto-mapa {
+  .mapa-wrapper {
+    border-radius: $radius; overflow: hidden; box-shadow: $shadow-lg; height: 380px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contacto-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+// ─── Footer ───────────────────────────────────────────────────────
+.footer {
+  background: $bg-dark; padding: 60px 0 0; color: $text-white;
+  &-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  &-logo { height: 40px; width: auto; margin-bottom: 16px; }
+  &-brand p { font-family: $font-body; font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+  h4 { font-family: $font-display; font-size: 1rem; color: $text-white; margin-bottom: 16px; }
+  &-links, &-contacto {
+    display: flex; flex-direction: column; gap: 10px;
+    a, span {
+      font-family: $font-body; font-size: 0.9rem; color: rgba(255,255,255,0.6);
+      text-decoration: none; transition: color $transition; cursor: pointer;
+      i { width: 20px; color: $primary-light; }
+      &:hover { color: $primary-light; }
+    }
+  }
+  &-bottom {
+    padding: 24px 0; text-align: center;
+    p { font-family: $font-body; font-size: 0.85rem; color: rgba(255,255,255,0.4); }
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+// ─── WhatsApp FAB ─────────────────────────────────────────────────
+.fab-whatsapp {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  width: 56px; height: 56px; background: #25D366; color: white;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  text-decoration: none; transition: transform $transition, box-shadow $transition;
+  &:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37, 211, 102, 0.5); }
+}
