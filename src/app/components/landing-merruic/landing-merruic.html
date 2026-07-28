@@ -26,19 +26,20 @@
       </button>
     </div>
   </div>
-
-  <div class="navbar-backdrop" [class.open]="menuAbierto()" (click)="toggleMenu()"></div>
-  <nav class="navbar-mobile" [class.open]="menuAbierto()">
-    <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
-    <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
-    <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
-    <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
-    <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
-    <a routerLink="/login" (click)="toggleMenu()" class="btn-login-mobile">
-      <i class="fas fa-user"></i> Iniciar Sesión
-    </a>
-  </nav>
 </header>
+
+<!-- Mobile menu (fuera del navbar para evitar containing block del backdrop-filter) -->
+<div class="navbar-backdrop" [class.open]="menuAbierto()" (click)="toggleMenu()"></div>
+<nav class="navbar-mobile" [class.open]="menuAbierto()">
+  <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
+  <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
+  <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
+  <a href="#nosotros" (click)="scrollA('nosotros', $event)">Nosotros</a>
+  <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+  <a routerLink="/login" (click)="toggleMenu()" class="btn-login-mobile">
+    <i class="fas fa-user"></i> Iniciar Sesión
+  </a>
+</nav>
 
 <!-- HERO -->
 <section id="inicio" class="hero">
