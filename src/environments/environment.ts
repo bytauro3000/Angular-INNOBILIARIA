@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://gatewayinmobiliaria.onrender.com',
-    wsUrl: 'wss://gatewayinmobiliaria.onrender.com'
+    apiUrl: 'https://ms-gateway-latest.onrender.com',
+    wsUrl: 'wss://ms-gateway-latest.onrender.com'
 };
