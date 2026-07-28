@@ -163,7 +163,7 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
   readonly estadisticas: Estadistica[] = [
     { valor: 15, prefijo: '+', sufijo: '', label: 'años de experiencia' },
     { valor: 240, prefijo: '+', sufijo: '', label: 'familias atendidas' },
-    { valor: 3, prefijo: '', sufijo: '', label: 'proyectos en habilitación' }
+    { valor: 35, prefijo: '~', sufijo: ' min', label: 'de Lima Centro' }
   ];
 
   private scrollTriggers: ScrollTrigger[] = [];
