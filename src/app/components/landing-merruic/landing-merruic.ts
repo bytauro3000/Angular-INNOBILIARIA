@@ -176,6 +176,7 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
   scrollA(id: string, event: Event): void {
     event.preventDefault();
     this.menuAbierto.set(false);
+    document.body.style.overflow = '';
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -183,7 +184,10 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   toggleMenu(): void {
-    this.menuAbierto.update(v => !v);
+    this.menuAbierto.update(v => {
+      document.body.style.overflow = v ? '' : 'hidden';
+      return !v;
+    });
   }
 
   ngAfterViewInit(): void {
