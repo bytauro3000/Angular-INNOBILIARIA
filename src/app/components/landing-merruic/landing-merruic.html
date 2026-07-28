@@ -27,6 +27,7 @@
     </div>
   </div>
 
+  <div class="navbar-backdrop" [class.open]="menuAbierto()" (click)="toggleMenu()"></div>
   <nav class="navbar-mobile" [class.open]="menuAbierto()">
     <a href="#inicio" (click)="scrollA('inicio', $event)">Inicio</a>
     <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
