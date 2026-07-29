@@ -175,6 +175,16 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
     this.scrolled.set(window.scrollY > 50);
   }
 
+  readonly videoFases = [
+    { pct: 0, izq: 'El terreno vacío te espera', der: 'Lotes desde 120 m² en Carabayllo' },
+    { pct: 0.25, izq: 'Cimientos sólidos', der: 'Terreno con título saneado' },
+    { pct: 0.50, izq: 'Paredes que protegen', der: 'Financiamiento directo sin bancos' },
+    { pct: 0.75, izq: 'Techo que abriga', der: 'Servicios básicos incluidos' },
+    { pct: 1, izq: 'Tu hogar terminado', der: 'Inversión segura, plusvalía garantizada' }
+  ];
+
+  readonly videoUrl = 'https://res.cloudinary.com/cqjufsgf/video/upload/f_auto,q_auto,vc_auto/v1785303126/videolanding_rtxtoc.mp4';
+
   scrollA(id: string, event: Event): void {
     event.preventDefault();
     this.menuAbierto.set(false);
@@ -201,6 +211,7 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
     requestAnimationFrame(() => {
       const root = this.host.nativeElement;
       this.initHeroAnimation(root);
+      this.initVideoScroll(root);
       this.initReveals(root);
       this.initCounters(root);
       ScrollTrigger.refresh();
@@ -232,6 +243,43 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
     gsap.from('.hero-content > *', {
       opacity: 0, y: 30, stagger: 0.12, duration: 0.9, ease: 'power3.out', delay: 0.3
     });
+  }
+
+  private initVideoScroll(root: HTMLElement): void {
+    const seccion = root.querySelector<HTMLElement>('.video-section');
+    const video = root.querySelector<HTMLVideoElement>('.video-section video');
+    const izqEl = root.querySelector<HTMLElement>('.video-izq');
+    const derEl = root.querySelector<HTMLElement>('.video-der');
+    if (!seccion || !video || !izqEl || !derEl) return;
+
+    let duracion = video.duration || 4;
+
+    const actualizarFase = (progreso: number) => {
+      const fases = this.videoFases;
+      let fase = fases[0];
+      for (let i = fases.length - 1; i >= 0; i--) {
+        if (progreso >= fases[i].pct) { fase = fases[i]; break; }
+      }
+      izqEl.textContent = fase.izq;
+      derEl.textContent = fase.der;
+    };
+
+    const st = gsap.to(video, {
+      currentTime: duracion,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: seccion,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (self: ScrollTrigger) => {
+          const prog = self.progress;
+          video.currentTime = prog * duracion;
+          actualizarFase(prog);
+        }
+      }
+    }).scrollTrigger;
+    this.track(st);
   }
 
   private initReveals(root: HTMLElement): void {
