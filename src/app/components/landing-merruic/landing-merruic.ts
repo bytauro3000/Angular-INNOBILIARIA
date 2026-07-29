@@ -47,42 +47,44 @@ export class LandingMerruicComponent implements OnInit, AfterViewInit, OnDestroy
   readonly anioActual = new Date().getFullYear();
   empresaData: EmpresaPublic | null = null;
 
+  telefono = '';
+  telefonoLimpio = '';
+  whatsappUrl = '';
+  correo = '';
+  logoHeader = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png';
+  logoFooter = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png';
+  nombreComercial = 'Inmobiliaria Merruic';
+  ruc = '';
+  mapaUrl: SafeResourceUrl;
+
   constructor(
     private empresaService: EmpresaService,
     private sanitizer: DomSanitizer,
     private host: ElementRef<HTMLElement>
-  ) {}
+  ) {
+    this.mapaUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      'https://www.google.com/maps?q=Lima&output=embed'
+    );
+  }
 
   ngOnInit(): void {
-    this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
-  }
-
-  get telefono(): string { return this.empresaData?.celular || ''; }
-
-  get telefonoLimpio(): string {
-    return this.empresaData?.whatsapp?.replace(/[^\d]/g, '') || '';
-  }
-
-  get whatsappUrl(): string {
-    const num = this.telefonoLimpio;
-    return `https://wa.me/${num}?text=${encodeURIComponent('Hola, estoy interesado en conocer más sobre los lotes disponibles.')}`;
-  }
-
-  get correo(): string { return this.empresaData?.email || ''; }
-
-  get logoHeader(): string { return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png'; }
-
-  get logoFooter(): string { return this.empresaData?.logoUrl || this.empresaData?.logoSmallUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png'; }
-
-  get nombreComercial(): string { return this.empresaData?.nombreComercial || 'Inmobiliaria Merruic'; }
-
-  get ruc(): string { return this.empresaData?.ruc || ''; }
-
-  get mapaUrl(): SafeResourceUrl {
-    const dir = encodeURIComponent(this.empresaData?.direccion || 'Lima, Peru');
-    return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.google.com/maps?q=${dir}&output=embed`
-    );
+    this.empresaService.obtenerEmpresa().subscribe(e => {
+      this.empresaData = e;
+      if (!e) return;
+      this.telefono = e.celular || '';
+      this.telefonoLimpio = (e.whatsapp || '').replace(/[^\d]/g, '');
+      const num = this.telefonoLimpio;
+      this.whatsappUrl = `https://wa.me/${num}?text=${encodeURIComponent('Hola, estoy interesado en conocer más sobre los lotes disponibles.')}`;
+      this.correo = e.email || '';
+      this.logoHeader = e.logoSmallUrl || e.logoUrl || this.logoHeader;
+      this.logoFooter = e.logoUrl || e.logoSmallUrl || this.logoFooter;
+      this.nombreComercial = e.nombreComercial || this.nombreComercial;
+      this.ruc = e.ruc || '';
+      const dir = encodeURIComponent(e.direccion || 'Lima, Peru');
+      this.mapaUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.google.com/maps?q=${dir}&output=embed`
+      );
+    });
   }
 
   menuAbierto = signal(false);
