@@ -143,17 +143,17 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const cw = container.clientWidth;
     const ch = container.clientHeight;
     const scale = Math.min(cw / w, ch / h, 1);
-    const dw = w * scale;
-    const dh = h * scale;
-    const margin = 20;
+    const dw = Math.round(w * scale);
+    const dh = Math.round(h * scale);
+    const margin = Math.round(Math.min(dw, dh) * 0.04);
     this.cropState = {
       ...this.cropState,
       imgW: w,
       imgH: h,
       x: margin,
       y: margin,
-      w: Math.max(dw - margin * 2, 100),
-      h: Math.max(dh - margin * 2, 60)
+      w: dw - margin * 2,
+      h: dh - margin * 2
     };
   }
 
