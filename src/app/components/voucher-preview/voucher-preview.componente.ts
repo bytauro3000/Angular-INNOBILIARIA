@@ -206,12 +206,9 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
     let { x, y, w, h, offsetX, offsetY, imgW, imgH } = this.cropState;
     const mw = 40;
-    const imgLeft = offsetX;
-    const imgTop = offsetY;
-    const imgRight = offsetX + (img.clientWidth || rect.width);
-    const imgBottom = offsetY + (img.clientHeight || rect.height);
-    const aw = imgRight - imgLeft;
-    const ah = imgBottom - imgTop;
+    const cropImg = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
+    const aw = cropImg ? cropImg.clientWidth || (rect.width - offsetX * 2) : rect.width;
+    const ah = cropImg ? cropImg.clientHeight || (rect.height - offsetY * 2) : rect.height;
     if (dir === 'move') {
       x = clamp(origX + dx, 0, aw - origW);
       y = clamp(origY + dy, 0, ah - origH);
