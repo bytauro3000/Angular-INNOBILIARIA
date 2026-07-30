@@ -74,25 +74,22 @@
         <form (ngSubmit)="guardarParcelero()">
           <div class="form-wrapper-modal">
 
-            <div class="form-row form-2-col">
-              <div class="form-group">
+            <div class="form-row form-dni-nombre">
+              <div class="form-group form-dni">
                 <label for="par-dni"><i class="bi bi-person-vcard"></i> N° DNI</label>
                 <div class="input-container-relative">
                   <input type="text" id="par-dni" [(ngModel)]="nuevoParcelero.dni" name="dni" required
-                    placeholder="Número de DNI" maxlength="8" (input)="onDniInput()" />
+                    placeholder="DNI" maxlength="8" (input)="onDniInput()" />
                   <div *ngIf="cargandoDni" class="spinner-dni">
                     <div class="spinner-border spinner-border-sm text-success" role="status"></div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="form-row form-2-col">
-              <div class="form-group">
+              <div class="form-group form-nombre">
                 <label for="par-nombres"><i class="bi bi-person"></i> Nombres</label>
                 <input type="text" id="par-nombres" [(ngModel)]="nuevoParcelero.nombres" name="nombres" required placeholder="Nombres del parcelero" />
               </div>
-              <div class="form-group">
+              <div class="form-group form-apellido">
                 <label for="par-apellidos"><i class="bi bi-person-fill"></i> Apellidos</label>
                 <input type="text" id="par-apellidos" [(ngModel)]="nuevoParcelero.apellidos" name="apellidos" required placeholder="Apellidos del parcelero" />
               </div>
