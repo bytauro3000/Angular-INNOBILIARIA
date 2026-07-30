@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { LoginComponent } from './login.component';
 import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login-layout',
