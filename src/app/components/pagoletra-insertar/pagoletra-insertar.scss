@@ -444,8 +444,8 @@ $white:        #ffffff;
     flex-wrap: nowrap;
 
     input.form-control {
-      width: auto !important;
-      flex: 1 1 auto;
+      width: 100% !important;
+      flex: 1;
       min-width: 0;
       border-top-right-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
