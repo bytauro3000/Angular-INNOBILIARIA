@@ -9,15 +9,18 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
   imports: [CommonModule],
   template: `
     <div class="voucher-container">
-      <div class="upload-area" (click)="fileInput.click()" [class.disabled]="disabled">
-        <input #fileInput type="file" multiple accept="image/*" (change)="onFilesSelected($event)" [disabled]="disabled" style="display: none">
+      <div class="upload-area" (click)="triggerFileInput()" [class.disabled]="disabled">
+        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="disabled" style="display: none">
         <i class="bi bi-cloud-upload"></i>
-        <span>Seleccionar imágenes</span>
+        <span>Seleccionar imagen</span>
       </div>
 
       <div class="preview-list" *ngIf="files.length > 0">
         <div class="preview-item" *ngFor="let file of files; let i = index">
           <img [src]="file.url" (click)="openLightbox(i)" alt="voucher">
+          <button class="crop-btn" (click)="openCrop(i)" title="Recortar">
+            <i class="bi bi-crop"></i>
+          </button>
           <div class="ocr-badge" *ngIf="enableOcr && i === 0" [class.ocr-processing]="ocrProcessing" [class.ocr-done]="!ocrProcessing && ocrProcessed">
             <i class="bi" [class.bi-hourglass-split]="ocrProcessing" [class.bi-check-circle-fill]="!ocrProcessing && ocrProcessed"></i>
             <span>{{ ocrProcessing ? 'Analizando...' : (ocrProcessed ? 'OCR listo' : '') }}</span>
@@ -31,6 +34,33 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
       <div class="lightbox" *ngIf="lightboxIndex !== null" (click)="closeLightbox()">
         <img [src]="files[lightboxIndex].url" (click)="$event.stopPropagation()" alt="voucher grande">
         <button class="close-lightbox" (click)="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="crop-overlay" *ngIf="cropState">
+        <div class="crop-modal" (mousedown)="$event.stopPropagation()">
+          <div class="crop-header">
+            <span>Recortar imagen</span>
+            <button class="crop-close-btn" (click)="cancelCrop()"><i class="bi bi-x-lg"></i></button>
+          </div>
+          <div class="crop-image-wrap" #cropWrap (mousedown)="onCropBgMouseDown($event)">
+            <img #cropImg [src]="cropState.url" (load)="onCropImgLoad()" alt="recortar">
+            <div class="crop-selection"
+              [style.left.px]="cropState.x"
+              [style.top.px]="cropState.y"
+              [style.width.px]="cropState.w"
+              [style.height.px]="cropState.h"
+              (mousedown)="onSelMouseDown($event)">
+              <div class="crop-handle nw" data-dir="nw"></div>
+              <div class="crop-handle ne" data-dir="ne"></div>
+              <div class="crop-handle sw" data-dir="sw"></div>
+              <div class="crop-handle se" data-dir="se"></div>
+            </div>
+          </div>
+          <div class="crop-actions">
+            <button class="crop-cancel" (click)="cancelCrop()">Cancelar</button>
+            <button class="crop-confirm" (click)="confirmCrop()">Aplicar recorte</button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -54,32 +84,194 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   ocrProcessing: boolean = false;
   ocrProcessed: boolean = false;
 
+  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; originalFile: File; editIndex: number } | null = null;
+  private dragState: { startX: number; startY: number; origX: number; origY: number; origW: number; origH: number; dir: string } | null = null;
+
   private ocrService = inject(OcrVoucherService);
   private ocrDoneForFileNames: Set<string> = new Set();
 
   private onChange: (value: File[]) => void = () => {};
   private onTouched: () => void = () => {};
 
-  onFilesSelected(event: any): void {
-    const selectedFiles = Array.from(event.target.files) as File[];
-    for (const file of selectedFiles) {
+  triggerFileInput(): void {
+    if (this.disabled) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e: any) => {
+      const file = e.target?.files?.[0];
+      if (!file) return;
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const fileEntry = { file, url: e.target.result };
-        this.files.push(fileEntry);
-        this.emitChange();
-
-        if (this.enableOcr && !this.ocrDoneForFileNames.has(file.name)) {
-          this.ocrDoneForFileNames.add(file.name);
-          this.runOcr(fileEntry);
-        }
+      reader.onload = (ev: any) => {
+        this.openCropForFile(file, ev.target.result);
       };
       reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.openCropForFile(file, e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private openCropForFile(file: File, url: string): void {
+    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, originalFile: file, editIndex: -1 };
+    this.dragState = null;
+  }
+
+  openCrop(index: number): void {
+    const f = this.files[index];
+    if (!f) return;
+    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, originalFile: f.file, editIndex: index };
+    this.dragState = null;
+  }
+
+  onCropImgLoad(): void {
+    if (!this.cropState) return;
+    const img = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
+    if (!img) return;
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    const container = img.parentElement;
+    if (!container) return;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const scale = Math.min(cw / w, ch / h, 1);
+    const dw = w * scale;
+    const dh = h * scale;
+    const margin = 20;
+    this.cropState = {
+      ...this.cropState,
+      imgW: w,
+      imgH: h,
+      x: margin,
+      y: margin,
+      w: Math.max(dw - margin * 2, 100),
+      h: Math.max(dh - margin * 2, 60)
+    };
+  }
+
+  onCropBgMouseDown(e: MouseEvent): void {
+    if (!this.cropState || this.dragState) return;
+    const wrap = e.currentTarget as HTMLElement;
+    const rect = wrap.getBoundingClientRect();
+    if (!rect) return;
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const minSize = 40;
+    this.cropState = { ...this.cropState, x: px, y: py, w: minSize, h: minSize };
+    this.dragState = { startX: e.clientX, startY: e.clientY, origX: px, origY: py, origW: minSize, origH: minSize, dir: 'se' };
+    this.initDragListeners();
+  }
+
+  onSelMouseDown(e: MouseEvent): void {
+    e.stopPropagation();
+    if (!this.cropState || this.disabled) return;
+    const target = e.target as HTMLElement;
+    const dir = target.getAttribute('data-dir') || 'move';
+    this.dragState = {
+      startX: e.clientX, startY: e.clientY,
+      origX: this.cropState.x, origY: this.cropState.y,
+      origW: this.cropState.w, origH: this.cropState.h,
+      dir
+    };
+    this.initDragListeners();
+  }
+
+  private initDragListeners(): void {
+    const onMove = (me: MouseEvent) => this.onDragMove(me);
+    const onUp = () => { this.dragState = null; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  private onDragMove(e: MouseEvent): void {
+    if (!this.cropState || !this.dragState) return;
+    const wrap = document.querySelector('.crop-image-wrap');
+    if (!wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    const dx = e.clientX - this.dragState.startX;
+    const dy = e.clientY - this.dragState.startY;
+    const { dir, origX, origY, origW, origH } = this.dragState;
+    const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+    let { x, y, w, h } = this.cropState;
+    const mw = 40;
+    if (dir === 'move') {
+      x = clamp(origX + dx, 0, rect.width - origW);
+      y = clamp(origY + dy, 0, rect.height - origH);
+    } else if (dir === 'se') {
+      w = clamp(origW + dx, mw, rect.width - origX);
+      h = clamp(origH + dy, mw, rect.height - origY);
+    } else if (dir === 'sw') {
+      w = clamp(origW - dx, mw, origX + origW);
+      x = origX + origW - w;
+      h = clamp(origH + dy, mw, rect.height - origY);
+    } else if (dir === 'ne') {
+      w = clamp(origW + dx, mw, rect.width - origX);
+      h = clamp(origH - dy, mw, origY + origH);
+      y = origY + origH - h;
+    } else if (dir === 'nw') {
+      w = clamp(origW - dx, mw, origX + origW);
+      x = origX + origW - w;
+      h = clamp(origH - dy, mw, origY + origH);
+      y = origY + origH - h;
     }
+    this.cropState = { ...this.cropState, x, y, w, h };
+  }
+
+  cancelCrop(): void {
+    this.cropState = null;
+    this.dragState = null;
+  }
+
+  confirmCrop(): void {
+    if (!this.cropState) return;
+    const { x, y, w, h, originalFile, editIndex } = this.cropState;
+    const img = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
+    if (!img) return;
+    const scaleX = img.naturalWidth / img.clientWidth;
+    const scaleY = img.naturalHeight / img.clientHeight;
+    const sx = Math.round(x * scaleX);
+    const sy = Math.round(y * scaleY);
+    const sw = Math.round(w * scaleX);
+    const sh = Math.round(h * scaleY);
+    const canvas = document.createElement('canvas');
+    canvas.width = sw;
+    canvas.height = sh;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const name = originalFile.name.replace(/(\.\w+)$/, '_cropped$1');
+      const croppedFile = new File([blob], name, { type: originalFile.type });
+      const croppedUrl = URL.createObjectURL(blob);
+      const entry = { file: croppedFile, url: croppedUrl };
+      if (editIndex >= 0 && editIndex < this.files.length) {
+        URL.revokeObjectURL(this.files[editIndex].url);
+        this.files[editIndex] = entry;
+      } else {
+        this.files.push(entry);
+      }
+      this.cropState = null;
+      this.dragState = null;
+      this.emitChange();
+      if (this.enableOcr) {
+        this.ocrDoneForFileNames.add(croppedFile.name);
+        this.runOcr(entry);
+      }
+    }, originalFile.type);
   }
 
   removeFile(index: number): void {
     const removed = this.files[index];
+    URL.revokeObjectURL(removed.url);
     this.files.splice(index, 1);
     this.emitChange();
     if (removed) {
@@ -117,13 +309,13 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   }
 
   ngOnDestroy(): void {
+    this.files.forEach(f => URL.revokeObjectURL(f.url));
     this.ocrService.terminate();
   }
 
   writeValue(obj: any): void {
-    // Cuando el padre asigna null/undefined o un array vacío, limpiamos el preview.
-    // Caso típico: cambio de medioPago a EFECTIVO, o botón "quitar voucher" en el padre.
     if (obj === null || obj === undefined || (Array.isArray(obj) && obj.length === 0)) {
+      this.files.forEach(f => URL.revokeObjectURL(f.url));
       this.files = [];
       this.ocrDoneForFileNames.clear();
       this.ocrProcessed = false;
