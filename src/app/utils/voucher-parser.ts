@@ -66,10 +66,6 @@ function extractNumeroOperacion(text: string): string | null {
 
   return null;
 }
-    }
-  }
-  return null;
-}
 
 const MONTH_ALT = 'ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|set|sep(?:t(?:iembre)?)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?';
 
