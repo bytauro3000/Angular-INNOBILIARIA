@@ -8,6 +8,7 @@ import { ThemeService } from '../../services/theme.service';
 import { DistritoService } from '../../services/distrito.service';
 import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
+import { environment } from '../../../environments/environment';
 
 type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios' | 'reportes';
 
@@ -34,6 +35,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     private hoverCloseTimeout: any = null;
 
     empresaData: EmpresaPublic | null = null;
+    isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
     constructor(
         private tokenService: TokenService,
