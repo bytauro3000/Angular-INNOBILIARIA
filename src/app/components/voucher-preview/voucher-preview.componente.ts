@@ -45,8 +45,8 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
           <div class="crop-image-wrap" #cropWrap (mousedown)="onCropBgMouseDown($event)">
             <img #cropImg [src]="cropState.url" (load)="onCropImgLoad()" alt="recortar">
             <div class="crop-selection"
-              [style.left.px]="cropState.x"
-              [style.top.px]="cropState.y"
+              [style.left.px]="cropState.offsetX + cropState.x"
+              [style.top.px]="cropState.offsetY + cropState.y"
               [style.width.px]="cropState.w"
               [style.height.px]="cropState.h"
               (mousedown)="onSelMouseDown($event)">
@@ -84,7 +84,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   ocrProcessing: boolean = false;
   ocrProcessed: boolean = false;
 
-  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; originalFile: File; editIndex: number } | null = null;
+  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number } | null = null;
   private dragState: { startX: number; startY: number; origX: number; origY: number; origW: number; origH: number; dir: string } | null = null;
 
   private ocrService = inject(OcrVoucherService);
@@ -121,14 +121,14 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   }
 
   private openCropForFile(file: File, url: string): void {
-    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, originalFile: file, editIndex: -1 };
+    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: file, editIndex: -1 };
     this.dragState = null;
   }
 
   openCrop(index: number): void {
     const f = this.files[index];
     if (!f) return;
-    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, originalFile: f.file, editIndex: index };
+    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: f.file, editIndex: index };
     this.dragState = null;
   }
 
@@ -145,11 +145,15 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const scale = Math.min(cw / w, ch / h, 1);
     const dw = Math.round(w * scale);
     const dh = Math.round(h * scale);
+    const offsetX = Math.round((cw - dw) / 2);
+    const offsetY = Math.round((ch - dh) / 2);
     const margin = Math.round(Math.min(dw, dh) * 0.04);
     this.cropState = {
       ...this.cropState,
       imgW: w,
       imgH: h,
+      offsetX: Math.max(offsetX, 0),
+      offsetY: Math.max(offsetY, 0),
       x: margin,
       y: margin,
       w: dw - margin * 2,
@@ -162,8 +166,8 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const wrap = e.currentTarget as HTMLElement;
     const rect = wrap.getBoundingClientRect();
     if (!rect) return;
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
+    const px = e.clientX - rect.left - this.cropState.offsetX;
+    const py = e.clientY - rect.top - this.cropState.offsetY;
     const minSize = 40;
     this.cropState = { ...this.cropState, x: px, y: py, w: minSize, h: minSize };
     this.dragState = { startX: e.clientX, startY: e.clientY, origX: px, origY: py, origW: minSize, origH: minSize, dir: 'se' };
@@ -200,20 +204,26 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const dy = e.clientY - this.dragState.startY;
     const { dir, origX, origY, origW, origH } = this.dragState;
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-    let { x, y, w, h } = this.cropState;
+    let { x, y, w, h, offsetX, offsetY, imgW, imgH } = this.cropState;
     const mw = 40;
+    const imgLeft = offsetX;
+    const imgTop = offsetY;
+    const imgRight = offsetX + (img.clientWidth || rect.width);
+    const imgBottom = offsetY + (img.clientHeight || rect.height);
+    const aw = imgRight - imgLeft;
+    const ah = imgBottom - imgTop;
     if (dir === 'move') {
-      x = clamp(origX + dx, 0, rect.width - origW);
-      y = clamp(origY + dy, 0, rect.height - origH);
+      x = clamp(origX + dx, 0, aw - origW);
+      y = clamp(origY + dy, 0, ah - origH);
     } else if (dir === 'se') {
-      w = clamp(origW + dx, mw, rect.width - origX);
-      h = clamp(origH + dy, mw, rect.height - origY);
+      w = clamp(origW + dx, mw, aw - origX);
+      h = clamp(origH + dy, mw, ah - origY);
     } else if (dir === 'sw') {
       w = clamp(origW - dx, mw, origX + origW);
       x = origX + origW - w;
-      h = clamp(origH + dy, mw, rect.height - origY);
+      h = clamp(origH + dy, mw, ah - origY);
     } else if (dir === 'ne') {
-      w = clamp(origW + dx, mw, rect.width - origX);
+      w = clamp(origW + dx, mw, aw - origX);
       h = clamp(origH - dy, mw, origY + origH);
       y = origY + origH - h;
     } else if (dir === 'nw') {
@@ -232,13 +242,13 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   confirmCrop(): void {
     if (!this.cropState) return;
-    const { x, y, w, h, originalFile, editIndex } = this.cropState;
+    const { x, y, w, h, offsetX, offsetY, originalFile, editIndex } = this.cropState;
     const img = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
     if (!img) return;
-    const scaleX = img.naturalWidth / img.clientWidth;
-    const scaleY = img.naturalHeight / img.clientHeight;
-    const sx = Math.round(x * scaleX);
-    const sy = Math.round(y * scaleY);
+    const scaleX = img.naturalWidth / (img.clientWidth || 1);
+    const scaleY = img.naturalHeight / (img.clientHeight || 1);
+    const sx = Math.round((x) * scaleX);
+    const sy = Math.round((y) * scaleY);
     const sw = Math.round(w * scaleX);
     const sh = Math.round(h * scaleY);
     const canvas = document.createElement('canvas');
