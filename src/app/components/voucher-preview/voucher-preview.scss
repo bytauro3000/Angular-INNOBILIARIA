@@ -16,6 +16,7 @@
     i { font-size: 2rem; color: #023e8a; }
     span { font-size: 0.9rem; color: #334155; }
     &:hover:not(.disabled) { border-color: #3498db; background-color: #f0f7ff; }
+    &.dragging { border-color: #023e8a; background-color: #e8f0fe; border-style: solid; transform: scale(1.02); }
     &.disabled { background-color: #e9ecef; border-color: #adb5bd; cursor: not-allowed; opacity: 0.6; }
   }
 

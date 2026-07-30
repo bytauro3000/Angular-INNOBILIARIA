@@ -9,10 +9,16 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
   imports: [CommonModule],
   template: `
     <div class="voucher-container">
-      <div class="upload-area" (click)="triggerFileInput()" [class.disabled]="disabled">
+      <div class="upload-area"
+        (click)="triggerFileInput()"
+        [class.disabled]="disabled"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="disabled" style="display: none">
         <i class="bi bi-cloud-upload"></i>
-        <span>Seleccionar imagen</span>
+        <span>{{ isDragging ? 'Suelta la imagen aquí' : 'Seleccionar o arrastrar imagen' }}</span>
       </div>
 
       <div class="preview-list" *ngIf="files.length > 0">
@@ -84,6 +90,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   ocrProcessing: boolean = false;
   ocrProcessed: boolean = false;
 
+  isDragging = false;
   cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number } | null = null;
   private dragState: { startX: number; startY: number; origX: number; origY: number; origW: number; origH: number; dir: string } | null = null;
 
@@ -113,6 +120,33 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   onFileSelected(event: any): void {
     const file = event.target?.files?.[0];
     if (!file) return;
+    this.processFile(file);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.disabled) this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+    if (this.disabled) return;
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    this.processFile(file);
+  }
+
+  private processFile(file: File): void {
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.openCropForFile(file, e.target.result);

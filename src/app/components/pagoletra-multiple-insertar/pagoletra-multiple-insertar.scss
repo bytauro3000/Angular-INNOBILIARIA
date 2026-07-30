@@ -426,10 +426,12 @@ $white:        #ffffff;
     flex-direction: row !important;
     align-items: stretch;
     width: 100%;
+    flex-wrap: nowrap;
 
     input.form-control {
       width: auto !important;
       flex: 1 1 auto;
+      min-width: 0;
       border-top-right-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
       border-right: none !important;
