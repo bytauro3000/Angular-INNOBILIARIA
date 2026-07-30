@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { LoginComponent } from './login.component';
 import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login-layout',
@@ -16,6 +17,7 @@ export class LoginLayoutComponent implements OnInit {
 
   readonly anioActual = new Date().getFullYear();
   empresaData: EmpresaPublic | null = null;
+  isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
   constructor(private empresaService: EmpresaService) {}
 
