@@ -35,10 +35,14 @@ export class LoginLayoutComponent implements OnInit {
   }
 
   get logoBranding(): string {
-    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_280/v1773725974/logogrande_rfvxhu.png';
+    const ivanFallback = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_280/v1773725974/logogrande_rfvxhu.png';
+    const merruicFallback = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png';
+    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || (this.isMerruic ? merruicFallback : ivanFallback);
   }
 
   get logoMobile(): string {
-    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_160/v1773725974/logogrande_rfvxhu.png';
+    const ivanFallback = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto,w_160/v1773725974/logogrande_rfvxhu.png';
+    const merruicFallback = 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png';
+    return this.empresaData?.logoSmallUrl || this.empresaData?.logoUrl || (this.isMerruic ? merruicFallback : ivanFallback);
   }
 }

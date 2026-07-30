@@ -337,6 +337,18 @@ $ease:          cubic-bezier(0.16, 1, 0.3, 1);
   .form-footer p i { color: #14B8A6; }
   .form-mobile-back { color: #14B8A6; }
   .brand-logo { filter: none; }
+
+  ::ng-deep {
+    .input-icon-modern { color: #14B8A6 !important; }
+    .form-control-modern:focus { border-color: #14B8A6 !important; box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.2) !important; }
+    .form-check-input:checked { background-color: #14B8A6 !important; border-color: #14B8A6 !important; }
+    .form-check-input:focus { box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2) !important; border-color: #14B8A6 !important; }
+    .forgot-password-link { color: #14B8A6 !important; }
+    .forgot-password-link:hover { color: #0F766E !important; }
+    .btn-login { background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%) !important; box-shadow: 0 6px 18px rgba(20, 184, 166, 0.3) !important; }
+    .btn-login:hover:not(:disabled) { box-shadow: 0 10px 24px rgba(20, 184, 166, 0.45) !important; }
+    .eye-icon:hover { color: #14B8A6 !important; }
+  }
 }
 
 /* ============================================== */
