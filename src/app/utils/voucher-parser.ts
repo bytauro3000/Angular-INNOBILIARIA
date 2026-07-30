@@ -22,27 +22,50 @@ export function extractVoucherData(text: string): VoucherFields {
 }
 
 function extractNumeroOperacion(text: string): string | null {
+  const lines = text.split('\n');
+
+  const keywords = /OP(?:ERACI[OÓ]N|\.\s*ERACI[OÓ]N)|N[°ºo0RO.\-]*\s*OP|N[úu]mero\s*Op|N[úu]mero.*[Oo]peraci|C[oó]digo.*[Oo]peraci|ID\s*[Oo]peraci|ID\s*[Tt]ransacci|COMPROBANTE\s*N[°ºo0]|NRO[.:\s]*OP/i;
+
   const labelPatterns = [
     /N[úu]mero\s+de\s+operaci[oó]n/i,
-    /Nro\.?\s+de\s+operaci[oó]n/i,
+    /Nro[.:\s]*de\s+operaci[oó]n/i,
     /N[°ºo0.\-]?\s*de\s+operaci[oó]n/i,
-    /C[oó]digo\s+de\s+operaci[oó]n/i,
-    /C[oó]d\.?\s+de\s+operaci[oó]n/i,
-    /ID\s+de\s+(?:operaci[oó]n|transacci[oó]n)/i,
-    /NRO\.?\s+OPERACI[OÓ]N/i,
+    /C[oó]digo[.:\s]*de\s+operaci[oó]n/i,
+    /C[oó]d[.:\s]*de\s+operaci[oó]n/i,
+    /ID[.:\s]*de\s+(?:operaci[oó]n|transacci[oó]n)/i,
+    /NRO[.:\s]*OPERACI[OÓ]N/i,
+    /N[°ºo0RO.\-]*\s*OP(?:ERACI[OÓ]N)?/i,
+    /OP(?:ERACI[OÓ]N|)\s*N[°ºo0]/i,
     /operaci[oó]n\s+n[úu]mero/i,
     /comprobante\s+n[úu]mero/i
   ];
 
   for (const pattern of labelPatterns) {
     const match = text.match(pattern);
-    if (match && typeof match.index === 'number') {
-      const afterLabel = text.substring(match.index + match[0].length);
-      const numMatch = afterLabel.match(/[:\-]?\s*(\d[\d.,]*\d|\d)/);
-      if (numMatch && numMatch[1]) {
-        const cleaned = cleanNumber(numMatch[1]);
-        if (cleaned.length >= 4) return cleaned;
-      }
+    if (!match || typeof match.index !== 'number') continue;
+
+    const afterLabel = text.substring(match.index + match[0].length);
+    const numMatch = afterLabel.match(/[:\-]?\s*(\d{4,})/);
+    if (numMatch && numMatch[1]) {
+      const cleaned = numMatch[1].replace(/[^\d]/g, '');
+      if (cleaned.length >= 4) return cleaned;
+    }
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!keywords.test(trimmed)) continue;
+    const nums = trimmed.match(/\b(\d{4,})\b/g);
+    if (!nums) continue;
+    const valid = nums.filter(n => {
+      const num = n.replace(/[^\d]/g, '');
+      return num.length >= 4 && num.length <= 10;
+    });
+    if (valid.length > 0) return valid[0];
+  }
+
+  return null;
+}
     }
   }
   return null;
