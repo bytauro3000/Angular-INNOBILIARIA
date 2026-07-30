@@ -76,7 +76,7 @@
               <span>Días de atraso</span>
               <strong class="text-orange">{{ calculoMora.diasMora }} día{{ calculoMora.diasMora !== 1 ? 's' : '' }}</strong>
             </div>
-            <div class="mora-row">
+            <div class="mora-row" *ngIf="calculoMora.montoPorcentaje > 0">
               <span>Interés 5% del importe</span>
               <strong>{{ simboloMoneda }} {{ calculoMora.montoPorcentaje | number:'1.2-2' }}</strong>
             </div>

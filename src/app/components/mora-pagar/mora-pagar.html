@@ -21,7 +21,7 @@
                         <span>Días de mora</span>
                         <strong class="text-warning">{{ mora.diasMora }} días</strong>
                     </div>
-                    <div class="resumen-row">
+                    <div class="resumen-row" *ngIf="mora.montoPorcentaje > 0">
                         <span>Interés (5%)</span>
                         <strong>{{ simboloMoneda }} {{ mora.montoPorcentaje | number:'1.2-2' }}</strong>
                     </div>

@@ -41,7 +41,7 @@
 
                 <div class="separador"></div>
 
-                <div class="detalle-row calculo">
+                <div class="detalle-row calculo" *ngIf="calculo.montoPorcentaje > 0">
                     <span class="detalle-label">Interés (5% del importe)</span>
                     <span class="detalle-valor mora-pct">{{ simboloMoneda }} {{ calculo.montoPorcentaje | number:'1.2-2' }}</span>
                 </div>
