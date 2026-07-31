@@ -2,6 +2,11 @@
 @import "@ng-select/ng-select/themes/default.theme.css";
 @import "@angular/material/prebuilt-themes/azure-blue.css";
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     margin: 0;
     padding: 0;
