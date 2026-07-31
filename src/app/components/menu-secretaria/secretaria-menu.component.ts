@@ -60,11 +60,6 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.empresaService.obtenerEmpresa().subscribe(e => this.empresaData = e);
 
-        // Aplicar tema Merruic global a las vistas (dark OLED + verde lima)
-        if (this.isMerruic) {
-            document.body.classList.add('merruic');
-        }
-
         // Precargar distritos en cache para que estén disponibles
         // inmediatamente en vistas como registro de letras de cambio
         this.distritoService.listarDistritos().subscribe();
@@ -92,9 +87,6 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         if (this.hoverCloseTimeout) {
             clearTimeout(this.hoverCloseTimeout);
             this.hoverCloseTimeout = null;
-        }
-        if (this.isMerruic) {
-            document.body.classList.remove('merruic');
         }
     }
 
