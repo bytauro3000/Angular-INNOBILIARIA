@@ -8,7 +8,6 @@ import { IngresoMensualDTO } from '../../dto/ingresomensual.dto';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-secretaria-dashboard',
@@ -18,8 +17,6 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
-
-  isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
   // ── Totales generales ──────────────────────────────────────────────────────
   totalLotes: number = 0;
@@ -47,10 +44,6 @@ export class SecretariaDashboard implements OnInit {
   ingresosMensualesCargando: boolean = true;
 
   // ── Gráficos ───────────────────────────────────────────────────────────────
-  private get gridColor(): string { return this.isMerruic ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'; }
-  private get tickColor(): string | undefined { return this.isMerruic ? '#94A3B8' : undefined; }
-  private get legendColor(): string | undefined { return this.isMerruic ? '#cbd5e1' : undefined; }
-
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -59,17 +52,17 @@ export class SecretariaDashboard implements OnInit {
       x: {
         stacked: true,
         grid: { display: false },
-        ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 10 }, color: this.tickColor }
+        ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 10 } }
       },
       y: {
         stacked: true,
         beginAtZero: true,
-        grid: { color: this.gridColor },
-        ticks: { precision: 0, stepSize: 1, color: this.tickColor }
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { precision: 0, stepSize: 1 }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, color: this.legendColor } }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } }
     }
   };
 
@@ -78,7 +71,7 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     cutout: '70%',
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, color: this.legendColor } }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } }
     }
   };
 
@@ -102,15 +95,15 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
       y: {
         beginAtZero: true,
-        grid: { color: this.gridColor },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 }, color: this.legendColor } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
       tooltip: {
         callbacks: {
           beforeBody: (items) => {
@@ -145,15 +138,15 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
       y: {
         beginAtZero: true,
-        grid: { color: this.gridColor },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 }, color: this.legendColor } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
       tooltip: {
         callbacks: {
           beforeBody: (items) => {
@@ -188,11 +181,11 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3, borderWidth: 2 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
       y: {
         beginAtZero: true,
-        grid: { color: this.gridColor },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
       }
     },
     plugins: {
