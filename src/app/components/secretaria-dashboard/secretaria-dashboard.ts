@@ -47,6 +47,10 @@ export class SecretariaDashboard implements OnInit {
   ingresosMensualesCargando: boolean = true;
 
   // ── Gráficos ───────────────────────────────────────────────────────────────
+  private get gridColor(): string { return this.isMerruic ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'; }
+  private get tickColor(): string | undefined { return this.isMerruic ? '#94A3B8' : undefined; }
+  private get legendColor(): string | undefined { return this.isMerruic ? '#cbd5e1' : undefined; }
+
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -55,17 +59,17 @@ export class SecretariaDashboard implements OnInit {
       x: {
         stacked: true,
         grid: { display: false },
-        ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 10 } }
+        ticks: { autoSkip: false, maxRotation: 45, minRotation: 45, font: { size: 10 }, color: this.tickColor }
       },
       y: {
         stacked: true,
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: { precision: 0, stepSize: 1 }
+        grid: { color: this.gridColor },
+        ticks: { precision: 0, stepSize: 1, color: this.tickColor }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, color: this.legendColor } }
     }
   };
 
@@ -74,7 +78,7 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     cutout: '70%',
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15 } }
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, color: this.legendColor } }
     }
   };
 
@@ -98,15 +102,15 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
+        grid: { color: this.gridColor },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 }, color: this.legendColor } },
       tooltip: {
         callbacks: {
           beforeBody: (items) => {
@@ -141,15 +145,15 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
+        grid: { color: this.gridColor },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
       }
     },
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 } } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 15, font: { size: 11 }, color: this.legendColor } },
       tooltip: {
         callbacks: {
           beforeBody: (items) => {
@@ -184,11 +188,11 @@ export class SecretariaDashboard implements OnInit {
     maintainAspectRatio: false,
     elements: { line: { tension: 0.3, borderWidth: 2 }, point: { radius: 3, hoverRadius: 5 } },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, color: this.tickColor } },
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.04)' },
-        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US') }
+        grid: { color: this.gridColor },
+        ticks: { callback: (value) => '$ ' + value.toLocaleString('en-US'), color: this.tickColor }
       }
     },
     plugins: {
