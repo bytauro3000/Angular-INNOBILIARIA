@@ -8,6 +8,7 @@ import { IngresoMensualDTO } from '../../dto/ingresomensual.dto';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-secretaria-dashboard',
@@ -17,6 +18,8 @@ import { TipoCambioService } from '../../services/tipo-cambio.service';
   styleUrls: ['./secretaria-dashboard.scss'],
 })
 export class SecretariaDashboard implements OnInit {
+
+  isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
   // ── Totales generales ──────────────────────────────────────────────────────
   totalLotes: number = 0;
