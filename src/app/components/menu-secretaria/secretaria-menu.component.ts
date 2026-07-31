@@ -37,6 +37,17 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     empresaData: EmpresaPublic | null = null;
     isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
+    get logoDefault(): string {
+        if (this.isMerruic) {
+            return 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1785274320/ChatGPT%20Image%2028%20jul%202026%2C%2003_48_23%20p.m._1785274320104.png';
+        }
+        return 'https://res.cloudinary.com/dlgqaifrk/image/upload/f_auto,q_auto/v1773723460/logo_y1ygeg.png';
+    }
+
+    get nombreComercialDefault(): string {
+        return this.isMerruic ? 'Inmobiliaria Merruic' : 'Inmobiliaria Ivan';
+    }
+
     constructor(
         private tokenService: TokenService,
         private logoutService: LogoutService,
