@@ -483,7 +483,7 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
       if (result.isConfirmed) {
         this.contratoService.eliminarContrato(id).subscribe({
           next: () => { this.toastr.success('Contrato eliminado exitosamente', 'Éxito'); this.cargarContratos(); },
-          error: () => { this.toastr.error('Error al eliminar el contrato', 'Error'); }
+          error: (err) => { this.toastr.error(err.error?.message || 'Error al eliminar el contrato', 'Error'); }
         });
       }
     });
