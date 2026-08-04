@@ -108,6 +108,11 @@ export class ContratoInsertarComponent implements OnInit {
   // Voucher dentro del modal
   voucherInicialFiles: File[] = [];
 
+  // OCR por voucher del pago inicial: se acumulan los N° de operación (coma) y
+  // se conserva la fecha más alta detectada entre todos los vouchers.
+  private ocrOperationNumbers: Map<string, string> = new Map();
+  private ocrVoucherFechas: Map<string, string> = new Map();
+
   // Estado del guardado (para el flujo de 2 pasos: guardar contrato → subir voucher)
   idContratoGuardado: number | null = null;
 
@@ -267,25 +272,28 @@ export class ContratoInsertarComponent implements OnInit {
     if (this.pagoInicialRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoInicialRequest.numeroOperacion = null;
       this.voucherInicialFiles = [];
+      this.limpiarOcrInicial();
     }
   }
 
   /**
-   * Recibe los datos extraídos por OCR del voucher del pago inicial.
-   * Sobrescribe siempre los campos detectados (el usuario puede corregir manualmente después).
+   * Recibe los datos extraídos por OCR de cada voucher del pago inicial.
+   * Acumula los N° de operación (separados por coma) y conserva la fecha más alta.
    */
   onVoucherOcr(data: VoucherOcrData): void {
     console.log('[OCR Pago Inicial] Datos extraídos:', data);
 
     const cambios: string[] = [];
 
-    if (data.numeroOperacion) {
-      this.pagoInicialRequest.numeroOperacion = data.numeroOperacion;
+    if (data.numeroOperacion && data.fileName) {
+      this.ocrOperationNumbers.set(data.fileName, data.numeroOperacion);
+      this.actualizarNumeroOperacionInicial();
       cambios.push(`N° operación: ${data.numeroOperacion}`);
     }
 
-    if (data.fechaPago) {
-      this.pagoInicialRequest.fechaPago = data.fechaPago;
+    if (data.fechaPago && data.fileName) {
+      this.ocrVoucherFechas.set(data.fileName, data.fechaPago);
+      this.actualizarFechaInicial();
       cambios.push(`Fecha: ${data.fechaPago}`);
     }
 
@@ -296,10 +304,40 @@ export class ContratoInsertarComponent implements OnInit {
       );
     } else {
       this.toastr.warning(
-        'No se pudo extraer N° operación ni fecha. Llénalos manualmente.',
+        `No se pudo extraer N° operación ni fecha del voucher "${data.fileName ?? ''}". Llénalos manualmente.`,
         'OCR'
       );
     }
+  }
+
+  /** Al quitar/agregar vouchers se limpian los datos OCR de los que ya no están. */
+  onVoucherInicialFilesChange(files: File[]): void {
+    const nombresActuales = new Set(files.map(f => f.name));
+    for (const fileName of this.ocrOperationNumbers.keys()) {
+      if (!nombresActuales.has(fileName)) this.ocrOperationNumbers.delete(fileName);
+    }
+    for (const fileName of this.ocrVoucherFechas.keys()) {
+      if (!nombresActuales.has(fileName)) this.ocrVoucherFechas.delete(fileName);
+    }
+    this.actualizarNumeroOperacionInicial();
+    this.actualizarFechaInicial();
+  }
+
+  private actualizarNumeroOperacionInicial(): void {
+    const numeros = Array.from(this.ocrOperationNumbers.values());
+    this.pagoInicialRequest.numeroOperacion = numeros.length > 0 ? numeros.join(', ') : null;
+  }
+
+  private actualizarFechaInicial(): void {
+    const fechas = Array.from(this.ocrVoucherFechas.values());
+    if (fechas.length === 0) return;
+    const max = fechas.reduce((a, b) => (a > b ? a : b));
+    this.pagoInicialRequest.fechaPago = max;
+  }
+
+  private limpiarOcrInicial(): void {
+    this.ocrOperationNumbers.clear();
+    this.ocrVoucherFechas.clear();
   }
 
   confirmarPagoInicial(): void {
@@ -415,6 +453,7 @@ export class ContratoInsertarComponent implements OnInit {
       if (this.inicialNum <= 0) {
         this.pagoInicialRequest = this.resetPagoInicial();
         this.voucherInicialFiles = [];
+        this.limpiarOcrInicial();
       }
     });
 
@@ -425,6 +464,7 @@ export class ContratoInsertarComponent implements OnInit {
         this.actualizarSaldo();
         this.pagoInicialRequest = this.resetPagoInicial();
         this.voucherInicialFiles = [];
+        this.limpiarOcrInicial();
       }
       this.actualizarObservacion();
     });
@@ -650,25 +690,39 @@ export class ContratoInsertarComponent implements OnInit {
     this.contratoService.guardarContrato(request).subscribe({
       next: (res: any) => {
         this.idContratoGuardado = res?.idContrato ?? null;
-        // Si hay voucher pendiente, subirlo
-        if (this.voucherInicialFiles.length > 0 && this.idContratoGuardado) {
-          this.contratoService.subirVoucherInicial(this.idContratoGuardado, this.voucherInicialFiles[0]).subscribe({
-            next: () => { this.finalizarGuardado(res); },
-            error: () => {
-              // El contrato se guardó bien; el voucher falló → aviso pero navegar igual
-              this.toastr.warning('Contrato guardado. No se pudo subir el voucher, intenta luego.', 'Voucher');
-              this.finalizarGuardado(res);
-            }
-          });
-        } else {
-          this.finalizarGuardado(res);
-        }
+        this.subirVouchersIniciales(res);
       },
       error: (err) => {
         this.isGuardando = false;
         this.toastr.error(err.error?.message || 'Error al guardar el contrato');
       }
     });
+  }
+
+  /** Sube todos los vouchers del pago inicial (secuencialmente) y finaliza el guardado. */
+  private subirVouchersIniciales(res: any): void {
+    const idContrato = this.idContratoGuardado;
+    if (!idContrato || this.voucherInicialFiles.length === 0) {
+      this.finalizarGuardado(res);
+      return;
+    }
+    const files = [...this.voucherInicialFiles];
+    let idx = 0;
+    const siguiente = () => {
+      if (idx >= files.length) {
+        this.finalizarGuardado(res);
+        return;
+      }
+      const file = files[idx++];
+      this.contratoService.subirVoucherInicial(idContrato, file).subscribe({
+        next: () => siguiente(),
+        error: () => {
+          this.toastr.warning(`No se pudo subir "${file.name}", intenta luego.`, 'Voucher');
+          siguiente();
+        }
+      });
+    };
+    siguiente();
   }
 
   private finalizarGuardado(res: any): void {
@@ -703,6 +757,7 @@ export class ContratoInsertarComponent implements OnInit {
     this.tipoCambioEmpresa = 0; this.tipoCambioCompra = 0;
     this.pagoInicialRequest = this.resetPagoInicial();
     this.voucherInicialFiles = [];
+    this.limpiarOcrInicial();
   }
 
   abrirModalVendedor() { this.vendedorModalContrato.abrirModal(); }

@@ -522,6 +522,7 @@
             [(ngModel)]="voucherInicialFiles"
             [disabled]="!requiereVoucher"
             [enableOcr]="requiereVoucher"
+            (filesChange)="onVoucherInicialFilesChange($event)"
             (ocrData)="onVoucherOcr($event)">
           </app-voucher-preview>
         </div>
