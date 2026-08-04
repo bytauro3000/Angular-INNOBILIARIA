@@ -186,6 +186,7 @@ export class ContratoInsertarComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.cargarCombos();
+    this.cargarClientesIniciales();
     this.handleFormChanges();
     this.cargarDatosTransferencia();
     this.cargarTipoCambio();
@@ -550,12 +551,24 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   abrirListaClientes() {
+    if (this.clientes.length === 0) {
+      this.cargarClientesIniciales();
+    }
     if (this.filtroCliente.trim().length < 2) {
-      this.clientesFiltrados = [];
       this.mostrarClientes = true;
+      this.clientesFiltrados = this.clientes.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
       return;
     }
     this.filtrarClientes();
+  }
+
+  private cargarClientesIniciales(): void {
+    this.clienteService.listarClientesPaginado(0, 200).subscribe(p => {
+      this.clientes = p.content;
+      if (this.mostrarClientes && this.filtroCliente.trim().length < 2) {
+        this.clientesFiltrados = this.clientes.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
+      }
+    });
   }
 
   private generarObservacion(): string {
@@ -572,7 +585,11 @@ export class ContratoInsertarComponent implements OnInit {
 
   filtrarClientes() {
     const f = this.filtroCliente.trim();
-    if (f.length < 2) { this.clientesFiltrados = []; this.mostrarClientes = true; return; }
+    if (f.length < 2) {
+      this.mostrarClientes = true;
+      this.clientesFiltrados = this.clientes.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
+      return;
+    }
     this.clienteService.buscarClientesPorFiltro(f, /^\d+$/.test(f) ? 'documento' : 'nombres').subscribe(data => {
       this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(s => s.idCliente === c.idCliente));
       this.mostrarClientes = true;
@@ -766,7 +783,7 @@ export class ContratoInsertarComponent implements OnInit {
   abrirModalLote() { this.loteModalContrato.abrirModal(); }
 
   recargarVendedores() { this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; }); }
-  RecargarClientes() { this.clienteService.listarClientesPaginado(0, 200).subscribe(p => { this.clientes = p.content; }); }
+  RecargarClientes() { this.cargarClientesIniciales(); }
   RecargarProgramas() { this.programaService.listarProgramas().subscribe(p => { this.programas = p; this.programasFiltrados = [...p]; }); }
   RecargarLotes() {
     const id = this.contratoForm.get('idPrograma')?.value;
