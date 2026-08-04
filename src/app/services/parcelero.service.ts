@@ -24,6 +24,11 @@ export class ParceleroService {
     return this.http.get<Parcelero>(`${this.apiUrl}/${id}`);
   }
 
+  // BUSCAR POR DNI (igual que clientes)
+  obtenerParceleroPorDni(dni: string): Observable<Parcelero> {
+    return this.http.get<Parcelero>(`${this.apiUrl}/buscar/numDoc/${dni}`);
+  }
+
   // CREAR
   crearParcelero(parcelero: Parcelero): Observable<Parcelero> {
     return this.http.post<Parcelero>(this.apiUrl, parcelero);

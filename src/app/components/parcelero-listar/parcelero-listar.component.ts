@@ -61,13 +61,14 @@ export class ParceleroListarComponent implements OnInit, AfterViewInit {
       distinctUntilChanged(),
       switchMap(dni => {
         if (!dni || dni.length < 8) return of({ tipo: 'invalid' as const });
-        return this.parceleroService.listarParceleros().pipe(
-          map(lista => {
-            const existe = lista.find(p => p.dni === dni);
-            if (existe) return { tipo: 'found' as const, dni, existente: existe };
-            return { tipo: 'notFound' as const, dni };
-          }),
-          catchError(() => of({ tipo: 'error' as const }))
+        return this.parceleroService.obtenerParceleroPorDni(dni).pipe(
+          map(existente => ({ tipo: 'found' as const, dni, existente })),
+          catchError(err => {
+            if (err.status === 404) {
+              return of({ tipo: 'notFound' as const, dni });
+            }
+            return of({ tipo: 'error' as const });
+          })
         );
       })
     ).subscribe(result => {
@@ -217,6 +218,7 @@ export class ParceleroListarComponent implements OnInit, AfterViewInit {
     const datos = { ...this.nuevoParcelero };
     datos.nombres = datos.nombres?.toUpperCase();
     datos.apellidos = datos.apellidos?.toUpperCase();
+    datos.email = datos.email?.trim() ? datos.email.trim() : undefined;
 
     if (this.parceleroEditando && this.parceleroEditando.idParcelero) {
       this.parceleroService.actualizarParcelero(this.parceleroEditando.idParcelero, datos).subscribe({
