@@ -226,8 +226,15 @@ export class SeparacionInsertEdit implements OnInit {
     op.subscribe({
       next: () => {
         this.toastr.success('Separación guardada correctamente');
-        this.router.navigate(['/secretaria-menu/separaciones']);
+        this.router.navigate([this.basePath]);
       }
     });
+  }
+
+  /** Ruta de retorno según el menú desde el que se entró (vendedor o secretaría). */
+  get basePath(): string {
+    return this.router.url.includes('/vendedor-menu/')
+      ? '/vendedor-menu/separaciones'
+      : '/secretaria-menu/separaciones';
   }
 }

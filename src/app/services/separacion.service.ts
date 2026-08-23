@@ -25,6 +25,13 @@ export class SeparacionService {
   }
 
   /**
+   * Obtiene SOLO las separaciones del vendedor logueado (vendedor.id_usuario).
+   */
+  obtenerSeparacionesMias(): Observable<SeparacionResumen[]> {
+    return this.http.get<SeparacionResumen[]>(`${this.apiUrl}/mias`);
+  }
+
+  /**
    * Busca separaciones por filtro de texto.
    */
   buscarSeparaciones(filtro: string): Observable<SeparacionDTO[]> {

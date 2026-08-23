@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core'; 
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router'; 
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'; 
 import Swal from 'sweetalert2';
 
 import { SeparacionResumen } from '../../dto/separacionresumen.dto';
@@ -30,18 +30,27 @@ export class SeparacionComponent implements OnInit {
   totalPages = 0;
   filtroTexto = '';
 
+  // 'todas' → secretaría (resumen general). 'mias' → vendedor logueado (solo sus separaciones).
+  modo: 'todas' | 'mias' = 'todas';
+
   constructor(
     private separacionService: SeparacionService,
     private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit(): void {
+    this.modo = (this.route.snapshot.data['modo'] === 'mias') ? 'mias' : 'todas';
     this.cargarDatos();
   }
 
   cargarDatos(): void {
-    this.separacionService.obtenerSeparacionResumen().subscribe({
+    const obs = (this.modo === 'mias')
+      ? this.separacionService.obtenerSeparacionesMias()
+      : this.separacionService.obtenerSeparacionResumen();
+
+    obs.subscribe({
       next: (data) => {
         this.separaciones = data;
         this.aplicarFiltro();
@@ -120,11 +129,15 @@ export class SeparacionComponent implements OnInit {
   }
 
   mostrarCrear(): void {
-    this.router.navigate(['/secretaria-menu/separaciones/registrar']);
+    this.router.navigate([this.basePath + '/registrar']);
   }
 
   mostrarEditar(item: SeparacionResumen): void {
-    this.router.navigate(['/secretaria-menu/separaciones/editar', item.idSeparacion]);
+    this.router.navigate([this.basePath + '/editar', item.idSeparacion]);
+  }
+
+  private get basePath(): string {
+    return this.modo === 'mias' ? '/vendedor-menu/separaciones' : '/secretaria-menu/separaciones';
   }
 
   eliminar(item: SeparacionResumen): void {

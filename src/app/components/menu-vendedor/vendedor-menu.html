@@ -69,6 +69,17 @@
             <span class="nav-indicator"></span>
           </a>
         </li>
+        <li class="nav-item">
+          <a
+            routerLink="separaciones"
+            routerLinkActive="active"
+            [attr.data-tooltip]="'Mis Separaciones'"
+            (click)="cerrarSidebarMovil()">
+            <span class="nav-icon"><i class="fas fa-file-signature"></i></span>
+            <span class="nav-label">Mis Separaciones</span>
+            <span class="nav-indicator"></span>
+          </a>
+        </li>
       </ul>
     </nav>
 

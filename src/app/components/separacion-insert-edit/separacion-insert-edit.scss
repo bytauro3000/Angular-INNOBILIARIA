@@ -1,119 +1,210 @@
-/* ============================================================
-   ESTILOS GENERALES DEL CONTENEDOR
-   ============================================================ */
+@use "sass:color";
+
+// ============================================
+// VARIABLES (mismo sistema que registrar contrato)
+// ============================================
+$navy:        #023e8a;
+$navy-mid:    #0353a4;
+$navy-light:  #0466c8;
+$green:       #27ae60;
+$green-dark:  #219150;
+$text-dark:   #1e293b;
+$text-mid:    #334155;
+$text-soft:   #64748b;
+$border:      #e2e8f0;
+$input-bg:    #f8fafc;
+$white:       #ffffff;
+$finance-bg:  #f0f5ff;
+$finance-border: #c7d7f7;
+$error:       #e74c3c;
+$error-bg:    #fff5f5;
+
+// ============================================
+// CONTENEDOR
+// ============================================
 .contratos-container {
-  padding: 2rem;
-  max-width: 1000px;
+  padding: 1rem;
+  max-width: 980px;
   margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-  h2 {
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    font-size: 1.3rem;
-    font-weight: 600;
-    padding: 1rem 1.5rem;
-    text-align: center;
-    border-radius: 8px 8px 0 0;
-    margin-bottom: 0;
-    border-bottom: 2px solid #2ecc71;
+// ============================================
+// CABECERA
+// ============================================
+.page-header {
+  background: linear-gradient(135deg, $navy, $navy-mid);
+  border-radius: 12px 12px 0 0;
+  padding: 0.75rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+
+    .header-icon { font-size: 1.4rem; color: $green; flex-shrink: 0; }
+
+    h2 {
+      color: $white;
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .contrato-id {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.78rem;
+    }
+  }
+
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(39,174,96,0.2);
+    color: #6ee7a8;
+    border: 1px solid rgba(39,174,96,0.3);
+    white-space: nowrap;
   }
 }
 
+// ============================================
+// WRAPPER
+// ============================================
 .form-wrapper {
-  background-color: #34495e;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  border-radius: 0 0 8px 8px;
+  background: $white;
+  border: 1px solid $border;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 0 1.2rem 1.2rem;
+  box-shadow: 0 6px 24px rgba(2,62,138,0.08);
 }
 
+// ============================================
+// SECCIONES
+// ============================================
+.form-section {
+  border-top: 1px solid $border;
+  padding-top: 0.9rem;
+  margin-top: 0.9rem;
+
+  &:first-of-type { border-top: none; padding-top: 1rem; margin-top: 0; }
+}
+
+.section-title {
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: $navy-mid;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { font-size: 0.82rem; }
+}
+
+// ============================================
+// GRID
+// ============================================
 .form-row {
   display: grid;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-  grid-template-columns: 1fr;
-  align-items: start;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+  width: 100%;
+  &:last-child { margin-bottom: 0; }
 }
+.form-1-col { grid-template-columns: 1fr; }
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.form-3-col { grid-template-columns: repeat(3, 1fr); }
 
-.form-2-col {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
+@media (max-width: 768px) { .form-3-col { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .form-row { grid-template-columns: 1fr !important; } }
 
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
+// ============================================
+// GRUPOS
+// ============================================
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 3px;
 
   label {
-    font-weight: 500;
-    color: #ecf0f1;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    text-align: left;
+    color: $text-mid;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    i { color: $navy-light; font-size: 0.75rem; }
   }
 
-  input.custom-select-input, 
-  select, 
-  textarea.custom-select-input {
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    border: 1px solid #4a627a;
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+  input, select, textarea {
+    background: $input-bg;
+    border: 1.5px solid $border;
+    color: $text-dark;
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 0.85rem;
+    height: 36px;
     width: 100%;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 
     &:focus {
-      outline: none;
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
+      background: $white;
+      border-color: $navy-light;
+      box-shadow: 0 0 0 3px rgba($navy, 0.08);
     }
-
+    &::placeholder { color: #a0aec0; font-size: 0.82rem; }
     &:disabled {
-      background-color: #3e566e;
-      color: #bdc3c7;
+      background: #eef2f9;
+      color: $navy-mid;
+      font-weight: 600;
       cursor: not-allowed;
+      border-color: $finance-border;
     }
   }
 }
 
-/* ============================================================
-   SELECTS PERSONALIZADOS Y BOTONES +
-   ============================================================ */
+// ============================================
+// INPUT + BOTÓN
+// ============================================
 .input-with-button {
   display: flex;
   align-items: stretch;
-  width: 100%;
 
-  .custom-select-container {
-    flex-grow: 1;
-    position: relative;
-    z-index: 10;
-  }
-
-  .custom-select-input {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-  }
+  .custom-select-container { flex: 1; position: relative; min-width: 0; }
+  .custom-select-input { border-radius: 8px 0 0 8px !important; border-right: none !important; }
 
   .btn-add-mini {
-    background-color: #249042;
-    color: white;
-    padding: 0 12px;
-    border-radius: 0 4px 4px 0;
+    background: linear-gradient(135deg, $green, $green-dark);
+    color: $white;
     border: none;
+    padding: 0 12px;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
-    font-size: 1.1rem;
-    min-width: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    &:hover { background-color: #2ecc71; }
+    height: 36px;
+    transition: filter 0.2s;
+    &:hover { filter: brightness(1.1); }
   }
 }
 
@@ -124,67 +215,83 @@
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #bdc3c7;
+    color: $text-soft;
     pointer-events: none;
-    font-size: 14px;
+    font-size: 12px;
     z-index: 11;
   }
 }
 
+// ============================================
+// DROPDOWN
+// ============================================
 .custom-select-list {
   position: absolute;
-  top: calc(100% + 1px);
-  left: 0;
-  width: 100%;
-  background: #2c3e50;
-  border: 1px solid #4a627a;
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  max-height: 200px;
+  top: calc(100% + 3px);
+  left: 0; right: 0;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  z-index: 1000;
+  max-height: 180px;
   overflow-y: auto;
-  z-index: 100;
-  padding: 0;
+  padding: 3px 0;
   margin: 0;
   list-style: none;
+  box-shadow: 0 8px 24px rgba(2,62,138,0.12);
 
   li {
-    padding: 0.6rem 0.8rem;
-    color: #ecf0f1;
+    padding: 7px 12px;
+    color: $text-dark;
     cursor: pointer;
+    font-size: 0.83rem;
+    transition: background 0.15s;
     text-align: left;
-    border-bottom: 1px solid #3e566e;
-    font-size: 0.9rem;
-    &:hover { background: #2ecc71; color: #2c3e50; }
+    border-bottom: 1px solid #f1f5f9;
+
+    &:hover { background: #f0f5ff; color: $navy; }
+    &.no-data { color: $text-soft; font-style: italic; text-align: center; cursor: default; border: none; }
   }
-  .no-data { text-align: center; padding: 10px; color: #bdc3c7; font-size: 0.9rem; }
 }
 
+// ============================================
+// ITEMS SELECCIONADOS
+// ============================================
 .selected-items-list {
-  margin-top: 0.2rem;
   padding: 0;
+  margin-top: 4px;
   list-style: none;
-  li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .item-tag {
+    background: #f0f5ff;
+    border: 1px solid $finance-border;
+    padding: 5px 9px;
+    border-radius: 7px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #3e566e;
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    color: #ecf0f1;
-    font-size: 0.85rem;
-    border: 1px solid #4a627a;
+    color: $text-dark;
+    font-size: 0.8rem;
+
+    span { display: flex; align-items: center; gap: 5px; i { color: $navy-light; font-size: 0.75rem; } }
+
     button {
-      background: none; border: none; color: #e74c3c; cursor: pointer;
-      font-size: 1.1rem; padding: 0 5px;
-      &:hover { color: #ff5e4d; }
+      background: none; border: none; color: $error;
+      cursor: pointer; font-size: 0.78rem; padding: 0 3px;
+      transition: color 0.15s, transform 0.15s;
+      &:hover { color: color.adjust($error, $lightness: -10%, $space: hsl); transform: scale(1.2); }
     }
+
+    &.lote-tag { background: #f0faf4; border-color: #b2dfcc; }
   }
 }
 
-/* ============================================================
-   CALENDARIO MATERIAL DESIGN DARK - CORRECCIONES
-   ============================================================ */
+// ============================================
+// CALENDARIO MATERIAL (claro, coherente)
+// ============================================
 .datepicker-wrapper {
   position: relative;
   display: flex;
@@ -195,101 +302,50 @@
     position: absolute;
     right: 5px;
     z-index: 11;
-    ::ng-deep button {
-      color: #2ecc71 !important;
-      transform: scale(0.9);
-    }
+    ::ng-deep button { color: $navy-light !important; transform: scale(0.9); }
   }
 }
 
-/* Eliminar el espacio inferior rojo (subscript) */
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  display: none !important;
-}
+::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+::ng-deep .mat-mdc-text-field-wrapper { padding-bottom: 0 !important; }
 
-::ng-deep .mat-mdc-text-field-wrapper {
-  padding-bottom: 0 !important;
-}
-
-/* Panel flotante del calendario */
-::ng-deep .mat-datepicker-content {
-  background-color: #1e2b37 !important; /* Fondo ultra oscuro */
-  color: #ecf0f1 !important;
-  border: 1px solid #2ecc71;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-
-  .mat-calendar-period-button {
-    color: #ecf0f1 !important;
-    font-weight: bold;
-    text-transform: capitalize;
-  }
-
-  .mat-calendar-arrow { fill: #ecf0f1 !important; }
-
-  /* Nombres de días corregidos */
-  .mat-calendar-table-header th {
-    color: #2ecc71 !important;
-    font-weight: bold;
-    padding-bottom: 10px;
-    font-size: 0.8rem;
-  }
-
-  .mat-calendar-table-header-row {
-    height: 40px !important; /* Separa los nombres de los números */
-  }
-
-  .mat-calendar-body-cell-content { color: #ecf0f1 !important; }
-
-  .mat-calendar-body-today:not(.mat-calendar-body-selected) {
-    border-color: #f1c40f !important;
-  }
-
-  .mat-calendar-body-selected {
-    background-color: #2ecc71 !important;
-    color: #1e2b37 !important;
-    font-weight: bold;
-  }
-
-  .mat-calendar-previous-button, 
-  .mat-calendar-next-button { color: #2ecc71 !important; }
-}
-
-/* ============================================================
-   BOTONES DE ACCIÓN
-   ============================================================ */
+// ============================================
+// BOTONES DE ACCIÓN
+// ============================================
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 0.5rem; /* Ajustado para estar más cerca */
+  gap: 10px;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid $border;
+
+  @media (max-width: 576px) { flex-direction: column; .btn { width: 100%; } }
 
   .btn {
-    padding: 0.6rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 8px 24px;
+    border-radius: 40px;
     font-weight: 600;
-    font-size: 0.95rem;
-    display: flex;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 7px;
     transition: all 0.2s ease;
+    min-width: 140px;
   }
-
   .btn-primary {
-    background-color: #2ecc71; color: white;
-    &:hover:not(:disabled) { background-color: #27ad60; transform: translateY(-1px); }
+    background: linear-gradient(135deg, $green, $green-dark);
+    color: $white;
+    box-shadow: 0 3px 10px rgba(39,174,96,0.3);
+    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(39,174,96,0.4); }
+    &:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
   }
-
   .btn-secondary {
-    background-color: #e74c3c; color: white;
-    &:hover { background-color: #c0392b; }
+    background: transparent; color: $text-mid;
+    border: 1.5px solid $border !important;
+    &:hover { background: #f1f5f9; border-color: #cbd5e1 !important; }
   }
-
-  .btn:disabled { background-color: #7f8c8d; cursor: not-allowed; opacity: 0.6; }
-}
-/* Ocultar el nombre del mes que aparece dentro de la tabla de días */
-::ng-deep .mat-calendar-body-label {
-    display: none !important;
 }

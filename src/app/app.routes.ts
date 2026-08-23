@@ -191,7 +191,10 @@ export const routes: Routes = [
     data: { roles: ['ROLE_VENDEDOR'] },
     children: [
       { path: '', component: VendedorPanelLotesComponent },
-      { path: 'mensajeria', component: MensajeriaComponent }
+      { path: 'mensajeria', component: MensajeriaComponent },
+      { path: 'separaciones', component: SeparacionComponent, data: { modo: 'mias' } },
+      { path: 'separaciones/registrar', component: SeparacionInsertEdit },
+      { path: 'separaciones/editar/:id', component: SeparacionInsertEdit }
     ]
   }
 ];
