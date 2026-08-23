@@ -107,7 +107,31 @@ export class SeparacionInsertEdit implements OnInit {
     this.clientesFiltrados = [];
     this.vendedorService.listarVendedores().subscribe(v => { this.vendedores = v; this.vendedoresFiltrados = [...v]; });
     this.programaService.listarProgramas().subscribe(v => { this.programas = v; this.programasFiltrados = [...v]; });
+    this.cargarClientesIniciales();
   }
+
+  private cargarClientesIniciales(): void {
+    this.clienteService.listarClientesPaginado(0, 200).subscribe(p => {
+      this.clientes = p.content || [];
+      if (this.mostrarClientes && this.filtroCliente.trim().length < 2) {
+        this.clientesFiltrados = this.clientes.filter(c => !this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente));
+      }
+    });
+  }
+
+  abrirListaClientes() {
+    if (this.clientes.length === 0) {
+      this.cargarClientesIniciales();
+    }
+    if (this.filtroCliente.trim().length < 2) {
+      this.mostrarClientes = true;
+      this.clientesFiltrados = this.clientes.filter(c => !this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente));
+      return;
+    }
+    this.filtrarClientes();
+  }
+
+  RecargarClientes() { this.cargarClientesIniciales(); }
 
   private getEmptySeparacion(): Separacion {
     return {
@@ -127,8 +151,8 @@ export class SeparacionInsertEdit implements OnInit {
   filtrarClientes() {
     const f = this.filtroCliente.trim();
     if (f.length < 2) {
-      this.clientesFiltrados = [];
       this.mostrarClientes = true;
+      this.clientesFiltrados = this.clientes.filter(c => !this.separacion.clientes.some(sc => sc.cliente.idCliente === c.idCliente));
       return;
     }
     this.clienteService.buscarClientesPorFiltro(f, /^\d+$/.test(f) ? 'documento' : 'nombres').subscribe(data => {
@@ -166,8 +190,11 @@ export class SeparacionInsertEdit implements OnInit {
     this.filtroPrograma = p.nombrePrograma;
     this.mostrarProgramas = false;
     this.lotes = [];
-    this.loteService.listarLotes().subscribe(data => {
-      this.lotes = data.filter(l => l.programa?.idPrograma === p.idPrograma && l.estado?.toString().toUpperCase() === 'DISPONIBLE');
+    this.lotesFiltrados = [];
+    // Usa el endpoint por programa (trae idPrograma + estado) en vez de listar
+    // todos y filtrar por l.programa (que no viene anidado en listarLotes).
+    this.loteService.listarLotesEntidadPorPrograma(p.idPrograma!).subscribe(data => {
+      this.lotes = data.filter(l => l.estado?.toString().toUpperCase() === 'DISPONIBLE');
       this.lotesFiltrados = [...this.lotes];
     });
   }
