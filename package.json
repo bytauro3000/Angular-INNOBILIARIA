@@ -21,6 +21,16 @@
       }
     ]
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js",
+      "esbuild",
+      "lmdb",
+      "msgpackr-extract",
+      "tesseract.js"
+    ]
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^20.3.15",
