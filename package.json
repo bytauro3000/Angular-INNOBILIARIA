@@ -21,15 +21,13 @@
       }
     ]
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "core-js",
-      "esbuild",
-      "lmdb",
-      "msgpackr-extract",
-      "tesseract.js"
-    ]
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "core-js": true,
+    "esbuild": true,
+    "lmdb": true,
+    "msgpackr-extract": true,
+    "tesseract.js": true
   },
   "private": true,
   "dependencies": {
