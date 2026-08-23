@@ -13,6 +13,7 @@ import { Moneda } from '../../dto/moneda.enum';
 import { Router } from '@angular/router';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-letracambio-insertar',
@@ -38,6 +39,8 @@ export class LetracambioInsertarComponent implements OnInit {
   cargandoDistritos = false;
   cargando = false;
   success: string | null = null;
+
+  isMerruic = environment.apiUrl.includes('ms-gateway-latest');
 
   constructor(
     private distritoService: DistritoService,
@@ -118,7 +121,8 @@ export class LetracambioInsertarComponent implements OnInit {
     const fechaHoyPeru = obtenerFechaPeru();
 
     return {
-      idDistrito: 8,
+      // Merruic → Carabayllo (28) · Iván → Los Olivos (8)
+      idDistrito: this.isMerruic ? 28 : 8,
       fechaGiro: fechaHoyPeru,
       fechaVencimientoInicial: fechaHoyPeru,
       importe: '',
