@@ -21,25 +21,20 @@ $border-color: #e9ecef;
 
   .page-header {
     h2 {
-      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       color: $text-dark;
       font-weight: 600;
       font-family: Georgia, 'Times New Roman', Times, serif;
       font-size: 1.3rem;
       margin-bottom: 4px;
-      padding-left: 20px;
+      padding-left: 0;
 
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-left: 8px solid $navy;
+      i {
+        color: $navy;
+        font-size: 1.35rem;
+        line-height: 1;
       }
     }
 
