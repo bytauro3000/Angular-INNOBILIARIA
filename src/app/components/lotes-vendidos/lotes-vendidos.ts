@@ -87,7 +87,7 @@ export class LotesVendidosComponent implements OnInit {
       next: (data) => {
         this.cargando = false;
         this.todasLasRespuestas = data;
-        this.programas = data.programas;
+        this.programas = data.programas.map(p => ({ ...p, lotes: this.ordenarLotes(p.lotes) }));
         this.totalGeneral = data.totalGeneral;
         this.cantidadLotes = data.cantidadLotes;
         if (this.modo === 'secretaria') this.construirVendedoresConVentas();
@@ -97,6 +97,15 @@ export class LotesVendidosComponent implements OnInit {
         this.error = 'No se pudieron cargar los lotes vendidos.';
         console.error('Error al cargar ventas:', err);
       },
+    });
+  }
+
+  /** Ordena por manzana (texto) y luego por número de lote (numérico). */
+  private ordenarLotes(lotes: LoteVendidoDTO[]): LoteVendidoDTO[] {
+    return [...lotes].sort((a, b) => {
+      const mz = a.manzana.localeCompare(b.manzana, undefined, { numeric: true, sensitivity: 'base' });
+      if (mz !== 0) return mz;
+      return a.numeroLote.localeCompare(b.numeroLote, undefined, { numeric: true, sensitivity: 'base' });
     });
   }
 
@@ -149,7 +158,7 @@ export class LotesVendidosComponent implements OnInit {
     this.vendedorSeleccionado = null;
     this.filtroVendedor = '';
     this.mostrarVendedores = false;
-    this.programas = this.todasLasRespuestas?.programas ?? [];
+    this.programas = (this.todasLasRespuestas?.programas ?? []).map(p => ({ ...p, lotes: this.ordenarLotes(p.lotes) }));
     this.totalGeneral = this.todasLasRespuestas?.totalGeneral ?? 0;
     this.cantidadLotes = this.todasLasRespuestas?.cantidadLotes ?? 0;
   }
@@ -168,7 +177,7 @@ export class LotesVendidosComponent implements OnInit {
         cantidadLotes: p.lotes.length,
       }));
 
-    this.programas = programasFiltrados;
+    this.programas = programasFiltrados.map(p => ({ ...p, lotes: this.ordenarLotes(p.lotes) }));
     this.totalGeneral = programasFiltrados.reduce((sum, p) => sum + p.totalPrograma, 0);
     this.cantidadLotes = programasFiltrados.reduce((sum, p) => sum + p.cantidadLotes, 0);
   }
