@@ -14,6 +14,32 @@ export interface ImpactoEdicionDTO {
   cantidadPagos:  number;
 }
 
+export interface LoteVendidoDTO {
+  manzana: string;
+  numeroLote: string;
+  area: number;
+  costoVenta: number;
+  cliente: string;
+  vendedor: string;
+  idVendedor?: number;
+  fechaContrato: string;
+  estadoContrato: string;
+  idContrato: number;
+}
+
+export interface ProgramaVendidoDTO {
+  nombrePrograma: string;
+  lotes: LoteVendidoDTO[];
+  totalPrograma: number;
+  cantidadLotes: number;
+}
+
+export interface LotesVendidosResponseDTO {
+  programas: ProgramaVendidoDTO[];
+  totalGeneral: number;
+  cantidadLotes: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -53,6 +79,11 @@ export class ContratoService {
     return this.http.get<ContratoListItemDTO[]>(`${this.apiUrl}/buscar-por-cliente-resumen`, {
       params: new HttpParams().set('termino', termino)
     });
+  }
+
+  listarLotesVendidos(idVendedor?: number): Observable<LotesVendidosResponseDTO> {
+    const params = idVendedor ? new HttpParams().set('idVendedor', idVendedor.toString()) : undefined;
+    return this.http.get<LotesVendidosResponseDTO>(`${this.apiUrl}/lotes-vendidos`, { params });
   }
 
   guardarContrato(request: ContratoRequestDTO): Observable<ContratoResponseDTO> {

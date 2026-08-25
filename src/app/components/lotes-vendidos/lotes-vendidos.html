@@ -1,0 +1,126 @@
+<div class="lotes-vendidos-container" (click)="cerrarListaSiClickFuera($event)">
+  <div class="page-header">
+    <h2 *ngIf="modo === 'vendedor'">Mis Ventas</h2>
+    <h2 *ngIf="modo === 'secretaria'">Ventas por Vendedor</h2>
+    <p class="page-subtitle" *ngIf="modo === 'vendedor'">Lotes vendidos por ti</p>
+    <p class="page-subtitle" *ngIf="modo === 'secretaria'">Consulta los lotes vendidos filtrados por vendedor</p>
+  </div>
+
+  <!-- Filtro por vendedor (solo secretaria) -->
+  <div class="filtro-vendedor" *ngIf="modo === 'secretaria'">
+    <div class="custom-select-container" #vendedorBusquedaContainer>
+      <div class="select-input-wrapper">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          [(ngModel)]="filtroVendedor"
+          placeholder="Buscar vendedor por nombre, apellidos o DNI..."
+          (focus)="mostrarVendedores = true; filtrarVendedores()"
+          (input)="filtrarVendedores()"
+          class="form-control vendedor-input" />
+        <button
+          *ngIf="vendedorSeleccionado"
+          type="button"
+          class="btn-limpiar"
+          (click)="limpiarFiltroVendedor()"
+          title="Quitar filtro">
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+      <ul class="custom-select-list" *ngIf="mostrarVendedores">
+        <li *ngFor="let v of vendedoresFiltrados" (mousedown)="seleccionarVendedor(v)">
+          <div class="vendedor-option">
+            <span class="vendedor-nombre">{{ v.nombre }}</span>
+            <span class="vendedor-dni" *ngIf="v.dni">DNI: {{ v.dni }}</span>
+          </div>
+        </li>
+        <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">
+          <i class="bi bi-search"></i> No se encontraron vendedores
+        </li>
+      </ul>
+    </div>
+    <div class="filtro-info" *ngIf="vendedorSeleccionado">
+      Mostrando ventas de <strong>{{ vendedorSeleccionado.nombre }}</strong>
+    </div>
+  </div>
+
+  <!-- Cargando -->
+  <div class="estado-carga" *ngIf="cargando">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Cargando ventas...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="alerta-error" *ngIf="error">
+    <i class="bi bi-exclamation-triangle"></i> {{ error }}
+  </div>
+
+  <!-- Sin datos -->
+  <div class="estado-vacio" *ngIf="!cargando && !error && programas.length === 0">
+    <i class="bi bi-inbox"></i>
+    <p>No se encontraron lotes vendidos{{ modo === 'secretaria' && vendedorSeleccionado ? ' para este vendedor' : '' }}.</p>
+  </div>
+
+  <!-- Listado agrupado por programa -->
+  <div class="programas" *ngIf="!cargando && !error && programas.length > 0">
+    <div class="programa-card" *ngFor="let programa of programas">
+      <div class="programa-header">
+        <h3><i class="bi bi-buildings"></i> {{ programa.nombrePrograma }}</h3>
+        <div class="programa-stats">
+          <span class="badge-lotes">{{ programa.cantidadLotes }} lote(s)</span>
+          <span class="badge-total">{{ programa.totalPrograma | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="tabla-wrapper">
+        <table class="table table-hover tabla-lotes">
+          <thead>
+            <tr>
+              <th>Mz.</th>
+              <th>Lt.</th>
+              <th>Área (m²)</th>
+              <th>Cliente</th>
+              <th *ngIf="modo === 'secretaria'">Vendedor</th>
+              <th>Fecha Contrato</th>
+              <th>Estado</th>
+              <th class="text-end">Costo de Venta</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lote of programa.lotes">
+              <td>{{ lote.manzana }}</td>
+              <td>{{ lote.numeroLote }}</td>
+              <td>{{ lote.area }}</td>
+              <td>{{ lote.cliente }}</td>
+              <td *ngIf="modo === 'secretaria'">{{ lote.vendedor }}</td>
+              <td>{{ lote.fechaContrato | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge-estado" [ngClass]="'estado-' + (lote.estadoContrato | lowercase)">
+                  {{ lote.estadoContrato }}
+                </span>
+              </td>
+              <td class="text-end fw-bold">{{ lote.costoVenta | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" (click)="irAContrato(lote.idContrato)" title="Ver contrato">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Totales -->
+    <div class="totales-card">
+      <div class="totales-item">
+        <span class="totales-label">Lotes vendidos</span>
+        <span class="totales-valor">{{ cantidadLotes }}</span>
+      </div>
+      <div class="totales-item">
+        <span class="totales-label">Total General</span>
+        <span class="totales-valor total-destacado">{{ totalGeneral | currency:'USD':'symbol':'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

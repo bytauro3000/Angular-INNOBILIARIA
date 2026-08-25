@@ -10,7 +10,7 @@ import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
 import { environment } from '../../../environments/environment';
 
-type SubmenuKey = 'clientes' | 'contrato' | 'lotes' | 'servicios' | 'reportes';
+type SubmenuKey = 'clientes' | 'contrato' | 'vendedores' | 'lotes' | 'servicios' | 'reportes';
 
 @Component({
   selector: 'app-secretaria-menu',
@@ -27,6 +27,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
     isContratoSubmenuOpen: boolean = false;
     isServiciosBasicosSubmenuOpen: boolean = false;
     isLotesSubmenuOpen: boolean = false;
+    isVendedoresSubmenuOpen: boolean = false;
     isReportesSubmenuOpen: boolean = false;
     isUserDropdownOpen: boolean = false;
 
@@ -118,6 +119,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isClientesSubmenuOpen = !this.isClientesSubmenuOpen;
     }
@@ -128,6 +130,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isClientesSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isContratoSubmenuOpen = !this.isContratoSubmenuOpen;
     }
@@ -138,6 +141,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = !this.isServiciosBasicosSubmenuOpen;
     }
@@ -148,8 +152,20 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isClientesSubmenuOpen = false;
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isLotesSubmenuOpen = !this.isLotesSubmenuOpen;
+    }
+
+    toggleVendedoresSubmenu() {
+        if (this.hasHoverSupport) return;
+        this.isUserDropdownOpen = false;
+        this.isClientesSubmenuOpen = false;
+        this.isContratoSubmenuOpen = false;
+        this.isServiciosBasicosSubmenuOpen = false;
+        this.isLotesSubmenuOpen = false;
+        this.isReportesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = !this.isVendedoresSubmenuOpen;
     }
 
     toggleReportesSubmenu() {
@@ -159,6 +175,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = !this.isReportesSubmenuOpen;
     }
 
@@ -173,11 +190,13 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         if (submenu === 'clientes') this.isClientesSubmenuOpen = true;
         else if (submenu === 'contrato') this.isContratoSubmenuOpen = true;
         else if (submenu === 'lotes') this.isLotesSubmenuOpen = true;
         else if (submenu === 'servicios') this.isServiciosBasicosSubmenuOpen = true;
+        else if (submenu === 'vendedores') this.isVendedoresSubmenuOpen = true;
         else if (submenu === 'reportes') this.isReportesSubmenuOpen = true;
     }
 
@@ -189,6 +208,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
             else if (submenu === 'contrato') this.isContratoSubmenuOpen = false;
             else if (submenu === 'lotes') this.isLotesSubmenuOpen = false;
             else if (submenu === 'servicios') this.isServiciosBasicosSubmenuOpen = false;
+            else if (submenu === 'vendedores') this.isVendedoresSubmenuOpen = false;
             else if (submenu === 'reportes') this.isReportesSubmenuOpen = false;
             this.hoverCloseTimeout = null;
         }, 150);
@@ -209,6 +229,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isUserDropdownOpen = !this.isUserDropdownOpen;
     }
@@ -221,6 +242,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
             this.isContratoSubmenuOpen = false;
             this.isServiciosBasicosSubmenuOpen = false;
             this.isLotesSubmenuOpen = false;
+            this.isVendedoresSubmenuOpen = false;
             this.isReportesSubmenuOpen = false;
             this.isUserDropdownOpen = false;
         }
@@ -232,6 +254,7 @@ export class SecretariaMenuComponent implements OnInit, OnDestroy {
         this.isContratoSubmenuOpen = false;
         this.isServiciosBasicosSubmenuOpen = false;
         this.isLotesSubmenuOpen = false;
+        this.isVendedoresSubmenuOpen = false;
         this.isReportesSubmenuOpen = false;
         this.isUserDropdownOpen = false;
     }

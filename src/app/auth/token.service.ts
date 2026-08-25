@@ -33,6 +33,17 @@ export class TokenService {
     }
   }
 
+  getIdVendedor(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.idVendedor ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   getExpiresAt(): number | null {
     const token = this.getToken();
     if (!token) return null;

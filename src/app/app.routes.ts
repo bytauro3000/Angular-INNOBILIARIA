@@ -56,6 +56,7 @@ import { PagoInscripcionListarComponent } from './components/pago-inscripcion-li
 // Otros componentes
 import { ParceleroListarComponent } from './components/parcelero-listar/parcelero-listar.component';
 import { VendedorListarComponent } from './components/vendedor-listar/vendedor-listar.component';
+import { LotesVendidosComponent } from './components/lotes-vendidos/lotes-vendidos';
 import { ProgramaListarComponent } from './components/programa-listar/programa-listar.componente';
 import { LoteLitarComponent } from './components/lote-listar/lote-listar.component';
 import { ReporteLotesComponent } from './components/reporte-lote/reporte-lote';
@@ -135,6 +136,7 @@ export const routes: Routes = [
       // Otros
       { path: 'programas', component: ProgramaListarComponent },
       { path: 'vendedores', component: VendedorListarComponent },
+      { path: 'vendedores/ventas-por-vendedor', component: LotesVendidosComponent, data: { modo: 'secretaria' } },
       { path: 'lotes', component: LoteLitarComponent },
       { path: 'lotes/reporte', component: ReporteLotesComponent },
       { path: 'parceleros', component: ParceleroListarComponent },
@@ -194,7 +196,8 @@ export const routes: Routes = [
       { path: 'mensajeria', component: MensajeriaComponent },
       { path: 'separaciones', component: SeparacionComponent, data: { modo: 'mias' } },
       { path: 'separaciones/registrar', component: SeparacionInsertEdit },
-      { path: 'separaciones/editar/:id', component: SeparacionInsertEdit }
+      { path: 'separaciones/editar/:id', component: SeparacionInsertEdit },
+      { path: 'mis-ventas', component: LotesVendidosComponent, data: { modo: 'vendedor' } }
     ]
   }
 ];

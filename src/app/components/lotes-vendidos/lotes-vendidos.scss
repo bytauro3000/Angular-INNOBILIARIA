@@ -1,0 +1,309 @@
+@use "sass:color";
+
+$navy: #023e8a;
+$blue: #2980b9;
+$green: #27ae60;
+$yellow: #f1c40f;
+$orange: #f39c12;
+$red: #e74c3c;
+$light-blue: #3498db;
+$gray: #ecf0f1;
+$light-bg: #f5f7fa;
+$text-dark: #1e293b;
+$text-light: #334155;
+$border-color: #e9ecef;
+
+.lotes-vendidos-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+
+  .page-header {
+    h2 {
+      position: relative;
+      color: $text-dark;
+      font-weight: 600;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+      padding-left: 20px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-left: 8px solid $navy;
+      }
+    }
+
+    .page-subtitle {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin: 0 0 20px 20px;
+    }
+  }
+
+  // ── Filtro de vendedor (select autocompletar) ─────────────────────────────
+  .filtro-vendedor {
+    max-width: 420px;
+    margin-bottom: 20px;
+
+    .custom-select-container { position: relative; }
+
+    .select-input-wrapper {
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 8px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+
+      &:focus-within { box-shadow: 0 0 0 3px rgba($navy, 0.12); border-color: $navy; }
+
+      .bi-search { color: #94a3b8; font-size: 0.9rem; flex-shrink: 0; }
+
+      .vendedor-input {
+        border: none; padding: 9px 0; flex: 1; outline: none;
+        font-size: 0.95rem; background: transparent; color: $text-dark; min-width: 0;
+        &::placeholder { color: #94a3b8; }
+      }
+
+      .btn-limpiar {
+        background: none; border: none; padding: 0; cursor: pointer;
+        color: $red; font-size: 1rem; display: flex; align-items: center;
+        flex-shrink: 0; transition: color 0.2s;
+        &:hover { color: color.adjust($red, $lightness: -10%); }
+      }
+    }
+
+    .custom-select-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      list-style: none;
+      margin: 0;
+      padding: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 1050;
+
+      li {
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.15s;
+        &:hover { background: rgba($navy, 0.08); }
+      }
+
+      .vendedor-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        .vendedor-nombre { font-weight: 500; color: $text-dark; font-size: 0.9rem; }
+        .vendedor-dni { color: #94a3b8; font-size: 0.78rem; }
+      }
+
+      .no-data {
+        color: #94a3b8;
+        font-size: 0.88rem;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 10px;
+        &:hover { background: transparent; }
+      }
+    }
+
+    .filtro-info {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #64748b;
+      strong { color: $navy; }
+    }
+  }
+
+  // ── Estados ───────────────────────────────────────────────────────────────
+  .estado-carga {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: #64748b;
+  }
+
+  .alerta-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+  }
+
+  .estado-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 70px 0;
+    color: #94a3b8;
+    i { font-size: 3rem; opacity: 0.5; }
+  }
+
+  // ── Tarjetas por programa ─────────────────────────────────────────────────
+  .programa-card {
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+    overflow: hidden;
+
+    .programa-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px 20px;
+      background: linear-gradient(90deg, rgba($navy, 0.05), rgba($blue, 0.04));
+      border-bottom: 1px solid $border-color;
+
+      h3 {
+        margin: 0;
+        font-size: 1.02rem;
+        color: $text-dark;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        i { color: $navy; }
+      }
+
+      .programa-stats {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        .badge-lotes {
+          background: rgba($blue, 0.12);
+          color: $blue;
+          font-size: 0.78rem;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 20px;
+        }
+
+        .badge-total {
+          background: rgba($green, 0.14);
+          color: $green;
+          font-size: 0.9rem;
+          font-weight: 700;
+          padding: 4px 12px;
+          border-radius: 20px;
+        }
+      }
+    }
+
+    .tabla-wrapper {
+      overflow-x: auto;
+
+      .tabla-lotes {
+        margin: 0;
+        font-size: 0.9rem;
+
+        thead th {
+          background: $light-bg;
+          color: #64748b;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          padding: 10px 16px;
+          border-bottom: 1px solid $border-color;
+          white-space: nowrap;
+        }
+
+        tbody td {
+          padding: 10px 16px;
+          vertical-align: middle;
+          border-bottom: 1px solid #f1f5f9;
+          color: $text-light;
+        }
+
+        tbody tr {
+          transition: background 0.15s;
+          &:hover { background: rgba($navy, 0.03); }
+        }
+
+        .badge-estado {
+          display: inline-block;
+          padding: 3px 10px;
+          border-radius: 20px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+
+          &.estado-activo { background: rgba($green, 0.14); color: $green; }
+          &.estado-mora { background: rgba($yellow, 0.3); color: #a16207; }
+          &.estado-cancelado { background: rgba($blue, 0.14); color: $blue; }
+          &.estado-transferido { background: rgba($orange, 0.18); color: $orange; }
+        }
+      }
+    }
+  }
+
+  // ── Totales generales ─────────────────────────────────────────────────────
+  .totales-card {
+    display: flex;
+    justify-content: flex-end;
+    gap: 24px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+
+    .totales-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+
+      .totales-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+      }
+
+      .totales-valor { font-size: 1.15rem; font-weight: 700; color: $text-dark; }
+
+      .total-destacado {
+        color: $green;
+        font-size: 1.35rem;
+      }
+    }
+  }
+}
