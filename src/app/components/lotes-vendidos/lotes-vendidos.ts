@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { ContratoService, LotesVendidosResponseDTO, ProgramaVendidoDTO, LoteVendidoDTO } from '../../services/contrato.service';
 import { VendedorService } from '../../services/vendedor.service';
@@ -31,6 +32,7 @@ export class LotesVendidosComponent implements OnInit {
   cantidadLotes = 0;
   cargando = false;
   error = '';
+  sinVendedorAsociado = false;
 
   // Select autocompletar (solo en modo secretaria)
   vendedoresConVentas: VendedorConVentas[] = [];
@@ -59,10 +61,28 @@ export class LotesVendidosComponent implements OnInit {
   cargarDatos(): void {
     this.cargando = true;
     this.error = '';
-    const obs = (this.modo === 'vendedor')
-      ? this.contratoService.listarLotesVendidos(this.tokenService.getIdVendedor() ?? undefined)
-      : this.contratoService.listarLotesVendidos();
+    this.sinVendedorAsociado = false;
 
+    // En modo vendedor, si la cuenta no está vinculada a ningún vendedor, no se
+    // consulta nada: la vista queda vacía con un aviso.
+    if (this.modo === 'vendedor') {
+      const idVendedor = this.tokenService.getIdVendedor();
+      if (idVendedor == null) {
+        this.cargando = false;
+        this.sinVendedorAsociado = true;
+        this.programas = [];
+        this.totalGeneral = 0;
+        this.cantidadLotes = 0;
+        return;
+      }
+      this.consultar(this.contratoService.listarLotesVendidos(idVendedor));
+      return;
+    }
+
+    this.consultar(this.contratoService.listarLotesVendidos());
+  }
+
+  private consultar(obs: Observable<LotesVendidosResponseDTO>): void {
     obs.subscribe({
       next: (data) => {
         this.cargando = false;
