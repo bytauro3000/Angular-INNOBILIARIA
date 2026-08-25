@@ -213,19 +213,25 @@
         </div>
       </div>
 
-      <!-- ── SECCIÓN: PAGO DE INICIAL (botón / estado) ── -->
+      <!-- ── SECCIÓN: PAGO DE INICIAL (financiado) / PAGO AL CONTADO (contado) ── -->
       <div class="form-section" *ngIf="mostrarBotonPagoInicial">
-        <div class="section-title"><i class="bi bi-receipt"></i> Pago de Inicial</div>
+        <div class="section-title">
+          <i class="bi bi-receipt"></i> {{ esFinanciado ? 'Pago de Inicial' : 'Pago al Contado' }}
+        </div>
 
         <!-- Estado: no configurado -->
         <div class="pago-inicial-placeholder" *ngIf="!pagoInicialConfigurado">
           <i class="bi bi-info-circle"></i>
-          <span>
+          <span *ngIf="esFinanciado">
             El contrato tiene una inicial de <strong>{{ formatearMoneda(inicialNum) }}</strong>.
             Completa los datos del pago antes de guardar.
           </span>
+          <span *ngIf="!esFinanciado">
+            El precio total de <strong>{{ formatearMoneda(montoTotalNum) }}</strong> se cancela al contado.
+            Completa los datos del pago y emite el comprobante antes de guardar.
+          </span>
           <button type="button" class="btn-abrir-pago-inicial" (click)="abrirModalPagoInicial()">
-            <i class="bi bi-plus-circle"></i> Configurar pago de inicial
+            <i class="bi bi-plus-circle"></i> {{ esFinanciado ? 'Configurar pago de inicial' : 'Registrar pago al contado' }}
           </button>
         </div>
 
@@ -233,7 +239,7 @@
         <div class="pago-inicial-resumen" *ngIf="pagoInicialConfigurado">
           <div class="pago-inicial-resumen-header">
             <i class="bi bi-check-circle-fill text-success"></i>
-            <span>Pago de inicial configurado</span>
+            <span>{{ esFinanciado ? 'Pago de inicial configurado' : 'Pago al contado configurado' }}</span>
             <button type="button" class="btn-editar-pago-inicial" (click)="abrirModalPagoInicial()">
               <i class="bi bi-pencil"></i> Editar
             </button>
@@ -377,7 +383,7 @@
         </strong>
       </div>
       <div class="confirm-item" *ngIf="pagoInicialConfigurado">
-        <span>Comprobante Inicial</span>
+        <span>{{ esFinanciado ? 'Comprobante Inicial' : 'Comprobante Contado' }}</span>
         <strong>{{ pagoInicialRequest.tipoComprobante }} · {{ pagoInicialRequest.medioPago }}</strong>
       </div>
       <div class="confirm-item" *ngIf="clientesSeleccionados.length > 0">
@@ -408,8 +414,9 @@
         <i class="bi bi-cash-stack"></i>
       </div>
       <div>
-        <h3>Pago de Inicial</h3>
-        <p>Inicial: <strong>{{ formatearMoneda(inicialNum) }}</strong></p>
+        <h3>{{ esFinanciado ? 'Pago de Inicial' : 'Pago al Contado' }}</h3>
+        <p *ngIf="esFinanciado">Inicial: <strong>{{ formatearMoneda(inicialNum) }}</strong></p>
+        <p *ngIf="!esFinanciado">Monto Total: <strong>{{ formatearMoneda(montoTotalNum) }}</strong></p>
       </div>
       <button type="button" class="btn-close-modal" (click)="cerrarModalPagoInicial()">
         <i class="bi bi-x-lg"></i>
@@ -506,7 +513,7 @@
           <textarea [(ngModel)]="pagoInicialRequest.observaciones"
                     rows="2"
                     class="pi-textarea"
-                    placeholder="Ej: Pago de Inicial de la Mz. A Lt. 1 del Programa X"></textarea>
+                    [placeholder]="esFinanciado ? 'Ej: Pago de Inicial de la Mz. A Lt. 1 del Programa X' : 'Ej: Pago al contado de la Mz. A Lt. 1 del Programa X'"></textarea>
         </div>
       </div>
 
@@ -536,7 +543,7 @@
         <i class="bi bi-x-circle"></i> Cancelar
       </button>
       <button type="button" class="btn btn-save" (click)="confirmarPagoInicial()">
-        <i class="bi bi-check-lg"></i> Confirmar pago de inicial
+        <i class="bi bi-check-lg"></i> {{ esFinanciado ? 'Confirmar pago de inicial' : 'Confirmar pago al contado' }}
       </button>
     </div>
 

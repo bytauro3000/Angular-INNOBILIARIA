@@ -126,9 +126,11 @@ export class ContratoInsertarComponent implements OnInit {
   get saldoNum(): number { return Number(this.contratoForm?.get('saldo')?.value) || 0; }
   get cantidadLetrasNum(): number { return Number(this.contratoForm?.get('cantidadLetras')?.value) || 0; }
 
-  /** Mostrar botón "Pago de Inicial" solo cuando aplica */
+  /** Mostrar botón "Pago de Inicial" (financiado) o "Pago al Contado" (contado) */
   get mostrarBotonPagoInicial(): boolean {
-    return this.esFinanciado && this.inicialNum > 0;
+    if (this.esFinanciado) return this.inicialNum > 0;
+    // Contado: se cobra el monto total al contado
+    return this.montoTotalNum > 0;
   }
 
   /** ¿Ya está configurado el pago inicial? */
@@ -219,15 +221,16 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   abrirModalPagoInicial(): void {
-    // Prellenar con datos del formulario
-    this.pagoInicialRequest.importePagado = this.inicialNum;
+    // Prellenar con datos del formulario: inicial (financiado) o monto total (contado)
+    this.pagoInicialRequest.importePagado = this.esFinanciado ? this.inicialNum : this.montoTotalNum;
 
     // Autogenerar observación
     const loteStr = this.lotesSeleccionados.length > 0
       ? this.lotesSeleccionados.map(l => `Mz. ${l.manzana} Lt. ${l.numeroLote}`).join(', ')
       : 'Mz. ___ Lt. ___';
     const programa = this.filtroPrograma || '___';
-    this.pagoInicialRequest.observaciones = `Pago de Inicial de la ${loteStr} del Programa ${programa}`;
+    const prefijoObs = this.esFinanciado ? 'Pago de Inicial de la' : 'Pago al contado de la';
+    this.pagoInicialRequest.observaciones = `${prefijoObs} ${loteStr} del Programa ${programa}`;
 
     this.mostrarModalPagoInicial = true;
   }
