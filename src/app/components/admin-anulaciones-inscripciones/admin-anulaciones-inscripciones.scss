@@ -175,10 +175,10 @@ $accent-light: color.adjust($accent, $lightness: 35%);
 
   th {
     color: white;
-    font-weight: 600;
-    font-size: 0.85rem;
+    font-weight: 500;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
     padding: 12px 10px;
     white-space: nowrap;
     text-align: left;
@@ -721,10 +721,12 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .tabla-custom {
-      thead tr { background: #1a2430; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      thead tr { background: #1a2430; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        th { text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; }
+      }
       tbody tr {
-        border-bottom: none;
-        td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        td { color: rgba(255, 255, 255, 0.7); }
         &:hover td { background: rgba(201, 149, 46, 0.08); }
         td.monto { color: #e2b859; }
         .badge-servicio { background: rgba(201, 149, 46, 0.12); color: #e2b859; }
