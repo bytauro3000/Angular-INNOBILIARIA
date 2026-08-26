@@ -270,11 +270,11 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
       }
     }
     .table-container {
-      background: #101C24;
+      background: #1a2430;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .custom-table {
-      thead { background: #101C24; border-bottom: 2px solid #c9952e; }
+      thead { background: #1a2430; border-bottom: 2px solid #c9952e; }
       tbody tr {
         border-color: rgba(255, 255, 255, 0.06);
         &:hover { background: rgba(201, 149, 46, 0.04); }
@@ -294,7 +294,7 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
 
   // ── Modal PIN (usaba fondo blanco fijo) ──
   .pin-modal {
-    background: #101C24;
+    background: #1a2430;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }

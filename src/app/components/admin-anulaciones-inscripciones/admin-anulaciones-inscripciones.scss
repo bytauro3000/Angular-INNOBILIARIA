@@ -701,7 +701,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       p { color: #94a3b8; }
     }
     .filtros {
-      background: #101C24;
+      background: #1a2430;
       border-color: rgba(255, 255, 255, 0.06);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       .form-group label { color: #94a3b8; }
@@ -716,12 +716,12 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         &:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.25); transform: none; } }
     }
     .tabla-wrapper {
-      background: #101C24;
+      background: #1a2430;
       border-color: rgba(255, 255, 255, 0.06);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .tabla-custom {
-      thead tr { background: #101C24; border-bottom: 2px solid #c9952e; }
+      thead tr { background: #1a2430; border-bottom: 2px solid #c9952e; }
       tbody tr {
         border-bottom: none;
         td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }
@@ -735,7 +735,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       }
     }
     .pago-card {
-      background: #101C24;
+      background: #1a2430;
       border-color: rgba(255, 255, 255, 0.06);
       .card-monto { color: #e2b859; }
       .card-servicio { background: rgba(201, 149, 46, 0.12); color: #e2b859; }
@@ -744,9 +744,9 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       .card-value { color: #f1f5f9; }
       &.anulado { background: rgba(239, 68, 68, 0.08); }
       .card-ubicacion { background: rgba(255, 255, 255, 0.04); color: #94a3b8; }
-      .card-acciones .btn-icon { background: #101C24; }
+      .card-acciones .btn-icon { background: #1a2430; }
     }
-    .empty-state { background: #101C24; color: #64748b; }
+    .empty-state { background: #1a2430; color: #64748b; }
   }
   .estado-badge {
     &.vigente { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }
