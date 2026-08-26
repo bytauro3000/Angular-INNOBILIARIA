@@ -109,6 +109,12 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         background-color: white;
       }
     }
+
+    .fecha-picker {
+      width: 100%;
+      --mat-form-field-container-height: 40px;
+      --mat-form-field-container-vertical-padding: 0;
+    }
   }
 
   button {
@@ -733,6 +739,10 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         color: #f1f5f9;
         &::placeholder { color: #64748b; }
         &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); background: #252932; }
+      }
+      .form-group .fecha-picker {
+        .mat-mdc-form-field-flex { background: #252932; border-radius: 10px; }
+        input.mat-mdc-input-element { color: #f1f5f9; }
       }
       .btn-limpiar { background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; box-shadow: none;
         &:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.25); transform: none; } }

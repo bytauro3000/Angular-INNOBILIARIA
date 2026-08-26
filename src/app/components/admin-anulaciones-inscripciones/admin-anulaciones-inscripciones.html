@@ -30,11 +30,19 @@
     </div>
     <div class="form-group">
       <label>Fecha Desde</label>
-      <input type="date" class="form-control" [(ngModel)]="filtros.fechaDesde">
+      <mat-form-field appearance="outline" class="fecha-picker">
+        <input matInput [matDatepicker]="pickerDesde" [(ngModel)]="fechaDesde" placeholder="dd/mm/aaaa">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDesde></mat-datepicker>
+      </mat-form-field>
     </div>
     <div class="form-group">
       <label>Fecha Hasta</label>
-      <input type="date" class="form-control" [(ngModel)]="filtros.fechaHasta">
+      <mat-form-field appearance="outline" class="fecha-picker">
+        <input matInput [matDatepicker]="pickerHasta" [(ngModel)]="fechaHasta" placeholder="dd/mm/aaaa">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+        <mat-datepicker #pickerHasta></mat-datepicker>
+      </mat-form-field>
     </div>
     <button class="btn-buscar" (click)="aplicarFiltros()">
       <i class="bi bi-search"></i> Buscar

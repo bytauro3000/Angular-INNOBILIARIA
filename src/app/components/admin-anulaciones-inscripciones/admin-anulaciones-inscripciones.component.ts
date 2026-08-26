@@ -1,13 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { AdminAnulacionesService, FiltrosAnulacion } from '../../services/admin-anulaciones.service';
 import { PagoInscripcionDTO } from '../../services/inscripcion.service';
 
 @Component({
   selector: 'app-admin-anulaciones-inscripciones',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule, MatIconModule],
   templateUrl: './admin-anulaciones-inscripciones.html',
   styleUrls: ['./admin-anulaciones-inscripciones.scss']
 })
@@ -19,6 +24,8 @@ export class AdminAnulacionesInscripcionesComponent implements OnInit {
 
   filtros: FiltrosAnulacion = {};
   tipoComprobanteFiltro = '';
+  fechaDesde?: Date;
+  fechaHasta?: Date;
 
   // Al escoger Boleta o Recibo, prefill el N° de comprobante con la serie
   onTipoComprobanteChange(): void {
@@ -60,8 +67,19 @@ export class AdminAnulacionesInscripcionesComponent implements OnInit {
     });
   }
 
-  aplicarFiltros(): void { this.cargarPagos(); }
-  limpiarFiltros(): void { this.filtros = {}; this.tipoComprobanteFiltro = ''; this.cargarPagos(); }
+  aplicarFiltros(): void {
+    this.filtros.fechaDesde = this.fechaDesde ? this.formatDate(this.fechaDesde) : undefined;
+    this.filtros.fechaHasta = this.fechaHasta ? this.formatDate(this.fechaHasta) : undefined;
+    this.cargarPagos();
+  }
+  limpiarFiltros(): void { this.filtros = {}; this.tipoComprobanteFiltro = ''; this.fechaDesde = undefined; this.fechaHasta = undefined; this.cargarPagos(); }
+
+  private formatDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
 
   abrirModalAnular(pago: PagoInscripcionDTO): void {
     this.pagoSeleccionado = pago;
