@@ -83,7 +83,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
   .form-group {
     display: flex;
     flex-direction: column;
-    min-width: 160px;
+    min-width: 140px;
     flex: 1;
 
     label {
@@ -114,7 +114,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
 
     .fecha-picker {
       width: 100%;
-      --mat-form-field-container-height: 40px;
+      --mat-form-field-container-height: 38px;
       --mat-form-field-container-vertical-padding: 0;
     }
   }

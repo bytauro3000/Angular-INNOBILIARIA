@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -29,11 +29,23 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
   fechaDesde?: Date;
   fechaHasta?: Date;
 
-  // Al escoger Boleta o Recibo, prefill el N° de comprobante con la serie
+  @ViewChild('numeroComprobanteInput') numeroComprobanteInput?: ElementRef;
+
+  // Al escoger Boleta o Recibo, prefill el N° de comprobante con la serie y foca
   onTipoComprobanteChange(): void {
     if (this.tipoComprobanteFiltro === 'B001') this.filtros.numeroComprobante = 'B001-';
     else if (this.tipoComprobanteFiltro === 'RB01') this.filtros.numeroComprobante = 'RB01-';
     else this.filtros.numeroComprobante = '';
+
+    // Mover el foco al campo y colocar el cursor después del guion
+    setTimeout(() => {
+      const input = this.numeroComprobanteInput?.nativeElement as HTMLInputElement | undefined;
+      if (input) {
+        input.focus();
+        const pos = input.value.length;
+        input.setSelectionRange(pos, pos);
+      }
+    }, 0);
   }
 
   // Modal anulación
