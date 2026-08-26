@@ -705,7 +705,8 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .tabla-custom {
-      thead tr { background: #1a2430; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      thead { background: #1a2430 !important; }
+      thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         th { text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; color: #94a3b8; }
       }
       tbody tr {
