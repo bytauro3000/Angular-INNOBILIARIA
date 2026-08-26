@@ -9,9 +9,6 @@ import { PagoInscripcionDTO } from './inscripcion.service';
 
 export interface FiltrosAnulacion {
   numeroComprobante?: string;
-  programa?:          string;
-  manzana?:           string;
-  lote?:              string;
   fechaDesde?:        string;
   fechaHasta?:        string;
 }
@@ -130,9 +127,6 @@ export class AdminAnulacionesService {
     let params = new HttpParams();
     if (!filtros) return params;
     if (filtros.numeroComprobante) params = params.set('numeroComprobante', filtros.numeroComprobante);
-    if (filtros.programa)          params = params.set('programa', filtros.programa);
-    if (filtros.manzana)           params = params.set('manzana', filtros.manzana);
-    if (filtros.lote)              params = params.set('lote', filtros.lote);
     if (filtros.fechaDesde)        params = params.set('fechaDesde', filtros.fechaDesde);
     if (filtros.fechaHasta)        params = params.set('fechaHasta', filtros.fechaHasta);
     return params;
@@ -142,8 +136,6 @@ export class AdminAnulacionesService {
     let params = new HttpParams();
     if (!filtros) return params;
     if (filtros.numeroComprobante) params = params.set('numeroComprobante', filtros.numeroComprobante);
-    if (filtros.manzana)           params = params.set('manzana', filtros.manzana);
-    if (filtros.lote)              params = params.set('numeroLote', filtros.lote);
     if (filtros.fechaDesde)        params = params.set('desde', filtros.fechaDesde);
     if (filtros.fechaHasta)        params = params.set('hasta', filtros.fechaHasta);
     return params;
