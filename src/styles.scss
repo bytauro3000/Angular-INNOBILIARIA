@@ -62,7 +62,8 @@ body.dark-mode app-reporte-lote,
 body.dark-mode app-lectura-plantilla,
 body.dark-mode app-mensajeria,
 body.dark-mode app-historial-moras-picker,
-body.dark-mode app-separacion-insert-edit {
+body.dark-mode app-separacion-insert-edit,
+body.dark-mode app-lotes-vendidos {
   background: #0a1628 !important;
 }
 
@@ -497,6 +498,54 @@ body.dark-mode .messaging-container {
   }
 }
 
+// ── LOTES VENDIDOS (Mis Ventas / Ventas por Vendedor) ──
+body.dark-mode .lotes-vendidos-container {
+  .page-header h2 { color: #f1f5f9; i { color: #c9952e; } }
+  .page-subtitle { color: #94a3b8; }
+
+  .filtro-vendedor .select-input-wrapper {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+    .vendedor-input { color: #e2e8f0; &::placeholder { color: #64748b; } }
+    &:focus-within { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
+  }
+  .custom-select-list {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+    li:hover { background: rgba(201, 149, 46, 0.08); }
+    .vendedor-nombre { color: #e2e8f0; }
+    .vendedor-dni { color: #64748b; }
+  }
+  .filtro-info { color: #94a3b8; strong { color: #c9952e; } }
+
+  .alerta-error { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+  .estado-vacio { color: #94a3b8; }
+
+  .programa-card {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    .programa-header {
+      background: linear-gradient(90deg, rgba(201, 149, 46, 0.08), transparent);
+      border-color: rgba(255, 255, 255, 0.06);
+      h3 { color: #f1f5f9; i { color: #c9952e; } }
+    }
+    .tabla-lotes {
+      thead th { background: #0a1628; color: #94a3b8; border-color: rgba(255, 255, 255, 0.08); }
+      tbody td { color: #cbd5e1; border-color: rgba(255, 255, 255, 0.06); }
+      tbody tr:hover { background: rgba(201, 149, 46, 0.04); }
+    }
+  }
+
+  .totales-card {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+    .totales-label { color: #94a3b8; }
+    .totales-valor { color: #f1f5f9; }
+    .total-destacado { color: #c9952e; }
+  }
+}
+
 // ── CARGANDO (recibos) ──
 body.dark-mode .cargando {
   background: #0f1f36;
@@ -572,6 +621,24 @@ body.dark-mode .pagina-numero-btn {
 }
 body.dark-mode .resultado-contador { color: #94a3b8; }
 body.dark-mode .programa-label { color: #06b6d4; }
+
+// ── RECIBOS LISTAR (filtros + container) ──
+body.dark-mode app-recibos-listar .container {
+  h2 { color: #f1f5f9; border-left-color: #c9952e; }
+  .filtros {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+    .form-group label { color: #94a3b8; }
+    .form-group select,
+    .form-group input {
+      background: #152b45;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      &:focus { border-color: #c9952e; }
+    }
+  }
+  .sin-resultados { background: #0f1f36; }
+}
 
 // ── LECTURA PLANILLA (unified-table, cards, inputs) ──
 body.dark-mode .unified-table {

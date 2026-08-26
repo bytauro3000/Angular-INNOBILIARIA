@@ -128,3 +128,37 @@
     }
   }
 }
+
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .upload-area {
+    background-color: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.15);
+    i { color: #c9952e; }
+    span { color: #94a3b8; }
+    &:hover:not(.disabled) { border-color: #c9952e; background-color: #152b45; }
+    &.dragging { border-color: #c9952e; background-color: #152b45; }
+    &.disabled { background-color: #0a1628; border-color: rgba(255, 255, 255, 0.1); }
+  }
+
+  .preview-item { border-color: rgba(255, 255, 255, 0.08); }
+
+  .crop-modal { background: #0f1f36; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+  .crop-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    span { color: #f1f5f9; }
+  }
+  .crop-close-btn {
+    color: #94a3b8;
+    &:hover { background: rgba(255, 255, 255, 0.06); color: #f1f5f9; }
+  }
+  .crop-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+    .crop-cancel {
+      background: #152b45;
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      &:hover { background: rgba(255, 255, 255, 0.06); }
+    }
+  }
+}

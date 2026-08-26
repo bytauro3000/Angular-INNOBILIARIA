@@ -448,6 +448,87 @@
   color: #ef4444;
 }
 
+/* ── DARK MODE ──────────────────────────────────── */
+:host-context(body.dark-mode) {
+  .page-title { color: #f1f5f9; }
+  .page-subtitle { color: #94a3b8; }
+
+  .btn-outline {
+    color: #94a3b8;
+    border-color: rgba(255, 255, 255, 0.15);
+    &:hover { border-color: #c9952e; color: #f1f5f9; background: rgba(255, 255, 255, 0.04); }
+  }
+
+  .form-card,
+  .table-card {
+    background: #0f1f36;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .form-title {
+    color: #f1f5f9;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .field-group label,
+  .logo-upload label {
+    color: #94a3b8;
+  }
+
+  .field-group input {
+    background: #152b45;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    &::placeholder { color: #64748b; }
+    &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
+  }
+
+  .logos-section {
+    border-top-color: rgba(255, 255, 255, 0.08);
+    h3 { color: #f1f5f9; }
+  }
+
+  .upload-area {
+    border-color: rgba(255, 255, 255, 0.15);
+    &:hover { border-color: #c9952e; background: rgba(201, 149, 46, 0.06); }
+  }
+  .upload-placeholder { color: #64748b; }
+
+  .form-actions { border-top-color: rgba(255, 255, 255, 0.08); }
+
+  .loading { color: #94a3b8; }
+  .spinner { border-color: rgba(255, 255, 255, 0.1); border-top-color: #c9952e; }
+  .empty-state { color: #94a3b8; }
+
+  .empresa-row {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+    &:hover { background: rgba(255, 255, 255, 0.03); }
+  }
+
+  .checkbox-wrapper .checkmark {
+    background: #0f1f36;
+    border-color: #475569;
+  }
+
+  .mini-logo {
+    background: #152b45;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .mini-logo-placeholder {
+    background: #152b45;
+    color: #64748b;
+  }
+
+  .empresa-nombre { color: #f1f5f9; }
+  .empresa-ruc { color: #94a3b8; }
+
+  .badge-active { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+  .badge-inactive { background: rgba(255, 255, 255, 0.06); color: #94a3b8; }
+
+  .btn-icon { color: #94a3b8; &:hover { background: rgba(255, 255, 255, 0.06); color: #c9952e; } }
+  .btn-icon-danger:hover { background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
+}
+
 /* ── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
   .form-grid {

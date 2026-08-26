@@ -358,6 +358,21 @@ $ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
   min-width: 0;
 }
 
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .vendedor-layout {
+    background: #0a1628;
+  }
+
+  .main-content {
+    background: #0a1628;
+  }
+
+  .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
 // ── COLAPSADO ──
 .vendedor-layout.colapsado {
   .sidebar {

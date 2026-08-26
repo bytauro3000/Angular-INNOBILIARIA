@@ -581,6 +581,77 @@
   color: #2ecc71;
 }
 
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .panel-title { color: #f1f5f9; }
+  .panel-subtitle { color: #94a3b8; }
+
+  .btn-plano {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    &:hover { border-color: #c9952e; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+  }
+
+  .programa-selector label { color: #94a3b8; }
+  .programa-selector select {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #c9952e; }
+    option { background: #0f1f36; color: #e2e8f0; }
+  }
+
+  .resumen-item {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .resumen-count { color: #f1f5f9; }
+  .resumen-label { color: #94a3b8; }
+
+  .leyenda {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .leyenda-item { color: #cbd5e1; }
+
+  .plano-referencia {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .plano-fallback { color: #94a3b8; code { background: #152b45; color: #e2e8f0; } }
+
+  .loading { color: #94a3b8; }
+
+  .manzana {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .manzana-header { background: #1a2332; }
+
+  .lote.selected { box-shadow: 0 0 0 3px #c9952e, 0 12px 24px rgba(0, 0, 0, 0.3); }
+
+  .empty { color: #94a3b8; }
+
+  .detalle-panel {
+    background: #0f1f36;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  .detalle-header { background: #1a2332; }
+  .detalle-row { border-bottom-color: rgba(255, 255, 255, 0.06); }
+  .detalle-row.total .detalle-label { color: #f1f5f9; }
+  .detalle-value { color: #f1f5f9; }
+  .detalle-row.total .detalle-value { color: #6ee7b7; }
+  .simulacion-divider { background: rgba(255, 255, 255, 0.06); }
+  .simulacion-label { color: #94a3b8; }
+  .simulacion-input {
+    background: #152b45;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #c9952e; box-shadow: 0 0 0 2px rgba(201, 149, 46, 0.1); }
+  }
+}
+
 @media (max-width: 768px) {
   .panel-lotes { padding: 0 12px; }
 
