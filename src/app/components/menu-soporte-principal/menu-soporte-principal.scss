@@ -93,3 +93,11 @@
 .card-programas {
   background: linear-gradient(135deg, #9b59b6, #8e44ad);
 }
+
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .principal-container {
+    .titulo { color: #f1f5f9; }
+    .subtitulo { color: #94a3b8; }
+  }
+}
