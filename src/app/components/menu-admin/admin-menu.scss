@@ -686,11 +686,11 @@ $ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
 // ── DARK MODE ──
 :host-context(body.dark-mode) {
   .admin-layout {
-    background: #0a1628;
+    background: #101318;
   }
 
   .main-content {
-    background: #0a1628;
+    background: #101318;
   }
 
   .sidebar-overlay {
@@ -698,10 +698,10 @@ $ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .mobile-toggle {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    &:hover { background: #152b45; }
+    &:hover { background: #252932; }
     &.is-open { background: $gold; color: $navy-deep; }
   }
 }

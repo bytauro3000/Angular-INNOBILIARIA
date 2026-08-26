@@ -1,4 +1,4 @@
-// ── Variables ─────────────────────────────────────────────────────────────
+﻿// ── Variables ─────────────────────────────────────────────────────────────
 $navy:       #023e8a;
 $blue:       #2980b9;
 $green:      #27ae60;
@@ -369,7 +369,7 @@ $bg-white:   #ffffff;
 
   // ── Tarjetas de resumen ─────────────────
   .resumen-card {
-    background: #152b45;
+    background: #252932;
     border-color: rgba(99, 179, 237, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
@@ -380,7 +380,7 @@ $bg-white:   #ffffff;
   // ── Estado cargando / vacío ─────────────
   .estado-cargando,
   .estado-vacio {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(99, 179, 237, 0.15);
     color: #64748b;
 
@@ -394,7 +394,7 @@ $bg-white:   #ffffff;
 
   // ── Bloque por programa ─────────────────
   .programa-bloque {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(99, 179, 237, 0.15);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   }

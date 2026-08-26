@@ -1,4 +1,4 @@
-@use "sass:color";
+﻿@use "sass:color";
 
 // ============================================
 // VARIABLES — Paleta "Pago Letras" Admin
@@ -719,27 +719,27 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       p { color: #94a3b8; }
     }
     .filtros {
-      background: #0f1f36;
+      background: #101C24;
       border-color: rgba(255, 255, 255, 0.06);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       .form-group label { color: #94a3b8; }
       .form-group .form-control {
-        background: #152b45;
+        background: #252932;
         border-color: rgba(255, 255, 255, 0.08);
         color: #f1f5f9;
         &::placeholder { color: #64748b; }
-        &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); background: #152b45; }
+        &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); background: #252932; }
       }
       .btn-limpiar { background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; box-shadow: none;
         &:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.25); transform: none; } }
     }
     .tabla-wrapper {
-      background: #0f1f36;
+      background: #101C24;
       border-color: rgba(255, 255, 255, 0.06);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .tabla-custom {
-      thead tr { background: #0f1f36; border-bottom: 2px solid #c9952e; }
+      thead tr { background: #101C24; border-bottom: 2px solid #c9952e; }
       tbody tr {
         border-bottom: none;
         td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }
@@ -753,7 +753,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       }
     }
     .pago-card {
-      background: #0f1f36;
+      background: #101C24;
       border-color: rgba(255, 255, 255, 0.06);
       .card-monto { color: #e2b859; }
       .card-grid { border-color: rgba(255, 255, 255, 0.06); }
@@ -762,9 +762,9 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       &.anulado { background: rgba(239, 68, 68, 0.08); }
       .card-cliente { background: rgba(255, 255, 255, 0.04); color: #94a3b8; }
       .card-motivo { background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
-      .card-acciones .btn-icon { background: #0f1f36; }
+      .card-acciones .btn-icon { background: #101C24; }
     }
-    .empty-state { background: #0f1f36; color: #64748b; }
+    .empty-state { background: #101C24; color: #64748b; }
   }
   .estado-badge {
     &.vigente { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }

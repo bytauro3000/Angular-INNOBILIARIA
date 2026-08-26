@@ -1,4 +1,4 @@
-$primary-teal: #0f766e;
+﻿$primary-teal: #0f766e;
 $teal:         #14b8a6;
 $dark-modal:   #122b39;
 $dark-input:   #1a3a4a;
@@ -262,7 +262,7 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
     }
     .toolbar .search-box {
       select, input {
-        background: #152b45;
+        background: #252932;
         border-color: rgba(255, 255, 255, 0.08);
         color: #f1f5f9;
         &::placeholder { color: #64748b; }
@@ -270,11 +270,11 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
       }
     }
     .table-container {
-      background: #0f1f36;
+      background: #101C24;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .custom-table {
-      thead { background: #0f1f36; border-bottom: 2px solid #c9952e; }
+      thead { background: #101C24; border-bottom: 2px solid #c9952e; }
       tbody tr {
         border-color: rgba(255, 255, 255, 0.06);
         &:hover { background: rgba(201, 149, 46, 0.04); }
@@ -294,7 +294,7 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
 
   // ── Modal PIN (usaba fondo blanco fijo) ──
   .pin-modal {
-    background: #0f1f36;
+    background: #101C24;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -303,7 +303,7 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
   .pin-modal-body p { color: #94a3b8; }
   .pin-email { color: #f1f5f9 !important; }
   .pin-input {
-    background: #152b45;
+    background: #252932;
     border-color: rgba(255, 255, 255, 0.15);
     color: #f1f5f9;
     &:focus { border-color: #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15); }

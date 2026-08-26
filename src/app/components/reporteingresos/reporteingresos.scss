@@ -1,4 +1,4 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 
 // ── Variables ──────────────────────────────────────────────────────────────
 $color-letra:       #4361ee;
@@ -663,14 +663,14 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
 
   // ── Card de filtros ─────────────────────────────────────────────────────────
   .ri-filtros-card {
-    background: #152b45;
+    background: #252932;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 
     .ri-field label { color: #64748b; }
   }
 
   .ri-input-fecha {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(99, 179, 237, 0.2);
     color: #e2e8f0;
 
@@ -679,15 +679,15 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   }
 
   .btn-limpiar {
-    background: #0f1f36;
+    background: #101C24;
     color: #94a3b8;
     border: 1px solid rgba(99, 179, 237, 0.2);
-    &:hover:not(:disabled) { background: #152b45; color: #e2e8f0; }
+    &:hover:not(:disabled) { background: #252932; color: #e2e8f0; }
   }
 
   // ── Tarjetas de totales ─────────────────────────────────────────────────────
   .ri-total-card {
-    background: #152b45;
+    background: #252932;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 
     .tc-label        { color: #94a3b8; }
@@ -704,7 +704,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
 
   // ── Sección tabla ───────────────────────────────────────────────────────────
   .ri-tabla-section {
-    background: #0f1f36;
+    background: #101C24;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   }
 
@@ -720,7 +720,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   .ri-filtro-tipo { color: #64748b; }
 
   .ri-select-tipo {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(99, 179, 237, 0.2);
     color: #e2e8f0;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -730,12 +730,12 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     appearance: none;
     padding-right: 28px;
 
-    option { background: #0f1f36; color: #e2e8f0; }
+    option { background: #101C24; color: #e2e8f0; }
     &:focus { border-color: #3b82f6; }
   }
 
   // ── Tabla ───────────────────────────────────────────────────────────────────
-  .ri-tabla-wrap { background: #0f1f36; }
+  .ri-tabla-wrap { background: #101C24; }
 
   .ri-tabla {
     thead tr { background: linear-gradient(135deg, #023e8a, #0353a4); }
@@ -761,7 +761,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     // Dark mode: tarjetas en mobile
     @media (max-width: 768px) {
       .ri-tabla tbody tr {
-        background: #0f1f36;
+        background: #101C24;
         border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
@@ -828,13 +828,13 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   }
 
   .skel-line {
-    background: linear-gradient(90deg, #152b45 25%, #1a3a5c 50%, #152b45 75%);
+    background: linear-gradient(90deg, #252932 25%, #1a3a5c 50%, #252932 75%);
     background-size: 600px 100%;
     animation: shimmer-dark 1.3s infinite;
   }
 
   .ri-skel-card {
-    background: #152b45;
+    background: #252932;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 }

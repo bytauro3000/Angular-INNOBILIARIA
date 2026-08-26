@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');
 
 .gestion-empresa {
   font-family: 'Josefin Sans', 'Segoe UI', sans-serif;
@@ -461,7 +461,7 @@
 
   .form-card,
   .table-card {
-    background: #0f1f36;
+    background: #101C24;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
@@ -476,7 +476,7 @@
   }
 
   .field-group input {
-    background: #152b45;
+    background: #252932;
     border-color: rgba(255, 255, 255, 0.08);
     color: #e2e8f0;
     &::placeholder { color: #64748b; }
@@ -506,16 +506,16 @@
   }
 
   .checkbox-wrapper .checkmark {
-    background: #0f1f36;
+    background: #101C24;
     border-color: #475569;
   }
 
   .mini-logo {
-    background: #152b45;
+    background: #252932;
     border-color: rgba(255, 255, 255, 0.08);
   }
   .mini-logo-placeholder {
-    background: #152b45;
+    background: #252932;
     color: #64748b;
   }
 

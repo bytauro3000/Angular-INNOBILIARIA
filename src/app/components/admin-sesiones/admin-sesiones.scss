@@ -271,14 +271,14 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     background:
       radial-gradient(circle at 0% 0%, rgba(201, 149, 46, 0.06), transparent 40%),
       radial-gradient(circle at 100% 100%, rgba(26, 122, 122, 0.04), transparent 40%),
-      #0a1628;
+      #101318;
   }
-  .kpi-card, .table-container { background: #0f1f36; border-color: rgba(255,255,255,0.06); }
+  .kpi-card, .table-container { background: #101C24; border-color: rgba(255,255,255,0.06); }
   .kpi-card .kpi-value { color: #f1f5f9; }
   .kpi-card .kpi-label { color: #94a3b8; }
   .section-title h2 { color: #f1f5f9; }
   .section-title p { color: #94a3b8; }
-  .sesiones-table thead { background: linear-gradient(135deg, #0a1628, #152b45); }
+  .sesiones-table thead { background: linear-gradient(135deg, #101318, #252932); }
   .sesiones-table tbody tr {
     border-color: rgba(255,255,255,0.06);
     &:hover { background: rgba(201,149,46,0.04); }

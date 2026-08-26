@@ -1,4 +1,4 @@
-$collapsed-w:  64px;
+﻿$collapsed-w:  64px;
 $expanded-w:   272px;
 
 // ── Paleta Indigo Profundo + Violeta (soporte técnico) ──
@@ -361,11 +361,11 @@ $ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
 // ── DARK MODE ──
 :host-context(body.dark-mode) {
   .soporte-layout {
-    background: #0a1628;
+    background: #101318;
   }
 
   .main-content {
-    background: #0a1628;
+    background: #101318;
   }
 
   .sidebar-overlay {

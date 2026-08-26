@@ -1,4 +1,4 @@
-.panel-lotes {
+﻿.panel-lotes {
   max-width: 1200px;
   margin: 0 auto;
   padding: 28px 24px 0;
@@ -587,7 +587,7 @@
   .panel-subtitle { color: #94a3b8; }
 
   .btn-plano {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.08);
     color: #e2e8f0;
     &:hover { border-color: #c9952e; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
@@ -595,36 +595,36 @@
 
   .programa-selector label { color: #94a3b8; }
   .programa-selector select {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.08);
     color: #e2e8f0;
     &:focus { border-color: #c9952e; }
-    option { background: #0f1f36; color: #e2e8f0; }
+    option { background: #101C24; color: #e2e8f0; }
   }
 
   .resumen-item {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.06);
   }
   .resumen-count { color: #f1f5f9; }
   .resumen-label { color: #94a3b8; }
 
   .leyenda {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.06);
   }
   .leyenda-item { color: #cbd5e1; }
 
   .plano-referencia {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.06);
   }
-  .plano-fallback { color: #94a3b8; code { background: #152b45; color: #e2e8f0; } }
+  .plano-fallback { color: #94a3b8; code { background: #252932; color: #e2e8f0; } }
 
   .loading { color: #94a3b8; }
 
   .manzana {
-    background: #0f1f36;
+    background: #101C24;
     border-color: rgba(255, 255, 255, 0.06);
   }
   .manzana-header { background: #1a2332; }
@@ -634,7 +634,7 @@
   .empty { color: #94a3b8; }
 
   .detalle-panel {
-    background: #0f1f36;
+    background: #101C24;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
   .detalle-header { background: #1a2332; }
@@ -645,7 +645,7 @@
   .simulacion-divider { background: rgba(255, 255, 255, 0.06); }
   .simulacion-label { color: #94a3b8; }
   .simulacion-input {
-    background: #152b45;
+    background: #252932;
     border-color: rgba(255, 255, 255, 0.08);
     color: #e2e8f0;
     &:focus { border-color: #c9952e; box-shadow: 0 0 0 2px rgba(201, 149, 46, 0.1); }

@@ -1,4 +1,4 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 
 $teal:        #0f766e;
 $teal-light:  #14b8a6;
@@ -132,8 +132,8 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   .rc-container { color: #e2e8f0; }
   .rc-titulo { color: #f1f5f9; i { color: $teal-light; } }
   .rc-subtitulo { color: #64748b; }
-  .rc-filtros-card, .rc-tabla-section { background: #0f1f36; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
-  .rc-input-fecha { background: #0f1f36; border-color: rgba(255,255,255,.1); color: #e2e8f0; &:focus { border-color: $teal-light; } }
+  .rc-filtros-card, .rc-tabla-section { background: #101C24; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
+  .rc-input-fecha { background: #101C24; border-color: rgba(255,255,255,.1); color: #e2e8f0; &:focus { border-color: $teal-light; } }
   .rc-field label { color: #94a3b8; }
   .rc-tabla thead th { background: linear-gradient(135deg, #023e8a, #0353a4); }
   .rc-tabla tbody td { border-color: rgba(255,255,255,.06); color: #e2e8f0; }
