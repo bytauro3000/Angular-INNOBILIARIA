@@ -209,10 +209,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
 
   .comprobante-badge {
     display: inline-block;
-    background: rgba($accent, 0.1);
     color: color.adjust($accent, $lightness: -5%);
-    padding: 4px 10px;
-    border-radius: 8px;
     font-size: 0.82rem;
     font-weight: 600;
   }
@@ -472,10 +469,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
 
     .comprobante-badge {
       display: inline-block;
-      background: rgba($accent, 0.1);
       color: color.adjust($accent, $lightness: -5%);
-      padding: 4px 10px;
-      border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 600;
     }
@@ -711,7 +705,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         td.motivo { color: rgba(255, 255, 255, 0.5); }
         &.anulado { background: rgba(239, 68, 68, 0.04); td { background: transparent; } }
         &.anulado:hover { background: rgba(239, 68, 68, 0.1); }
-        .comprobante-badge { background: rgba(201, 149, 46, 0.12); color: #e2b859; }
+        .comprobante-badge { color: #e2b859; }
       }
     }
     .pago-card {
