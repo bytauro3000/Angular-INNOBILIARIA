@@ -34,7 +34,9 @@ body.dark-mode {
 }
 
 body.dark-mode .main-content,
+body.dark-mode app-admin-menu,
 body.dark-mode app-admin-dashboard,
+body.dark-mode app-admin-sesiones,
 body.dark-mode app-admin-anulaciones-letras,
 body.dark-mode app-admin-anulaciones-moras,
 body.dark-mode app-admin-anulaciones-iniciales,
@@ -417,15 +419,82 @@ body.dark-mode .selector-programa select {
   color: #e2e8f0;
 }
 
-// ── MENSAJERIA ── (keep minimal, it works with global bg)
+// ── MENSAJERIA ──
 body.dark-mode .messaging-container {
-  .sidebar-header h2 { color: #f1f5f9; }
-  .chat-item { border-color: rgba(255,255,255,0.06); }
-  .chat-item .chat-info h4 { color: #e2e8f0; }
-  .chat-item .chat-info p { color: #64748b; }
-  .chat-item:hover, .chat-item.active { background: rgba(6,182,212,0.04); }
-  .chat-window-header { border-color: rgba(255,255,255,0.06); }
-  .chat-window-header h3 { color: #f1f5f9; }
+  background: #0f1f36;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+  .contacts-panel {
+    background: #0a1628;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    .panel-header {
+      border-color: rgba(255, 255, 255, 0.08);
+      h2 { color: #f1f5f9; }
+    }
+
+    .search-box {
+      input {
+        background: #0f1f36;
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #e2e8f0;
+        &::placeholder { color: #64748b; }
+        &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
+      }
+      i { color: #64748b; }
+    }
+  }
+
+  .contact-item {
+    .contact-info .contact-name { color: #f1f5f9; }
+    .contact-time { color: #64748b; }
+    .contact-preview { color: #94a3b8; }
+    .contact-rol { color: #64748b; }
+    &:hover, &.active { background: rgba(201, 149, 46, 0.06); }
+  }
+
+  .empty-contacts { color: #64748b; }
+
+  .chat-main {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .chat-header {
+    background: #0a1628;
+    border-color: rgba(255, 255, 255, 0.08);
+    .chat-header-info h3 { color: #f1f5f9; }
+    .chat-header-rol { color: #94a3b8; }
+    .typing-indicator { color: #94a3b8; }
+  }
+
+  .messages-container { background: #0f1f36; }
+
+  .message-row.theirs .message-bubble {
+    background: #152b45;
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.06);
+    .message-time { color: #94a3b8; }
+  }
+  .message-row.mine .message-bubble {
+    background: #0f766e;
+    color: #fff;
+  }
+
+  .empty-messages { color: #64748b; }
+
+  .chat-footer {
+    background: #0a1628;
+    border-color: rgba(255, 255, 255, 0.08);
+    .input-group input {
+      background: #0f1f36;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      &::placeholder { color: #64748b; }
+      &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
+    }
+  }
 }
 
 // ── CARGANDO (recibos) ──

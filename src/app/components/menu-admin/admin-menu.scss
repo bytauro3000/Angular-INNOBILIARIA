@@ -682,3 +682,26 @@ $ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
     transform: none;
   }
 }
+
+// ── DARK MODE ──
+:host-context(body.dark-mode) {
+  .admin-layout {
+    background: #0a1628;
+  }
+
+  .main-content {
+    background: #0a1628;
+  }
+
+  .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .mobile-toggle {
+    background: #0f1f36;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    &:hover { background: #152b45; }
+    &.is-open { background: $gold; color: $navy-deep; }
+  }
+}

@@ -291,6 +291,28 @@ $ease-out-ek:  cubic-bezier(0.23, 1, 0.32, 1);
     &.activo   { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
     &.inactivo { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
   }
+
+  // ── Modal PIN (usaba fondo blanco fijo) ──
+  .pin-modal {
+    background: #0f1f36;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .pin-modal-header h4 { color: #f1f5f9; }
+  .pin-close { color: #94a3b8; &:hover { color: #f1f5f9; } }
+  .pin-modal-body p { color: #94a3b8; }
+  .pin-email { color: #f1f5f9 !important; }
+  .pin-input {
+    background: #152b45;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+    &:focus { border-color: #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15); }
+  }
+  .pin-modal-footer .btn-cancelar {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+    &:hover { background: rgba(255, 255, 255, 0.05); color: #f1f5f9; }
+  }
 }
 
 @keyframes spin      { to { transform: rotate(360deg); } }
