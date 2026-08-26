@@ -468,7 +468,7 @@ $ease-out-ek: cubic-bezier(0.23, 1, 0.32, 1);
     }
 
     .custom-table {
-      thead { background: #1a2430; border-bottom: 2px solid #c9952e; }
+      thead { background: #1a2430; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
       tbody tr {
         border-bottom: none;
         td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }

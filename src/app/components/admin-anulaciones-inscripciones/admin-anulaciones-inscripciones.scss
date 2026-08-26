@@ -721,7 +721,7 @@ $accent-light: color.adjust($accent, $lightness: 35%);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
     .tabla-custom {
-      thead tr { background: #1a2430; border-bottom: 2px solid #c9952e; }
+      thead tr { background: #1a2430; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
       tbody tr {
         border-bottom: none;
         td { border-bottom: none; color: rgba(255, 255, 255, 0.7); }

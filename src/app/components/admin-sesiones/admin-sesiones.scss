@@ -278,7 +278,7 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   .kpi-card .kpi-label { color: #94a3b8; }
   .section-title h2 { color: #f1f5f9; }
   .section-title p { color: #94a3b8; }
-  .sesiones-table thead { background: linear-gradient(135deg, #101318, #252932); }
+  .sesiones-table thead { background: linear-gradient(135deg, #101318, #252932); border-bottom: 1px solid rgba(255,255,255,0.1); }
   .sesiones-table tbody tr {
     border-color: rgba(255,255,255,0.06);
     &:hover { background: rgba(201,149,46,0.04); }
