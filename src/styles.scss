@@ -96,7 +96,7 @@ body.dark-mode select option {
 
 // Flatpickr en dark mode
 body.dark-mode .flatpickr-calendar {
-  background: #101C24 !important;
+  background: #1a2430 !important;
   color: #e2e8f0;
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
@@ -107,11 +107,11 @@ body.dark-mode .flatpickr-days,
 body.dark-mode .flatpickr-dayContainer,
 body.dark-mode .flatpickr-weekdays,
 body.dark-mode .flatpickr-weekdaycontainer {
-  background: #101C24 !important;
+  background: #1a2430 !important;
   color: #e2e8f0;
 }
 body.dark-mode .flatpickr-months {
-  background: #101C24 !important;
+  background: #1a2430 !important;
 }
 body.dark-mode .flatpickr-months .flatpickr-month,
 body.dark-mode .flatpickr-current-month,
@@ -153,7 +153,7 @@ body.dark-mode .flatpickr-next-month:hover {
   fill: #c9952e;
 }
 body.dark-mode .flatpickr-time {
-  background: #101C24 !important;
+  background: #1a2430 !important;
 }
 body.dark-mode .flatpickr-time input,
 body.dark-mode .flatpickr-time .flatpickr-time-separator,
@@ -226,7 +226,7 @@ body.dark-mode .messaging-container {
 // ── FILTERS ──
 body.dark-mode .filtros-header .search-box,
 body.dark-mode .filtros .search-box {
-  background: #101C24 !important;
+  background: #1a2430 !important;
   border-color: rgba(255,255,255,0.08) !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -265,7 +265,7 @@ body.dark-mode .filtros-header .selector-busqueda {
 body.dark-mode .filtros-header .btn-toggle {
   color: #94a3b8;
   &:hover:not(.active) { background: rgba(255,255,255,0.05); color: #e2e8f0; }
-  &.active { background: #101C24; color: #06b6d4; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+  &.active { background: #1a2430; color: #06b6d4; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 }
 
 body.dark-mode .btn-clear-inline {
@@ -300,30 +300,30 @@ body.dark-mode .picker-card {
 // ── TABLE WRAPPER ──
 body.dark-mode .main-card,
 body.dark-mode .contrato-card {
-  background: #101C24 !important;
+  background: #1a2430 !important;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   border: 1px solid rgba(255,255,255,0.06);
 }
 
 // ── TABLE ──
 body.dark-mode .table-custom {
-  thead tr { background: linear-gradient(135deg, #101318, #1a334d); }
-  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
-  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
-  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
-  .id-number { color: #06b6d4; }
+  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
+  .id-number { color: #e2b859; }
   .multi-item-container div:not(:last-child) { border-bottom-color: rgba(255,255,255,0.06); }
   .no-data { color: #64748b; }
 }
 
 body.dark-mode .tabla-recibos {
-  background: #101C24;
+  background: #1a2430;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   border: 1px solid rgba(255,255,255,0.06);
-  thead tr { background: linear-gradient(135deg, #101318, #1a334d); }
-  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
-  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; background: transparent; }
-  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; background: transparent; }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .estado-pendiente { background: rgba(251,191,36,0.15); color: #fbbf24; }
   .estado-pagado    { background: rgba(52,211,153,0.15); color: #34d399; }
   .estado-vencido   { background: rgba(248,113,113,0.15); color: #f87171; }
@@ -345,7 +345,7 @@ body.dark-mode .tabla-recibos .btn-action {
 
 // ── PAGINATION ──
 body.dark-mode .paginacion-controles .btn-paginacion {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   color: #cbd5e1;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -380,7 +380,7 @@ body.dark-mode .estado-dropdown .btn-estado-menu {
   &:hover { background: rgba(6,182,212,0.1); border-color: #06b6d4; color: #06b6d4; }
 }
 body.dark-mode .estado-menu {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   .estado-menu-item {
@@ -390,12 +390,12 @@ body.dark-mode .estado-menu {
 }
 
 // ── LOADING ──
-body.dark-mode .loading-dots-wrapper-inline { background: #101C24; }
+body.dark-mode .loading-dots-wrapper-inline { background: #1a2430; }
 body.dark-mode .loading-dots span { background: #06b6d4; }
 body.dark-mode .loading-text { color: #64748b; }
 
 // ── EMPTY STATE ──
-body.dark-mode .empty-state { background: #101C24; }
+body.dark-mode .empty-state { background: #1a2430; }
 body.dark-mode .empty-state i { color: #334155; }
 body.dark-mode .empty-title { color: #94a3b8; }
 body.dark-mode .empty-subtitle { color: #64748b; }
@@ -403,7 +403,7 @@ body.dark-mode .no-data { color: #64748b; }
 
 // ── CONTRATO INFO CARD (pagoletras) ──
 body.dark-mode .contrato-info-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   h4 { color: #06b6d4; }
   .info-grid strong { color: #94a3b8; }
@@ -422,7 +422,7 @@ body.dark-mode .filtro-chips .chip-count { background: rgba(255,255,255,0.06); c
 
 // ── LECTURA PLANILLA ──
 body.dark-mode .main-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   .card-header h2 { color: #f1f5f9; }
   .badge-price { color: #cbd5e1; }
@@ -443,14 +443,14 @@ body.dark-mode .reporte-header {
   .reporte-subtitle { color: #64748b; }
 }
 body.dark-mode .resumen-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   .card-valor { color: #f1f5f9; }
   .card-label { color: #94a3b8; }
   .card-icon { color: #06b6d4; }
 }
 body.dark-mode .programa-bloque {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
 }
 body.dark-mode .programa-header h3 { color: #e2e8f0; }
@@ -458,12 +458,12 @@ body.dark-mode .programa-badge { background: rgba(6,182,212,0.15); color: #06b6d
 body.dark-mode .estado-cargando { color: #94a3b8; }
 body.dark-mode .estado-vacio { color: #64748b; i { color: #34d399; } }
 body.dark-mode .tabla-mora {
-  thead tr { background: linear-gradient(135deg, #101318, #1a334d); }
-  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
-  td { color: #cbd5e1; border-bottom-color: rgba(255,255,255,0.06); }
-  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #cbd5e1; border-bottom-color: rgba(255,255,255,0.1); }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .fila-critica td { background-color: rgba(248,113,113,0.06) !important; }
-  .badge-letras { background: rgba(6,182,212,0.15); color: #06b6d4; }
+  .badge-letras { background: rgba(201,149,46,0.15); color: #e2b859; }
   .badge-bajo  { background: rgba(52,211,153,0.15); color: #34d399; }
   .badge-medio { background: rgba(251,191,36,0.15);  color: #fbbf24; }
   .badge-alto  { background: rgba(248,113,113,0.15); color: #f87171; }
@@ -476,7 +476,7 @@ body.dark-mode .tabla-mora {
 
 // ── REPORTE INGRESOS ──
 body.dark-mode .ri-filtros-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   label { color: #94a3b8; }
 }
@@ -490,7 +490,7 @@ body.dark-mode .ri-input-fecha {
 body.dark-mode .ri-actions .btn-buscar { background: #06b6d4; color: #101318; &:hover { filter: brightness(1.1); } }
 body.dark-mode .ri-actions .btn-limpiar { background: #374151; color: #cbd5e1; &:hover { background: #4b5563; } }
 body.dark-mode .ri-total-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   .tc-label { color: #94a3b8; }
   .tc-monto { color: #e2e8f0; }
@@ -499,7 +499,7 @@ body.dark-mode .ri-total-card {
   .tc-barra { background: rgba(255,255,255,0.06); }
 }
 body.dark-mode .ri-tabla-section {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
 }
 body.dark-mode .ri-tabla-titulo { color: #f1f5f9; }
@@ -514,7 +514,7 @@ body.dark-mode .ri-vacio, body.dark-mode .ri-inicial { color: #64748b; i { color
 
 // ── REPORTE LOTE ──
 body.dark-mode .reporte-toolbar {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   .toolbar-left { color: #f1f5f9; }
 }
@@ -525,15 +525,15 @@ body.dark-mode .reporte-divider { border-color: rgba(255,255,255,0.08); }
 body.dark-mode .programa-nombre { color: #f1f5f9; }
 body.dark-mode .programa-meta-info { color: #94a3b8; }
 body.dark-mode .tabla-lotes {
-  thead tr { background: linear-gradient(135deg, #101318, #1a334d); }
-  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
-  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
-  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .badge-estado { background: #252932; color: #94a3b8; }
   .estado-disponible { background: rgba(52,211,153,0.15); color: #34d399; }
   .estado-vendido    { background: rgba(248,113,113,0.15); color: #f87171; }
   .estado-separado   { background: rgba(251,191,36,0.15);  color: #fbbf24; }
-  .tfoot-resumen td { background: rgba(6,182,212,0.06); color: #06b6d4; }
+  .tfoot-resumen td { background: rgba(201,149,46,0.08); color: #e2b859; }
   .subtotal-label { color: #cbd5e1; }
 }
 body.dark-mode .reporte-footer p { color: #64748b; }
@@ -560,7 +560,7 @@ body.dark-mode .selector-programa select {
 
 // ── MENSAJERIA ──
 body.dark-mode .messaging-container {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 
@@ -575,7 +575,7 @@ body.dark-mode .messaging-container {
 
     .search-box {
       input {
-        background: #101C24;
+        background: #1a2430;
         border-color: rgba(255, 255, 255, 0.08);
         color: #e2e8f0;
         &::placeholder { color: #64748b; }
@@ -596,7 +596,7 @@ body.dark-mode .messaging-container {
   .empty-contacts { color: #64748b; }
 
   .chat-main {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.08);
   }
 
@@ -608,7 +608,7 @@ body.dark-mode .messaging-container {
     .typing-indicator { color: #94a3b8; }
   }
 
-  .messages-container { background: #101C24; }
+  .messages-container { background: #1a2430; }
 
   .message-row.theirs .message-bubble {
     background: #252932;
@@ -627,7 +627,7 @@ body.dark-mode .messaging-container {
     background: #101318;
     border-color: rgba(255, 255, 255, 0.08);
     .input-group input {
-      background: #101C24;
+      background: #1a2430;
       border-color: rgba(255, 255, 255, 0.08);
       color: #e2e8f0;
       &::placeholder { color: #64748b; }
@@ -642,13 +642,13 @@ body.dark-mode .lotes-vendidos-container {
   .page-subtitle { color: #94a3b8; }
 
   .filtro-vendedor .select-input-wrapper {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.08);
     .vendedor-input { color: #e2e8f0; &::placeholder { color: #64748b; } }
     &:focus-within { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
   }
   .custom-select-list {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.08);
     li:hover { background: rgba(201, 149, 46, 0.08); }
     .vendedor-nombre { color: #e2e8f0; }
@@ -660,7 +660,7 @@ body.dark-mode .lotes-vendidos-container {
   .estado-vacio { color: #94a3b8; }
 
   .programa-card {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.06);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     .programa-header {
@@ -669,14 +669,14 @@ body.dark-mode .lotes-vendidos-container {
       h3 { color: #f1f5f9; i { color: #c9952e; } }
     }
     .tabla-lotes {
-      thead th { background: #101318; color: #94a3b8; border-color: rgba(255, 255, 255, 0.08); }
-      tbody td { color: #cbd5e1; border-color: rgba(255, 255, 255, 0.06); }
+      thead th { background: #1a2430; color: #94a3b8; border-color: rgba(255, 255, 255, 0.08); }
+      tbody td { color: #cbd5e1; border-color: rgba(255, 255, 255, 0.1); }
       tbody tr:hover { background: rgba(201, 149, 46, 0.04); }
     }
   }
 
   .totales-card {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.06);
     .totales-label { color: #94a3b8; }
     .totales-valor { color: #f1f5f9; }
@@ -686,42 +686,42 @@ body.dark-mode .lotes-vendidos-container {
 
 // ── CARGANDO (recibos) ──
 body.dark-mode .cargando {
-  background: #101C24;
+  background: #1a2430;
   color: #06b6d4;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   &::after { border-color: #06b6d4; border-top-color: transparent; }
 }
 body.dark-mode .sin-resultados {
-  background: #101C24;
+  background: #1a2430;
   color: #64748b;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 // ── LETRACAMBIO LISTAR ──
 body.dark-mode .tabla-letras {
-  background: #101C24 !important;
+  background: #1a2430 !important;
   table {
-    thead tr { background: linear-gradient(135deg, #101318, #1a334d) !important; }
-    th { color: #f1f5f9 !important; border-bottom: 2px solid #06b6d4 !important; }
-    td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
-    tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+    thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+    th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+    td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+    tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
     .importe-texto { color: #e2e8f0 !important; }
-    .celda-importe:hover td { background-color: rgba(6,182,212,0.08) !important; }
-    .input-edicion { background: #1a334d; border-color: #06b6d4; color: #e2e8f0; }
+    .celda-importe:hover td { background-color: rgba(201,149,46,0.08) !important; }
+    .input-edicion { background: #252932; border-color: #c9952e; color: #e2e8f0; }
   }
   .no-results { color: #64748b; }
 }
 @media (max-width: 767px) {
   body.dark-mode .tabla-letras tr {
-    background: #101C24 !important;
+    background: #1a2430 !important;
     border-color: rgba(255,255,255,0.06) !important;
   }
   body.dark-mode .tabla-letras td {
-    border-bottom-color: rgba(255,255,255,0.06) !important;
-    &::before { color: #06b6d4 !important; }
+    border-bottom-color: rgba(255,255,255,0.1) !important;
+    &::before { color: #e2b859 !important; }
   }
   body.dark-mode .tabla-letras td:first-child {
-    background: linear-gradient(135deg, #101318, #1a334d) !important;
+    background: #1a2430 !important;
   }
 }
 body.dark-mode .mensaje-cargando { color: #94a3b8; }
@@ -734,7 +734,7 @@ body.dark-mode .btn-imprimircronograma { background: rgba(52,211,153,0.15); colo
   &:hover:not(:disabled) { background: #34d399; color: #101318; } }
 body.dark-mode .tabla-letras .pagina-btn,
 body.dark-mode .tabla-letras .pagina-numero-btn {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   color: #cbd5e1;
   &:hover:not(:disabled) { background: #06b6d4; color: #101318; border-color: #06b6d4; }
@@ -744,14 +744,14 @@ body.dark-mode .tabla-letras .pagina-numero-btn {
 
 // ── PAGO-INSCRIPCION LISTAR ──
 body.dark-mode .btn-outline-secondary {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   color: #cbd5e1;
   &:hover:not(:disabled) { background: #06b6d4; color: #101318; border-color: #06b6d4; }
   &:disabled { opacity: 0.4; }
 }
 body.dark-mode .pagina-numero-btn {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.08);
   color: #cbd5e1;
   &:hover:not(:disabled) { background: #06b6d4; color: #101318; border-color: #06b6d4; }
@@ -762,10 +762,10 @@ body.dark-mode .programa-label { color: #06b6d4; }
 
 // ── SELECCIÓN DE MÓDULO ──
 body.dark-mode .selection-wrapper {
-  background: linear-gradient(160deg, #101318 0%, #101C24 100%);
+  background: linear-gradient(160deg, #101318 0%, #1a2430 100%);
 }
 body.dark-mode .selection-card {
-  background: #101C24;
+  background: #1a2430;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
 }
 body.dark-mode .selection-card .heading { color: #f1f5f9; }
@@ -797,7 +797,7 @@ body.dark-mode .selection-card .logout-btn {
 body.dark-mode app-recibos-listar .container {
   h2 { color: #f1f5f9; border-left-color: #c9952e; }
   .filtros {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(255, 255, 255, 0.06);
     .form-group label { color: #94a3b8; }
     .form-group select,
@@ -808,15 +808,15 @@ body.dark-mode app-recibos-listar .container {
       &:focus { border-color: #c9952e; }
     }
   }
-  .sin-resultados { background: #101C24; }
+  .sin-resultados { background: #1a2430; }
 }
 
 // ── LECTURA PLANILLA (unified-table, cards, inputs) ──
 body.dark-mode .unified-table {
-  thead tr { background: linear-gradient(135deg, #101318, #1a334d); }
-  th { color: #f1f5f9; border-bottom: 2px solid #06b6d4; }
-  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
-  tbody tr:hover td { background-color: rgba(6,182,212,0.08) !important; }
+  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   td.bg-light { background: #252932 !important; color: #cbd5e1; }
   .name-box strong { color: #e2e8f0; }
   .badge-mz { background: #252932; color: #94a3b8; }
@@ -824,11 +824,11 @@ body.dark-mode .unified-table {
     background: #252932;
     border-color: rgba(255,255,255,0.08);
     color: #e2e8f0;
-    &:focus { border-color: #06b6d4; box-shadow: 0 0 0 2px rgba(6,182,212,0.08); }
+    &:focus { border-color: #c9952e; box-shadow: 0 0 0 2px rgba(201,149,46,0.1); }
   }
 }
 body.dark-mode .vivienda-card {
-  background: #101C24;
+  background: #1a2430;
   border-color: rgba(255,255,255,0.06);
   .name-box strong { color: #e2e8f0; }
   .badge-mz { background: #252932; color: #94a3b8; }
@@ -836,7 +836,7 @@ body.dark-mode .vivienda-card {
     background: #252932;
     border-color: rgba(255,255,255,0.08);
     color: #e2e8f0;
-    &:focus { border-color: #06b6d4; }
+    &:focus { border-color: #c9952e; }
     &:disabled { opacity: 0.5; }
   }
   .service-block { border-color: rgba(255,255,255,0.06); }
@@ -854,7 +854,7 @@ body.dark-mode .btn-save {
   &:disabled { opacity: 0.5; }
 }
 body.dark-mode .floating-search-btn {
-  background: #101C24;
+  background: #1a2430;
   color: #06b6d4;
   border-color: rgba(255,255,255,0.08);
 }
