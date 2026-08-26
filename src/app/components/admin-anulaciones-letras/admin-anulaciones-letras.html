@@ -20,8 +20,16 @@
   <!-- Filtros -->
   <div class="filtros-panel">
     <div class="filtro-group">
+      <label>Tipo Comprobante</label>
+      <select class="form-control" [(ngModel)]="tipoComprobanteFiltro" (change)="onTipoComprobanteChange()">
+        <option value="">Todos</option>
+        <option value="B001">Boleta (B001)</option>
+        <option value="RB01">Recibo (RB01)</option>
+      </select>
+    </div>
+    <div class="filtro-group">
       <label>N° Comprobante</label>
-      <input type="text" class="form-control" placeholder="RB01-XXXXXX"
+      <input type="text" class="form-control" placeholder="B001- o RB01-..."
              [(ngModel)]="filtros.numeroComprobante">
     </div>
     <div class="filtro-group">

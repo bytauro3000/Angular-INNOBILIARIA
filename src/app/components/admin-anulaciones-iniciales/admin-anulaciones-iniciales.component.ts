@@ -27,6 +27,14 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
   cargando = false;
 
   filtros: FiltrosAnulacion = {};
+  tipoComprobanteFiltro = '';
+
+  // Al escoger Boleta o Recibo, prefill el N° de comprobante con la serie
+  onTipoComprobanteChange(): void {
+    if (this.tipoComprobanteFiltro === 'B001') this.filtros.numeroComprobante = 'B001-';
+    else if (this.tipoComprobanteFiltro === 'RB01') this.filtros.numeroComprobante = 'RB01-';
+    else this.filtros.numeroComprobante = '';
+  }
 
   mostrarModalAnular = false;
   pagoSeleccionado?: PagoInicialAdminDTO;
@@ -62,7 +70,7 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
   }
 
   aplicarFiltros(): void { this.cargarPagos(); }
-  limpiarFiltros(): void { this.filtros = {}; this.cargarPagos(); }
+  limpiarFiltros(): void { this.filtros = {}; this.tipoComprobanteFiltro = ''; this.cargarPagos(); }
 
   abrirModalAnular(pago: PagoInicialAdminDTO): void {
     this.pagoSeleccionado = pago;

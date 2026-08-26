@@ -18,6 +18,14 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
   cargando = false;
 
   filtros: FiltrosAnulacion = {};
+  tipoComprobanteFiltro = '';
+
+  // Al escoger Boleta o Recibo, prefill el N° de comprobante con la serie
+  onTipoComprobanteChange(): void {
+    if (this.tipoComprobanteFiltro === 'B001') this.filtros.numeroComprobante = 'B001-';
+    else if (this.tipoComprobanteFiltro === 'RB01') this.filtros.numeroComprobante = 'RB01-';
+    else this.filtros.numeroComprobante = '';
+  }
 
   // Modal anulación
   mostrarModalAnular = false;
@@ -66,6 +74,7 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
 
   limpiarFiltros(): void {
     this.filtros = {};
+    this.tipoComprobanteFiltro = '';
     this.cargarPagos();
   }
 

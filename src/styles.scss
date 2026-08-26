@@ -47,6 +47,12 @@ body.dark-mode input[type="month"] {
   }
 }
 
+// ── Selects nativos en dark mode: opciones del dropdown oscuras ──
+body.dark-mode select option {
+  background-color: #1a2530;
+  color: #e2e8f0;
+}
+
 body.dark-mode .main-content,
 body.dark-mode app-admin-menu,
 body.dark-mode app-admin-dashboard,
