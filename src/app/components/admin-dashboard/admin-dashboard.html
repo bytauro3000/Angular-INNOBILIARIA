@@ -33,6 +33,68 @@
     </div>
   </header>
 
+  <!-- ═══════════════════ INGRESOS ═══════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-title">
+        <span class="section-icon money"><i class="fas fa-coins"></i></span>
+        <div>
+          <h2>Ingresos del Día</h2>
+          <p>Recaudación desglosada por tipo de pago</p>
+        </div>
+      </div>
+
+      <div class="date-picker-wrap">
+        <label>Fecha</label>
+        <div class="date-input">
+          <i class="far fa-calendar"></i>
+          <input type="date" [(ngModel)]="fechaSeleccionada" (change)="onFechaChange()">
+        </div>
+      </div>
+    </div>
+
+    <div class="ingresos-grid" *ngIf="!cargandoIngresos && ingresos; else cargandoIng">
+
+      <article class="ingreso-card {{ card.color }}" *ngFor="let card of ingresosCards; let i = index" [style.animation-delay.ms]="i * 70">
+        <div class="ingreso-head">
+          <div class="ingreso-icon"><i class="fas {{ card.icon }}"></i></div>
+          <span class="ingreso-pct">{{ getPorcentajeIngreso(card.key) }}%</span>
+        </div>
+        <span class="ingreso-label">{{ card.label }}</span>
+        <span class="ingreso-monto">$ {{ getMonto(card.key) | number:'1.2-2' }}</span>
+        <div class="ingreso-bar">
+          <div class="ingreso-bar-fill" [style.width.%]="getPorcentajeIngreso(card.key)"></div>
+        </div>
+        <span class="ingreso-cant">
+          <i class="fas fa-receipt"></i> {{ getCantidad(card.key) }} registros
+        </span>
+      </article>
+
+      <!-- Recaudación total como tarjeta del grid -->
+      <article class="ingreso-card green total-card" style="animation-delay: 280ms">
+        <div class="ingreso-head">
+          <div class="ingreso-icon"><i class="fas fa-wallet"></i></div>
+          <span class="ingreso-pct total-pct">100%</span>
+        </div>
+        <span class="ingreso-label">Recaudación Total</span>
+        <span class="ingreso-monto total-monto">$ {{ ingresos!.totalGeneral | number:'1.2-2' }}</span>
+        <div class="ingreso-bar">
+          <div class="ingreso-bar-fill" style="width: 100%"></div>
+        </div>
+        <span class="ingreso-cant">
+          <i class="fas fa-receipt"></i> {{ getTotalRegistros() }} registros totales
+        </span>
+      </article>
+    </div>
+
+    <ng-template #cargandoIng>
+      <div class="loading-state" *ngIf="cargandoIngresos">
+        <div class="spinner"></div>
+        <p>Cargando ingresos...</p>
+      </div>
+    </ng-template>
+  </section>
+
   <!-- ═══════════════════ KPIs ═══════════════════ -->
   <section class="section">
     <div class="section-head">
@@ -70,68 +132,6 @@
       <div class="loading-state" *ngIf="cargandoTotales">
         <div class="spinner"></div>
         <p>Cargando indicadores...</p>
-      </div>
-    </ng-template>
-  </section>
-
-  <!-- ═══════════════════ INGRESOS ═══════════════════ -->
-  <section class="section">
-    <div class="section-head">
-      <div class="section-title">
-        <span class="section-icon money"><i class="fas fa-coins"></i></span>
-        <div>
-          <h2>Ingresos del Día</h2>
-          <p>Recaudación desglosada por tipo de pago</p>
-        </div>
-      </div>
-
-      <div class="date-picker-wrap">
-        <label>Fecha</label>
-        <div class="date-input">
-          <i class="far fa-calendar"></i>
-          <input type="date" [(ngModel)]="fechaSeleccionada" (change)="onFechaChange()">
-        </div>
-      </div>
-    </div>
-
-    <div class="ingresos-grid" *ngIf="!cargandoIngresos && ingresos; else cargandoIng">
-
-      <article class="ingreso-card {{ card.color }}" *ngFor="let card of ingresosCards; let i = index" [style.animation-delay.ms]="i * 70">
-        <div class="ingreso-head">
-          <div class="ingreso-icon"><i class="fas {{ card.icon }}"></i></div>
-          <span class="ingreso-pct">{{ getPorcentajeIngreso(card.key) }}%</span>
-        </div>
-        <span class="ingreso-label">{{ card.label }}</span>
-        <span class="ingreso-monto">S/ {{ getMonto(card.key) | number:'1.2-2' }}</span>
-        <div class="ingreso-bar">
-          <div class="ingreso-bar-fill" [style.width.%]="getPorcentajeIngreso(card.key)"></div>
-        </div>
-        <span class="ingreso-cant">
-          <i class="fas fa-receipt"></i> {{ getCantidad(card.key) }} registros
-        </span>
-      </article>
-
-      <!-- Recaudación total como tarjeta del grid -->
-      <article class="ingreso-card green total-card" style="animation-delay: 280ms">
-        <div class="ingreso-head">
-          <div class="ingreso-icon"><i class="fas fa-wallet"></i></div>
-          <span class="ingreso-pct total-pct">100%</span>
-        </div>
-        <span class="ingreso-label">Recaudación Total</span>
-        <span class="ingreso-monto total-monto">S/ {{ ingresos!.totalGeneral | number:'1.2-2' }}</span>
-        <div class="ingreso-bar">
-          <div class="ingreso-bar-fill" style="width: 100%"></div>
-        </div>
-        <span class="ingreso-cant">
-          <i class="fas fa-receipt"></i> {{ getTotalRegistros() }} registros totales
-        </span>
-      </article>
-    </div>
-
-    <ng-template #cargandoIng>
-      <div class="loading-state" *ngIf="cargandoIngresos">
-        <div class="spinner"></div>
-        <p>Cargando ingresos...</p>
       </div>
     </ng-template>
   </section>

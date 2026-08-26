@@ -25,12 +25,12 @@ export class AdminDashboardComponent implements OnInit {
   totalContratos = 0;
 
   kpiCards: { key: string; label: string; icon: string; color: string; bgGrad: string }[] = [
-    { key: 'clientes',   label: 'Clientes',   icon: 'fa-users',          color: '#0f766e', bgGrad: 'linear-gradient(135deg, #0f766e, #14b8a6)'   },
-    { key: 'lotes',      label: 'Lotes',      icon: 'fa-map-marked-alt', color: '#0891b2', bgGrad: 'linear-gradient(135deg, #0891b2, #22d3ee)'   },
-    { key: 'vendedores', label: 'Vendedores', icon: 'fa-user-tie',       color: '#d97706', bgGrad: 'linear-gradient(135deg, #d97706, #fbbf24)'   },
-    { key: 'programas',  label: 'Programas',  icon: 'fa-city',           color: '#7c3aed', bgGrad: 'linear-gradient(135deg, #7c3aed, #a78bfa)'   },
-    { key: 'parceleros', label: 'Parceleros', icon: 'fa-hard-hat',       color: '#be185d', bgGrad: 'linear-gradient(135deg, #be185d, #f472b6)'   },
-    { key: 'contratos',  label: 'Contratos',  icon: 'fa-file-contract',  color: '#059669', bgGrad: 'linear-gradient(135deg, #059669, #34d399)'   }
+    { key: 'clientes',   label: 'Clientes',   icon: 'fa-users',          color: '#16a085', bgGrad: 'linear-gradient(135deg, #1abc9c, #16a085)'   },
+    { key: 'lotes',      label: 'Lotes',      icon: 'fa-map-marked-alt', color: '#2980b9', bgGrad: 'linear-gradient(135deg, #3498db, #2980b9)'   },
+    { key: 'vendedores', label: 'Vendedores', icon: 'fa-user-tie',       color: '#e67e22', bgGrad: 'linear-gradient(135deg, #f39c12, #e67e22)'   },
+    { key: 'programas',  label: 'Programas',  icon: 'fa-city',           color: '#8e44ad', bgGrad: 'linear-gradient(135deg, #9b59b6, #8e44ad)'   },
+    { key: 'parceleros', label: 'Parceleros', icon: 'fa-hard-hat',       color: '#27ae60', bgGrad: 'linear-gradient(135deg, #2ecc71, #27ae60)'   },
+    { key: 'contratos',  label: 'Contratos',  icon: 'fa-file-contract',  color: '#14b8a6', bgGrad: 'linear-gradient(135deg, #0f766e, #14b8a6)'   }
   ];
 
   ingresosCards: { key: string; label: string; icon: string; color: string; }[] = [

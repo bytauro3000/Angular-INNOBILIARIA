@@ -289,14 +289,14 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .kpi-card {
-  background: $bg-card;
+  background: var(--card-gradient);
   border-radius: $radius;
   padding: 20px 22px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: $shadow;
-  border: 1px solid $border-soft;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  color: #fff;
   position: relative;
   overflow: hidden;
   transition: transform 0.25s $ease-out, box-shadow 0.25s $ease-out;
@@ -307,13 +307,13 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: var(--card-gradient);
-    opacity: 0.8;
+    background: rgba(255,255,255,0.35);
+    opacity: 0.6;
   }
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: $shadow-lg;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 
     .kpi-icon-wrap { transform: scale(1.06); }
   }
@@ -324,8 +324,8 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--card-accent);
-    box-shadow: 0 4px 12px -2px var(--card-accent);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.2);
     transition: transform 0.2s $ease-out;
     position: relative;
 
@@ -334,15 +334,15 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       position: absolute;
       inset: -4px;
       border-radius: 16px;
-      background: var(--card-accent);
-      opacity: 0.08;
+      background: rgba(255,255,255,0.12);
+      opacity: 0.4;
       z-index: -1;
     }
   }
 
   .kpi-icon {
     font-size: 1.1rem;
-    color: white;
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -356,7 +356,7 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   .kpi-label {
     font-size: 0.7rem;
-    color: $text-secondary;
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -365,21 +365,21 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   .kpi-value {
     font-size: 1.8rem;
     font-weight: 800;
-    color: $text-primary;
+    color: #fff;
     line-height: 1.15;
     letter-spacing: -0.5px;
   }
 
   .kpi-bar {
     height: 3px;
-    background: #e9ecf3;
+    background: rgba(255, 255, 255, 0.25);
     border-radius: 999px;
     overflow: hidden;
     margin-top: 2px;
 
     .kpi-bar-fill {
       width: 100%; height: 100%;
-      background: var(--card-gradient);
+      background: rgba(255, 255, 255, 0.7);
       border-radius: 999px;
       opacity: 0.5;
       transform-origin: left;
@@ -745,7 +745,13 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       #0a1628;
   }
 
-  .kpi-card,
+  .kpi-card {
+    /* Fondo degradado sólido se conserva (las tarjetas KPI ya llevan su color).
+       Solo se ajustan los textos para que sigan legibles en cualquier tema. */
+    .kpi-value { color: #fff; }
+    .kpi-label { color: rgba(255, 255, 255, 0.9); }
+  }
+
   .ingreso-card,
   .lotes-table-container,
   .contrato-card {
@@ -754,9 +760,7 @@ $ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
-  .kpi-card .kpi-bar { background: rgba(255, 255, 255, 0.06); }
-  .kpi-card .kpi-value { color: #f1f5f9; }
-  .kpi-card .kpi-label { color: #94a3b8; }
+  .kpi-card .kpi-bar { background: rgba(255, 255, 255, 0.25); }
 
   .section-title h2 { color: #f1f5f9; }
   .section-title p { color: #94a3b8; }
