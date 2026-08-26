@@ -622,6 +622,39 @@ body.dark-mode .pagina-numero-btn {
 body.dark-mode .resultado-contador { color: #94a3b8; }
 body.dark-mode .programa-label { color: #06b6d4; }
 
+// ── SELECCIÓN DE MÓDULO ──
+body.dark-mode .selection-wrapper {
+  background: linear-gradient(160deg, #0a1628 0%, #0f1f36 100%);
+}
+body.dark-mode .selection-card {
+  background: #0f1f36;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+}
+body.dark-mode .selection-card .heading { color: #f1f5f9; }
+body.dark-mode .selection-card .subheading { color: #94a3b8; strong { color: #c9952e; } }
+body.dark-mode .selection-card .brand-logo { background: #152b45; }
+body.dark-mode .selection-card .option-card {
+  background: #152b45;
+  border-color: rgba(255, 255, 255, 0.12);
+  &:hover { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); }
+}
+body.dark-mode .selection-card .option-secretaria {
+  border-color: #0F766E;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.18) 0%, #152b45 100%);
+  &:hover { background: linear-gradient(135deg, rgba(15, 118, 110, 0.3) 0%, #152b45 100%); }
+}
+body.dark-mode .selection-card .option-soporte {
+  border-color: #0369A1;
+  background: linear-gradient(135deg, rgba(3, 105, 161, 0.18) 0%, #152b45 100%);
+  &:hover { background: linear-gradient(135deg, rgba(3, 105, 161, 0.3) 0%, #152b45 100%); }
+}
+body.dark-mode .selection-card .card-desc { color: #94a3b8; }
+body.dark-mode .selection-card .logout-btn {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  &:hover { color: #fca5a5; border-color: #fca5a5; background: rgba(239, 68, 68, 0.08); }
+}
+
 // ── RECIBOS LISTAR (filtros + container) ──
 body.dark-mode app-recibos-listar .container {
   h2 { color: #f1f5f9; border-left-color: #c9952e; }
