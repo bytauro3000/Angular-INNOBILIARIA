@@ -1,18 +1,14 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import { FlatpickrDirective } from '../../directives/flatpickr.directive';
 import { AdminAnulacionesService, FiltrosAnulacion } from '../../services/admin-anulaciones.service';
 import { PagoLetraResponse } from '../../dto/pagoletraresponse.dto';
 
 @Component({
   selector: 'app-admin-anulaciones-letras',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [CommonModule, FormsModule, FlatpickrDirective],
   templateUrl: './admin-anulaciones-letras.html',
   styleUrls: ['./admin-anulaciones-letras.scss']
 })
@@ -25,9 +21,9 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
   filtros: FiltrosAnulacion = {};
   tipoComprobanteFiltro = '';
 
-  // Fechas para el mat-datepicker (Date objects)
-  fechaDesde?: Date;
-  fechaHasta?: Date;
+  // Fechas para el flatpickr (string ISO YYYY-MM-DD)
+  fechaDesde?: string;
+  fechaHasta?: string;
 
   @ViewChild('numeroComprobanteInput') numeroComprobanteInput?: ElementRef;
 
@@ -90,8 +86,8 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
-    this.filtros.fechaDesde = this.fechaDesde ? this.formatDate(this.fechaDesde) : undefined;
-    this.filtros.fechaHasta = this.fechaHasta ? this.formatDate(this.fechaHasta) : undefined;
+    this.filtros.fechaDesde = this.fechaDesde || undefined;
+    this.filtros.fechaHasta = this.fechaHasta || undefined;
     this.cargarPagos();
   }
 
@@ -101,13 +97,6 @@ export class AdminAnulacionesLetrasComponent implements OnInit {
     this.fechaDesde = undefined;
     this.fechaHasta = undefined;
     this.cargarPagos();
-  }
-
-  private formatDate(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
   }
 
   // ── Modal anular ────────────────────────────────────────

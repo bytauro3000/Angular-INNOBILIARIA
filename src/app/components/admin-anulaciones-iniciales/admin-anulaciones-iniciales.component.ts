@@ -1,11 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import { FlatpickrDirective } from '../../directives/flatpickr.directive';
 import { AdminAnulacionesService, FiltrosAnulacion } from '../../services/admin-anulaciones.service';
 import { PagoInicialResponseDTO } from '../../dto/pagoinicialresponse.dto';
 
@@ -21,7 +17,7 @@ export interface PagoInicialAdminDTO extends PagoInicialResponseDTO {
 @Component({
   selector: 'app-admin-anulaciones-iniciales',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [CommonModule, FormsModule, FlatpickrDirective],
   templateUrl: './admin-anulaciones-iniciales.html',
   styleUrls: ['./admin-anulaciones-iniciales.scss']
 })
@@ -33,8 +29,8 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
 
   filtros: FiltrosAnulacion = {};
   tipoComprobanteFiltro = '';
-  fechaDesde?: Date;
-  fechaHasta?: Date;
+  fechaDesde?: string;
+  fechaHasta?: string;
 
   @ViewChild('numeroComprobanteInput') numeroComprobanteInput?: ElementRef;
 
@@ -88,18 +84,11 @@ export class AdminAnulacionesInicialesComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
-    this.filtros.fechaDesde = this.fechaDesde ? this.formatDate(this.fechaDesde) : undefined;
-    this.filtros.fechaHasta = this.fechaHasta ? this.formatDate(this.fechaHasta) : undefined;
+    this.filtros.fechaDesde = this.fechaDesde || undefined;
+    this.filtros.fechaHasta = this.fechaHasta || undefined;
     this.cargarPagos();
   }
   limpiarFiltros(): void { this.filtros = {}; this.tipoComprobanteFiltro = ''; this.fechaDesde = undefined; this.fechaHasta = undefined; this.cargarPagos(); }
-
-  private formatDate(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
 
   abrirModalAnular(pago: PagoInicialAdminDTO): void {
     this.pagoSeleccionado = pago;

@@ -58,13 +58,6 @@ $ease-out-ek: cubic-bezier(0.23, 1, 0.32, 1);
 
       label { font-size: 0.72rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; }
       .form-control { font-size: 0.88rem; border-radius: 6px; }
-
-      .fecha-picker {
-        width: 100%;
-        font-size: 0.88rem;
-        --mat-form-field-container-height: 38px;
-        --mat-form-field-container-vertical-padding: 0;
-      }
     }
 
     .filtro-acciones {
@@ -464,11 +457,6 @@ $ease-out-ek: cubic-bezier(0.23, 1, 0.32, 1);
         color: #f1f5f9;
         &::placeholder { color: #64748b; }
         &:focus { border-color: #c9952e; box-shadow: 0 0 0 3px rgba(201, 149, 46, 0.1); }
-      }
-      .filtro-group .fecha-picker {
-        --mat-form-field-container-vertical-padding: 0;
-        .mat-mdc-form-field-flex { background: #252932; border-radius: 6px; }
-        input.mat-mdc-input-element { color: #f1f5f9; }
       }
       .btn-limpiar { background: transparent; border-color: rgba(255, 255, 255, 0.15); color: #94a3b8;
         &:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.25); } }
