@@ -877,3 +877,76 @@ body.dark-mode .floating-search-btn {
   border-color: rgba(255,255,255,0.08);
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// TARJETAS MÓVILES EN MODO OSCURO (vistas del menú secretaría)
+// Cuando las tablas se convierten en tarjetas (<768px) los componentes usan
+// fondo blanco; estos overrides las pintan con la paleta oscura.
+// ─────────────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+
+  // ── .table-custom (clientes, contratos, separaciones, programas, vendedores, lotes, parceleros, pagos inscripción) ──
+  body.dark-mode .table-custom tbody tr:not(.loading-row):not(.empty-row),
+  body.dark-mode .table-custom tbody tr {
+    background: #1a2430 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  body.dark-mode .table-custom tbody tr:not(.loading-row):not(.empty-row) td,
+  body.dark-mode .table-custom tbody td {
+    border-bottom-color: rgba(255,255,255,0.08) !important;
+    color: #e2e8f0 !important;
+
+    &::before {
+      color: #e2b859 !important;
+    }
+  }
+
+  body.dark-mode .table-custom tbody td:first-child {
+    background: #023e8a !important;
+    border-bottom-color: rgba(255,255,255,0.12) !important;
+  }
+
+  // ── .tabla-custom (pago letras) ──
+  body.dark-mode .tabla-custom tbody tr {
+    background: #1a2430 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    &.parcial { border-color: rgba(251,191,36,0.4) !important; }
+  }
+
+  body.dark-mode .tabla-custom tbody td {
+    border-bottom-color: rgba(255,255,255,0.08) !important;
+    color: #e2e8f0 !important;
+
+    &::before {
+      color: #e2b859 !important;
+    }
+  }
+
+  body.dark-mode .tabla-custom tbody td:first-child {
+    background: #023e8a !important;
+    border-bottom-color: rgba(255,255,255,0.12) !important;
+  }
+
+  // ── .tabla-moras (mora listar) ──
+  body.dark-mode .tabla-moras tbody tr {
+    background: #1a2430 !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+    &.row-pendiente { border-color: rgba(251,191,36,0.4) !important; }
+    &.row-pagado    { border-color: rgba(52,211,153,0.4) !important; }
+  }
+
+  body.dark-mode .tabla-moras tbody td {
+    border-bottom-color: rgba(255,255,255,0.08) !important;
+    color: #e2e8f0 !important;
+
+    &::before {
+      color: #e2b859 !important;
+    }
+  }
+}
+
