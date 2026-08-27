@@ -2,6 +2,7 @@ export interface FilaClienteMora {
   nombreClientes: string;
   manzanas: string[];
   numeroLotes: string[];
+  areas: number[];
   cantidadLetrasAtrasadas: number;
   rangoLetras: string;
   importeTotal: number;

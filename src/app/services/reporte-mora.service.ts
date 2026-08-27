@@ -16,6 +16,10 @@ export class ReporteMoraService {
     return this.http.get<ReporteClientesMoraDTO[]>(`${this.apiUrl}/clientes`);
   }
 
+  obtenerClientesLetrasVencidas(): Observable<ReporteClientesMoraDTO[]> {
+    return this.http.get<ReporteClientesMoraDTO[]>(`${this.apiUrl}/letras-vencidas`);
+  }
+
   descargarPdf(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/clientes/pdf`, { responseType: 'blob' });
   }
