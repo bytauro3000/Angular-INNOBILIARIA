@@ -16,6 +16,9 @@ export class LetrasVencidasComponent implements OnInit {
   grupos: ReporteClientesMoraDTO[] = [];
   cargando = true;
 
+  /** Referencia a la pestaña de WhatsApp Web abierta por este botón (para reutilizarla). */
+  private whatsappWindow: Window | null = null;
+
   constructor(
     private reporteMoraService: ReporteMoraService,
     private toastr: ToastrService
@@ -117,6 +120,17 @@ export class LetrasVencidasComponent implements OnInit {
       `${cantidad} ${sustantivo} por un total de ${importe}. ` +
       `Por favor acercarse a oficina a regularizar su pago y evite generar intereses.`;
 
-    window.open(`https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
+    const url = `https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`;
+
+    // Si ya abrimos una pestaña de WhatsApp Web desde este botón y sigue abierta,
+    // la reutilizamos (navega al chat nuevo y la trae al frente). Si no existe
+    // o fue cerrada, se abre una nueva con el nombre fijo "WhatsAppWeb".
+    if (this.whatsappWindow && !this.whatsappWindow.closed) {
+      this.whatsappWindow.location.href = url;
+      this.whatsappWindow.focus();
+    } else {
+      this.whatsappWindow = window.open(url, 'WhatsAppWeb');
+      this.whatsappWindow?.focus();
+    }
   }
 }
