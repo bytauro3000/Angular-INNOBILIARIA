@@ -202,6 +202,7 @@ $bg-white:   #ffffff;
 
 .tabla-mora {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.83rem;
 
@@ -218,10 +219,23 @@ $bg-white:   #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     border-bottom: 2px solid $border;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
 
     &.text-center { text-align: center; }
     &.text-right  { text-align: right; }
+
+    // ── Anchos fijos por columna (para alinear todas las tablas) ──
+    &:nth-child(1) { width: 42px; }
+    &:nth-child(2) { width: auto; }   // Cliente(s): toma el resto
+    &:nth-child(3) { width: 52px; }   // MZ
+    &:nth-child(4) { width: 52px; }   // LT
+    &:nth-child(5) { width: 96px; }   // Área
+    &:nth-child(6) { width: 88px; }   // Letras
+    &:nth-child(7) { width: 104px; }  // Rango
+    &:nth-child(8) { width: 138px; }  // Importe Adeudado
+    &:nth-child(9) { width: 120px; }  // Celular
+    &:nth-child(10) { width: 120px; } // WhatsApp
   }
 
   tbody tr {
@@ -241,15 +255,18 @@ $bg-white:   #ffffff;
     padding: 10px 14px;
     color: $text-dark;
     vertical-align: middle;
+    overflow-wrap: break-word;
 
     &.text-center { text-align: center; }
     &.text-right  { text-align: right; }
   }
+
+  .lote-linea { white-space: nowrap; }
 }
 
 // ── Celdas especiales ─────────────────────────────────────────────────────
 .td-num { color: $text-light; font-size: 0.78rem; width: 36px; }
-.td-cliente { font-weight: 500; min-width: 200px; }
+.td-cliente { font-weight: 500; }
 .td-mz, .td-lt { font-weight: 600; color: $navy; }
 .td-area { color: $text-light; white-space: nowrap; }
 .lote-linea { white-space: nowrap; }
