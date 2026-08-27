@@ -117,6 +117,6 @@ export class LetrasVencidasComponent implements OnInit {
       `${cantidad} ${sustantivo} por un total de ${importe}. ` +
       `Por favor acercarse a oficina a regularizar su pago y evite generar intereses.`;
 
-    window.open(`https://wa.me/${celularLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 }
