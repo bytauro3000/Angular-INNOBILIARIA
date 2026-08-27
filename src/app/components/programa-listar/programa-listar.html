@@ -30,14 +30,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let programa of programasFiltrados">
-          <td>{{ programa.idPrograma }}</td>
-          <td>{{ programa.nombrePrograma }}</td>
-          <td>{{ programa.ubicacion }}</td>
-          <td>{{ programa.areaTotal }}</td>
-          <td>{{ programa.precioM2 | currency:'USD':'symbol':'1.0-2' }}</td>
-          <td class="fw-bold">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
-          <td>{{ programa.distrito.nombre }}</td>
-          <td class="acciones-cell">
+          <td data-label="ID">{{ programa.idPrograma }}</td>
+          <td data-label="Nombre">{{ programa.nombrePrograma }}</td>
+          <td data-label="Ubicación">{{ programa.ubicacion }}</td>
+          <td data-label="Área Total">{{ programa.areaTotal }}</td>
+          <td data-label="Precio m²">{{ programa.precioM2 | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td class="fw-bold" data-label="Costo Total">{{ programa.costoTotal | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td data-label="Distrito">{{ programa.distrito.nombre }}</td>
+          <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
               <button class="btn-action btn-edit" (click)="abrirModal(programa)" title="Editar">
                 <i class="bi bi-pencil"></i>

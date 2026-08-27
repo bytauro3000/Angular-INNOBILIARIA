@@ -32,32 +32,32 @@
       </thead>
       <tbody>
         <tr *ngFor="let s of paginasSeparaciones">
-          <td class="text-center">{{ s.idSeparacion }}</td>
+          <td class="text-center" data-label="ID">{{ s.idSeparacion }}</td>
 
-          <td>
+          <td data-label="Cliente">
             <div *ngFor="let c of s.clientes">{{ c.nombreCompleto }}</div>
           </td>
 
-          <td class="text-center">
+          <td class="text-center" data-label="DNI/RUC">
             <div *ngFor="let c of s.clientes">{{ c.numDoc }}</div>
           </td>
 
-          <td class="text-center">
+          <td class="text-center" data-label="Mz - Lt">
             <div *ngFor="let l of s.lotes">Mz. {{ l.manzana }} - Lt. {{ l.numeroLote }}</div>
           </td>
 
-          <td>{{ s.nomVendedor }}</td>
-          <td class="text-center">{{ s.fechaSepara | date:'dd/MM/yyyy' : 'UTC' }}</td>
-          <td class="text-center">{{ s.fechaLimite | date:'dd/MM/yyyy' : 'UTC' }}</td>
-          <td class="text-end">{{ s.monto | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td data-label="Vendedor">{{ s.nomVendedor }}</td>
+          <td class="text-center" data-label="F. Separación">{{ s.fechaSepara | date:'dd/MM/yyyy' : 'UTC' }}</td>
+          <td class="text-center" data-label="F. Límite">{{ s.fechaLimite | date:'dd/MM/yyyy' : 'UTC' }}</td>
+          <td class="text-end" data-label="Monto">{{ s.monto | currency:'USD':'symbol':'1.2-2' }}</td>
 
-          <td class="text-center">
+          <td class="text-center" data-label="Estado">
             <span class="badge" [ngClass]="s.estadoSeparacion === 'EN_PROCESO' ? 'badge-warning' : 'badge-success'">
               {{ s.estadoSeparacion === 'EN_PROCESO' ? 'En Proceso' : 'Completado' }}
             </span>
           </td>
 
-          <td class="acciones-cell">
+          <td class="acciones-cell" data-label="Acciones">
             <div class="acciones-container">
               <button class="btn-action btn-edit" (click)="mostrarEditar(s)" title="Editar">
                 <i class="bi bi-pencil"></i>
