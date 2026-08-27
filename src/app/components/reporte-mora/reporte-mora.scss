@@ -250,17 +250,17 @@ $bg-white:   #ffffff;
     &.text-center { text-align: center; }
     &.text-right  { text-align: right; }
 
-    // ── Anchos fijos por columna (para alinear todas las tablas) ──
-    &:nth-child(1) { width: 38px; }
-    &:nth-child(2) { width: auto; }   // Cliente(s): toma el resto
-    &:nth-child(3) { width: 42px; }   // MZ
-    &:nth-child(4) { width: 42px; }   // LT
-    &:nth-child(5) { width: 86px; }   // Desde
-    &:nth-child(6) { width: 66px; }   // Letras Atrasadas
-    &:nth-child(7) { width: 88px; }   // Rango
-    &:nth-child(8) { width: 120px; }  // Importe Adeudado
-    &:nth-child(9) { width: 108px; }  // Celular
-    &:nth-child(10) { width: 112px; } // WhatsApp
+    // ── Anchos por columna en % (suman 100%, la tabla nunca desborda) ──
+    &:nth-child(1)  { width: 4%; }    // #
+    &:nth-child(2)  { width: 26%; }   // Cliente(s)
+    &:nth-child(3)  { width: 5%; }    // MZ
+    &:nth-child(4)  { width: 5%; }    // LT
+    &:nth-child(5)  { width: 9%; }    // Desde
+    &:nth-child(6)  { width: 6%; }    // Letras Atrasadas
+    &:nth-child(7)  { width: 9%; }    // Rango
+    &:nth-child(8)  { width: 13%; }   // Importe Adeudado
+    &:nth-child(9)  { width: 11%; }   // Celular
+    &:nth-child(10) { width: 12%; }   // WhatsApp
   }
 
   tbody tr {
@@ -292,7 +292,7 @@ $bg-white:   #ffffff;
 
 // ── Celdas especiales ─────────────────────────────────────────────────────
 .td-num { color: $text-light; font-size: 0.78rem; width: 36px; }
-.td-cliente { font-weight: 500; }
+.td-cliente { font-weight: 500; word-break: break-word; }
 .td-mz, .td-lt { font-weight: 600; color: $navy; }
 .td-importe { font-weight: 700; color: $text-dark; white-space: nowrap; }
 .td-celular { font-family: monospace; font-size: 0.82rem; }
