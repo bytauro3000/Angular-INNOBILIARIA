@@ -1,4 +1,4 @@
-﻿@use 'sass:color';
+@use 'sass:color';
 
 // ── Variables ──────────────────────────────────────────────────────────────
 $color-letra:       #4361ee;
@@ -670,7 +670,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   }
 
   .ri-input-fecha {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(99, 179, 237, 0.2);
     color: #e2e8f0;
 
@@ -679,7 +679,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   }
 
   .btn-limpiar {
-    background: #101C24;
+    background: #1a2430;
     color: #94a3b8;
     border: 1px solid rgba(99, 179, 237, 0.2);
     &:hover:not(:disabled) { background: #252932; color: #e2e8f0; }
@@ -704,7 +704,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
 
   // ── Sección tabla ───────────────────────────────────────────────────────────
   .ri-tabla-section {
-    background: #101C24;
+    background: #1a2430;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   }
 
@@ -720,7 +720,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
   .ri-filtro-tipo { color: #64748b; }
 
   .ri-select-tipo {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(99, 179, 237, 0.2);
     color: #e2e8f0;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -730,20 +730,24 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     appearance: none;
     padding-right: 28px;
 
-    option { background: #101C24; color: #e2e8f0; }
+    option { background: #1a2430; color: #e2e8f0; }
     &:focus { border-color: #3b82f6; }
   }
 
   // ── Tabla ───────────────────────────────────────────────────────────────────
-  .ri-tabla-wrap { background: #101C24; }
+  .ri-tabla-wrap { background: #1a2430; }
 
   .ri-tabla {
-    thead tr { background: linear-gradient(135deg, #023e8a, #0353a4); }
+    thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
 
     th {
       background: transparent;
-      color: #f1f5f0;
-      border-bottom: 2px solid #06b6d4;
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
     }
 
     td {
@@ -761,7 +765,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     // Dark mode: tarjetas en mobile
     @media (max-width: 768px) {
       .ri-tabla tbody tr {
-        background: #101C24;
+        background: #1a2430;
         border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
@@ -778,21 +782,21 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
       }
 
       .ri-tabla tfoot .fila-total {
-        background: linear-gradient(135deg, #023e8a, #0353a4);
-        td { color: #f1f5f0; }
+        background: #252932;
+        td { color: #f1f5f9; }
       }
     }
 
     tfoot .fila-total {
       background: transparent;
       td {
-        background: linear-gradient(135deg, #023e8a, #0353a4);
-        color: #f1f5f0;
-        border-top: 2px solid #06b6d4;
+        background: #252932;
+        color: #f1f5f9;
+        border-top: 1px solid rgba(255,255,255,0.1);
       }
       .total-label {
-        color: #f1f5f0;
-        i { color: #06b6d4; }
+        color: #f1f5f9;
+        i { color: #e2b859; }
       }
     }
   }

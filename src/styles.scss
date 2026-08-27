@@ -307,9 +307,10 @@ body.dark-mode .contrato-card {
 }
 
 // ── TABLE ──
-body.dark-mode .table-custom {
-  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+body.dark-mode .table-custom,
+body.dark-mode .tabla-custom {
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
   td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
   tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .id-number { color: #e2b859; }
@@ -321,8 +322,8 @@ body.dark-mode .tabla-recibos {
   background: #1a2430;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   border: 1px solid rgba(255,255,255,0.06);
-  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
   td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; background: transparent; }
   tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .estado-pendiente { background: rgba(251,191,36,0.15); color: #fbbf24; }
@@ -459,8 +460,8 @@ body.dark-mode .programa-badge { background: rgba(6,182,212,0.15); color: #06b6d
 body.dark-mode .estado-cargando { color: #94a3b8; }
 body.dark-mode .estado-vacio { color: #64748b; i { color: #34d399; } }
 body.dark-mode .tabla-mora {
-  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
   td { color: #cbd5e1; border-bottom-color: rgba(255,255,255,0.1); }
   tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .fila-critica td { background-color: rgba(248,113,113,0.06) !important; }
@@ -473,6 +474,22 @@ body.dark-mode .tabla-mora {
     &:hover:not(:disabled) { background: #25d366; color: #101318; } }
   .sin-celular, .sin-whatsapp { color: #64748b; }
   .lote-linea { color: #cbd5e1; }
+}
+
+// ── MORA LISTAR (detalle de pagos) ──
+body.dark-mode .tabla-moras {
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #cbd5e1; border-bottom-color: rgba(255,255,255,0.1); }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
+}
+
+// ── PAGO LISTA MODAL ──
+body.dark-mode .table-pagos {
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
 }
 
 // ── REPORTE INGRESOS ──
@@ -526,8 +543,8 @@ body.dark-mode .reporte-divider { border-color: rgba(255,255,255,0.08); }
 body.dark-mode .programa-nombre { color: #f1f5f9; }
 body.dark-mode .programa-meta-info { color: #94a3b8; }
 body.dark-mode .tabla-lotes {
-  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
   td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
   tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   .badge-estado { background: #252932; color: #94a3b8; }
@@ -814,8 +831,8 @@ body.dark-mode app-recibos-listar .container {
 
 // ── LECTURA PLANILLA (unified-table, cards, inputs) ──
 body.dark-mode .unified-table {
-  thead tr { background: #1a2430; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  th { color: #94a3b8; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+  thead tr { background: #1a2430 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+  th { color: #94a3b8 !important; text-transform: uppercase; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
   td { color: #e2e8f0 !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
   tbody tr:hover td { background-color: rgba(201,149,46,0.08) !important; }
   td.bg-light { background: #252932 !important; color: #cbd5e1; }

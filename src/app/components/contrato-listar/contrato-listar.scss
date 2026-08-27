@@ -1,4 +1,4 @@
-﻿@use "sass:color";
+@use "sass:color";
 
 // ============================================
 // VARIABLES
@@ -722,7 +722,7 @@ $border-color: #e9ecef;
   // ── Botones de filtro toggle ─────────────
   .filtros-header {
     .selector-busqueda {
-      background: #101C24;
+      background: #252932;
       border-color: rgba(99, 179, 237, 0.2);
 
       .btn-toggle {
@@ -745,7 +745,7 @@ $border-color: #e9ecef;
 
     // ── Search box (buscar por ID) ──────────
     .search-box {
-      background: #101C24;
+      background: #252932;
       border-color: rgba(99, 179, 237, 0.2);
 
       input {
@@ -764,7 +764,7 @@ $border-color: #e9ecef;
     .busqueda-lote {
 
       .select-programa {
-        background-color: #101C24;
+        background-color: #252932;
         color: #e2e8f0;
         border-color: rgba(99, 179, 237, 0.2);
         background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -773,7 +773,7 @@ $border-color: #e9ecef;
         background-size: 15px;
 
         option {
-          background: #101C24;
+          background: #252932;
           color: #e2e8f0;
         }
 
@@ -786,7 +786,7 @@ $border-color: #e9ecef;
 
       // Es un <input type="text"> — solo limpiar, sin tocar appearance
       .input-lote {
-        background-color: #101C24 !important;
+        background-color: #252932 !important;
         color: #e2e8f0 !important;
         border-color: rgba(99, 179, 237, 0.2) !important;
         background-image: none !important;   // ← quita la V del SVG anterior
@@ -804,7 +804,7 @@ $border-color: #e9ecef;
 
   // ── Tabla wrapper ────────────────────────
   .tabla-wrapper {
-    background: #101C24;
+    background: #1a2430;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   }
 
@@ -828,13 +828,13 @@ $border-color: #e9ecef;
 
   // ── Loading dots ─────────────────────────
   .loading-dots-wrapper-inline {
-    background: #101C24;
+    background: #252932;
   }
   .loading-text { color: #4a6080; }
 
   // ── Empty state ──────────────────────────
   .empty-state {
-    background: #101C24;
+    background: #252932;
     i { color: #1e3a5f; }
     .empty-title    { color: #4a6080; }
     .empty-subtitle { color: #2d4a6a; }
@@ -863,7 +863,7 @@ $border-color: #e9ecef;
   // ── Paginación ───────────────────────────
   .paginacion-controles {
     .btn-paginacion {
-      background: #101C24;
+      background: #252932;
       border-color: rgba(99, 179, 237, 0.2);
       color: #94a3b8;
       box-shadow: none;

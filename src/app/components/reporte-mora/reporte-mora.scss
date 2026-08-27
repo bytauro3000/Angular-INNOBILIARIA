@@ -1,4 +1,4 @@
-﻿// ── Variables ─────────────────────────────────────────────────────────────
+// ── Variables ─────────────────────────────────────────────────────────────
 $navy:       #023e8a;
 $blue:       #2980b9;
 $green:      #27ae60;
@@ -380,7 +380,7 @@ $bg-white:   #ffffff;
   // ── Estado cargando / vacío ─────────────
   .estado-cargando,
   .estado-vacio {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(99, 179, 237, 0.15);
     color: #64748b;
 
@@ -394,7 +394,7 @@ $bg-white:   #ffffff;
 
   // ── Bloque por programa ─────────────────
   .programa-bloque {
-    background: #101C24;
+    background: #1a2430;
     border-color: rgba(99, 179, 237, 0.15);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   }
