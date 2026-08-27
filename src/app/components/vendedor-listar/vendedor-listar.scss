@@ -414,6 +414,14 @@ $border-color: #e9ecef;
     }
   }
 
+  .table-custom tbody td > div,
+  .table-custom tbody td > span {
+    justify-self: end;
+    text-align: right;
+    min-width: 0;
+    word-break: break-word;
+  }
+
   .filtros-header {
     flex-direction: column;
     align-items: stretch;
