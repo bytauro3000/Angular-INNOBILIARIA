@@ -4,6 +4,15 @@ import { ReporteMoraService } from '../../services/reporte-mora.service';
 import { ReporteClientesMoraDTO, FilaClienteMora } from '../../dto/reporte-mora.dto';
 import { ToastrService } from 'ngx-toastr';
 
+// Nombre fijo de la ventana de WhatsApp Web. Al usar siempre el mismo nombre,
+// el navegador reutiliza esa pestaña aunque la referencia JS se pierda
+// (por ejemplo al navegar entre vistas).
+const WHATSAPP_WEB_WINDOW_NAME = 'WhatsAppWeb';
+
+// Referencia a nivel de módulo: sobrevive a la navegación entre vistas y a la
+// recreación del componente. Mientras la pestaña siga abierta se reutiliza.
+let whatsappWindowRef: Window | null = null;
+
 @Component({
   selector: 'app-letras-vencidas',
   standalone: true,
@@ -15,9 +24,6 @@ export class LetrasVencidasComponent implements OnInit {
 
   grupos: ReporteClientesMoraDTO[] = [];
   cargando = true;
-
-  /** Referencia a la pestaña de WhatsApp Web abierta por este botón (para reutilizarla). */
-  private whatsappWindow: Window | null = null;
 
   constructor(
     private reporteMoraService: ReporteMoraService,
@@ -122,15 +128,15 @@ export class LetrasVencidasComponent implements OnInit {
 
     const url = `https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`;
 
-    // Si ya abrimos una pestaña de WhatsApp Web desde este botón y sigue abierta,
-    // la reutilizamos (navega al chat nuevo y la trae al frente). Si no existe
-    // o fue cerrada, se abre una nueva con el nombre fijo "WhatsAppWeb".
-    if (this.whatsappWindow && !this.whatsappWindow.closed) {
-      this.whatsappWindow.location.href = url;
-      this.whatsappWindow.focus();
-    } else {
-      this.whatsappWindow = window.open(url, 'WhatsAppWeb');
-      this.whatsappWindow?.focus();
+    // Reutiliza la pestaña de WhatsApp Web si sigue abierta (referencia de módulo
+    // + nombre de ventana fijo). Solo abre una nueva si no existe o fue cerrada.
+    if (whatsappWindowRef && !whatsappWindowRef.closed) {
+      whatsappWindowRef.location.href = url;
+      whatsappWindowRef.focus();
+      return;
     }
+
+    whatsappWindowRef = window.open(url, WHATSAPP_WEB_WINDOW_NAME);
+    whatsappWindowRef?.focus();
   }
 }
