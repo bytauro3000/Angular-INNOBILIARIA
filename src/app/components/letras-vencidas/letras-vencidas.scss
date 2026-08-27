@@ -211,7 +211,7 @@ $bg-white:   #ffffff;
   }
 
   th {
-    padding: 10px 14px;
+    padding: 10px 8px;
     text-align: left;
     font-weight: 600;
     color: $text-light;
@@ -226,16 +226,16 @@ $bg-white:   #ffffff;
     &.text-right  { text-align: right; }
 
     // ── Anchos fijos por columna (para alinear todas las tablas) ──
-    &:nth-child(1) { width: 42px; }
+    &:nth-child(1) { width: 38px; }
     &:nth-child(2) { width: auto; }   // Cliente(s): toma el resto
-    &:nth-child(3) { width: 52px; }   // MZ
-    &:nth-child(4) { width: 52px; }   // LT
-    &:nth-child(5) { width: 96px; }   // Área
-    &:nth-child(6) { width: 88px; }   // Letras
-    &:nth-child(7) { width: 104px; }  // Rango
-    &:nth-child(8) { width: 138px; }  // Importe Adeudado
-    &:nth-child(9) { width: 120px; }  // Celular
-    &:nth-child(10) { width: 120px; } // WhatsApp
+    &:nth-child(3) { width: 42px; }   // MZ
+    &:nth-child(4) { width: 42px; }   // LT
+    &:nth-child(5) { width: 86px; }   // Área
+    &:nth-child(6) { width: 66px; }   // Letras
+    &:nth-child(7) { width: 88px; }   // Rango
+    &:nth-child(8) { width: 120px; }  // Importe Adeudado
+    &:nth-child(9) { width: 108px; }  // Celular
+    &:nth-child(10) { width: 112px; } // WhatsApp
   }
 
   tbody tr {
@@ -252,7 +252,7 @@ $bg-white:   #ffffff;
   }
 
   td {
-    padding: 10px 14px;
+    padding: 10px 8px;
     color: $text-dark;
     vertical-align: middle;
     overflow-wrap: break-word;
@@ -338,6 +338,75 @@ $bg-white:   #ffffff;
   }
   .resumen-cards {
     flex-direction: column;
+  }
+
+  // ── Tabla → tarjetas ─────────────────────
+  .tabla-wrapper {
+    overflow-x: visible;
+  }
+
+  .tabla-mora {
+    table-layout: auto;
+    display: block;
+
+    thead { display: none; }
+
+    tbody { display: block; }
+
+    tr {
+      display: block;
+      background: #ffffff;
+      margin-bottom: 16px;
+      border: 1px solid $border;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      padding: 0;
+    }
+
+    td {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 8px;
+      padding: 10px 14px;
+      border: none;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: right;
+      white-space: normal;
+      overflow-wrap: break-word;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.78rem;
+        color: $navy;
+        text-align: left;
+        justify-self: start;
+        white-space: nowrap;
+        padding-top: 2px;
+      }
+
+      & > * { min-width: 0; }
+
+      &:last-child { border-bottom: none; }
+    }
+
+    // Nº de fila: franja superior
+    td.td-num {
+      background: $navy;
+      color: #fff;
+      font-weight: bold;
+      border-bottom: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px 14px;
+      &::before { display: none; }
+    }
+
+    .badge-letras { width: 26px; height: 26px; }
+    .btn-whatsapp { width: 100%; justify-content: center; }
   }
 }
 
@@ -436,5 +505,26 @@ $bg-white:   #ffffff;
     color: #25d366;
     border: 1px solid rgba(37, 211, 102, 0.3);
     &:hover { background: #25d366; color: #101318; }
+  }
+
+  // Tarjetas responsive en modo oscuro
+  @media (max-width: 768px) {
+    .tabla-mora {
+      tr {
+        background: #1a2430;
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+
+      td {
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+
+        &::before { color: #c9952e; }
+      }
+
+      td.td-num {
+        background: #023e8a;
+        color: #fff;
+      }
+    }
   }
 }

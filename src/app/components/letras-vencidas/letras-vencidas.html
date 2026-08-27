@@ -86,24 +86,24 @@
             <tr *ngFor="let fila of grupo.clientes; let i = index"
                 [ngClass]="{'fila-critica': fila.cantidadLetrasAtrasadas >= 3}">
               <td class="td-num">{{ i + 1 }}</td>
-              <td class="td-cliente">{{ fila.nombreClientes }}</td>
+              <td class="td-cliente" data-label="Cliente(s)">{{ fila.nombreClientes }}</td>
 
               <!-- MZ: un <div> por cada manzana del contrato -->
-              <td class="td-mz">
+              <td class="td-mz" data-label="MZ">
                 <div *ngFor="let mz of fila.manzanas" class="lote-linea">{{ mz }}</div>
               </td>
 
               <!-- LT: un <div> por cada lote del contrato (mismo orden que MZ) -->
-              <td class="td-lt">
+              <td class="td-lt" data-label="LT">
                 <div *ngFor="let lt of fila.numeroLotes" class="lote-linea">{{ lt }}</div>
               </td>
 
               <!-- Área: un <div> por cada lote -->
-              <td class="td-area">
+              <td class="td-area" data-label="Área">
                 <div *ngFor="let area of fila.areas" class="lote-linea">{{ formatArea(area) }}</div>
               </td>
 
-              <td class="td-cantidad text-center">
+              <td class="td-cantidad text-center" data-label="Letras">
                 <span class="badge-letras" [ngClass]="{
                   'badge-bajo':  fila.cantidadLetrasAtrasadas === 1,
                   'badge-medio': fila.cantidadLetrasAtrasadas === 2,
@@ -113,20 +113,20 @@
                 </span>
               </td>
 
-              <td class="td-rango text-center">
+              <td class="td-rango text-center" data-label="Rango">
                 <span class="rango-chip">{{ fila.rangoLetras }}</span>
               </td>
 
-              <td class="td-importe text-right">
+              <td class="td-importe text-right" data-label="Importe Adeudado">
                 {{ simbolo(fila.moneda) }} {{ fila.importeTotal | number:'1.2-2' }}
               </td>
 
-              <td class="td-celular">
+              <td class="td-celular" data-label="Celular">
                 <span *ngIf="fila.celular">{{ fila.celular }}</span>
                 <span *ngIf="!fila.celular" class="sin-celular">—</span>
               </td>
 
-              <td class="td-whatsapp text-center">
+              <td class="td-whatsapp text-center" data-label="WhatsApp">
                 <button class="btn-whatsapp"
                         *ngIf="fila.celular"
                         (click)="abrirWhatsapp(fila)"

@@ -236,7 +236,7 @@ $bg-white:   #ffffff;
   }
 
   th {
-    padding: 10px 14px;
+    padding: 10px 8px;
     text-align: left;
     font-weight: 600;
     color: $text-light;
@@ -251,16 +251,16 @@ $bg-white:   #ffffff;
     &.text-right  { text-align: right; }
 
     // ── Anchos fijos por columna (para alinear todas las tablas) ──
-    &:nth-child(1) { width: 42px; }
+    &:nth-child(1) { width: 38px; }
     &:nth-child(2) { width: auto; }   // Cliente(s): toma el resto
-    &:nth-child(3) { width: 52px; }   // MZ
-    &:nth-child(4) { width: 52px; }   // LT
-    &:nth-child(5) { width: 96px; }   // Desde
-    &:nth-child(6) { width: 88px; }   // Letras Atrasadas
-    &:nth-child(7) { width: 104px; }  // Rango
-    &:nth-child(8) { width: 138px; }  // Importe Adeudado
-    &:nth-child(9) { width: 120px; }  // Celular
-    &:nth-child(10) { width: 120px; } // WhatsApp
+    &:nth-child(3) { width: 42px; }   // MZ
+    &:nth-child(4) { width: 42px; }   // LT
+    &:nth-child(5) { width: 86px; }   // Desde
+    &:nth-child(6) { width: 66px; }   // Letras Atrasadas
+    &:nth-child(7) { width: 88px; }   // Rango
+    &:nth-child(8) { width: 120px; }  // Importe Adeudado
+    &:nth-child(9) { width: 108px; }  // Celular
+    &:nth-child(10) { width: 112px; } // WhatsApp
   }
 
   tbody tr {
@@ -278,7 +278,7 @@ $bg-white:   #ffffff;
   }
 
   td {
-    padding: 10px 14px;
+    padding: 10px 8px;
     color: $text-dark;
     vertical-align: middle;
     overflow-wrap: break-word;
