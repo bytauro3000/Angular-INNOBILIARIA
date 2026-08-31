@@ -1005,10 +1005,10 @@ formatearNumeroLote(): void {
       this.resultadosModal = [];
       this.contratoService.buscarPorNombreCliente(termino).subscribe({
         next: (contratos) => {
-          this.resultadosModal = contratos;
+          this.resultadosModal = (contratos || []).filter(c => this.contratoCobrable(c));
           this.buscandoModal = false;
-          if (contratos.length === 0) {
-            this.toastr.info('No se encontraron contratos con ese nombre', 'Sin resultados');
+          if (this.resultadosModal.length === 0) {
+            this.toastr.info('No se encontraron contratos cobrables con ese nombre', 'Sin resultados');
           }
         },
         error: () => {
@@ -1026,10 +1026,10 @@ formatearNumeroLote(): void {
       this.resultadosModal = [];
       this.contratoService.obtenerContratoPorId(id).subscribe({
         next: (contrato) => {
-          this.resultadosModal = contrato ? [contrato] : [];
+          this.resultadosModal = contrato && this.contratoCobrable(contrato) ? [contrato] : [];
           this.buscandoModal = false;
-          if (!contrato) {
-            this.toastr.info('No se encontró ningún contrato con ese ID', 'Sin resultados');
+          if (!this.resultadosModal.length) {
+            this.toastr.info('No se encontró ningún contrato cobrable con ese ID', 'Sin resultados');
           }
         },
         error: () => {
@@ -1038,6 +1038,13 @@ formatearNumeroLote(): void {
         }
       });
     }
+  }
+
+  /** Un contrato solo es cobrable si NO está en un estado terminal (renuncia,
+   *  transferencia, resolución o cancelación): el cliente ya no es dueño. */
+  contratoCobrable(contrato: ContratoResponseDTO | null): boolean {
+    if (!contrato) return false;
+    return !['RENUNCIA', 'TRANSFERIDO', 'RESUELTO', 'CANCELADO'].includes(contrato.estadoContrato);
   }
 
   /** Selecciona un contrato del modal, rellena los campos del formulario y ejecuta la búsqueda */
