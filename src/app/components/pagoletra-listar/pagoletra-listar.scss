@@ -334,6 +334,18 @@ $border-color: #e9ecef;
         border-color: rgba(255,255,255,0.3);
       }
     }
+
+    &.tab-anuladas.active {
+      background: #6b7280;
+      color: white;
+      box-shadow: 0 2px 8px rgba(#6b7280, 0.35);
+
+      .tab-count-anuladas {
+        background: rgba(255,255,255,0.25);
+        color: #f3f4f6;
+        border-color: rgba(255,255,255,0.3);
+      }
+    }
   }
 }
 
@@ -356,6 +368,22 @@ $border-color: #e9ecef;
     background: #dcfce7;
     color: #166534;
   }
+}
+
+// Contador de anuladas dentro del tab
+.tab-count-anuladas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  padding: 0 7px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 // Contador de parciales dentro del tab
@@ -645,6 +673,8 @@ $border-color: #e9ecef;
     &.estado-pagado    { color: #047857; background-color: #ecfdf5; border: 1px solid #6ee7b7; }
     // NUEVO: badge PARCIAL — naranja ámbar diferenciado de PENDIENTE
     &.estado-parcial   { color: #92400e; background-color: #fff7ed; border: 1px solid #fdba74; }
+    // NUEVO: badge ANULADO — gris/rojo apagado (renuncia/resolución)
+    &.estado-anulado   { color: #6b7280; background-color: #f3f4f6; border: 1px solid #d1d5db; }
   }
 
   // ── Celda de importe con saldo parcial ────────────────────────────────────

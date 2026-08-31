@@ -62,6 +62,7 @@ export class PagoletraListarComponent implements OnInit {
   letrasPendientes: LetraCambioConSeleccion[] = [];
   letrasPagadas: LetraCambio[] = [];
   letrasParciales: LetraCambio[] = [];
+  letrasAnuladas: LetraCambio[] = [];
 
   /** Abonos (PagoLetraResponse) cargados por idLetra para la vista Parciales */
   abonosPorLetra: { [key: number]: any[] } = {};
@@ -80,7 +81,7 @@ export class PagoletraListarComponent implements OnInit {
   idContratoParaLista: number | null = null;
 
   letraSeleccionada: LetraCambio | null = null;
-  tipoLista: 'pendientes' | 'parciales' | 'pagadas' = 'pendientes';
+  tipoLista: 'pendientes' | 'parciales' | 'pagadas' | 'anuladas' = 'pendientes';
 
   filtroNumeroLetra: string = '';
 
@@ -151,7 +152,7 @@ export class PagoletraListarComponent implements OnInit {
   letraBloqueada(letra: LetraCambioConSeleccion): boolean {
     if (this.pinValidado) return false;
     if (this.esSoporte) return false;
-    if (letra.estadoLetra === 'PAGADO' || letra.estadoLetra === 'PARCIAL') return false;
+    if (letra.estadoLetra === 'PAGADO' || letra.estadoLetra === 'PARCIAL' || letra.estadoLetra === 'ANULADO') return false;
     if (this.ultimaLetraPagadaNum <= 0) return false;
     return this.extraerNumeroLetra(letra.numeroLetra) < this.ultimaLetraPagadaNum;
   }
@@ -346,6 +347,7 @@ export class PagoletraListarComponent implements OnInit {
         this.letrasPendientes = [];
         this.letrasPagadas = [];
         this.letrasParciales = [];
+        this.letrasAnuladas = [];
         this.moraResumen = null;
       }
     });
@@ -370,6 +372,7 @@ export class PagoletraListarComponent implements OnInit {
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
         this.letrasParciales = letras.filter(l => l.estadoLetra === 'PARCIAL');
+        this.letrasAnuladas = letras.filter(l => l.estadoLetra === 'ANULADO');
         this.seleccionadasMap.clear();
         this.filtroNumeroLetra = '';
 
@@ -417,6 +420,7 @@ export class PagoletraListarComponent implements OnInit {
           .map(l => ({ ...l, seleccionada: false }));
         this.letrasPagadas = letras.filter(l => l.estadoLetra === 'PAGADO');
         this.letrasParciales = letras.filter(l => l.estadoLetra === 'PARCIAL');
+        this.letrasAnuladas = letras.filter(l => l.estadoLetra === 'ANULADO');
         this.seleccionadasMap.clear();
         this.filtroNumeroLetra = '';
 
@@ -630,6 +634,7 @@ formatearNumeroLote(): void {
     this.letrasPendientes = [];
     this.letrasPagadas = [];
     this.letrasParciales = [];
+    this.letrasAnuladas = [];
     this.abonosPorLetra = {};
     this.cargandoAbonosPorLetra = {};
     this.seleccionadasMap.clear();
@@ -803,7 +808,7 @@ formatearNumeroLote(): void {
     });
   }
 
-  cambiarTipoLista(tipo: 'pendientes' | 'parciales' | 'pagadas'): void {
+  cambiarTipoLista(tipo: 'pendientes' | 'parciales' | 'pagadas' | 'anuladas'): void {
     if (this.tipoLista !== tipo) {
       this.tipoLista = tipo;
       this.filtroNumeroLetra = '';
@@ -852,6 +857,7 @@ formatearNumeroLote(): void {
   get tituloLista(): string {
     if (this.tipoLista === 'pendientes') return 'Letras Pendientes de Pago';
     if (this.tipoLista === 'parciales') return 'Letras con Pago a Cuenta (PARCIAL)';
+    if (this.tipoLista === 'anuladas') return 'Letras Anuladas';
     return 'Letras Pagadas';
   }
 
@@ -866,6 +872,8 @@ formatearNumeroLote(): void {
       lista = this.letrasPendientes as LetraCambioConSeleccion[];
     } else if (this.tipoLista === 'parciales') {
       lista = this.letrasParciales as LetraCambioConSeleccion[];
+    } else if (this.tipoLista === 'anuladas') {
+      lista = this.letrasAnuladas as LetraCambioConSeleccion[];
     } else {
       lista = this.letrasPagadas as LetraCambioConSeleccion[];
     }

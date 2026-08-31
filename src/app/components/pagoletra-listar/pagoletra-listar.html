@@ -198,6 +198,13 @@
           Pagadas
           <span class="tab-count pagadas-count">{{ letrasPagadas.length }}</span>
         </button>
+        <button class="toggle-btn tab-anuladas"
+                [class.active]="tipoLista === 'anuladas'"
+                (click)="cambiarTipoLista('anuladas')"
+                *ngIf="letrasAnuladas.length > 0">
+          Anuladas
+          <span class="tab-count tab-count-anuladas">{{ letrasAnuladas.length }}</span>
+        </button>
       </div>
 
       <div class="filtro-letra-derecha">
@@ -425,7 +432,8 @@
               'estado-pendiente': letra.estadoLetra === 'PENDIENTE',
               'estado-vencido':   letra.estadoLetra === 'VENCIDO',
               'estado-pagado':    letra.estadoLetra === 'PAGADO',
-              'estado-parcial':   letra.estadoLetra === 'PARCIAL'
+              'estado-parcial':   letra.estadoLetra === 'PARCIAL',
+              'estado-anulado':   letra.estadoLetra === 'ANULADO'
             }">{{ letra.estadoLetra }}</span>
           </td>
           <td class="acciones-cell" data-label="Acciones">
@@ -469,7 +477,7 @@
         No hay letras que coincidan con "<strong>{{ filtroNumeroLetra }}</strong>".
       </ng-container>
       <ng-template #sinLetrasFiltro>
-        No hay letras {{ tipoLista === 'pendientes' ? 'pendientes' : 'pagadas' }} para este contrato.
+        No hay letras {{ tipoLista === 'pendientes' ? 'pendientes' : (tipoLista === 'anuladas' ? 'anuladas' : 'pagadas') }} para este contrato.
       </ng-template>
     </div>
 

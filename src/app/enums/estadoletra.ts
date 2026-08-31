@@ -2,5 +2,6 @@ export enum EstadoLetra {
   PENDIENTE = 'PENDIENTE',
   PAGADO    = 'PAGADO',
   VENCIDO   = 'VENCIDO',
-  PARCIAL   = 'PARCIAL'
+  PARCIAL   = 'PARCIAL',
+  ANULADO   = 'ANULADO'
 }
