@@ -8,11 +8,12 @@ import { IngresoMensualDTO } from '../../dto/ingresomensual.dto';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
+import { CuentasPorCobrarComponent } from '../cuentas-por-cobrar/cuentas-por-cobrar.component';
 
 @Component({
   selector: 'app-secretaria-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, RouterModule],
+  imports: [CommonModule, BaseChartDirective, RouterModule, CuentasPorCobrarComponent],
   templateUrl: './secretaria-dashboard.html',
   styleUrls: ['./secretaria-dashboard.scss'],
 })

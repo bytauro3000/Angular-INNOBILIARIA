@@ -1,0 +1,85 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CuentasPorCobrarService } from '../../services/cuentas-por-cobrar.service';
+import { CuentasPorCobrarDTO, GrupoProgramaDTO } from '../../dto/cuentas-por-cobrar.dto';
+import { ToastrService } from 'ngx-toastr';
+
+@Component({
+  selector: 'app-cuentas-por-cobrar',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './cuentas-por-cobrar.html',
+  styleUrls: ['./cuentas-por-cobrar.scss']
+})
+export class CuentasPorCobrarComponent implements OnInit {
+
+  data: CuentasPorCobrarDTO | null = null;
+  cargando = true;
+  /** Programas expandidos (por defecto el primero). */
+  expandidos: Set<string> = new Set();
+
+  constructor(
+    private cuentasService: CuentasPorCobrarService,
+    private toastr: ToastrService
+  ) {}
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando = true;
+    this.cuentasService.obtenerCuentasPorCobrar().subscribe({
+      next: (data) => {
+        this.data = data;
+        this.cargando = false;
+        // Por defecto expandir el primer programa
+        if (data.programas.length > 0) {
+          this.expandidos = new Set([data.programas[0].nombrePrograma]);
+        } else {
+          this.expandidos = new Set();
+        }
+      },
+      error: () => {
+        this.toastr.error('Error al cargar cuentas por cobrar', 'Error');
+        this.cargando = false;
+      }
+    });
+  }
+
+  togglePrograma(programa: GrupoProgramaDTO): void {
+    if (this.expandidos.has(programa.nombrePrograma)) {
+      this.expandidos.delete(programa.nombrePrograma);
+    } else {
+      this.expandidos.add(programa.nombrePrograma);
+    }
+  }
+
+  estaExpandido(nombrePrograma: string): boolean {
+    return this.expandidos.has(nombrePrograma);
+  }
+
+  get totalContratos(): number {
+    if (!this.data) return 0;
+    return this.data.programas.reduce((sum, p) => sum + p.contratos.length, 0);
+  }
+
+  get totalLetras(): number {
+    if (!this.data) return 0;
+    return this.data.programas.reduce((sum, p) =>
+      sum + p.contratos.reduce((s, f) => s + f.cantidadLetras, 0), 0);
+  }
+
+  simbolo(moneda: string): string {
+    return moneda === 'PEN' ? 'S/' : '$';
+  }
+
+  formatFecha(fecha: string): string {
+    if (!fecha) return '—';
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return fecha;
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+  }
+}
