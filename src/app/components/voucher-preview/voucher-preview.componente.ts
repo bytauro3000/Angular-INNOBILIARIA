@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnDestroy, forwardRef, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnDestroy, forwardRef, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.service';
@@ -24,7 +24,7 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
       <div class="preview-list" *ngIf="files.length > 0">
         <div class="preview-item" *ngFor="let file of files; let i = index">
           <img [src]="file.url" (click)="openLightbox(i)" alt="voucher">
-          <button class="crop-btn" (click)="openCrop(i)" title="Recortar">
+          <button class="crop-btn" (click)="openCrop(i)" title="Recortar / girar">
             <i class="bi bi-crop"></i>
           </button>
           <div class="ocr-badge" *ngIf="enableOcr && i === 0" [class.ocr-processing]="ocrProcessing" [class.ocr-done]="!ocrProcessing && ocrProcessed">
@@ -45,11 +45,26 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
       <div class="crop-overlay" *ngIf="cropState">
         <div class="crop-modal" (mousedown)="$event.stopPropagation()">
           <div class="crop-header">
-            <span>Recortar imagen</span>
+            <span>Recortar / girar imagen</span>
             <button class="crop-close-btn" (click)="cancelCrop()"><i class="bi bi-x-lg"></i></button>
           </div>
+          <!-- Rotación libre (al estilo Word) centrada en la parte superior -->
+          <div class="crop-rotate-bar" (mousedown)="$event.stopPropagation()">
+            <button class="rotate-btn" (click)="rotateStep(-5)" title="Girar 5° a la izquierda">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <input type="range" class="rotate-slider" min="0" max="360" step="1"
+                   [value]="cropState.rotation" (input)="onRotateInput($event)" />
+            <span class="rotate-value">{{ cropState.rotation }}°</span>
+            <button class="rotate-btn" (click)="rotateStep(5)" title="Girar 5° a la derecha">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="rotate-btn" (click)="resetRotation()" title="Restablecer">
+              <i class="bi bi-arrow-counterclockwise"></i> 0°
+            </button>
+          </div>
           <div class="crop-image-wrap" #cropWrap (mousedown)="onCropBgMouseDown($event)">
-            <img #cropImg [src]="cropState.url" (load)="onCropImgLoad()" alt="recortar">
+            <canvas #cropCanvas class="crop-canvas"></canvas>
             <div class="crop-selection"
               [style.left.px]="cropState.offsetX + cropState.x"
               [style.top.px]="cropState.offsetY + cropState.y"
@@ -64,7 +79,7 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
           </div>
           <div class="crop-actions">
             <button class="crop-cancel" (click)="cancelCrop()">Cancelar</button>
-            <button class="crop-confirm" (click)="confirmCrop()">Aplicar recorte</button>
+            <button class="crop-confirm" (click)="confirmCrop()">Aplicar</button>
           </div>
         </div>
       </div>
@@ -91,8 +106,10 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   ocrProcessed: boolean = false;
 
   isDragging = false;
-  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number } | null = null;
+  @ViewChild('cropCanvas') cropCanvas!: ElementRef<HTMLCanvasElement>;
+  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number; rotation: number; canvas: HTMLCanvasElement | null } | null = null;
   private dragState: { startX: number; startY: number; origX: number; origY: number; origW: number; origH: number; dir: string } | null = null;
+  private cropImageElement: HTMLImageElement | null = null;
 
   private ocrService = inject(OcrVoucherService);
   private ocrDoneForFileNames: Set<string> = new Set();
@@ -155,24 +172,37 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   }
 
   private openCropForFile(file: File, url: string): void {
-    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: file, editIndex: -1 };
+    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: file, editIndex: -1, rotation: 0, canvas: null };
     this.dragState = null;
+    this.loadCropImage(url);
   }
 
   openCrop(index: number): void {
     const f = this.files[index];
     if (!f) return;
-    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: f.file, editIndex: index };
+    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: f.file, editIndex: index, rotation: 0, canvas: null };
     this.dragState = null;
+    this.loadCropImage(f.url);
+  }
+
+  /** Carga la imagen a recortar en memoria y calcula el área inicial. */
+  private loadCropImage(url: string): void {
+    const img = new Image();
+    this.cropImageElement = img;
+    img.onload = () => {
+      this.cropState = this.cropState ? { ...this.cropState, canvas: this.cropCanvas?.nativeElement ?? null } : this.cropState;
+      this.onCropImgLoad();
+    };
+    img.src = url;
   }
 
   onCropImgLoad(): void {
     if (!this.cropState) return;
-    const img = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
+    const img = this.cropImageElement;
     if (!img) return;
     const w = img.naturalWidth;
     const h = img.naturalHeight;
-    const container = img.parentElement;
+    const container = this.cropCanvas?.nativeElement?.parentElement;
     if (!container) return;
     const cw = container.clientWidth;
     const ch = container.clientHeight;
@@ -193,6 +223,55 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
       w: dw - margin * 2,
       h: dh - margin * 2
     };
+    this.renderCropCanvas();
+  }
+
+  /** Renderiza la imagen (con su rotación) dentro del canvas de recorte. */
+  private renderCropCanvas(): void {
+    const canvas = this.cropCanvas?.nativeElement;
+    const state = this.cropState;
+    const img = this.cropImageElement;
+    if (!canvas || !state || !img) return;
+
+    const scale = Math.max(state.imgW, state.imgH) > 0
+      ? Math.min(canvas.parentElement?.clientWidth ?? state.imgW, canvas.parentElement?.clientHeight ?? state.imgH) / Math.max(state.imgW, state.imgH)
+      : 1;
+    const dw = Math.round(state.imgW * scale);
+    const dh = Math.round(state.imgH * scale);
+    canvas.width = dw;
+    canvas.height = dh;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, dw, dh);
+    ctx.save();
+    ctx.translate(dw / 2, dh / 2);
+    ctx.rotate((state.rotation * Math.PI) / 180);
+    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+    ctx.restore();
+  }
+
+  /** Ajusta la rotación con el slider (0-360°). */
+  onRotateInput(event: Event): void {
+    if (!this.cropState) return;
+    const value = parseInt((event.target as HTMLInputElement).value, 10) || 0;
+    this.cropState = { ...this.cropState, rotation: value };
+    this.renderCropCanvas();
+  }
+
+  /** Rota en pasos de 5° a la izquierda o derecha. */
+  rotateStep(deg: number): void {
+    if (!this.cropState) return;
+    const rot = (this.cropState.rotation + deg) % 360;
+    this.cropState = { ...this.cropState, rotation: rot < 0 ? rot + 360 : rot };
+    this.renderCropCanvas();
+  }
+
+  /** Restablece la rotación a 0°. */
+  resetRotation(): void {
+    if (!this.cropState) return;
+    this.cropState = { ...this.cropState, rotation: 0 };
+    this.renderCropCanvas();
   }
 
   onCropBgMouseDown(e: MouseEvent): void {
@@ -231,18 +310,18 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   private onDragMove(e: MouseEvent): void {
     if (!this.cropState || !this.dragState) return;
-    const wrap = document.querySelector('.crop-image-wrap');
-    if (!wrap) return;
-    const rect = wrap.getBoundingClientRect();
+    const canvas = this.cropCanvas?.nativeElement;
+    if (!canvas) return;
+    const rect = canvas.parentElement?.getBoundingClientRect();
+    if (!rect) return;
     const dx = e.clientX - this.dragState.startX;
     const dy = e.clientY - this.dragState.startY;
     const { dir, origX, origY, origW, origH } = this.dragState;
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-    let { x, y, w, h, offsetX, offsetY, imgW, imgH } = this.cropState;
+    let { x, y, w, h, offsetX, offsetY } = this.cropState;
     const mw = 40;
-    const cropImg = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
-    const aw = cropImg ? cropImg.clientWidth || (rect.width - offsetX * 2) : rect.width;
-    const ah = cropImg ? cropImg.clientHeight || (rect.height - offsetY * 2) : rect.height;
+    const aw = canvas.clientWidth || (rect.width - offsetX * 2);
+    const ah = canvas.clientHeight || (rect.height - offsetY * 2);
     if (dir === 'move') {
       x = clamp(origX + dx, 0, aw - origW);
       y = clamp(origY + dy, 0, ah - origH);
@@ -269,26 +348,27 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   cancelCrop(): void {
     this.cropState = null;
     this.dragState = null;
+    this.cropImageElement = null;
   }
 
   confirmCrop(): void {
     if (!this.cropState) return;
     const { x, y, w, h, offsetX, offsetY, originalFile, editIndex } = this.cropState;
-    const img = document.querySelector('.crop-image-wrap img') as HTMLImageElement;
-    if (!img) return;
-    const scaleX = img.naturalWidth / (img.clientWidth || 1);
-    const scaleY = img.naturalHeight / (img.clientHeight || 1);
+    const canvas = this.cropCanvas?.nativeElement;
+    if (!canvas) return;
+    const scaleX = (canvas.width || canvas.clientWidth) / (canvas.clientWidth || 1);
+    const scaleY = (canvas.height || canvas.clientHeight) / (canvas.clientHeight || 1);
     const sx = Math.round((x) * scaleX);
     const sy = Math.round((y) * scaleY);
     const sw = Math.round(w * scaleX);
     const sh = Math.round(h * scaleY);
-    const canvas = document.createElement('canvas');
-    canvas.width = sw;
-    canvas.height = sh;
-    const ctx = canvas.getContext('2d');
+    const out = document.createElement('canvas');
+    out.width = sw;
+    out.height = sh;
+    const ctx = out.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-    canvas.toBlob(blob => {
+    ctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh);
+    out.toBlob(blob => {
       if (!blob) return;
       const name = originalFile.name.replace(/(\.\w+)$/, '_cropped$1');
       const croppedFile = new File([blob], name, { type: originalFile.type });
@@ -302,6 +382,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
       }
       this.cropState = null;
       this.dragState = null;
+      this.cropImageElement = null;
       this.emitChange();
       if (this.enableOcr) {
         this.ocrDoneForFileNames.add(croppedFile.name);

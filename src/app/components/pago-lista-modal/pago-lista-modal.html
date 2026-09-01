@@ -95,16 +95,12 @@
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="cerrarModal()">Cerrar</button>
       </div>
-
-      <!-- Selector de archivo oculto para reemplazar el voucher (soporta múltiples) -->
-      <input #fileVoucher type="file" accept="image/*" multiple style="display:none"
-             (change)="onVoucherSeleccionado($event)" />
     </div>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     MODAL EDITOR DE VOUCHER (recorte + rotación + fecha/número op.)
+     MODAL EDITOR DE VOUCHER (recorte + rotación libre + OCR)
      ══════════════════════════════════════════════════════════════ -->
 <div class="voucher-editor-overlay" *ngIf="editandoVoucher">
   <div class="voucher-editor-modal">
@@ -119,75 +115,22 @@
     </div>
 
     <div class="voucher-editor-body">
-      <!-- Galería de fotos del voucher (varias fotos si el pago fue en partes) -->
-      <div class="voucher-gallery" *ngIf="voucherItems.length > 0">
-        <div class="voucher-thumbs">
-          <div *ngFor="let item of voucherItems; let i = index"
-               class="voucher-thumb"
-               [class.active]="i === voucherIndex"
-               (click)="seleccionarVoucherItem(i)"
-               title="Editar esta foto">
-            <img [src]="item.url" alt="Foto {{ i + 1 }}" />
-            <span class="thumb-num">{{ i + 1 }}</span>
-            <button class="thumb-remove" (click)="quitarVoucherItem(i); $event.stopPropagation()"
-                    title="Quitar foto">
-              <i class="bi bi-x-lg"></i>
-            </button>
-          </div>
-          <button class="voucher-thumb voucher-thumb-add" (click)="agregarVoucherFoto()"
-                  title="Agregar otra foto del voucher">
-            <i class="bi bi-plus-lg"></i>
-          </button>
-        </div>
-        <div class="voucher-gallery-info">
-          <i class="bi bi-images"></i> {{ voucherItems.length }} foto{{ voucherItems.length !== 1 ? 's' : '' }}
-          — {{ voucherIndex + 1 }}/{{ voucherItems.length }}
-        </div>
-      </div>
+      <!-- Subida + recorte + rotación + OCR (reutiliza voucher-preview) -->
+      <app-voucher-preview
+        [(ngModel)]="voucherFilesModel"
+        [enableOcr]="true"
+        (filesChange)="onVoucherFilesChange($event)"
+        (ocrData)="onVoucherOcr($event)">
+      </app-voucher-preview>
 
-      <!-- Vista previa: canvas recortable (recorte = área visible del canvas) -->
-      <div class="voucher-viewport"
-           #voucherViewport
-           (mousedown)="onPanStart($event)"
-           (mousemove)="onPanMove($event)"
-           (mouseup)="onPanEnd()"
-           (mouseleave)="onPanEnd()"
-           (touchstart)="onPanStart($event)"
-           (touchmove)="onPanMove($event)"
-           (touchend)="onPanEnd()">
-        <canvas #voucherCanvas></canvas>
-        <div class="voucher-pan-hint">
-          <i class="bi bi-arrows-move"></i> Arrastra la imagen para ajustar el recorte
-        </div>
-      </div>
-
-      <!-- Controles de rotación y zoom -->
-      <div class="voucher-controls">
-        <button class="voucher-btn" (click)="rotarVoucher('left')" title="Girar a la izquierda">
-          <i class="bi bi-arrow-counterclockwise"></i> Izquierda
-        </button>
-        <button class="voucher-btn" (click)="rotarVoucher('right')" title="Girar a la derecha">
-          <i class="bi bi-arrow-clockwise"></i> Derecha
-        </button>
-        <button class="voucher-btn" (click)="zoomVoucher('out')" title="Alejar">
-          <i class="bi bi-zoom-out"></i>
-        </button>
-        <button class="voucher-btn" (click)="zoomVoucher('in')" title="Acercar">
-          <i class="bi bi-zoom-in"></i>
-        </button>
-        <button class="voucher-btn" (click)="resetVoucher()" title="Restablecer">
-          <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-        </button>
-      </div>
-
-      <!-- Datos del voucher (fecha operación + número operación) -->
+      <!-- Datos del voucher (autollenados por OCR) -->
       <div class="voucher-fields" *ngIf="voucherPago">
         <div class="voucher-field">
-          <label>Fecha de operación</label>
+          <label>Fecha de operación (OCR: la más alta)</label>
           <input type="date" [(ngModel)]="voucherFechaOperacion" class="voucher-input" />
         </div>
         <div class="voucher-field">
-          <label>Número de operación</label>
+          <label>Número de operación (OCR: separados por coma)</label>
           <input type="text" [(ngModel)]="voucherNumeroOperacion" class="voucher-input"
                  placeholder="N° de operación del voucher" />
         </div>
@@ -196,8 +139,8 @@
 
     <div class="voucher-editor-foot">
       <button class="voucher-btn-cancel" (click)="cancelarEditarVoucher()">Cancelar</button>
-      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher || voucherItems.length === 0">
-        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' + (voucherItems.length > 1 ? 's' : '') }}
+      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher || voucherFiles.length === 0">
+        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' + (voucherFiles.length > 1 ? 's' : '') }}
       </button>
     </div>
   </div>
