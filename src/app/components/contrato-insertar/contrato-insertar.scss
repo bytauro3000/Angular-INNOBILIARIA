@@ -308,7 +308,18 @@ $error-bg:    #fff5f5;
     color: $text-dark;
     font-size: 0.8rem;
 
-    span { display: flex; align-items: center; gap: 5px; i { color: $navy-light; font-size: 0.75rem; } }
+    // El nombre ocupa el espacio sobrante y se trunca; select y ✕ quedan fijos a la derecha
+    span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      i { color: $navy-light; font-size: 0.75rem; flex-shrink: 0; }
+    }
 
     .rol-cliente-select {
       margin: 0 6px;
@@ -320,12 +331,14 @@ $error-bg:    #fff5f5;
       background: #ffffff;
       color: $text-dark;
       cursor: pointer;
+      flex-shrink: 0;
       &:focus { outline: 2px solid rgba($navy-light, 0.35); }
     }
 
     button {
       background: none; border: none; color: $error;
       cursor: pointer; font-size: 0.78rem; padding: 0 3px;
+      flex-shrink: 0;
       transition: color 0.15s, transform 0.15s;
       &:hover { color: color.adjust($error, $lightness: -10%, $space: hsl); transform: scale(1.2); }
     }
