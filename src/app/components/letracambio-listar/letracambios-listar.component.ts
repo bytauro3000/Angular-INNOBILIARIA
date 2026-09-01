@@ -550,18 +550,19 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     y += 5;
     doc.setFont('times', 'bold');
     doc.text('Datos del Cliente', margin, y);
+    doc.text(`Celular: ${data.cliente1Celular}`, 145, y);
     doc.setFont('times', 'normal');
 
     // Fila dinámica: cliente1 → cliente2 (si existe) → aval (si existe),
     // contiguas, sin dejar espacio en blanco entre ellas.
     let filaY = y + 5;
 
-    // ── Cliente 1 (siempre) ──
+    // ── Cliente 1 (siempre, es el titular) ──
     doc.text(`Nombre 1: ${data.cliente1Nombre} ${data.cliente1Apellidos ?? ''}`, margin, filaY);
     doc.text(`DNI: ${data.cliente1NumDocumento}`, 145, filaY);
     filaY += 5;
 
-    // ── Cliente 2 (solo si existe) ──
+    // ── Cliente 2 (solo si existe OTRO titular) ──
     if (data.cliente2Nombre) {
       doc.text(`Nombre 2: ${data.cliente2Nombre} ${data.cliente2Apellidos ?? ''}`, margin, filaY);
       doc.text(`DNI: ${data.cliente2NumDocumento ?? ''}`, 145, filaY);
@@ -575,17 +576,16 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
       filaY += 5;
     }
 
-    // Datos de contacto del cliente 1 (debajo de las filas de personas)
+    // ── Dirección y distrito del cliente 1 (debajo de las filas de personas) ──
     doc.text(`Dirección: ${data.cliente1Direccion}`, margin, filaY);
     doc.text(`Distrito: ${data.cliente1Distrito}`, 145, filaY);
     filaY += 5;
-    doc.text(`Celular: ${data.cliente1Celular}`, 145, filaY);
-    doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, filaY + 5);
 
-    // Información del lote
+    // Información del lote (Teléfono va en la misma fila que "Datos del Lote")
     y = filaY + 15;
     doc.setFont('times', 'bold');
     doc.text('Datos del Lote', margin, y);
+    doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, y);
     doc.setFont('times', 'normal');
 
     doc.text(`Lote 1: Manzana ${data.lote1Manzana ?? ''}, Lote ${data.lote1NumeroLote ?? ''} - Área: ${data.lote1Area ?? ''} m²`, margin, y + 5);
