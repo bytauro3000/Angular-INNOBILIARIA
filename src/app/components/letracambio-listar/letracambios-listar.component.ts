@@ -582,7 +582,7 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     filaY += 5;
 
     // Información del lote (Teléfono va en la misma fila que "Datos del Lote")
-    y = filaY + 15;
+    y = filaY + 5;
     doc.setFont('times', 'bold');
     doc.text('Datos del Lote', margin, y);
     doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, y);
