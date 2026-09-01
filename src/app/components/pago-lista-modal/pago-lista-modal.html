@@ -62,6 +62,13 @@
                 </td>
                 <td>
                   <div class="acciones-container">
+                    <!-- Editar voucher: disponible para todos (corrección de imagen) -->
+                    <button class="btn-accion btn-voucher"
+                            (click)="editarVoucher(pago)"
+                            [disabled]="subiendoVoucher"
+                            title="Editar voucher (reemplazar imagen)">
+                      <i class="bi bi-image"></i>
+                    </button>
                     <!-- Solo el administrador puede anular o eliminar pagos -->
                     <button *ngIf="esAdministrador && !pago.anulado"
                             class="btn-accion btn-anular"
@@ -90,6 +97,10 @@
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="cerrarModal()">Cerrar</button>
       </div>
+
+      <!-- Selector de archivo oculto para reemplazar el voucher -->
+      <input #fileVoucher type="file" accept="image/*" style="display:none"
+             (change)="onVoucherSeleccionado($event)" />
     </div>
   </div>
 </div>

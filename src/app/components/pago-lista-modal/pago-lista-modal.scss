@@ -143,6 +143,12 @@ $border-color: #e9ecef;
     &:hover:not(:disabled) { background: $red; color: white; transform: scale(1.05); }
   }
 
+  &.btn-voucher {
+    border-color: $navy;
+    color: $navy;
+    &:hover:not(:disabled) { background: $navy; color: white; transform: scale(1.05); }
+  }
+
   &.btn-eliminar {
     border-color: #e74c3c;
     color: #e74c3c;

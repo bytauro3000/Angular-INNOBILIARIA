@@ -7,6 +7,8 @@ import Swal from 'sweetalert2';
 
 import { PagoLetraService } from '../../services/pagoletra.service';
 import { PagoLetraResponse } from '../../dto/pagoletraresponse.dto';
+import { PagoLetraRequest } from '../../dto/pagoletrarequest.dto';
+import { MedioPago } from '../../enums/mediopago.enum';
 import { Moneda } from '../../dto/moneda.enum';
 import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
@@ -20,6 +22,7 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class PagoListaModalComponent implements OnInit, AfterViewInit {
   @ViewChild('modalElement') modalElement!: ElementRef;
+  @ViewChild('fileVoucher') fileVoucher!: ElementRef;
   private modal?: bootstrap.Modal;
 
   @Input() idContrato!: number;
@@ -32,6 +35,9 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   eliminando = false;
   anulando = false;
   esAdministrador = false;
+  /** Pago en espera de seleccionar un nuevo voucher. */
+  pagoParaEditarVoucher: PagoLetraResponse | null = null;
+  subiendoVoucher = false;
 
   constructor(
     private pagoService: PagoLetraService,
@@ -192,6 +198,70 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
             this.anulando = false;
           }
         });
+      }
+    });
+  }
+
+  /** Abre el selector de archivo para reemplazar el voucher del pago. */
+  editarVoucher(pago: PagoLetraResponse): void {
+    this.pagoParaEditarVoucher = pago;
+    this.fileVoucher?.nativeElement?.click();
+  }
+
+  /** Al elegir un archivo, confirma y sube el nuevo voucher. */
+  onVoucherSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo después
+
+    if (!file || !this.pagoParaEditarVoucher) {
+      this.pagoParaEditarVoucher = null;
+      return;
+    }
+
+    const pago = this.pagoParaEditarVoucher;
+    this.pagoParaEditarVoucher = null;
+
+    Swal.fire({
+      title: 'Reemplazar voucher',
+      html: `¿Deseas reemplazar el voucher del pago de la letra <strong>N° ${this.getNumeroLetraLimpio(pago.numeroLetra)}</strong> por <strong>"${file.name}"</strong>?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, reemplazar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.subirVoucher(pago, file);
+      }
+    });
+  }
+
+  /** Llama al backend para actualizar el pago y reemplazar su voucher. */
+  private subirVoucher(pago: PagoLetraResponse, file: File): void {
+    if (this.subiendoVoucher) return;
+    this.subiendoVoucher = true;
+
+    const request: PagoLetraRequest = {
+      idLetra: pago.idLetra ?? 0,
+      importePagado: pago.importePagado ?? 0,
+      medioPago: (pago.medioPago as MedioPago) ?? 'EFECTIVO',
+      numeroOperacion: pago.numeroOperacion,
+      fechaPago: pago.fechaPago,
+      observaciones: pago.observaciones
+    };
+
+    this.pagoService.actualizarPago(pago.idPago, request, [file]).subscribe({
+      next: () => {
+        this.toastr.success('Voucher actualizado correctamente', 'Éxito');
+        this.subiendoVoucher = false;
+        this.cargarPagos();
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'No se pudo actualizar el voucher';
+        this.toastr.error(msg, 'Error');
+        this.subiendoVoucher = false;
       }
     });
   }
