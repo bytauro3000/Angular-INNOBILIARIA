@@ -162,12 +162,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let prog of getGraficoLotesKeys(); let i = index" [style.animation-delay.ms]="i * 50" class="lote-row">
-            <td class="prog-name"><i class="fas fa-map-pin"></i> {{ prog }}</td>
-            <td class="text-center disponible-val">{{ totales!.graficoLotes[prog].Disponible || 0 }}</td>
-            <td class="text-center separado-val">{{ totales!.graficoLotes[prog].Separado || 0 }}</td>
-            <td class="text-center vendido-val">{{ totales!.graficoLotes[prog].Vendido || 0 }}</td>
-            <td class="text-center total-val">{{ getTotalLotesPrograma(prog) }}</td>
-            <td>
+            <td class="prog-name" data-label="Programa"><i class="fas fa-map-pin"></i> {{ prog }}</td>
+            <td class="text-center disponible-val" data-label="Disponibles">{{ totales!.graficoLotes[prog].Disponible || 0 }}</td>
+            <td class="text-center separado-val" data-label="Separados">{{ totales!.graficoLotes[prog].Separado || 0 }}</td>
+            <td class="text-center vendido-val" data-label="Vendidos">{{ totales!.graficoLotes[prog].Vendido || 0 }}</td>
+            <td class="text-center total-val" data-label="Total">{{ getTotalLotesPrograma(prog) }}</td>
+            <td data-label="Ocupación">
               <div class="barra-progreso">
                 <div class="barra-disponible"
                      [style.width.%]="getPorcentaje(totales!.graficoLotes[prog].Disponible || 0, getTotalLotesPrograma(prog))">
