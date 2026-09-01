@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CuentasPorCobrarService } from '../../services/cuentas-por-cobrar.service';
 import { CuentasPorCobrarDTO, GrupoProgramaDTO, FilaCuentaDTO } from '../../dto/cuentas-por-cobrar.dto';
 import { ToastrService } from 'ngx-toastr';
@@ -7,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-cuentas-por-cobrar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cuentas-por-cobrar.html',
   styleUrls: ['./cuentas-por-cobrar.scss']
 })
@@ -17,6 +18,8 @@ export class CuentasPorCobrarComponent implements OnInit {
   cargando = true;
   /** Programas expandidos (por defecto el primero). */
   expandidos: Set<string> = new Set();
+  /** Término de búsqueda local (filtra cliente / MZ / LT en la tabla). */
+  filtro: string = '';
 
   constructor(
     private cuentasService: CuentasPorCobrarService,
@@ -57,6 +60,19 @@ export class CuentasPorCobrarComponent implements OnInit {
 
   estaExpandido(nombrePrograma: string): boolean {
     return this.expandidos.has(nombrePrograma);
+  }
+
+  /** Contratos del programa filtrados por el término de búsqueda (client-side). */
+  contratosFiltrados(programa: GrupoProgramaDTO): FilaCuentaDTO[] {
+    const termino = this.filtro.trim().toLowerCase();
+    if (!termino) return programa.contratos;
+    return programa.contratos.filter(f => {
+      const cliente = (f.nombreCliente || '').toLowerCase();
+      const mz = (f.manzanas || []).join(' ').toLowerCase();
+      const lt = (f.numeroLotes || []).join(' ').toLowerCase();
+      const programaNombre = (f.nombrePrograma || '').toLowerCase();
+      return cliente.includes(termino) || mz.includes(termino) || lt.includes(termino) || programaNombre.includes(termino);
+    });
   }
 
   get totalContratos(): number {

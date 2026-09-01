@@ -8,10 +8,25 @@
       </h3>
       <p class="cxc-subtitulo">Ingresos esperados por letras pendientes de pago (contratos ACTIVO / MORA)</p>
     </div>
-    <button class="btn-actualizar" (click)="cargar()" [disabled]="cargando" title="Actualizar datos">
-      <i class="fas fa-sync-alt" [class.fa-spin]="cargando"></i>
-      Actualizar
-    </button>
+    <div class="cxc-actions">
+      <div class="filtro-busqueda">
+        <i class="bi bi-search filtro-icon"></i>
+        <input
+          type="text"
+          class="filtro-input"
+          placeholder="Buscar por cliente, MZ o LT…"
+          [(ngModel)]="filtro"
+          [ngModelOptions]="{standalone: true}"
+          title="Filtra la tabla al instante (cliente, manzana o lote)" />
+        <button *ngIf="filtro" class="filtro-clear" (click)="filtro = ''" title="Limpiar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <button class="btn-actualizar" (click)="cargar()" [disabled]="cargando" title="Actualizar datos">
+        <i class="fas fa-sync-alt" [class.fa-spin]="cargando"></i>
+        Actualizar
+      </button>
+    </div>
   </div>
 
   <!-- ── Resumen general ─────────────────────────────────────────────────── -->
@@ -75,7 +90,7 @@
           <i class="fas" [ngClass]="estaExpandido(programa.nombrePrograma) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
           <i class="fas fa-map-marked-alt programa-icon"></i>
           <h3>{{ programa.nombrePrograma }}</h3>
-          <span class="programa-badge">{{ programa.contratos.length }} contrato{{ programa.contratos.length !== 1 ? 's' : '' }}</span>
+          <span class="programa-badge">{{ contratosFiltrados(programa).length }} contrato{{ contratosFiltrados(programa).length !== 1 ? 's' : '' }}</span>
         </div>
         <div class="programa-header-totales">
           <span *ngIf="programa.totalUsd > 0" class="tot-usd">$ {{ programa.totalUsd | number:'1.2-2' }}</span>
@@ -90,22 +105,29 @@
             <tr>
               <th>#</th>
               <th>Cliente</th>
-              <th>MZ</th>
-              <th>LT</th>
+              <th>Lote(s)</th>
               <th class="text-center">Letras</th>
+              <th class="text-right">Monto cobrado</th>
               <th class="text-right">Monto por cobrar</th>
               <th>Avance de pago</th>
               <th class="text-center">Próx. vencimiento</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let fila of programa.contratos; let i = index">
+            <tr *ngFor="let fila of contratosFiltrados(programa); let i = index">
               <td class="td-num">{{ i + 1 }}</td>
               <td class="td-cliente" data-label="Cliente">{{ fila.nombreCliente }}</td>
-              <td class="td-mz" data-label="MZ">{{ fila.manzana || '—' }}</td>
-              <td class="td-lt" data-label="LT">{{ fila.numeroLote || '—' }}</td>
+              <td class="td-lote" data-label="Lote(s)">
+                <div *ngFor="let mz of fila.manzanas; let li = index" class="lote-linea">
+                  <span class="lote-mz">{{ mz }}</span>
+                  <span class="lote-lt">{{ fila.numeroLotes[li] }}</span>
+                </div>
+              </td>
               <td class="td-cantidad text-center" data-label="Letras">
                 <span class="badge-letras">{{ fila.cantidadLetras }}</span>
+              </td>
+              <td class="td-cobrado text-right" data-label="Monto cobrado">
+                <span class="monto-cobrado">{{ simbolo(fila.moneda) }} {{ fila.montoPagado | number:'1.2-2' }}</span>
               </td>
               <td class="td-importe text-right" data-label="Monto por cobrar">
                 {{ simbolo(fila.moneda) }} {{ fila.montoPorCobrar | number:'1.2-2' }}
@@ -116,7 +138,8 @@
                   <span class="barra-pendiente" [style.width.%]="pctPendiente(fila)"></span>
                 </div>
                 <span class="avance-texto">
-                  <span class="av-pagado">{{ pctPagado(fila) }}%</span> /
+                  <span class="av-pagado">{{ pctPagado(fila) }}%</span>
+                  <span class="av-sep">·</span>
                   <span class="av-pendiente">{{ pctPendiente(fila) }}%</span>
                 </span>
               </td>
@@ -126,6 +149,9 @@
             </tr>
           </tbody>
         </table>
+        <div *ngIf="contratosFiltrados(programa).length === 0" class="sin-coincidencias">
+          <i class="bi bi-search"></i> No hay contratos que coincidan con "{{ filtro }}".
+        </div>
       </div>
 
     </div><!-- /programa-bloque -->

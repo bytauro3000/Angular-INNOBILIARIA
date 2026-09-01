@@ -14,8 +14,8 @@ export interface GrupoProgramaDTO {
 export interface FilaCuentaDTO {
   idContrato: number;
   nombreCliente: string;
-  manzana: string;
-  numeroLote: string;
+  manzanas: string[];
+  numeroLotes: string[];
   nombrePrograma: string;
   moneda: string;
   cantidadLetras: number;

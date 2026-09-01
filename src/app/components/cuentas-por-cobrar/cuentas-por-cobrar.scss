@@ -47,6 +47,57 @@ $bg-white:   #ffffff;
   }
 }
 
+.cxc-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filtro-busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .filtro-icon {
+    position: absolute;
+    left: 10px;
+    color: $text-light;
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+
+  .filtro-input {
+    width: 260px;
+    max-width: 100%;
+    padding: 8px 32px 8px 30px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: $text-dark;
+    background: $bg-white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    &::placeholder { color: #94a3b8; }
+    &:focus {
+      outline: none;
+      border-color: $navy;
+      box-shadow: 0 0 0 3px rgba($navy, 0.12);
+    }
+  }
+
+  .filtro-clear {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: $text-light;
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 2px;
+    &:hover { color: $red; }
+  }
+}
+
 .btn-actualizar {
   display: inline-flex;
   align-items: center;
@@ -239,14 +290,49 @@ $bg-white:   #ffffff;
 
   .td-num      { width: 40px; color: $text-light; text-align: center; }
   .td-cliente  { font-weight: 500; }
-  .td-mz       { width: 60px; }
-  .td-lt       { width: 60px; }
+  .td-lote     { width: 90px; }
   .td-cantidad { width: 70px; }
-  .td-importe  { font-weight: 600; }
+  .td-cobrado  { font-weight: 600; color: $green; white-space: nowrap; }
+  .td-importe  { font-weight: 600; white-space: nowrap; }
   .td-fecha    { width: 110px; }
 
   .text-center { text-align: center; }
   .text-right  { text-align: right; }
+}
+
+// Línea de lote: "MZ LT" (ej. "B1 14", "A1 15")
+.lote-linea {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+  white-space: nowrap;
+
+  .lote-mz {
+    font-weight: 700;
+    color: $navy;
+  }
+  .lote-lt {
+    color: $text-dark;
+  }
+}
+
+// Monto cobrado (verde)
+.monto-cobrado {
+  color: $green;
+}
+
+// ── Estado "sin coincidencias" al filtrar ──────────────────────────────────
+.sin-coincidencias {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: $text-light;
+  font-size: 0.85rem;
+
+  i { color: $blue; }
 }
 
 .badge-letras {
@@ -266,48 +352,63 @@ $bg-white:   #ffffff;
 
 // ── Barra de avance de pago (verde = pagado, rojo = pendiente) ──────────────
 .td-avance {
-  min-width: 130px;
+  min-width: 150px;
 }
 
 .barra-avance {
+  position: relative;
   display: flex;
   width: 100%;
-  max-width: 130px;
-  height: 10px;
-  border-radius: 6px;
+  max-width: 140px;
+  height: 14px;
+  border-radius: 7px;
   overflow: hidden;
   background: #fecaca;           // fondo rojo claro de respaldo
-  border: 1px solid $border;
+  border: 1px solid #fecaca;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
 }
 
 .barra-pagado {
-  background: $green;
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
   height: 100%;
-  transition: width 0.3s ease;
+  transition: width 0.4s ease;
 }
 
 .barra-pendiente {
-  background: $red;
+  background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
   height: 100%;
-  transition: width 0.3s ease;
+  transition: width 0.4s ease;
 }
 
 .avance-texto {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 4px;
-  margin-top: 3px;
+  margin-top: 4px;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
+  width: 100%;
+  max-width: 140px;
 
   .av-pagado   { color: $green; }
+  .av-sep      { color: $border; font-weight: 400; }
   .av-pendiente{ color: $red; }
 }
 
 // ── Responsive: convierte tabla en tarjetas ───────────────────────────────
 @media (max-width: 640px) {
   .cxc-container { padding: 16px; }
+  .cxc-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filtro-busqueda {
+    width: 100%;
+    .filtro-input { width: 100%; }
+  }
   .programa-header { flex-wrap: wrap; }
   .programa-header-totales { padding-left: 30px; }
 
