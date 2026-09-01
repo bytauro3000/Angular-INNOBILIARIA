@@ -143,11 +143,11 @@
         <span>{{ pago.motivoAnulacion }}</span>
       </div>
       <div class="card-acciones">
-        <button class="btn-icon btn-pdf" title="PDF" (click)="descargarComprobante(pago)">
-          <i class="bi bi-file-earmark-pdf"></i> PDF
+        <button class="btn-icon btn-pdf" title="Descargar comprobante" (click)="descargarComprobante(pago)">
+          <i class="bi bi-file-earmark-pdf"></i> CDP
         </button>
         <button class="btn-icon btn-nc-pdf" title="Descargar Nota de Crédito" *ngIf="pago.anulado" (click)="descargarNotaCredito(pago)">
-          <i class="fas fa-file-invoice"></i> PDF Anulado
+          <i class="bi bi-file-earmark-pdf"></i> Anulado
         </button>
         <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado" (click)="abrirModalAnular(pago)">
           <i class="bi bi-slash-circle"></i> Anular
