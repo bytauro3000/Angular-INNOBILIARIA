@@ -17,13 +17,13 @@ export function normalizarTerminoLote(termino: string): string {
  * Determina si un lote coincide con el término de búsqueda.
  *
  * Soporta:
- *  - "B1"            → filtra por manzana (todos los lotes de esa MZ).
- *  - "14"            → filtra por número de lote (todos con ese prefijo numérico).
- *  - "B1 14"         → filtra el lote EXACTO (manzana B1 + lote 14).
- *  - "B1 1" / "B1-1" → coinciden manzana B1 y lote con prefijo "1" (14, 15, 19…).
+ *  - "B1"    → filtra por manzana (todos los lotes de esa MZ).
+ *  - "14"    → filtra por número de lote (prefijo numérico: 14, 140…).
+ *  - "B1 14" → filtra el lote EXACTO 14 de la manzana B1 (no el 141).
+ *  - "B1 1"  → filtra el lote EXACTO 1 de la manzana B1 (no 14, 15, 19…).
  *
- * El prefijo numérico busca por dígitos (extrae la parte numérica del lote),
- * así "B1 1" encuentra los lotes 14, 15, 19 pero no el 2.
+ * La manzana siempre coincide en forma exacta; el lote coincide exacto cuando
+ * se escribe MZ + lote, y por prefijo numérico cuando se escribe solo un número.
  */
 export function loteCoincide(lote: Lote, termino: string): boolean {
   const term = normalizarTerminoLote(termino);
@@ -49,16 +49,16 @@ export function loteCoincide(lote: Lote, termino: string): boolean {
     return mz.includes(solo);
   }
 
-  // Dos partes (MZ + lote): la manzana debe coincidir y el lote por prefijo numérico
+  // Dos partes (MZ + lote): manzana exacta y lote EXACTO
   const mzBusqueda = partes[0];
   const ltBusqueda = partes.slice(1).join('');
 
   if (mz !== mzBusqueda) return false;
 
   if (/^\d+$/.test(ltBusqueda)) {
-    return extraerDigitos(lt).startsWith(ltBusqueda);
+    return extraerDigitos(lt) === ltBusqueda;
   }
-  return lt.includes(ltBusqueda);
+  return lt === ltBusqueda;
 }
 
 function extraerDigitos(valor: string): string {
