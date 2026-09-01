@@ -16,9 +16,10 @@
           class="filtro-input"
           placeholder="Buscar por cliente, MZ o LT…"
           [(ngModel)]="filtro"
+          (ngModelChange)="onFiltroChange()"
           [ngModelOptions]="{standalone: true}"
           title="Filtra la tabla al instante (cliente, manzana o lote)" />
-        <button *ngIf="filtro" class="filtro-clear" (click)="filtro = ''" title="Limpiar">
+        <button *ngIf="filtro" class="filtro-clear" (click)="filtro = ''; onFiltroChange()" title="Limpiar">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>

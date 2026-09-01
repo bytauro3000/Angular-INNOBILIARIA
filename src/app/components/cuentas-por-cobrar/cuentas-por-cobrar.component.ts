@@ -62,17 +62,43 @@ export class CuentasPorCobrarComponent implements OnInit {
     return this.expandidos.has(nombrePrograma);
   }
 
+  /**
+   * Al escribir en el buscador, expande automáticamente los programas que tienen
+   * coincidencias y pliega los que no. Si el campo queda vacío, restaura el
+   * estado por defecto (solo el primer programa expandido).
+   */
+  onFiltroChange(): void {
+    if (!this.data || this.data.programas.length === 0) return;
+
+    const termino = this.filtro.trim().toLowerCase();
+    if (!termino) {
+      this.expandidos = new Set([this.data.programas[0].nombrePrograma]);
+      return;
+    }
+
+    const nuevos = new Set<string>();
+    for (const programa of this.data.programas) {
+      if (this.contratosFiltrados(programa).length > 0) {
+        nuevos.add(programa.nombrePrograma);
+      }
+    }
+    this.expandidos = nuevos;
+  }
+
   /** Contratos del programa filtrados por el término de búsqueda (client-side). */
   contratosFiltrados(programa: GrupoProgramaDTO): FilaCuentaDTO[] {
     const termino = this.filtro.trim().toLowerCase();
     if (!termino) return programa.contratos;
-    return programa.contratos.filter(f => {
-      const cliente = (f.nombreCliente || '').toLowerCase();
-      const mz = (f.manzanas || []).join(' ').toLowerCase();
-      const lt = (f.numeroLotes || []).join(' ').toLowerCase();
-      const programaNombre = (f.nombrePrograma || '').toLowerCase();
-      return cliente.includes(termino) || mz.includes(termino) || lt.includes(termino) || programaNombre.includes(termino);
-    });
+    return programa.contratos.filter(f => this.filaCoincide(f, termino));
+  }
+
+  /** Indica si una fila coincide con el término (cliente / MZ / LT / programa). */
+  private filaCoincide(f: FilaCuentaDTO, termino: string): boolean {
+    const cliente = (f.nombreCliente || '').toLowerCase();
+    const mz = (f.manzanas || []).join(' ').toLowerCase();
+    const lt = (f.numeroLotes || []).join(' ').toLowerCase();
+    const programaNombre = (f.nombrePrograma || '').toLowerCase();
+    return cliente.includes(termino) || mz.includes(termino) || lt.includes(termino) || programaNombre.includes(termino);
   }
 
   get totalContratos(): number {
