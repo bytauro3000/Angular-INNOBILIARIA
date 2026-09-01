@@ -107,7 +107,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   isDragging = false;
   @ViewChild('cropCanvas') cropCanvas!: ElementRef<HTMLCanvasElement>;
-  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number; rotation: number; canvas: HTMLCanvasElement | null } | null = null;
+  cropState: { url: string; x: number; y: number; w: number; h: number; imgW: number; imgH: number; offsetX: number; offsetY: number; originalFile: File; editIndex: number; rotation: number; canvas: HTMLCanvasElement | null; scale: number } | null = null;
   private dragState: { startX: number; startY: number; origX: number; origY: number; origW: number; origH: number; dir: string } | null = null;
   private cropImageElement: HTMLImageElement | null = null;
 
@@ -172,7 +172,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   }
 
   private openCropForFile(file: File, url: string): void {
-    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: file, editIndex: -1, rotation: 0, canvas: null };
+    this.cropState = { url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: file, editIndex: -1, rotation: 0, canvas: null, scale: 1 };
     this.dragState = null;
     this.loadCropImage(url);
   }
@@ -180,7 +180,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   openCrop(index: number): void {
     const f = this.files[index];
     if (!f) return;
-    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: f.file, editIndex: index, rotation: 0, canvas: null };
+    this.cropState = { url: f.url, x: 0, y: 0, w: 0, h: 0, imgW: 0, imgH: 0, offsetX: 0, offsetY: 0, originalFile: f.file, editIndex: index, rotation: 0, canvas: null, scale: 1 };
     this.dragState = null;
     this.loadCropImage(f.url);
   }
@@ -216,6 +216,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
       ...this.cropState,
       imgW: w,
       imgH: h,
+      scale,
       offsetX: Math.max(offsetX, 0),
       offsetY: Math.max(offsetY, 0),
       x: margin,
@@ -233,11 +234,10 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     const img = this.cropImageElement;
     if (!canvas || !state || !img) return;
 
-    const scale = Math.max(state.imgW, state.imgH) > 0
-      ? Math.min(canvas.parentElement?.clientWidth ?? state.imgW, canvas.parentElement?.clientHeight ?? state.imgH) / Math.max(state.imgW, state.imgH)
-      : 1;
-    const dw = Math.round(state.imgW * scale);
-    const dh = Math.round(state.imgH * scale);
+    // Escala uniforme que convierte píxeles naturales → píxeles de pantalla.
+    const s = state.scale || 1;
+    const dw = Math.round(state.imgW * s);
+    const dh = Math.round(state.imgH * s);
     canvas.width = dw;
     canvas.height = dh;
     const ctx = canvas.getContext('2d');
@@ -353,21 +353,44 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   confirmCrop(): void {
     if (!this.cropState) return;
-    const { x, y, w, h, offsetX, offsetY, originalFile, editIndex } = this.cropState;
+    const { x, y, w, h, rotation, scale, originalFile, editIndex } = this.cropState;
     const canvas = this.cropCanvas?.nativeElement;
-    if (!canvas) return;
-    const scaleX = (canvas.width || canvas.clientWidth) / (canvas.clientWidth || 1);
-    const scaleY = (canvas.height || canvas.clientHeight) / (canvas.clientHeight || 1);
-    const sx = Math.round((x) * scaleX);
-    const sy = Math.round((y) * scaleY);
-    const sw = Math.round(w * scaleX);
-    const sh = Math.round(h * scaleY);
+    const img = this.cropImageElement;
+    if (!canvas || !img) return;
+
+    const s = scale || 1;
+    const rad = (rotation * Math.PI) / 180;
+
+    // Tamaño del recorte a resolución NATURAL (sin pérdida de calidad)
+    const outW = Math.max(1, Math.round(w / s));
+    const outH = Math.max(1, Math.round(h / s));
+
     const out = document.createElement('canvas');
-    out.width = sw;
-    out.height = sh;
+    out.width = outW;
+    out.height = outH;
     const ctx = out.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    // El canvas de pantalla muestra la imagen rotada centrada en (dw/2, dh/2).
+    // Centro del rectángulo de recorte en pantalla:
+    const cxDisplay = x + w / 2;
+    const cyDisplay = y + h / 2;
+    // Centro del canvas (donde está el centro de la imagen):
+    const canvasCx = canvas.width / 2;
+    const canvasCy = canvas.height / 2;
+    // Desplazamiento del centro de recorte respecto al centro de la imagen, en píxeles naturales:
+    const dxNat = (cxDisplay - canvasCx) / s;
+    const dyNat = (cyDisplay - canvasCy) / s;
+
+    // Dibuja la imagen natural rotada de modo que su centro quede en el centro del
+    // canvas de salida desplazado por (-dxNat, -dyNat). Así el área recortada
+    // coincide con el rectángulo seleccionado, a resolución completa.
+    ctx.save();
+    ctx.translate(outW / 2 - dxNat, outH / 2 - dyNat);
+    ctx.rotate(rad);
+    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+    ctx.restore();
+
     out.toBlob(blob => {
       if (!blob) return;
       const name = originalFile.name.replace(/(\.\w+)$/, '_cropped$1');
