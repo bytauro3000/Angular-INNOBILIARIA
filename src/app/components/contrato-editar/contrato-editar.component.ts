@@ -26,6 +26,7 @@ import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-edi
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { Moneda } from '../../dto/moneda.enum';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
+import { loteCoincide } from '../../utils/lote-filtro';
 
 /** Cliente agregado al contrato con su rol (TITULAR, AVAL, etc.). */
 export interface ClienteSeleccionado extends Cliente {
@@ -307,8 +308,8 @@ export class ContratoEditarComponent implements OnInit {
   }
   filtrarLotes() {
     if (!this.contratoForm.get('idPrograma')?.value) { this.toastr.warning('Primero selecciona un programa', 'Atención'); return; }
-    const f = this.filtroLote.toLowerCase();
-    this.lotesFiltrados = this.lotes.filter(l => !this.lotesSeleccionados.some(sl => sl.idLote === l.idLote) && `mz ${l.manzana} lt ${l.numeroLote}`.toLowerCase().includes(f));
+    const f = this.filtroLote;
+    this.lotesFiltrados = this.lotes.filter(l => !this.lotesSeleccionados.some(sl => sl.idLote === l.idLote) && loteCoincide(l, f));
     this.mostrarLotes = true;
   }
   seleccionarLote(l: Lote) { this.lotesSeleccionados.push(l); this.actualizarIdsLotes(); this.calcularMontoTotalLotes(); this.filtroLote = ''; this.filtrarLotes(); setTimeout(() => { this.mostrarLotes = false; }, 0); }

@@ -32,6 +32,7 @@ import { PagoLetraService } from '../../services/pagoletra.service';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
+import { loteCoincide } from '../../utils/lote-filtro';
 
 /** Cliente agregado al contrato con su rol (TITULAR, AVAL, etc.). */
 export interface ClienteSeleccionado extends Cliente {
@@ -631,10 +632,10 @@ export class ContratoInsertarComponent implements OnInit {
 
   filtrarLotes() {
     if (!this.contratoForm.get('idPrograma')?.value) { this.toastr.warning('Primero selecciona un programa', 'Atención'); return; }
-    const f = this.filtroLote.toLowerCase();
+    const f = this.filtroLote;
     this.lotesFiltrados = this.lotes.filter(l =>
       !this.lotesSeleccionados.some(s => s.idLote === l.idLote) &&
-      `mz ${l.manzana} lt ${l.numeroLote}`.toLowerCase().includes(f));
+      loteCoincide(l, f));
     this.mostrarLotes = true;
   }
   seleccionarLote(l: Lote) {
