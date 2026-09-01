@@ -20,5 +20,6 @@ export interface FilaCuentaDTO {
   moneda: string;
   cantidadLetras: number;
   montoPorCobrar: number;
+  montoPagado: number;
   proximaVencimiento: string;
 }

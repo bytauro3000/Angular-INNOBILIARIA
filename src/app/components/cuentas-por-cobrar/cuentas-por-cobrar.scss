@@ -264,6 +264,47 @@ $bg-white:   #ffffff;
   font-weight: 700;
 }
 
+// ── Barra de avance de pago (verde = pagado, rojo = pendiente) ──────────────
+.td-avance {
+  min-width: 130px;
+}
+
+.barra-avance {
+  display: flex;
+  width: 100%;
+  max-width: 130px;
+  height: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fecaca;           // fondo rojo claro de respaldo
+  border: 1px solid $border;
+}
+
+.barra-pagado {
+  background: $green;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.barra-pendiente {
+  background: $red;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.avance-texto {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  .av-pagado   { color: $green; }
+  .av-pendiente{ color: $red; }
+}
+
 // ── Responsive: convierte tabla en tarjetas ───────────────────────────────
 @media (max-width: 640px) {
   .cxc-container { padding: 16px; }

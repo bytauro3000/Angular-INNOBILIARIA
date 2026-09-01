@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CuentasPorCobrarService } from '../../services/cuentas-por-cobrar.service';
-import { CuentasPorCobrarDTO, GrupoProgramaDTO } from '../../dto/cuentas-por-cobrar.dto';
+import { CuentasPorCobrarDTO, GrupoProgramaDTO, FilaCuentaDTO } from '../../dto/cuentas-por-cobrar.dto';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -68,6 +68,18 @@ export class CuentasPorCobrarComponent implements OnInit {
     if (!this.data) return 0;
     return this.data.programas.reduce((sum, p) =>
       sum + p.contratos.reduce((s, f) => s + f.cantidadLetras, 0), 0);
+  }
+
+  /** Porcentaje ya pagado del contrato (verde en la barra de avance). */
+  pctPagado(fila: FilaCuentaDTO): number {
+    const total = (fila.montoPagado || 0) + (fila.montoPorCobrar || 0);
+    if (total <= 0) return 0;
+    return Math.min(100, Math.round(((fila.montoPagado || 0) / total) * 100));
+  }
+
+  /** Porcentaje pendiente de pago (rojo en la barra de avance). */
+  pctPendiente(fila: FilaCuentaDTO): number {
+    return Math.max(0, 100 - this.pctPagado(fila));
   }
 
   simbolo(moneda: string): string {

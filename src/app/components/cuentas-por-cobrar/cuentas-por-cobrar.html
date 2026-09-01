@@ -94,6 +94,7 @@
               <th>LT</th>
               <th class="text-center">Letras</th>
               <th class="text-right">Monto por cobrar</th>
+              <th>Avance de pago</th>
               <th class="text-center">Próx. vencimiento</th>
             </tr>
           </thead>
@@ -108,6 +109,16 @@
               </td>
               <td class="td-importe text-right" data-label="Monto por cobrar">
                 {{ simbolo(fila.moneda) }} {{ fila.montoPorCobrar | number:'1.2-2' }}
+              </td>
+              <td class="td-avance" data-label="Avance de pago">
+                <div class="barra-avance" [title]="pctPagado(fila) + '% pagado / ' + pctPendiente(fila) + '% pendiente'">
+                  <span class="barra-pagado" [style.width.%]="pctPagado(fila)"></span>
+                  <span class="barra-pendiente" [style.width.%]="pctPendiente(fila)"></span>
+                </div>
+                <span class="avance-texto">
+                  <span class="av-pagado">{{ pctPagado(fila) }}%</span> /
+                  <span class="av-pendiente">{{ pctPendiente(fila) }}%</span>
+                </span>
               </td>
               <td class="td-fecha text-center" data-label="Próx. vencimiento">
                 {{ formatFecha(fila.proximaVencimiento) }}

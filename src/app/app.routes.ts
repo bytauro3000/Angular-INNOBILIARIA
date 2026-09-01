@@ -74,6 +74,9 @@ import { ReporteMoraComponent } from './components/reporte-mora/reporte-mora.com
 // Letras Vencidas
 import { LetrasVencidasComponent } from './components/letras-vencidas/letras-vencidas.component';
 
+// Cuentas por Cobrar
+import { CuentasPorCobrarComponent } from './components/cuentas-por-cobrar/cuentas-por-cobrar.component';
+
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
 
@@ -129,6 +132,7 @@ export const routes: Routes = [
       { path: 'contratos/editar/:id', component: ContratoEditarComponent },
       { path: 'contratos/reporte-mora', component: ReporteMoraComponent },
       { path: 'letras-vencidas', component: LetrasVencidasComponent },
+      { path: 'cuentas-por-cobrar', component: CuentasPorCobrarComponent },
       { path: 'reporte-ingresos', component: ReporteIngresosComponent },
       { path: 'reporte-caja', component: ReporteCajaComponent },
       { path: 'historial-moras', component: HistorialMorasPickerComponent },
