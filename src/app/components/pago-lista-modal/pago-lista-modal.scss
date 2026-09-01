@@ -212,3 +212,204 @@ $border-color: #e9ecef;
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+// ═══ Editor de Voucher (recorte + rotación) ═════════════════════════════
+.voucher-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.voucher-editor-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.voucher-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid $border-color;
+
+  h5 {
+    margin: 0;
+    font-weight: 600;
+    color: $text-dark;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    i { color: $navy; }
+
+    .voucher-letra {
+      font-size: 0.75rem;
+      color: $text-light;
+      background: #f1f5f9;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+  }
+
+  .voucher-editor-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: $text-light;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+    &:hover { color: $red; }
+  }
+}
+
+.voucher-editor-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.voucher-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 420 / 300;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+
+  &:active { cursor: grabbing; }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .voucher-pan-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.75);
+    color: #e2e8f0;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+}
+
+.voucher-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+
+  .voucher-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid $border-color;
+    background: white;
+    color: $text-dark;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover { background: #f1f5f9; border-color: $navy; color: $navy; }
+  }
+}
+
+.voucher-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+
+  .voucher-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: $text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+  }
+
+  .voucher-input {
+    padding: 9px 12px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: $text-dark;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    &:focus {
+      outline: none;
+      border-color: $navy;
+      box-shadow: 0 0 0 3px rgba($navy, 0.12);
+    }
+  }
+}
+
+.voucher-editor-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid $border-color;
+
+  .voucher-btn-cancel {
+    padding: 9px 20px;
+    border-radius: 40px;
+    border: 1px solid $border-color;
+    background: transparent;
+    color: $text-light;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover { background: #f1f5f9; }
+  }
+
+  .voucher-btn-save {
+    padding: 9px 22px;
+    border-radius: 40px;
+    border: none;
+    background: $navy;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover:not(:disabled) { background: color.adjust($navy, $lightness: -8%, $space: hsl); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}
+
+@media (max-width: 480px) {
+  .voucher-fields { grid-template-columns: 1fr; }
+}

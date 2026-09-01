@@ -102,3 +102,77 @@
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL EDITOR DE VOUCHER (recorte + rotación + fecha/número op.)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="voucher-editor-overlay" *ngIf="editandoVoucher">
+  <div class="voucher-editor-modal">
+    <div class="voucher-editor-head">
+      <h5>
+        <i class="bi bi-crop"></i> Editar Voucher
+        <span *ngIf="voucherPago" class="voucher-letra">Letra N° {{ getNumeroLetraLimpio(voucherPago.numeroLetra) }}</span>
+      </h5>
+      <button class="voucher-editor-close" (click)="cancelarEditarVoucher()" aria-label="Cerrar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="voucher-editor-body">
+      <!-- Vista previa: canvas recortable (recorte = área visible del canvas) -->
+      <div class="voucher-viewport"
+           #voucherViewport
+           (mousedown)="onPanStart($event)"
+           (mousemove)="onPanMove($event)"
+           (mouseup)="onPanEnd()"
+           (mouseleave)="onPanEnd()"
+           (touchstart)="onPanStart($event)"
+           (touchmove)="onPanMove($event)"
+           (touchend)="onPanEnd()">
+        <canvas #voucherCanvas></canvas>
+        <div class="voucher-pan-hint">
+          <i class="bi bi-arrows-move"></i> Arrastra la imagen para ajustar el recorte
+        </div>
+      </div>
+
+      <!-- Controles de rotación y zoom -->
+      <div class="voucher-controls">
+        <button class="voucher-btn" (click)="rotarVoucher('left')" title="Girar a la izquierda">
+          <i class="bi bi-arrow-counterclockwise"></i> Izquierda
+        </button>
+        <button class="voucher-btn" (click)="rotarVoucher('right')" title="Girar a la derecha">
+          <i class="bi bi-arrow-clockwise"></i> Derecha
+        </button>
+        <button class="voucher-btn" (click)="zoomVoucher('out')" title="Alejar">
+          <i class="bi bi-zoom-out"></i>
+        </button>
+        <button class="voucher-btn" (click)="zoomVoucher('in')" title="Acercar">
+          <i class="bi bi-zoom-in"></i>
+        </button>
+        <button class="voucher-btn" (click)="resetVoucher()" title="Restablecer">
+          <i class="bi bi-arrow-counterclockwise"></i> Restablecer
+        </button>
+      </div>
+
+      <!-- Datos del voucher (fecha operación + número operación) -->
+      <div class="voucher-fields" *ngIf="voucherPago">
+        <div class="voucher-field">
+          <label>Fecha de operación</label>
+          <input type="date" [(ngModel)]="voucherFechaOperacion" class="voucher-input" />
+        </div>
+        <div class="voucher-field">
+          <label>Número de operación</label>
+          <input type="text" [(ngModel)]="voucherNumeroOperacion" class="voucher-input"
+                 placeholder="N° de operación del voucher" />
+        </div>
+      </div>
+    </div>
+
+    <div class="voucher-editor-foot">
+      <button class="voucher-btn-cancel" (click)="cancelarEditarVoucher()">Cancelar</button>
+      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher">
+        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' }}
+      </button>
+    </div>
+  </div>
+</div>

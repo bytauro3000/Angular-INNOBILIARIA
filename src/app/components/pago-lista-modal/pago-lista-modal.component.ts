@@ -39,6 +39,30 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   pagoParaEditarVoucher: PagoLetraResponse | null = null;
   subiendoVoucher = false;
 
+  // ── Editor de voucher (recorte + rotación) ──
+  editandoVoucher = false;
+  voucherPago: PagoLetraResponse | null = null;
+  voucherFile: File | null = null;
+  voucherFechaOperacion: string = '';
+  voucherNumeroOperacion: string = '';
+  /** URL de la imagen original cargada. */
+  voucherImgUrl: string | null = null;
+  /** Rotación acumulada en grados (múltiplos de 90). */
+  voucherRotation = 0;
+  /** Escala del zoom aplicada al recorte. */
+  voucherScale = 1;
+  /** Posición de arrastre del área visible (offset en %). */
+  voucherPanX = 0;
+  voucherPanY = 0;
+  dragging = false;
+  dragStartX = 0;
+  dragStartY = 0;
+  private imageElement: HTMLImageElement | null = null;
+  private loadedImage: HTMLImageElement | null = null;
+
+  @ViewChild('voucherCanvas') voucherCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('voucherViewport') voucherViewport!: ElementRef<HTMLDivElement>;
+
   constructor(
     private pagoService: PagoLetraService,
     private toastr: ToastrService,
@@ -208,7 +232,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     this.fileVoucher?.nativeElement?.click();
   }
 
-  /** Al elegir un archivo, confirma y sube el nuevo voucher. */
+  /** Al elegir un archivo, abre el editor de recorte/rotación del voucher. */
   onVoucherSeleccionado(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
@@ -222,20 +246,156 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     const pago = this.pagoParaEditarVoucher;
     this.pagoParaEditarVoucher = null;
 
-    Swal.fire({
-      title: 'Reemplazar voucher',
-      html: `¿Deseas reemplazar el voucher del pago de la letra <strong>N° ${this.getNumeroLetraLimpio(pago.numeroLetra)}</strong> por <strong>"${file.name}"</strong>?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#2563eb',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Sí, reemplazar',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
-      if (result.isConfirmed) {
-        this.subirVoucher(pago, file);
+    // Cargar la imagen y abrir el editor de recorte/rotación
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        this.loadedImage = img;
+        this.voucherImgUrl = reader.result as string;
+        this.voucherPago = pago;
+        this.voucherFile = file;
+        this.voucherFechaOperacion = pago.fechaOperacion ? pago.fechaOperacion.slice(0, 10) : '';
+        this.voucherNumeroOperacion = pago.numeroOperacion || '';
+        this.voucherRotation = 0;
+        this.voucherScale = 1;
+        this.voucherPanX = 0;
+        this.voucherPanY = 0;
+        this.editandoVoucher = true;
+        setTimeout(() => this.renderVoucherEditor(), 50);
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /** Renderiza la imagen en el canvas aplicando rotación, zoom y recorte. */
+  renderVoucherEditor(): void {
+    const canvas = this.voucherCanvas?.nativeElement;
+    if (!canvas || !this.loadedImage) return;
+
+    // Área de recorte fija (el canvas es el "viewport" del recorte)
+    const W = 420;
+    const H = 300;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, W, H);
+
+    const img = this.loadedImage;
+    // Tamaño base que cubre el canvas manteniendo proporción
+    const baseScale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+    const drawW = img.naturalWidth * baseScale * this.voucherScale;
+    const drawH = img.naturalHeight * baseScale * this.voucherScale;
+
+    // El canvas simula el "viewport" del recorte: la imagen es más grande y se
+    // desplaza con pan; el área visible del canvas es lo que se recorta.
+    ctx.save();
+    ctx.translate(W / 2 + this.voucherPanX, H / 2 + this.voucherPanY);
+    ctx.rotate((this.voucherRotation * Math.PI) / 180);
+
+    // Tras rotar, las dimensiones visuales cambian; calculamos la caja rotada
+    const cos = Math.abs(Math.cos((this.voucherRotation * Math.PI) / 180));
+    const sin = Math.abs(Math.sin((this.voucherRotation * Math.PI) / 180));
+    const boxW = drawW * cos + drawH * sin;
+    const boxH = drawW * sin + drawH * cos;
+
+    ctx.drawImage(img, -boxW / 2, -boxH / 2, boxW, boxH);
+    ctx.restore();
+
+    // Cuadrícula de recorte (marca visual del área)
+    ctx.strokeStyle = 'rgba(2,62,138,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.setLineDash([6, 6]);
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+    ctx.setLineDash([]);
+  }
+
+  /** Rota la imagen 90° a la izquierda o derecha. */
+  rotarVoucher(dir: 'left' | 'right'): void {
+    this.voucherRotation = (this.voucherRotation + (dir === 'right' ? 90 : -90)) % 360;
+    this.renderVoucherEditor();
+  }
+
+  /** Acerca o aleja (zoom del recorte). */
+  zoomVoucher(dir: 'in' | 'out'): void {
+    const step = 0.15;
+    this.voucherScale = Math.min(4, Math.max(1, this.voucherScale + (dir === 'in' ? step : -step)));
+    this.renderVoucherEditor();
+  }
+
+  /** Reinicia rotación, zoom y posición. */
+  resetVoucher(): void {
+    this.voucherRotation = 0;
+    this.voucherScale = 1;
+    this.voucherPanX = 0;
+    this.voucherPanY = 0;
+    this.renderVoucherEditor();
+  }
+
+  onPanStart(event: MouseEvent | TouchEvent): void {
+    this.dragging = true;
+    const pt = this.getPointer(event);
+    this.dragStartX = pt.x;
+    this.dragStartY = pt.y;
+    event.preventDefault();
+  }
+
+  onPanMove(event: MouseEvent | TouchEvent): void {
+    if (!this.dragging) return;
+    const pt = this.getPointer(event);
+    const dx = pt.x - this.dragStartX;
+    const dy = pt.y - this.dragStartY;
+    this.dragStartX = pt.x;
+    this.dragStartY = pt.y;
+    this.voucherPanX += dx;
+    this.voucherPanY += dy;
+    this.renderVoucherEditor();
+    event.preventDefault();
+  }
+
+  onPanEnd(): void {
+    this.dragging = false;
+  }
+
+  private getPointer(event: MouseEvent | TouchEvent): { x: number; y: number } {
+    if ('touches' in event && event.touches.length > 0) {
+      return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }
+    const me = event as MouseEvent;
+    return { x: me.clientX, y: me.clientY };
+  }
+
+  /** Cierra el editor sin guardar. */
+  cancelarEditarVoucher(): void {
+    this.editandoVoucher = false;
+    this.voucherPago = null;
+    this.voucherFile = null;
+    this.voucherImgUrl = null;
+    this.loadedImage = null;
+  }
+
+  /** Genera el blob recortado y sube el nuevo voucher con fecha/número de operación. */
+  guardarVoucher(): void {
+    if (!this.voucherPago || !this.voucherFile || this.subiendoVoucher) return;
+    const canvas = this.voucherCanvas?.nativeElement;
+    if (!canvas) return;
+
+    // Convierte el canvas (recorte/rotación) en un archivo de imagen
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        this.toastr.error('No se pudo generar la imagen recortada', 'Error');
+        return;
       }
-    });
+      const croppedFile = new File([blob], this.voucherFile!.name, { type: 'image/jpeg' });
+      this.subirVoucher(this.voucherPago!, croppedFile);
+    }, 'image/jpeg', 0.92);
   }
 
   /** Llama al backend para actualizar el pago y reemplazar su voucher. */
@@ -247,8 +407,9 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
       idLetra: pago.idLetra ?? 0,
       importePagado: pago.importePagado ?? 0,
       medioPago: (pago.medioPago as MedioPago) ?? 'EFECTIVO',
-      numeroOperacion: pago.numeroOperacion,
+      numeroOperacion: this.voucherNumeroOperacion || pago.numeroOperacion,
       fechaPago: pago.fechaPago,
+      fechaOperacion: this.voucherFechaOperacion || undefined,
       observaciones: pago.observaciones
     };
 
@@ -256,6 +417,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
       next: () => {
         this.toastr.success('Voucher actualizado correctamente', 'Éxito');
         this.subiendoVoucher = false;
+        this.cancelarEditarVoucher();
         this.cargarPagos();
       },
       error: (err) => {
