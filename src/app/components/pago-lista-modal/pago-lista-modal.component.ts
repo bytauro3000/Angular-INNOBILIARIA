@@ -13,6 +13,17 @@ import { Moneda } from '../../dto/moneda.enum';
 import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 
+/** Imagen de voucher en edición, con su propio estado de recorte/rotación. */
+interface VoucherEditItem {
+  file: File;
+  url: string;
+  image: HTMLImageElement;
+  rotation: number;
+  scale: number;
+  panX: number;
+  panY: number;
+}
+
 @Component({
   selector: 'app-pago-lista-modal',
   standalone: true,
@@ -39,26 +50,18 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   pagoParaEditarVoucher: PagoLetraResponse | null = null;
   subiendoVoucher = false;
 
-  // ── Editor de voucher (recorte + rotación) ──
+  // ── Editor de voucher (múltiples fotos: recorte + rotación) ──
   editandoVoucher = false;
   voucherPago: PagoLetraResponse | null = null;
-  voucherFile: File | null = null;
   voucherFechaOperacion: string = '';
   voucherNumeroOperacion: string = '';
-  /** URL de la imagen original cargada. */
-  voucherImgUrl: string | null = null;
-  /** Rotación acumulada en grados (múltiplos de 90). */
-  voucherRotation = 0;
-  /** Escala del zoom aplicada al recorte. */
-  voucherScale = 1;
-  /** Posición de arrastre del área visible (offset en %). */
-  voucherPanX = 0;
-  voucherPanY = 0;
+  /** Imágenes en edición (cada una con su propio recorte/rotación). */
+  voucherItems: VoucherEditItem[] = [];
+  /** Índice de la imagen activa en el editor. */
+  voucherIndex = 0;
   dragging = false;
   dragStartX = 0;
   dragStartY = 0;
-  private imageElement: HTMLImageElement | null = null;
-  private loadedImage: HTMLImageElement | null = null;
 
   @ViewChild('voucherCanvas') voucherCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('voucherViewport') voucherViewport!: ElementRef<HTMLDivElement>;
@@ -232,47 +235,101 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     this.fileVoucher?.nativeElement?.click();
   }
 
-  /** Al elegir un archivo, abre el editor de recorte/rotación del voucher. */
+  /** Al elegir uno o más archivos, los carga en el editor (multi-foto). */
   onVoucherSeleccionado(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input?.files?.[0];
+    const files = Array.from(input.files ?? []);
     input.value = ''; // permite volver a elegir el mismo archivo después
 
-    if (!file || !this.pagoParaEditarVoucher) {
-      this.pagoParaEditarVoucher = null;
-      return;
-    }
+    if (files.length === 0) return;
 
     const pago = this.pagoParaEditarVoucher;
     this.pagoParaEditarVoucher = null;
 
-    // Cargar la imagen y abrir el editor de recorte/rotación
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        this.loadedImage = img;
-        this.voucherImgUrl = reader.result as string;
-        this.voucherPago = pago;
-        this.voucherFile = file;
-        this.voucherFechaOperacion = pago.fechaOperacion ? pago.fechaOperacion.slice(0, 10) : '';
-        this.voucherNumeroOperacion = pago.numeroOperacion || '';
-        this.voucherRotation = 0;
-        this.voucherScale = 1;
-        this.voucherPanX = 0;
-        this.voucherPanY = 0;
-        this.editandoVoucher = true;
-        setTimeout(() => this.renderVoucherEditor(), 50);
+    // Si aún no hay pago en edición, es la primera carga
+    const esPrimera = !this.editandoVoucher || !this.voucherPago;
+    const pagoDestino = esPrimera ? pago : this.voucherPago;
+    if (!pagoDestino) {
+      this.pagoParaEditarVoucher = null;
+      return;
+    }
+
+    // Si es la primera, inicializar estado del editor
+    if (esPrimera) {
+      this.voucherPago = pagoDestino;
+      this.voucherFechaOperacion = pagoDestino.fechaOperacion ? pagoDestino.fechaOperacion.slice(0, 10) : '';
+      this.voucherNumeroOperacion = pagoDestino.numeroOperacion || '';
+      this.voucherItems = [];
+      this.voucherIndex = 0;
+      this.editandoVoucher = true;
+    }
+
+    // Cargar cada archivo como un item editable
+    let pendientes = files.length;
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          this.voucherItems.push({
+            file,
+            url: reader.result as string,
+            image: img,
+            rotation: 0,
+            scale: 1,
+            panX: 0,
+            panY: 0
+          });
+          pendientes--;
+          if (pendientes === 0) {
+            this.voucherIndex = this.voucherItems.length - 1;
+            setTimeout(() => this.renderVoucherEditor(), 50);
+          }
+        };
+        img.src = reader.result as string;
       };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
   }
 
-  /** Renderiza la imagen en el canvas aplicando rotación, zoom y recorte. */
+  /** Devuelve el item activo del editor (imagen que se está editando). */
+  private getItemActivo(): VoucherEditItem | undefined {
+    return this.voucherItems[this.voucherIndex];
+  }
+
+  /** Selecciona otra foto del editor para editar su recorte/rotación. */
+  seleccionarVoucherItem(index: number): void {
+    if (index < 0 || index >= this.voucherItems.length) return;
+    this.voucherIndex = index;
+    this.renderVoucherEditor();
+  }
+
+  /** Permite agregar más fotos al editor (voucher pagado en varias partes). */
+  agregarVoucherFoto(): void {
+    if (!this.voucherPago) return;
+    // Se marca para que onVoucherSeleccionado sepa que ya hay editor abierto
+    this.pagoParaEditarVoucher = null;
+    this.fileVoucher?.nativeElement?.click();
+  }
+
+  /** Quita una foto del editor. */
+  quitarVoucherItem(index: number): void {
+    this.voucherItems.splice(index, 1);
+    if (this.voucherItems.length === 0) {
+      this.cancelarEditarVoucher();
+      return;
+    }
+    if (this.voucherIndex >= this.voucherItems.length) {
+      this.voucherIndex = this.voucherItems.length - 1;
+    }
+    this.renderVoucherEditor();
+  }
+
+  /** Renderiza la imagen activa en el canvas aplicando rotación, zoom y recorte. */
   renderVoucherEditor(): void {
     const canvas = this.voucherCanvas?.nativeElement;
-    if (!canvas || !this.loadedImage) return;
+    const item = this.getItemActivo();
+    if (!canvas || !item) return;
 
     // Área de recorte fija (el canvas es el "viewport" del recorte)
     const W = 420;
@@ -286,21 +343,18 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(0, 0, W, H);
 
-    const img = this.loadedImage;
+    const img = item.image;
     // Tamaño base que cubre el canvas manteniendo proporción
     const baseScale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-    const drawW = img.naturalWidth * baseScale * this.voucherScale;
-    const drawH = img.naturalHeight * baseScale * this.voucherScale;
+    const drawW = img.naturalWidth * baseScale * item.scale;
+    const drawH = img.naturalHeight * baseScale * item.scale;
 
-    // El canvas simula el "viewport" del recorte: la imagen es más grande y se
-    // desplaza con pan; el área visible del canvas es lo que se recorta.
     ctx.save();
-    ctx.translate(W / 2 + this.voucherPanX, H / 2 + this.voucherPanY);
-    ctx.rotate((this.voucherRotation * Math.PI) / 180);
+    ctx.translate(W / 2 + item.panX, H / 2 + item.panY);
+    ctx.rotate((item.rotation * Math.PI) / 180);
 
-    // Tras rotar, las dimensiones visuales cambian; calculamos la caja rotada
-    const cos = Math.abs(Math.cos((this.voucherRotation * Math.PI) / 180));
-    const sin = Math.abs(Math.sin((this.voucherRotation * Math.PI) / 180));
+    const cos = Math.abs(Math.cos((item.rotation * Math.PI) / 180));
+    const sin = Math.abs(Math.sin((item.rotation * Math.PI) / 180));
     const boxW = drawW * cos + drawH * sin;
     const boxH = drawW * sin + drawH * cos;
 
@@ -317,25 +371,31 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     ctx.setLineDash([]);
   }
 
-  /** Rota la imagen 90° a la izquierda o derecha. */
+  /** Rota la imagen activa 90° a la izquierda o derecha. */
   rotarVoucher(dir: 'left' | 'right'): void {
-    this.voucherRotation = (this.voucherRotation + (dir === 'right' ? 90 : -90)) % 360;
+    const item = this.getItemActivo();
+    if (!item) return;
+    item.rotation = (item.rotation + (dir === 'right' ? 90 : -90)) % 360;
     this.renderVoucherEditor();
   }
 
-  /** Acerca o aleja (zoom del recorte). */
+  /** Acerca o aleja (zoom del recorte) de la imagen activa. */
   zoomVoucher(dir: 'in' | 'out'): void {
+    const item = this.getItemActivo();
+    if (!item) return;
     const step = 0.15;
-    this.voucherScale = Math.min(4, Math.max(1, this.voucherScale + (dir === 'in' ? step : -step)));
+    item.scale = Math.min(4, Math.max(1, item.scale + (dir === 'in' ? step : -step)));
     this.renderVoucherEditor();
   }
 
-  /** Reinicia rotación, zoom y posición. */
+  /** Reinicia rotación, zoom y posición de la imagen activa. */
   resetVoucher(): void {
-    this.voucherRotation = 0;
-    this.voucherScale = 1;
-    this.voucherPanX = 0;
-    this.voucherPanY = 0;
+    const item = this.getItemActivo();
+    if (!item) return;
+    item.rotation = 0;
+    item.scale = 1;
+    item.panX = 0;
+    item.panY = 0;
     this.renderVoucherEditor();
   }
 
@@ -349,13 +409,15 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
 
   onPanMove(event: MouseEvent | TouchEvent): void {
     if (!this.dragging) return;
+    const item = this.getItemActivo();
+    if (!item) return;
     const pt = this.getPointer(event);
     const dx = pt.x - this.dragStartX;
     const dy = pt.y - this.dragStartY;
     this.dragStartX = pt.x;
     this.dragStartY = pt.y;
-    this.voucherPanX += dx;
-    this.voucherPanY += dy;
+    item.panX += dx;
+    item.panY += dy;
     this.renderVoucherEditor();
     event.preventDefault();
   }
@@ -376,30 +438,69 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   cancelarEditarVoucher(): void {
     this.editandoVoucher = false;
     this.voucherPago = null;
-    this.voucherFile = null;
-    this.voucherImgUrl = null;
-    this.loadedImage = null;
+    this.voucherItems = [];
+    this.voucherIndex = 0;
   }
 
-  /** Genera el blob recortado y sube el nuevo voucher con fecha/número de operación. */
-  guardarVoucher(): void {
-    if (!this.voucherPago || !this.voucherFile || this.subiendoVoucher) return;
-    const canvas = this.voucherCanvas?.nativeElement;
-    if (!canvas) return;
+  /** Convierte el canvas (recorte/rotación) de un item en un archivo. */
+  private itemToFile(item: VoucherEditItem, index: number): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const canvas = this.voucherCanvas?.nativeElement;
+      if (!canvas) { reject(new Error('Canvas no disponible')); return; }
 
-    // Convierte el canvas (recorte/rotación) en un archivo de imagen
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        this.toastr.error('No se pudo generar la imagen recortada', 'Error');
-        return;
+      // Renderiza el item específico en el canvas y lo exporta
+      const W = 420;
+      const H = 300;
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas 2D no disponible')); return; }
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      const img = item.image;
+      const baseScale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+      const drawW = img.naturalWidth * baseScale * item.scale;
+      const drawH = img.naturalHeight * baseScale * item.scale;
+
+      ctx.save();
+      ctx.translate(W / 2 + item.panX, H / 2 + item.panY);
+      ctx.rotate((item.rotation * Math.PI) / 180);
+      const cos = Math.abs(Math.cos((item.rotation * Math.PI) / 180));
+      const sin = Math.abs(Math.sin((item.rotation * Math.PI) / 180));
+      const boxW = drawW * cos + drawH * sin;
+      const boxH = drawW * sin + drawH * cos;
+      ctx.drawImage(img, -boxW / 2, -boxH / 2, boxW, boxH);
+      ctx.restore();
+
+      canvas.toBlob((blob) => {
+        if (!blob) { reject(new Error('No se pudo generar la imagen')); return; }
+        const name = item.file.name || `voucher-${index + 1}.jpg`;
+        resolve(new File([blob], name, { type: 'image/jpeg' }));
+      }, 'image/jpeg', 0.92);
+    });
+  }
+
+  /** Genera los blobs recortados y sube todos los vouchers con fecha/número de operación. */
+  async guardarVoucher(): Promise<void> {
+    if (!this.voucherPago || this.voucherItems.length === 0 || this.subiendoVoucher) return;
+    this.subiendoVoucher = true;
+    try {
+      const archivos: File[] = [];
+      for (let i = 0; i < this.voucherItems.length; i++) {
+        archivos.push(await this.itemToFile(this.voucherItems[i], i));
       }
-      const croppedFile = new File([blob], this.voucherFile!.name, { type: 'image/jpeg' });
-      this.subirVoucher(this.voucherPago!, croppedFile);
-    }, 'image/jpeg', 0.92);
+      this.subirVoucher(this.voucherPago, archivos);
+    } catch (e) {
+      this.toastr.error('No se pudo generar el recorte de alguna foto', 'Error');
+      this.subiendoVoucher = false;
+    }
   }
 
-  /** Llama al backend para actualizar el pago y reemplazar su voucher. */
-  private subirVoucher(pago: PagoLetraResponse, file: File): void {
+  /** Llama al backend para actualizar el pago y reemplazar sus vouchers (todos). */
+  private subirVoucher(pago: PagoLetraResponse, files: File[]): void {
     if (this.subiendoVoucher) return;
     this.subiendoVoucher = true;
 
@@ -413,9 +514,9 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
       observaciones: pago.observaciones
     };
 
-    this.pagoService.actualizarPago(pago.idPago, request, [file]).subscribe({
+    this.pagoService.actualizarPago(pago.idPago, request, files).subscribe({
       next: () => {
-        this.toastr.success('Voucher actualizado correctamente', 'Éxito');
+        this.toastr.success(`Voucher${files.length > 1 ? 's' : ''} actualizado correctamente`, 'Éxito');
         this.subiendoVoucher = false;
         this.cancelarEditarVoucher();
         this.cargarPagos();

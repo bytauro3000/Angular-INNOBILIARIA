@@ -281,6 +281,106 @@ $border-color: #e9ecef;
   overflow-y: auto;
 }
 
+// ── Galería de fotos del voucher ──────────────────────────────────────────
+.voucher-gallery {
+  margin-bottom: 14px;
+
+  .voucher-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .voucher-thumb {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid $border-color;
+    cursor: pointer;
+    padding: 0;
+    background: white;
+    flex-shrink: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-num {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      background: rgba(15, 23, 42, 0.75);
+      color: white;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      background: rgba(220, 38, 38, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+
+      &:hover { background: $red; }
+    }
+
+    &:hover .thumb-remove { opacity: 1; }
+
+    &.active {
+      border-color: $navy;
+      box-shadow: 0 0 0 3px rgba($navy, 0.2);
+    }
+  }
+
+  .voucher-thumb-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #cbd5e1;
+    color: $text-light;
+    font-size: 1.4rem;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $navy;
+      color: $navy;
+      background: #f0f5ff;
+    }
+  }
+
+  .voucher-gallery-info {
+    margin-top: 8px;
+    font-size: 0.74rem;
+    color: $text-light;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    i { color: $navy; }
+  }
+}
+
 .voucher-viewport {
   position: relative;
   width: 100%;

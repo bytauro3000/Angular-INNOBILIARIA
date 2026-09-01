@@ -96,8 +96,8 @@
         <button type="button" class="btn-cancel" (click)="cerrarModal()">Cerrar</button>
       </div>
 
-      <!-- Selector de archivo oculto para reemplazar el voucher -->
-      <input #fileVoucher type="file" accept="image/*" style="display:none"
+      <!-- Selector de archivo oculto para reemplazar el voucher (soporta múltiples) -->
+      <input #fileVoucher type="file" accept="image/*" multiple style="display:none"
              (change)="onVoucherSeleccionado($event)" />
     </div>
   </div>
@@ -119,6 +119,32 @@
     </div>
 
     <div class="voucher-editor-body">
+      <!-- Galería de fotos del voucher (varias fotos si el pago fue en partes) -->
+      <div class="voucher-gallery" *ngIf="voucherItems.length > 0">
+        <div class="voucher-thumbs">
+          <div *ngFor="let item of voucherItems; let i = index"
+               class="voucher-thumb"
+               [class.active]="i === voucherIndex"
+               (click)="seleccionarVoucherItem(i)"
+               title="Editar esta foto">
+            <img [src]="item.url" alt="Foto {{ i + 1 }}" />
+            <span class="thumb-num">{{ i + 1 }}</span>
+            <button class="thumb-remove" (click)="quitarVoucherItem(i); $event.stopPropagation()"
+                    title="Quitar foto">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <button class="voucher-thumb voucher-thumb-add" (click)="agregarVoucherFoto()"
+                  title="Agregar otra foto del voucher">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+        <div class="voucher-gallery-info">
+          <i class="bi bi-images"></i> {{ voucherItems.length }} foto{{ voucherItems.length !== 1 ? 's' : '' }}
+          — {{ voucherIndex + 1 }}/{{ voucherItems.length }}
+        </div>
+      </div>
+
       <!-- Vista previa: canvas recortable (recorte = área visible del canvas) -->
       <div class="voucher-viewport"
            #voucherViewport
@@ -170,8 +196,8 @@
 
     <div class="voucher-editor-foot">
       <button class="voucher-btn-cancel" (click)="cancelarEditarVoucher()">Cancelar</button>
-      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher">
-        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' }}
+      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher || voucherItems.length === 0">
+        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' + (voucherItems.length > 1 ? 's' : '') }}
       </button>
     </div>
   </div>
