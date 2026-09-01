@@ -163,6 +163,9 @@
         <button class="btn-icon btn-pdf" title="Descargar PDF" (click)="descargarComprobante(pago)">
           <i class="fas fa-file-pdf"></i> PDF
         </button>
+        <button class="btn-icon btn-nc-pdf" title="Descargar Nota de Crédito" *ngIf="pago.anulado" (click)="descargarNotaCredito(pago)">
+          <i class="fas fa-file-invoice"></i> PDF Anulado
+        </button>
         <button class="btn-icon btn-anular" title="Anular" *ngIf="!pago.anulado && !puedeAnularConSunat(pago)" (click)="abrirModalAnular(pago)">
           <i class="fas fa-ban"></i> Anular
         </button>

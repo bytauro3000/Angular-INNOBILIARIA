@@ -582,6 +582,11 @@ $accent-light: color.adjust($accent, $lightness: 35%);
         border: 1px solid $danger;
         &:hover { background: $danger; color: white; }
       }
+      &.btn-nc-pdf {
+        color: $danger;
+        border: 1px solid $danger;
+        &:hover { background: $danger; color: white; }
+      }
       &:active { transform: scale(0.97); }
     }
   }
