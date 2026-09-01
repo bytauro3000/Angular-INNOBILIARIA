@@ -126,11 +126,11 @@
       <!-- Datos del voucher (autollenados por OCR) -->
       <div class="voucher-fields" *ngIf="voucherPago">
         <div class="voucher-field">
-          <label>Fecha de operación (OCR: la más alta)</label>
+          <label>Fecha de operación</label>
           <input type="date" [(ngModel)]="voucherFechaOperacion" class="voucher-input" />
         </div>
         <div class="voucher-field">
-          <label>Número de operación (OCR: separados por coma)</label>
+          <label>Número de operación</label>
           <input type="text" [(ngModel)]="voucherNumeroOperacion" class="voucher-input"
                  placeholder="N° de operación del voucher" />
         </div>
