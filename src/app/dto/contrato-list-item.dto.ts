@@ -21,6 +21,7 @@ export interface ClienteSimpleDTO {
   nombre: string;
   apellidos: string;
   numDoc: string;
+  tipoPropietario?: string;
 }
 
 export interface LoteSimpleDTO {

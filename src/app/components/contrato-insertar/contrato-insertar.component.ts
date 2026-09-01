@@ -12,7 +12,8 @@ import { Lote } from '../../models/lote.model';
 import { Programa } from '../../models/programa.model';
 import { Vendedor } from '../../models/vendedor.model';
 import { SeparacionDTO } from '../../dto/separacion.dto';
-import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
+import { ContratoRequestDTO, ContratoClienteRequestDTO } from '../../dto/contratorequest.dto';
+import { TipoPropietario } from '../../enums/tipopropietario.enum';
 import { PagoInicialRequestDTO } from '../../dto/pagoinicialrequest.dto';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -31,6 +32,11 @@ import { PagoLetraService } from '../../services/pagoletra.service';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
+
+/** Cliente agregado al contrato con su rol (TITULAR, AVAL, etc.). */
+export interface ClienteSeleccionado extends Cliente {
+  tipoPropietario: TipoPropietario;
+}
 
 @Component({
   selector: 'app-contrato-insertar',
@@ -61,8 +67,10 @@ export class ContratoInsertarComponent implements OnInit {
   vendedores: Vendedor[] = [];
   clientes: Cliente[] = [];
   separaciones: SeparacionDTO[] = [];
-  clientesSeleccionados: Cliente[] = [];
+  clientesSeleccionados: ClienteSeleccionado[] = [];
   lotesSeleccionados: Lote[] = [];
+
+  tipoPropietarioOptions = Object.values(TipoPropietario);
 
   modalidadContratoValues = ['DIRECTO', 'SEPARACION'];
   tipoContratoValues = ['CONTADO', 'FINANCIADO'];
@@ -600,7 +608,8 @@ export class ContratoInsertarComponent implements OnInit {
   }
   seleccionarCliente(c: Cliente) {
     if (!this.clientesSeleccionados.some(s => s.idCliente === c.idCliente)) {
-      this.clientesSeleccionados.push(c); this.actualizarIdsClientes();
+      this.clientesSeleccionados.push({ ...c, tipoPropietario: TipoPropietario.TITULAR });
+      this.actualizarIdsClientes();
     }
     this.filtroCliente = ''; this.clientesFiltrados = [];
     setTimeout(() => { this.mostrarClientes = false; }, 0);
@@ -609,8 +618,15 @@ export class ContratoInsertarComponent implements OnInit {
     this.clientesSeleccionados = this.clientesSeleccionados.filter(c => c.idCliente !== id);
     this.actualizarIdsClientes();
   }
+  cambiarRolCliente(id: number, rol: TipoPropietario) {
+    const c = this.clientesSeleccionados.find(c => c.idCliente === id);
+    if (c) { c.tipoPropietario = rol; this.actualizarIdsClientes(); }
+  }
   private actualizarIdsClientes() {
     this.contratoForm.get('idClientes')?.setValue(this.clientesSeleccionados.map(c => c.idCliente));
+  }
+  private getClientesRequest(): ContratoClienteRequestDTO[] {
+    return this.clientesSeleccionados.map(c => ({ idCliente: c.idCliente, tipoPropietario: c.tipoPropietario }));
   }
 
   filtrarLotes() {
@@ -657,7 +673,12 @@ export class ContratoInsertarComponent implements OnInit {
         if (!res) return;
         this.contratoForm.get('montoTotal')?.setValue(res.monto || 0);
         this.actualizarSaldo();
-        if (res.clientes?.length) { this.clientesSeleccionados = res.clientes.map((i: any) => i.cliente).filter(Boolean); this.actualizarIdsClientes(); }
+        if (res.clientes?.length) {
+          this.clientesSeleccionados = res.clientes
+            .map((i: any) => i.cliente ? { ...i.cliente, tipoPropietario: i.tipoPropietario ?? TipoPropietario.TITULAR } : null)
+            .filter(Boolean);
+          this.actualizarIdsClientes();
+        }
         if (res.lotes?.length) {
           this.lotesSeleccionados = res.lotes.map((i: any) => i.lote).filter(Boolean); this.actualizarIdsLotes();
           const prog = this.lotesSeleccionados[0]?.programa;
@@ -699,6 +720,7 @@ export class ContratoInsertarComponent implements OnInit {
       observaciones: v.observaciones,
       idVendedor: v.vendedorId,
       idSeparacion: v.idSeparacion,
+      clientes: this.getClientesRequest(),
       idClientes: v.idClientes,
       idLotes: v.idLotes,
       moneda: v.moneda,

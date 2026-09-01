@@ -16,7 +16,8 @@ import { Cliente } from '../../models/cliente.model';
 import { Lote } from '../../models/lote.model';
 import { Programa } from '../../models/programa.model';
 import { Vendedor } from '../../models/vendedor.model';
-import { ContratoRequestDTO } from '../../dto/contratorequest.dto';
+import { ContratoRequestDTO, ContratoClienteRequestDTO } from '../../dto/contratorequest.dto';
+import { TipoPropietario } from '../../enums/tipopropietario.enum';
 
 import { VendedorInsertar } from '../vendedor-insertar/vendedor-insertar';
 import { ClienteInsertarComponent } from '../cliente-insertar/cliente-insertar.component';
@@ -25,6 +26,11 @@ import { LotesInsertarEditar } from '../lotes-insertar-editar/lotes-insertar-edi
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { Moneda } from '../../dto/moneda.enum';
 import { TipoCambioService } from '../../services/tipo-cambio.service';
+
+/** Cliente agregado al contrato con su rol (TITULAR, AVAL, etc.). */
+export interface ClienteSeleccionado extends Cliente {
+  tipoPropietario: TipoPropietario;
+}
 
 @Component({
   selector: 'app-contrato-editar',
@@ -99,8 +105,10 @@ export class ContratoEditarComponent implements OnInit {
   programas: Programa[] = [];
   lotes: Lote[] = [];
   vendedores: Vendedor[] = [];
-  clientesSeleccionados: Cliente[] = [];
+  clientesSeleccionados: ClienteSeleccionado[] = [];
   lotesSeleccionados: Lote[] = [];
+
+  tipoPropietarioOptions = Object.values(TipoPropietario);
 
   vendedoresFiltrados: Vendedor[] = [];
   filtroVendedor: string = '';
@@ -259,7 +267,7 @@ export class ContratoEditarComponent implements OnInit {
           const prog = this.programas.find(p => p.nombrePrograma === res.lotes[0].nombrePrograma);
           if (prog) this.seleccionarPrograma(prog);
         }
-        this.clientesSeleccionados = (res.clientes || []).map((c: any) => ({ ...c } as Cliente));
+        this.clientesSeleccionados = (res.clientes || []).map((c: any) => ({ ...c, tipoPropietario: c.tipoPropietario ?? TipoPropietario.TITULAR } as ClienteSeleccionado));
         this.actualizarIdsClientes();
         this.lotesSeleccionados = (res.lotes || []).map((l: any) => ({ ...l, programa: { nombrePrograma: l.nombrePrograma } } as Lote));
         this.actualizarIdsLotes();
@@ -290,9 +298,13 @@ export class ContratoEditarComponent implements OnInit {
     if (f.length < 2) { this.clientesFiltrados = []; this.mostrarClientes = true; return; }
     this.clienteService.buscarClientesPorFiltro(f, /^\d+$/.test(f) ? 'documento' : 'nombres').subscribe(data => { this.clientesFiltrados = data.filter(c => !this.clientesSeleccionados.some(sc => sc.idCliente === c.idCliente)); this.mostrarClientes = true; });
   }
-  seleccionarCliente(c: Cliente) { this.clientesSeleccionados.push(c); this.actualizarIdsClientes(); this.filtroCliente = ''; this.clientesFiltrados = this.clientesFiltrados.filter(x => x.idCliente !== c.idCliente); setTimeout(() => { this.mostrarClientes = false; }, 0); }
+  seleccionarCliente(c: Cliente) { this.clientesSeleccionados.push({ ...c, tipoPropietario: TipoPropietario.TITULAR }); this.actualizarIdsClientes(); this.filtroCliente = ''; this.clientesFiltrados = this.clientesFiltrados.filter(x => x.idCliente !== c.idCliente); setTimeout(() => { this.mostrarClientes = false; }, 0); }
   eliminarCliente(id: number) { this.clientesSeleccionados = this.clientesSeleccionados.filter(c => c.idCliente !== id); this.actualizarIdsClientes(); }
+  cambiarRolCliente(id: number, rol: TipoPropietario) { const c = this.clientesSeleccionados.find(c => c.idCliente === id); if (c) { c.tipoPropietario = rol; this.actualizarIdsClientes(); } }
   private actualizarIdsClientes() { this.contratoForm.get('idClientes')?.setValue(this.clientesSeleccionados.map(c => c.idCliente)); }
+  private getClientesRequest(): ContratoClienteRequestDTO[] {
+    return this.clientesSeleccionados.map(c => ({ idCliente: c.idCliente, tipoPropietario: c.tipoPropietario }));
+  }
   filtrarLotes() {
     if (!this.contratoForm.get('idPrograma')?.value) { this.toastr.warning('Primero selecciona un programa', 'Atención'); return; }
     const f = this.filtroLote.toLowerCase();
@@ -352,6 +364,7 @@ export class ContratoEditarComponent implements OnInit {
       cantidadLetras: val.cantidadLetras,
       observaciones:  val.observaciones,
       idVendedor:     val.vendedorId,
+      clientes:       this.getClientesRequest(),
       idClientes:     val.idClientes,
       idLotes:        val.idLotes,
       moneda:         val.moneda || 'USD'

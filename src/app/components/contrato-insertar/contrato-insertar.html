@@ -295,6 +295,14 @@
             <ul class="selected-items-list">
               <li *ngFor="let cli of clientesSeleccionados" class="item-tag">
                 <span><i class="bi bi-person-fill"></i> {{ cli.nombre }} {{ cli.apellidos }}</span>
+                <select
+                  class="rol-cliente-select"
+                  [ngModel]="cli.tipoPropietario"
+                  [ngModelOptions]="{standalone: true}"
+                  (ngModelChange)="cambiarRolCliente(cli.idCliente, $event)"
+                  title="Tipo de propietario">
+                  <option *ngFor="let rol of tipoPropietarioOptions" [ngValue]="rol">{{ rol }}</option>
+                </select>
                 <button type="button" (click)="eliminarCliente(cli.idCliente)" title="Quitar">✕</button>
               </li>
             </ul>

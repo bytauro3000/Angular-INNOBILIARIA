@@ -20,6 +20,9 @@ export interface ReporteCronogramaPagosClientesDTO {
     cliente2Nombre: string;
     cliente2Apellidos: string;
     cliente2NumDocumento: string;
+    aval1Nombre: string;
+    aval1Apellidos: string;
+    aval1NumDocumento: string;
     lote1Manzana: string;
     lote1NumeroLote: string;
     lote1Area: number;

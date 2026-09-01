@@ -3,6 +3,7 @@ import { Distrito } from "../models/distrito.model";
 import { EstadoCivil } from "../enums/estadocivil.enum";
 import { TipoCliente } from "../enums/tipocliente.enum";
 import { EstadoCliente } from "../enums/estadocliente.enum";
+import { TipoPropietario } from "../enums/tipopropietario.enum";
 
 export interface ClienteResponseDTO {
   idCliente: number;
@@ -19,4 +20,6 @@ export interface ClienteResponseDTO {
   tipoCliente: TipoCliente;
   nacionalidad?: string;
   estado: EstadoCliente;
+  /** Rol del cliente dentro de un contrato (TITULAR, AVAL, etc.). Solo aplica en el contexto de un contrato. */
+  tipoPropietario?: TipoPropietario;
 }

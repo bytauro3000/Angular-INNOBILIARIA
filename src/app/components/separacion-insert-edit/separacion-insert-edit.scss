@@ -278,6 +278,18 @@ $error-bg:    #fff5f5;
 
     span { display: flex; align-items: center; gap: 5px; i { color: $navy-light; font-size: 0.75rem; } }
 
+    .rol-cliente-select {
+      margin: 0 6px;
+      padding: 2px 4px;
+      font-size: 0.72rem;
+      border: 1px solid $finance-border;
+      border-radius: 5px;
+      background: #ffffff;
+      color: $text-dark;
+      cursor: pointer;
+      &:focus { outline: 2px solid rgba($navy-light, 0.35); }
+    }
+
     button {
       background: none; border: none; color: $error;
       cursor: pointer; font-size: 0.78rem; padding: 0 3px;

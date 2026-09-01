@@ -118,6 +118,14 @@
             <ul class="selected-items-list">
               <li *ngFor="let sc of separacion.clientes" class="item-tag">
                 <span><i class="bi bi-person"></i> {{ sc.cliente.nombre }} {{ sc.cliente.apellidos }}</span>
+                <select
+                  class="rol-cliente-select"
+                  [ngModel]="sc.tipoPropietario"
+                  [ngModelOptions]="{standalone: true}"
+                  (ngModelChange)="cambiarRolCliente(sc.cliente.idCliente, $event)"
+                  title="Tipo de propietario">
+                  <option *ngFor="let rol of tipoPropietarioOptions" [ngValue]="rol">{{ rol }}</option>
+                </select>
                 <button type="button" (click)="quitarCliente(sc.cliente.idCliente)">✕</button>
               </li>
             </ul>

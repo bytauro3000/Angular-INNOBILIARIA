@@ -167,6 +167,15 @@ export class SeparacionInsertEdit implements OnInit {
     this.mostrarClientes = false;
   }
 
+  cambiarRolCliente(id: number, rol: TipoPropietario) {
+    const sc = this.separacion.clientes.find(s => s.cliente.idCliente === id);
+    if (sc) sc.tipoPropietario = rol;
+  }
+
+  get tipoPropietarioOptions(): TipoPropietario[] {
+    return Object.values(TipoPropietario);
+  }
+
   filtrarVendedores() {
     const f = this.filtroVendedor.toLowerCase();
     this.vendedoresFiltrados = this.vendedores.filter(v => `${v.nombre} ${v.apellidos}`.toLowerCase().includes(f) || v.dni.includes(f));

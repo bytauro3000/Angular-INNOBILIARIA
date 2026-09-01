@@ -111,7 +111,10 @@
             <!-- Clientes -->
             <td class="col-cliente" data-label="Cliente(s)">
               <div class="multi-item-container">
-                <div *ngFor="let cliente of contrato.clientes">{{ cliente.nombre }} {{ cliente.apellidos }}</div>
+                <div *ngFor="let cliente of contrato.clientes">
+                  {{ cliente.nombre }} {{ cliente.apellidos }}
+                  <span *ngIf="cliente.tipoPropietario && cliente.tipoPropietario !== 'TITULAR'" class="rol-cliente-badge">{{ cliente.tipoPropietario }}</span>
+                </div>
               </div>
             </td>
 

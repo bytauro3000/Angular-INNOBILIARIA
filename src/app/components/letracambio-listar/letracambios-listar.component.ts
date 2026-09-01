@@ -459,6 +459,30 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
           const dniY = y + 5 + (nombreLines.length * lineHeight);
           doc.text(`DNI: ${reporte[0].cliente1NumDocumento}`, centerX, dniY, { align: 'center' });
         }
+
+        // --- FIRMA DEL AVAL (si existe) ---
+        if (reporte[0].aval1Nombre) {
+          const maxLines = Math.max(
+            (reporte[0].cliente2Nombre
+              ? doc.splitTextToSize(`${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`.toUpperCase(), maxWidth).length
+              : doc.splitTextToSize(`${reporte[0].cliente1Nombre} ${reporte[0].cliente1Apellidos ?? ''}`.toUpperCase(), maxWidth).length),
+            reporte[0].cliente2Nombre
+              ? doc.splitTextToSize(`${reporte[0].cliente2Nombre} ${reporte[0].cliente2Apellidos ?? ''}`.toUpperCase(), maxWidth).length
+              : 0
+          );
+          const firmaAvalY = y + 5 + (maxLines * lineHeight) + 10;
+          const centerAval = pageWidth / 2;
+          const nombreAval = `${reporte[0].aval1Nombre} ${reporte[0].aval1Apellidos ?? ''}`.toUpperCase();
+          const nombreAvalLines = doc.splitTextToSize(nombreAval, maxWidth);
+
+          doc.line(centerAval - (anchoLinea / 2), firmaAvalY, centerAval + (anchoLinea / 2), firmaAvalY);
+          nombreAvalLines.forEach((line: string, i: number) => {
+            doc.text(line, centerAval, firmaAvalY + 5 + (i * lineHeight), { align: 'center' });
+          });
+          const dniAvalY = firmaAvalY + 5 + (nombreAvalLines.length * lineHeight);
+          doc.text(`DNI: ${reporte[0].aval1NumDocumento ?? ''}`, centerAval, dniAvalY, { align: 'center' });
+          doc.text('LA AVAL', centerAval, dniAvalY + 5, { align: 'center' });
+        }
         const pageCount = (doc.internal as any).getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
           doc.setPage(i);
@@ -527,19 +551,39 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     doc.setFont('times', 'bold');
     doc.text('Datos del Cliente', margin, y);
     doc.setFont('times', 'normal');
-    doc.text(`Nombre 1: ${data.cliente1Nombre} ${data.cliente1Apellidos ?? ''}`, margin, y + 5);
-    doc.text(`DNI: ${data.cliente1NumDocumento}`, 145, y + 5);
-    doc.text(`Dirección: ${data.cliente1Direccion}`, margin, y + 15);
-    doc.text(`Distrito: ${data.cliente1Distrito}`, 145, y + 15);
-    doc.text(`Celular: ${data.cliente1Celular}`, 145, y);
-    doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, y + 20);
 
-    doc.setFont('times', 'normal');
-    doc.text(`Nombre 2: ${data.cliente2Nombre ?? ''} ${data.cliente2Apellidos ?? ''}`, margin, y + 10);
-    doc.text(`DNI: ${data.cliente2NumDocumento ?? ''}`, 145, y + 10);
+    // Fila dinámica: cliente1 → cliente2 (si existe) → aval (si existe),
+    // contiguas, sin dejar espacio en blanco entre ellas.
+    let filaY = y + 5;
+
+    // ── Cliente 1 (siempre) ──
+    doc.text(`Nombre 1: ${data.cliente1Nombre} ${data.cliente1Apellidos ?? ''}`, margin, filaY);
+    doc.text(`DNI: ${data.cliente1NumDocumento}`, 145, filaY);
+    filaY += 5;
+
+    // ── Cliente 2 (solo si existe) ──
+    if (data.cliente2Nombre) {
+      doc.text(`Nombre 2: ${data.cliente2Nombre} ${data.cliente2Apellidos ?? ''}`, margin, filaY);
+      doc.text(`DNI: ${data.cliente2NumDocumento ?? ''}`, 145, filaY);
+      filaY += 5;
+    }
+
+    // ── Aval (solo si existe) — va en la fila siguiente al último cliente ──
+    if (data.aval1Nombre) {
+      doc.text(`Aval: ${data.aval1Nombre} ${data.aval1Apellidos ?? ''}`, margin, filaY);
+      doc.text(`DNI: ${data.aval1NumDocumento ?? ''}`, 145, filaY);
+      filaY += 5;
+    }
+
+    // Datos de contacto del cliente 1 (debajo de las filas de personas)
+    doc.text(`Dirección: ${data.cliente1Direccion}`, margin, filaY);
+    doc.text(`Distrito: ${data.cliente1Distrito}`, 145, filaY);
+    filaY += 5;
+    doc.text(`Celular: ${data.cliente1Celular}`, 145, filaY);
+    doc.text(`Teléfono: ${data.cliente1Telefono}`, 145, filaY + 5);
 
     // Información del lote
-    y += 20;
+    y = filaY + 15;
     doc.setFont('times', 'bold');
     doc.text('Datos del Lote', margin, y);
     doc.setFont('times', 'normal');
