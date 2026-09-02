@@ -24,7 +24,8 @@
         <button class="btn-buscar" (click)="buscarYResaltar()" title="Buscar y resaltar (la lista permanece intacta)">
           <i class="fas fa-search"></i> Buscar
         </button>
-        <button class="btn-clear-inline" (click)="limpiarBusqueda()" title="Limpiar filtros"
+        <button class="btn-clear-inline" *ngIf="programaSeleccionado || manzanaBusqueda || numeroLoteBusqueda"
+          (click)="limpiarBusqueda()" title="Limpiar filtros"
           [class.active]="programaSeleccionado || manzanaBusqueda || numeroLoteBusqueda">
           <i class="fas fa-times"></i>
         </button>
