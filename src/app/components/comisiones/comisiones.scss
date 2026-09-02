@@ -29,6 +29,7 @@ $bg-white:   #ffffff;
 }
 
 .com-title-block {
+  min-width: 0;
   .com-titulo {
     display: flex;
     align-items: center;
@@ -52,24 +53,29 @@ $bg-white:   #ffffff;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 // ── Buscador por Programa + MZ + LT (resalta, no filtra) ─────────────────────
 .busqueda-lote {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 4px;
+  flex-wrap: nowrap;
 
   .select-programa {
     padding: 8px 10px;
     border: 1px solid $border;
     border-radius: 6px;
     font-size: .82rem;
-    min-width: 180px;
-    max-width: 240px;
+    width: 160px;
+    min-width: 0;
+    max-width: 160px;
     background: $bg-white;
     outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
   }
   .input-lote {
@@ -77,7 +83,7 @@ $bg-white:   #ffffff;
     border: 1px solid $border;
     border-radius: 6px;
     font-size: .82rem;
-    width: 70px;
+    width: 56px;
     text-align: center;
     outline: none;
     &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
@@ -85,8 +91,8 @@ $bg-white:   #ffffff;
   .btn-buscar {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 4px;
+    padding: 8px 10px;
     border: 1px solid $navy;
     background: $navy;
     color: #fff;
@@ -100,8 +106,8 @@ $bg-white:   #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border: 1px solid $border;
     background: $bg-white;
     border-radius: 6px;
