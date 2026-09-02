@@ -430,32 +430,48 @@ $bg-white:   #ffffff;
     flex-wrap: wrap;
   }
 
-  .input-monto {
+.input-monto {
+  display: flex;
+  align-items: center;
+  border: 1px solid $border;
+  border-radius: 6px;
+  background: $bg-white;
+  overflow: hidden;
+  .input-simbolo {
+    padding: 0 10px;
+    font-size: .9rem;
+    color: $text-light;
+    background: #f1f5f9;
+    align-self: stretch;
     display: flex;
     align-items: center;
-    border: 1px solid $border;
-    border-radius: 6px;
-    background: $bg-white;
-    overflow: hidden;
-    .input-simbolo {
-      padding: 0 10px;
-      font-size: .9rem;
-      color: $text-light;
-      background: #f1f5f9;
-      align-self: stretch;
-      display: flex;
-      align-items: center;
-      border-right: 1px solid $border;
-    }
-    input {
-      border: none;
-      outline: none;
-      padding: 8px 10px;
-      font-size: .9rem;
-      width: 130px;
-      color: $text-dark;
-    }
+    border-right: 1px solid $border;
   }
+  input {
+    border: none;
+    outline: none;
+    padding: 8px 10px;
+    font-size: .9rem;
+    width: 130px;
+    color: $text-dark;
+  }
+}
+
+// Campo de monto con el símbolo de moneda DENTRO del input (formato contrato)
+.input-monto-currency {
+  padding: 8px 12px;
+  border: 1px solid $border;
+  border-radius: 6px;
+  font-size: .9rem;
+  width: 170px;
+  color: $text-dark;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  &:focus {
+    border-color: $navy;
+    box-shadow: 0 0 0 3px rgba($navy, .12);
+  }
+}
 }
 
 .btn-registrar {

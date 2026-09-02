@@ -156,16 +156,16 @@
             </span>
           </div>
           <div class="acordado-controls">
-            <div class="input-monto">
-              <span class="input-simbolo">{{ simbolo(c.moneda) }}</span>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                [value]="montoAcordado(c)"
-                (input)="setMontoAcordado(c, $any($event.target).value)"
-                title="Monto de comisión acordado (editable)" />
-            </div>
+            <input
+              type="text"
+              inputmode="decimal"
+              class="input-monto-currency"
+              [ngModel]="montoAcordado(c)"
+              (ngModelChange)="setMontoAcordado(c, $event)"
+              [ngModelOptions]="{standalone: true}"
+              appCurrencyFormatter
+              [currencySymbol]="simbolo(c.moneda) + ' '"
+              title="Monto de comisión acordado (editable)" />
             <button class="btn-registrar btn-guardar-monto" (click)="guardarMontoAcordado(c)" [disabled]="registrando">
               <i class="fas fa-save"></i> Guardar Monto
             </button>
@@ -183,16 +183,16 @@
             ({{ c.cantidadLetrasPagadas }} letra(s) pagada(s)).
           </div>
           <div class="adelanto-controls">
-            <div class="input-monto">
-              <span class="input-simbolo">{{ simbolo(c.moneda) }}</span>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                [value]="montoAdelanto(c)"
-                (input)="setMontoAdelanto(c, $any($event.target).value)"
-                title="Monto del adelanto (editable)" />
-            </div>
+            <input
+              type="text"
+              inputmode="decimal"
+              class="input-monto-currency"
+              [ngModel]="montoAdelanto(c)"
+              (ngModelChange)="setMontoAdelanto(c, $event)"
+              [ngModelOptions]="{standalone: true}"
+              appCurrencyFormatter
+              [currencySymbol]="simbolo(c.moneda) + ' '"
+              title="Monto del adelanto (editable)" />
             <button class="btn-registrar" (click)="registrarAdelanto(c)" [disabled]="registrando">
               <i class="fas fa-money-bill-wave"></i> Registrar Adelanto
             </button>

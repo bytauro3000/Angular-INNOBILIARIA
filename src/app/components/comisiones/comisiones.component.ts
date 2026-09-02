@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ComisionVendedorService } from '../../services/comision-vendedor.service';
 import { ProgramaService } from '../../services/programa.service';
 import { Programa } from '../../models/programa.model';
+import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import {
   ComisionVendedorDTO,
   PagoComisionMensualDTO
@@ -13,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-comisiones',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CurrencyFormatterDirective],
   templateUrl: './comisiones.html',
   styleUrls: ['./comisiones.scss']
 })
@@ -211,7 +212,7 @@ export class ComisionesComponent implements OnInit {
     return this.adelantoEditable.get(c.idComision)!;
   }
 
-  setMontoAdelanto(c: ComisionVendedorDTO, valor: string): void {
+  setMontoAdelanto(c: ComisionVendedorDTO, valor: any): void {
     this.adelantoEditable.set(c.idComision, Number(valor) || 0);
   }
 
@@ -229,7 +230,7 @@ export class ComisionesComponent implements OnInit {
     return this.montoAcordadoEditable.get(c.idComision)!;
   }
 
-  setMontoAcordado(c: ComisionVendedorDTO, valor: string): void {
+  setMontoAcordado(c: ComisionVendedorDTO, valor: any): void {
     this.montoAcordadoEditable.set(c.idComision, Number(valor) || 0);
   }
 
