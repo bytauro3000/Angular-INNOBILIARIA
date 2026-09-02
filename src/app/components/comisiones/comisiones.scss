@@ -269,10 +269,10 @@ $bg-white:   #ffffff;
       font-size: .78rem;
       color: $text-light;
       display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 640px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      line-height: 1.35;
     }
   }
 
@@ -514,7 +514,7 @@ $bg-white:   #ffffff;
     flex-direction: column;
     align-items: flex-start;
     .comision-header-right { width: 100%; justify-content: space-between; }
-    .com-datos .com-detalle { max-width: 220px; }
+    .com-datos .com-detalle { max-width: 100%; }
   }
   .com-detalles { grid-template-columns: 1fr; }
   .mensuales-footer { flex-direction: column; align-items: stretch; }
