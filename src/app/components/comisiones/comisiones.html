@@ -139,6 +139,32 @@
           </div>
         </div>
 
+        <!-- Monto acordado (negociado por el gerente) — editable mientras no haya pagos -->
+        <div class="com-monto-acordado" *ngIf="puedeEditarMonto(c)">
+          <div class="acordado-msg">
+            <i class="fas fa-handshake"></i>
+            <span>
+              Monto de comisión acordado (máximo el 3% del contrato:
+              <strong>{{ simbolo(c.moneda) }} {{ maximoComision(c) | number:'1.2-2' }}</strong>)
+            </span>
+          </div>
+          <div class="acordado-controls">
+            <div class="input-monto">
+              <span class="input-simbolo">{{ simbolo(c.moneda) }}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                [value]="montoAcordado(c)"
+                (input)="setMontoAcordado(c, $any($event.target).value)"
+                title="Monto de comisión acordado (editable)" />
+            </div>
+            <button class="btn-registrar btn-guardar-monto" (click)="guardarMontoAcordado(c)" [disabled]="registrando">
+              <i class="fas fa-save"></i> Guardar Monto
+            </button>
+          </div>
+        </div>
+
         <!-- Adelanto habilitado -->
         <div *ngIf="c.adelantoHabilitado" class="com-adelanto">
           <div class="adelanto-msg">

@@ -28,6 +28,8 @@ export class ComisionesComponent implements OnInit {
   pagosPorComision: Map<number, PagoComisionMensualDTO[]> = new Map();
   /** Monto editable del adelanto (por comisión). */
   adelantoEditable: Map<number, number> = new Map();
+  /** Monto acordado editable (negociado por el gerente) por comisión. */
+  montoAcordadoEditable: Map<number, number> = new Map();
   /** Registrando para evitar doble clic. */
   registrando: boolean = false;
 
@@ -63,6 +65,7 @@ export class ComisionesComponent implements OnInit {
         this.expandidas = new Set();
         this.pagosPorComision = new Map();
         this.adelantoEditable = new Map();
+        this.montoAcordadoEditable = new Map();
       },
       error: () => {
         this.toastr.error('Error al cargar las comisiones', 'Error');
@@ -207,6 +210,56 @@ export class ComisionesComponent implements OnInit {
 
   setMontoAdelanto(c: ComisionVendedorDTO, valor: string): void {
     this.adelantoEditable.set(c.idComision, Number(valor) || 0);
+  }
+
+  // ── Monto acordado (negociado por el gerente) ─────────────────────────────
+
+  /** Máximo permitido: 3% del monto total del contrato. */
+  maximoComision(c: ComisionVendedorDTO): number {
+    return Math.floor((c.montoTotalContrato || 0) * 0.03);
+  }
+
+  montoAcordado(c: ComisionVendedorDTO): number {
+    if (!this.montoAcordadoEditable.has(c.idComision)) {
+      this.montoAcordadoEditable.set(c.idComision, c.montoComisionTotal || 0);
+    }
+    return this.montoAcordadoEditable.get(c.idComision)!;
+  }
+
+  setMontoAcordado(c: ComisionVendedorDTO, valor: string): void {
+    this.montoAcordadoEditable.set(c.idComision, Number(valor) || 0);
+  }
+
+  /** Editable solo mientras NO haya pagos registrados (estado PENDIENTE sin adelanto). */
+  puedeEditarMonto(c: ComisionVendedorDTO): boolean {
+    return c.estado === 'PENDIENTE' && c.montoAdelanto == null;
+  }
+
+  guardarMontoAcordado(c: ComisionVendedorDTO): void {
+    if (this.registrando) return;
+    const monto = this.montoAcordado(c);
+    const maximo = this.maximoComision(c);
+    if (!monto || monto <= 0) {
+      this.toastr.warning('Ingrese un monto mayor a 0', 'Atención');
+      return;
+    }
+    if (monto > maximo) {
+      this.toastr.warning(`El monto no puede superar el 3% del contrato (${this.simbolo(c.moneda)} ${maximo})`, 'Atención');
+      return;
+    }
+    this.registrando = true;
+    this.comisionService.actualizarMontoComision(c.idComision, monto).subscribe({
+      next: (actualizado) => {
+        this.registrando = false;
+        this.toastr.success('Monto de comisión actualizado', 'Éxito');
+        const idx = this.comisiones.findIndex(x => x.idComision === c.idComision);
+        if (idx >= 0) this.comisiones[idx] = actualizado;
+      },
+      error: (err) => {
+        this.registrando = false;
+        this.toastr.error(this.extraerError(err), 'Error');
+      }
+    });
   }
 
   registrarAdelanto(c: ComisionVendedorDTO): void {

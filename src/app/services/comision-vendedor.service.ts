@@ -29,6 +29,10 @@ export class ComisionVendedorService {
     return this.http.post<PagoComisionResultadoDTO>(`${this.apiUrl}/adelantos`, request);
   }
 
+  actualizarMontoComision(idComision: number, monto: number): Observable<ComisionVendedorDTO> {
+    return this.http.put<ComisionVendedorDTO>(`${this.apiUrl}/monto`, { idComision, monto });
+  }
+
   registrarPagosMensuales(request: RegistrarPagosMensualesRequest): Observable<PagoComisionResultadoDTO> {
     return this.http.post<PagoComisionResultadoDTO>(`${this.apiUrl}/pagos`, request);
   }
