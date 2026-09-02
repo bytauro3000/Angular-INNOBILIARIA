@@ -17,6 +17,7 @@ export interface ComisionVendedorDTO {
   montoAdelantoSugerido: number;
   cantidadLetrasPagadas: number;
   fechaCreacion: string;
+  fechaContrato: string;
 }
 
 export interface PagoComisionMensualDTO {

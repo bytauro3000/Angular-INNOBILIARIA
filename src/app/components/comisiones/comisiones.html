@@ -103,7 +103,7 @@
           <div class="com-datos">
             <h3>{{ c.nombreVendedor }}</h3>
             <span class="com-detalle">
-              {{ c.nombreCliente }} · {{ c.programa }} · MZ {{ c.manzanas || '—' }} · LT {{ c.numeroLotes || '—' }} · Contrato #{{ c.idContrato }}
+              {{ c.nombreCliente }} · {{ c.programa }} · MZ {{ c.manzanas || '—' }} · LT {{ c.numeroLotes || '—' }} · Contrato #{{ c.idContrato }} · {{ formatFecha(c.fechaContrato) }}
             </span>
           </div>
         </div>
