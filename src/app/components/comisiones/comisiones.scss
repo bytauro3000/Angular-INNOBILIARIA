@@ -188,6 +188,12 @@ $bg-white:   #ffffff;
   .card-valor { font-size: 1.15rem; font-weight: 700; color: $text-dark; }
   .card-label { font-size: .78rem; color: $text-light; }
 
+  .card-icon-text {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
   &.card-usd .card-icon       { background: $green; }
   &.card-pen .card-icon       { background: $blue; }
   &.card-adelantos .card-icon { background: $orange; }
