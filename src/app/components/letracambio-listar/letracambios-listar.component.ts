@@ -528,6 +528,16 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     doc.line(colStarts['Vencimiento'] + colWidths['Vencimiento'], y, colStarts['Vencimiento'] + colWidths['Vencimiento'], y + 7); // Línea vertical después de la columna "Vencimiento"
   }
 
+  /** Abrevia el nombre del vendedor: quita "CONSTRUCTORA" si está presente
+   *  (ej: "INMOBILIARIA CONSTRUCTORA IVAN" → "INMOBILIARIA IVAN"). */
+  private formatearVendedor(nombre: string, apellidos: string): string {
+    const completo = `${nombre ?? ''} ${apellidos ?? ''}`.trim();
+    return completo
+      .replace(/\s+CONSTRUCTORA\s+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   // La función 'addHeader' debe ir aquí, dentro de la clase, como un método privado.
   private addHeader(doc: jsPDF, data: ReporteCronogramaPagosClientesDTO, page: number, margin: number): void {
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -544,7 +554,7 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     y += 10;
     doc.setFontSize(10);
     doc.text(`Proyecto: ${data.programaNombre}`, margin, y);
-    doc.text(`Vendedor: ${data.vendedorNombre} ${data.vendedorApellidos}`, 145, y);
+    doc.text(`Vendedor: ${this.formatearVendedor(data.vendedorNombre, data.vendedorApellidos)}`, 145, y);
 
     // Información del cliente
     y += 5;
