@@ -287,8 +287,8 @@
 </div>
 
 <!-- Modal de registro de pago de comisión -->
-<app-pago-comision-modal #pagoComisionModal
-  [comision]="modalComision!"
+<app-pago-comision-modal *ngIf="modalComision" #pagoComisionModal
+  [comision]="modalComision"
   [tipo]="modalTipo"
   [letrasHabilitadas]="modalLetras"
   (onClose)="onModalCerrado()"

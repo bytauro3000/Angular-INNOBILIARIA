@@ -297,7 +297,7 @@ export class ComisionesComponent implements OnInit {
     this.modalTipo = 'ADELANTO';
     this.modalComision = c;
     this.modalLetras = [];
-    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+    this.abrirModal();
   }
 
   /** Abre el modal para pagar las comisiones mensuales de una comisión. */
@@ -306,7 +306,7 @@ export class ComisionesComponent implements OnInit {
     this.modalTipo = 'MENSUAL';
     this.modalComision = c;
     this.modalLetras = this.pagosDe(c).filter(p => p.seleccionado);
-    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+    this.abrirModal();
   }
 
   /** Abre el modal para pagar las comisiones mensuales de varias comisiones (multi-lote). */
@@ -321,7 +321,16 @@ export class ComisionesComponent implements OnInit {
     this.modalTipo = 'MENSUAL';
     this.modalComision = seleccionadas[0];
     this.modalLetras = seleccionadas.flatMap(c => this.pagosDe(c));
-    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+    this.abrirModal();
+  }
+
+  /** Espera a que el *ngIf renderice el modal y luego lo abre. */
+  private abrirModal(): void {
+    setTimeout(() => {
+      if (this.pagoComisionModal) {
+        this.pagoComisionModal.abrir();
+      }
+    }, 60);
   }
 
   toggleSeleccionPago(c: ComisionVendedorDTO): void {

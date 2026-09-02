@@ -22,7 +22,7 @@ $bg-white:   #ffffff;
 .com-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
@@ -30,7 +30,7 @@ $bg-white:   #ffffff;
 
 .com-title-block {
   min-width: 0;
-  flex: 1 1 240px;
+  flex: 0 1 auto;
   .com-titulo {
     display: flex;
     align-items: center;
@@ -55,8 +55,9 @@ $bg-white:   #ffffff;
   gap: 10px;
   flex-wrap: wrap;
   flex-shrink: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   justify-content: flex-end;
+  margin-left: auto;
   min-width: 0;
 }
 
@@ -66,16 +67,15 @@ $bg-white:   #ffffff;
   align-items: center;
   gap: 4px;
   flex-wrap: nowrap;
-  flex: 1 1 auto;
 
   .select-programa {
     padding: 8px 10px;
     border: 1px solid $border;
     border-radius: 6px;
     font-size: .82rem;
-    flex: 1 1 240px;
+    width: 220px;
     min-width: 180px;
-    max-width: 360px;
+    max-width: 260px;
     background: $bg-white;
     outline: none;
     &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
