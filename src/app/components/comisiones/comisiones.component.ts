@@ -29,6 +29,12 @@ export class ComisionesComponent implements OnInit {
   /** Registrando para evitar doble clic. */
   registrando: boolean = false;
 
+  /** Término de búsqueda: Programa + MZ + LT (solo resalta, NO filtra). */
+  filtroBusqueda: string = '';
+  /** Id de comisión actualmente resaltada por el buscador. */
+  resaltadaId: number | null = null;
+  private resaltarTimeout: any = null;
+
   constructor(
     private comisionService: ComisionVendedorService,
     private toastr: ToastrService
@@ -53,6 +59,62 @@ export class ComisionesComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  // ── Buscador (resalta y hace scroll, NO filtra la lista) ───────────────────
+
+  /** Busca la comisión cuyo programa+MZ+LT coincide y la resalta + scroll. */
+  buscarYResaltar(): void {
+    const termino = (this.filtroBusqueda || '').trim().toLowerCase();
+    if (!termino) {
+      this.resaltadaId = null;
+      return;
+    }
+
+    // Coincidencia exacta primero; si no, coincidencia parcial (contains).
+    let encontrada = this.comisiones.find(c => this.coincidenciaExacta(c, termino))
+      || this.comisiones.find(c => this.coincidenciaParcial(c, termino));
+
+    if (!encontrada) {
+      this.resaltadaId = null;
+      this.toastr.info(`No se encontró "${this.filtroBusqueda}" en las comisiones`, 'Buscar');
+      return;
+    }
+
+    this.resaltadaId = encontrada.idComision;
+
+    // Hacer scroll hasta la tarjeta resaltada tras un tick (para que el DOM se actualice).
+    setTimeout(() => {
+      const el = document.getElementById('comision-' + encontrada.idComision);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Quitar el resaltado después de unos segundos.
+        if (this.resaltarTimeout) clearTimeout(this.resaltarTimeout);
+        this.resaltarTimeout = setTimeout(() => {
+          this.resaltadaId = null;
+        }, 3000);
+      }
+    }, 50);
+  }
+
+  private coincidenciaExacta(c: ComisionVendedorDTO, termino: string): boolean {
+    return this.claveBusqueda(c) === termino;
+  }
+
+  private coincidenciaParcial(c: ComisionVendedorDTO, termino: string): boolean {
+    return this.claveBusqueda(c).includes(termino);
+  }
+
+  /** Clave normalizada: "programa · mz · lt" en minúsculas. */
+  private claveBusqueda(c: ComisionVendedorDTO): string {
+    const p = (c.programa || '').toLowerCase();
+    const mz = (c.manzanas || '').toLowerCase();
+    const lt = (c.numeroLotes || '').toLowerCase();
+    return `${p} ${mz} ${lt}`.replace(/\s+/g, ' ').trim();
+  }
+
+  estaResaltada(idComision: number): boolean {
+    return this.resaltadaId === idComision;
   }
 
   // ── Resumen ────────────────────────────────────────────────────────────────

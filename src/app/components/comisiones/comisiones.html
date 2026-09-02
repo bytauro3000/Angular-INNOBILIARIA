@@ -11,11 +11,33 @@
       </p>
     </div>
     <div class="com-actions">
+      <div class="filtro-busqueda">
+        <i class="fas fa-search filtro-icon"></i>
+        <input
+          type="text"
+          class="filtro-input"
+          placeholder="Buscar: Programa MZ LT…"
+          [(ngModel)]="filtroBusqueda"
+          (keyup.enter)="buscarYResaltar()"
+          [ngModelOptions]="{standalone: true}"
+          title="Busca por programa + manzana + lote. Resalta la fila sin filtrar la lista." />
+        <button *ngIf="filtroBusqueda" class="filtro-clear" (click)="filtroBusqueda=''; resaltadaId=null" title="Limpiar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
       <button class="btn-actualizar" (click)="cargar()" [disabled]="cargando" title="Actualizar datos">
         <i class="fas fa-sync-alt" [class.fa-spin]="cargando"></i>
         Actualizar
       </button>
     </div>
+  </div>
+
+  <!-- Barra informativa del buscador -->
+  <div *ngIf="filtroBusqueda" class="busqueda-info">
+    <i class="fas fa-mouse-pointer"></i>
+    Buscando: <strong>{{ filtroBusqueda }}</strong>
+    <span *ngIf="resaltadaId !== null"> · resaltado en la lista (la lista permanece intacta)</span>
+    <span *ngIf="resaltadaId === null"> · presiona Enter para localizar</span>
   </div>
 
   <!-- ── Resumen general ─────────────────────────────────────────────────── -->
@@ -64,7 +86,9 @@
 
   <!-- ── Lista de comisiones ────────────────────────────────────────────── -->
   <div *ngIf="!cargando && comisiones.length > 0" class="comisiones-lista">
-    <div class="comision-bloque" *ngFor="let c of comisiones">
+    <div class="comision-bloque" *ngFor="let c of comisiones"
+         [id]="'comision-' + c.idComision"
+         [class.com-resaltada]="estaResaltada(c.idComision)">
 
       <!-- Cabecera (clic = expandir/colapsar pagos mensuales) -->
       <div class="comision-header" (click)="toggleComision(c)">

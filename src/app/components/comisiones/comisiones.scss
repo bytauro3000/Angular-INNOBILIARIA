@@ -51,6 +51,59 @@ $bg-white:   #ffffff;
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+// ── Buscador (resalta, no filtra) ────────────────────────────────────────────
+.filtro-busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .filtro-icon {
+    position: absolute;
+    left: 10px;
+    color: $text-light;
+    font-size: .85rem;
+  }
+  .filtro-input {
+    padding: 8px 34px 8px 32px;
+    border: 1px solid $border;
+    border-radius: 6px;
+    font-size: .85rem;
+    width: 240px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    &:focus {
+      border-color: $navy;
+      box-shadow: 0 0 0 3px rgba($navy, .12);
+    }
+  }
+  .filtro-clear {
+    position: absolute;
+    right: 8px;
+    border: none;
+    background: transparent;
+    color: $text-light;
+    cursor: pointer;
+    font-size: .8rem;
+    &:hover { color: $red; }
+  }
+}
+
+.busqueda-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .8rem;
+  color: $text-light;
+  background: rgba($navy, .06);
+  border: 1px dashed rgba($navy, .3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  i { color: $navy; }
+  strong { color: $navy; }
 }
 
 .btn-actualizar {
@@ -146,6 +199,12 @@ $bg-white:   #ffffff;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: box-shadow .3s, border-color .3s;
+
+  &.com-resaltada {
+    border: 2px solid $orange;
+    box-shadow: 0 0 0 4px rgba($orange, .25), 0 2px 8px rgba($orange, .3);
+  }
 }
 
 .comision-header {
