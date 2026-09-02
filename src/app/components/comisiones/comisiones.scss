@@ -73,9 +73,9 @@ $bg-white:   #ffffff;
     border: 1px solid $border;
     border-radius: 6px;
     font-size: .82rem;
-    width: 220px;
-    min-width: 180px;
-    max-width: 260px;
+    width: 300px;
+    min-width: 240px;
+    max-width: 340px;
     background: $bg-white;
     outline: none;
     &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
