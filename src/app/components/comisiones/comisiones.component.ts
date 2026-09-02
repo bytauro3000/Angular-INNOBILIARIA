@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComisionVendedorService } from '../../services/comision-vendedor.service';
 import { ProgramaService } from '../../services/programa.service';
 import { Programa } from '../../models/programa.model';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
+import { PagoComisionModal } from '../pago-comision-modal/pago-comision-modal.component';
 import {
   ComisionVendedorDTO,
   PagoComisionMensualDTO
@@ -14,11 +15,13 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-comisiones',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyFormatterDirective],
+  imports: [CommonModule, FormsModule, CurrencyFormatterDirective, PagoComisionModal],
   templateUrl: './comisiones.html',
   styleUrls: ['./comisiones.scss']
 })
 export class ComisionesComponent implements OnInit {
+
+  @ViewChild('pagoComisionModal') pagoComisionModal!: PagoComisionModal;
 
   comisiones: ComisionVendedorDTO[] = [];
   cargando = true;
@@ -35,6 +38,13 @@ export class ComisionesComponent implements OnInit {
   editandoMontoAcordado: Set<number> = new Set();
   /** Registrando para evitar doble clic. */
   registrando: boolean = false;
+
+  // ── Modal de pago de comisión ─────────────────────────────────────────────
+  modalTipo: 'ADELANTO' | 'MENSUAL' = 'ADELANTO';
+  modalComision: ComisionVendedorDTO | null = null;
+  modalLetras: PagoComisionMensualDTO[] = [];
+  /** Comisiones seleccionadas para pago mensual multi-lote. */
+  seleccionadasPago: Set<number> = new Set();
 
   // ── Filtro por Programa + MZ + LT (resalta y hace scroll, NO filtra) ────────
   programas: Programa[] = [];
@@ -279,28 +289,81 @@ export class ComisionesComponent implements OnInit {
     });
   }
 
-  registrarAdelanto(c: ComisionVendedorDTO): void {
-    if (this.registrando) return;
-    const monto = this.montoAdelanto(c);
-    if (!monto || monto <= 0) {
-      this.toastr.warning('Ingrese un monto de adelanto mayor a 0', 'Atención');
+  // ── Modal de pago (adelanto o mensual) ─────────────────────────────────────
+
+  /** Abre el modal para registrar el adelanto de la comisión. */
+  abrirModalAdelanto(c: ComisionVendedorDTO): void {
+    if (!c.adelantoHabilitado) return;
+    this.modalTipo = 'ADELANTO';
+    this.modalComision = c;
+    this.modalLetras = [];
+    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+  }
+
+  /** Abre el modal para pagar las comisiones mensuales de una comisión. */
+  abrirModalMensual(c: ComisionVendedorDTO): void {
+    if (this.pagosDe(c).length === 0) return;
+    this.modalTipo = 'MENSUAL';
+    this.modalComision = c;
+    this.modalLetras = this.pagosDe(c).filter(p => p.seleccionado);
+    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+  }
+
+  /** Abre el modal para pagar las comisiones mensuales de varias comisiones (multi-lote). */
+  abrirModalPagarSeleccionadas(): void {
+    const seleccionadas = this.comisiones.filter(c => this.seleccionadasPago.has(c.idComision));
+    if (seleccionadas.length === 0) {
+      this.toastr.warning('Seleccione al menos una comisión', 'Atención');
       return;
     }
-    this.registrando = true;
-    this.comisionService.registrarAdelanto({
-      idComision: c.idComision,
-      monto
-    }).subscribe({
-      next: (res) => {
-        this.registrando = false;
-        this.toastr.success(`Adelanto registrado (${res.numerosEgreso[0]})`, 'Éxito');
-        this.cargar();
-      },
-      error: (err) => {
-        this.registrando = false;
-        this.toastr.error(this.extraerError(err), 'Error');
+    // Multi-lote: toma la primera comisión para el contexto del modal; el backend
+    // genera UN solo egreso con el detalle de todos los lotes.
+    this.modalTipo = 'MENSUAL';
+    this.modalComision = seleccionadas[0];
+    this.modalLetras = seleccionadas.flatMap(c => this.pagosDe(c));
+    setTimeout(() => this.pagoComisionModal?.abrir(), 0);
+  }
+
+  toggleSeleccionPago(c: ComisionVendedorDTO): void {
+    if (this.seleccionadasPago.has(c.idComision)) {
+      this.seleccionadasPago.delete(c.idComision);
+    } else {
+      this.seleccionadasPago.add(c.idComision);
+    }
+  }
+
+  onModalCerrado(): void {
+    this.modalComision = null;
+    this.modalLetras = [];
+  }
+
+  onPagoComisionExitoso(): void {
+    this.seleccionadasPago.clear();
+    this.cargar();
+  }
+
+  estaSeleccionadaPago(c: ComisionVendedorDTO): boolean {
+    return this.seleccionadasPago.has(c.idComision);
+  }
+
+  get tieneSeleccionPago(): boolean {
+    return this.seleccionadasPago.size > 0;
+  }
+
+  get totalSeleccionadoPago(): number {
+    let total = 0;
+    this.comisiones.forEach(c => {
+      if (this.seleccionadasPago.has(c.idComision)) {
+        total += this.pagosDe(c).reduce((s, p) => s + (p.montoComision || 0), 0);
       }
     });
+    return total;
+  }
+
+  /** Símbolo de moneda de la primera comisión seleccionada (para la barra de pago). */
+  get simboloSeleccionPago(): string {
+    const primera = this.comisiones.find(c => this.seleccionadasPago.has(c.idComision));
+    return primera ? this.simbolo(primera.moneda) : '$';
   }
 
   // ── Pagos mensuales (multiselección) ───────────────────────────────────────
@@ -318,27 +381,7 @@ export class ComisionesComponent implements OnInit {
   }
 
   registrarPagosMensuales(c: ComisionVendedorDTO): void {
-    if (this.registrando) return;
-    const seleccionados = this.seleccionadosDe(c);
-    if (seleccionados.length === 0) {
-      this.toastr.warning('Seleccione al menos un pago mensual', 'Atención');
-      return;
-    }
-    this.registrando = true;
-    this.comisionService.registrarPagosMensuales({
-      idComision: c.idComision,
-      idLetras: seleccionados.map(p => p.idLetra)
-    }).subscribe({
-      next: (res) => {
-        this.registrando = false;
-        this.toastr.success(`Pagos registrados (${res.numerosEgreso[0]})`, 'Éxito');
-        this.cargar();
-      },
-      error: (err) => {
-        this.registrando = false;
-        this.toastr.error(this.extraerError(err), 'Error');
-      }
-    });
+    this.abrirModalMensual(c);
   }
 
   // ── PDF ────────────────────────────────────────────────────────────────────
@@ -376,6 +419,12 @@ export class ComisionesComponent implements OnInit {
       : estado === 'ANULADA' ? 'badge-anulada'
       : estado === 'EN_PAGO' ? 'badge-enpago'
       : 'badge-pendiente';
+  }
+
+  badgePendientes(nivelColor: string): string {
+    return nivelColor === 'ROJO' ? 'pend-rojo'
+      : nivelColor === 'NARANJA' ? 'pend-naranja'
+      : 'pend-verde';
   }
 
   pctPagado(c: ComisionVendedorDTO): number {

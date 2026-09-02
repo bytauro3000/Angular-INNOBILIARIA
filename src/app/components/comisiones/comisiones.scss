@@ -228,6 +228,55 @@ $bg-white:   #ffffff;
     border: 2px solid $orange;
     box-shadow: 0 0 0 4px rgba($orange, .25), 0 2px 8px rgba($orange, .3);
   }
+
+  // Nivel de pagos pendientes: verde (al día), naranja (1-2), rojo (3+)
+  &.nivel-verde   { border-left: 5px solid $green; }
+  &.nivel-naranja { border-left: 5px solid $orange; }
+  &.nivel-rojo    { border-left: 5px solid $red; }
+}
+
+// Checkbox de selección para pago mensual
+.chk-pagar {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+  margin: 0;
+  input { cursor: pointer; width: 16px; height: 16px; accent-color: $navy; }
+}
+
+// Badge de pagos pendientes
+.badge-pendientes {
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  &.pend-verde   { background: rgba($green, .15); color: $green; }
+  &.pend-naranja { background: rgba($orange, .15); color: $orange; }
+  &.pend-rojo    { background: rgba($red, .15); color: $red; }
+}
+
+// Barra de pago multi-lote
+.barra-pagar-seleccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: rgba($green, .08);
+  border: 1px dashed $green;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+
+  .sel-info {
+    font-size: .85rem;
+    color: $text-dark;
+    i { color: $green; margin-right: 6px; }
+    strong { color: $green; }
+  }
 }
 
 .comision-header {

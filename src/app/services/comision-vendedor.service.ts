@@ -5,6 +5,8 @@ import { environment } from '../../environments/environment';
 import {
   ComisionVendedorDTO,
   PagoComisionMensualDTO,
+  PagoComisionRequest,
+  PagoComisionResponse,
   PagoComisionResultadoDTO,
   RegistrarAdelantoRequest,
   RegistrarPagosMensualesRequest
@@ -27,6 +29,14 @@ export class ComisionVendedorService {
 
   registrarAdelanto(request: RegistrarAdelantoRequest): Observable<PagoComisionResultadoDTO> {
     return this.http.post<PagoComisionResultadoDTO>(`${this.apiUrl}/adelantos`, request);
+  }
+
+  /** Registra un pago de comisión (adelanto o mensual multi-lote) con vouchers. */
+  registrarPagoComision(request: PagoComisionRequest, vouchers?: File[]): Observable<PagoComisionResponse> {
+    const formData = new FormData();
+    formData.append('pago', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+    if (vouchers?.length) vouchers.forEach(v => formData.append('vouchers', v));
+    return this.http.post<PagoComisionResponse>(`${this.apiUrl}/pagos/registrar`, formData);
   }
 
   actualizarMontoComision(idComision: number, monto: number): Observable<ComisionVendedorDTO> {

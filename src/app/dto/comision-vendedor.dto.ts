@@ -18,6 +18,9 @@ export interface ComisionVendedorDTO {
   cantidadLetrasPagadas: number;
   fechaCreacion: string;
   fechaContrato: string;
+  pagosMensualesPendientes: number;
+  nivelColor: string;
+  pagosMensualesRegistrados: number;
 }
 
 export interface PagoComisionMensualDTO {
@@ -48,4 +51,26 @@ export interface RegistrarPagosMensualesRequest {
   idComision: number;
   idLetras: number[];
   observacion?: string;
+}
+
+export interface PagoComisionRequest {
+  tipo: 'ADELANTO' | 'MENSUAL';
+  idComision?: number;
+  idLetras?: number[];
+  monto?: number;
+  medioPago?: string;
+  numeroOperacion?: string;
+  fechaOperacion?: string;
+  fechaPago?: string;
+  observacion?: string;
+}
+
+export interface PagoComisionResponse {
+  numerosEgreso: string[];
+  idsComision: number[];
+  saldoPendiente: number | null;
+  estado: string;
+  fechaPago: string;
+  urlsVoucher: string[];
+  conceptoDetalle: string;
 }

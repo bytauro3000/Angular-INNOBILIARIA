@@ -1,0 +1,96 @@
+$navy:       #023e8a;
+$blue:       #2980b9;
+$green:      #27ae60;
+$red:        #dc2626;
+$orange:     #d97706;
+$text-dark:  #1e293b;
+$text-light: #475569;
+$border:     #e2e8f0;
+
+.pago-comision-modal {
+  .modal-header {
+    background: $navy;
+    color: #fff;
+    .modal-title i { margin-right: 6px; }
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .contexto-pago {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid $border;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+
+    .ctx-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      .ctx-label { font-size: .7rem; color: $text-light; text-transform: uppercase; letter-spacing: .3px; }
+      .ctx-valor { font-size: .85rem; font-weight: 600; color: $text-dark; }
+      .ctx-saldo { color: $orange; }
+    }
+  }
+
+  .detalle-lotes {
+    border: 1px solid $border;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+
+    .detalle-titulo {
+      font-size: .85rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin-bottom: 8px;
+      i { color: $navy; margin-right: 6px; }
+    }
+
+    .detalle-tabla {
+      margin: 0;
+      font-size: .83rem;
+      thead th {
+        background: #f1f5f9;
+        color: $text-light;
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+      }
+      .fila-total td { border-top: 2px solid $navy; color: $navy; }
+    }
+  }
+
+  .form-group { margin-bottom: 16px; }
+  label { font-size: .8rem; font-weight: 600; color: $text-dark; margin-bottom: 4px; }
+
+  .input-monto-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid $border;
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 260px;
+    .input-simbolo {
+      padding: 0 12px;
+      font-size: .9rem;
+      color: $text-light;
+      background: #f1f5f9;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid $border;
+    }
+    .input-monto {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      font-size: .95rem;
+    }
+  }
+}

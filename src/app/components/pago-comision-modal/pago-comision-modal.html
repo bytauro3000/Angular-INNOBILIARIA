@@ -1,0 +1,151 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-lg pago-comision-modal">
+
+      <!-- ── Cabecera ─────────────────────────────────────────────────────── -->
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-wallet2"></i>
+          {{ tipo === 'ADELANTO' ? 'Registrar Adelanto de Comisión' : 'Registrar Pago de Comisión' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrar()" aria-label="Cerrar"></button>
+      </div>
+
+      <!-- ── Cuerpo ──────────────────────────────────────────────────────── -->
+      <div class="modal-body">
+
+        <!-- Contexto del pago -->
+        <div class="contexto-pago">
+          <div class="ctx-item">
+            <span class="ctx-label">Vendedor</span>
+            <span class="ctx-valor">{{ comision.nombreVendedor }}</span>
+          </div>
+          <div class="ctx-item">
+            <span class="ctx-label">Cliente</span>
+            <span class="ctx-valor">{{ comision.nombreCliente }}</span>
+          </div>
+          <div class="ctx-item">
+            <span class="ctx-label">Programa</span>
+            <span class="ctx-valor">{{ comision.programa }}</span>
+          </div>
+          <div class="ctx-item">
+            <span class="ctx-label">Lote</span>
+            <span class="ctx-valor">MZ {{ comision.manzanas || '—' }} · LT {{ comision.numeroLotes || '—' }}</span>
+          </div>
+          <div class="ctx-item">
+            <span class="ctx-label">Contrato</span>
+            <span class="ctx-valor">#{{ comision.idContrato }}</span>
+          </div>
+          <div class="ctx-item">
+            <span class="ctx-label">Saldo restante</span>
+            <span class="ctx-valor ctx-saldo">{{ simbolo }} {{ comision.saldoPendiente | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- Detalle por lote (mensual multi-lote) -->
+        <div class="detalle-lotes" *ngIf="tipo === 'MENSUAL' && letrasHabilitadas.length > 0">
+          <div class="detalle-titulo">
+            <i class="bi bi-list-check"></i> Detalle de pagos mensuales (10% de cada letra)
+          </div>
+          <table class="table table-sm detalle-tabla">
+            <thead>
+              <tr>
+                <th>Letra</th>
+                <th>Vencimiento</th>
+                <th class="text-right">Importe letra</th>
+                <th class="text-right">Comisión (10%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let l of letrasHabilitadas">
+                <td>{{ l.numeroLetra }}</td>
+                <td>{{ formatFecha(l.fechaVencimiento) }}</td>
+                <td class="text-right">{{ simbolo }} {{ l.importeLetra | number:'1.2-2' }}</td>
+                <td class="text-right">{{ simbolo }} {{ l.montoComision | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="fila-total">
+                <td colspan="3" class="text-right">Total a pagar</td>
+                <td class="text-right"><strong>{{ simbolo }} {{ totalMensualSeleccionado | number:'1.2-2' }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Monto (adelanto editable; mensual se muestra como total) -->
+        <div class="form-group">
+          <label>{{ tipo === 'ADELANTO' ? 'Monto del adelanto' : 'Monto total a pagar' }}</label>
+          <div class="input-monto-wrap">
+            <span class="input-simbolo">{{ simbolo }}</span>
+            <input type="number" step="0.01" class="form-control input-monto"
+              [(ngModel)]="monto" name="monto"
+              [readonly]="tipo === 'MENSUAL'" [max]="comision.saldoPendiente" />
+          </div>
+          <small *ngIf="tipo === 'MENSUAL'" class="text-muted">
+            El monto mensual es el 10% de cada letra (fijo, no editable).
+          </small>
+        </div>
+
+        <!-- Medio de pago -->
+        <div class="form-group">
+          <label for="medioPago">Medio de pago</label>
+          <select id="medioPago" class="form-select" [(ngModel)]="medioPago" name="medioPago"
+            (change)="onMedioPagoChange()">
+            <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
+          </select>
+        </div>
+
+        <!-- N° operación y fechas (solo bancario) -->
+        <div class="row" *ngIf="!esEfectivo">
+          <div class="col-md-6 form-group">
+            <label for="numeroOperacion">N° de operación</label>
+            <input type="text" id="numeroOperacion" class="form-control"
+              [(ngModel)]="numeroOperacion" name="numeroOperacion" placeholder="Ingrese N° operación" />
+          </div>
+          <div class="col-md-3 form-group">
+            <label for="fechaOperacion">Fecha operación</label>
+            <input type="date" id="fechaOperacion" class="form-control"
+              [(ngModel)]="fechaOperacion" name="fechaOperacion" />
+          </div>
+          <div class="col-md-3 form-group">
+            <label for="fechaPago">Fecha de pago</label>
+            <input type="date" id="fechaPago" class="form-control"
+              [(ngModel)]="fechaPago" name="fechaPago" [readonly]="!esSoporte" />
+            <small *ngIf="!esSoporte" class="text-muted">Solo SOPORTE puede modificarla.</small>
+          </div>
+        </div>
+
+        <!-- Voucher (solo bancario) -->
+        <div class="form-group" *ngIf="!esEfectivo">
+          <label>Voucher de pago</label>
+          <app-voucher-preview
+            [(ngModel)]="voucherFiles"
+            [enableOcr]="true"
+            [disabled]="esEfectivo"
+            (ocrData)="onVoucherOcr($event)"
+            (filesChange)="onVoucherFilesChange($event)"
+            name="vouchers">
+          </app-voucher-preview>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-group">
+          <label for="observacion">Observaciones</label>
+          <textarea id="observacion" class="form-control" rows="2"
+            [(ngModel)]="observacion" name="observacion" placeholder="Opcional"></textarea>
+        </div>
+
+      </div>
+
+      <!-- ── Pie ──────────────────────────────────────────────────────────── -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrar()">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="guardar()" [disabled]="enviando">
+          <i class="bi bi-check-lg"></i> {{ enviando ? 'Registrando...' : 'Registrar Pago' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

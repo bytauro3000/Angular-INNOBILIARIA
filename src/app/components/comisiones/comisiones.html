@@ -36,6 +36,22 @@
     </div>
   </div>
 
+  <!-- Barra de pago multi-lote (mensual) -->
+  <div *ngIf="tieneSeleccionPago" class="barra-pagar-seleccion">
+    <span class="sel-info">
+      <i class="fas fa-check-square"></i>
+      {{ seleccionadasPago.size }} comisión(es) seleccionada(s) · Total:
+      <strong>{{ simboloSeleccionPago }} {{ totalSeleccionadoPago | number:'1.2-2' }}</strong>
+      · Genera UN solo recibo de egresos (EG01) con el detalle de cada lote.
+    </span>
+    <button class="btn-registrar btn-mensuales" (click)="abrirModalPagarSeleccionadas()" [disabled]="registrando">
+      <i class="fas fa-file-invoice-dollar"></i> Pagar Seleccionadas
+    </button>
+    <button class="btn-cancelar" (click)="seleccionadasPago.clear()" title="Limpiar selección">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
   <!-- Barra informativa del buscador -->
   <div *ngIf="programaSeleccionado || manzanaBusqueda || numeroLoteBusqueda" class="busqueda-info">
     <i class="fas fa-mouse-pointer"></i>
@@ -93,11 +109,18 @@
   <div *ngIf="!cargando && comisiones.length > 0" class="comisiones-lista">
     <div class="comision-bloque" *ngFor="let c of comisiones"
          [id]="'comision-' + c.idComision"
-         [class.com-resaltada]="estaResaltada(c.idComision)">
+         [class.com-resaltada]="estaResaltada(c.idComision)"
+         [class.nivel-verde]="c.nivelColor === 'VERDE'"
+         [class.nivel-naranja]="c.nivelColor === 'NARANJA'"
+         [class.nivel-rojo]="c.nivelColor === 'ROJO'">
 
       <!-- Cabecera (clic = expandir/colapsar pagos mensuales) -->
       <div class="comision-header" (click)="toggleComision(c)">
         <div class="comision-header-left">
+          <label class="chk-pagar" *ngIf="pagosDe(c).length > 0" title="Seleccionar para pago mensual"
+                 (click)="$event.stopPropagation()">
+            <input type="checkbox" [checked]="estaSeleccionadaPago(c)" (change)="toggleSeleccionPago(c)" />
+          </label>
           <i class="fas" [ngClass]="estaExpandida(c.idComision) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
           <div class="com-avatar" [title]="c.nombreVendedor">{{ c.nombreVendedor?.charAt(0) }}</div>
           <div class="com-datos">
@@ -108,6 +131,10 @@
           </div>
         </div>
         <div class="comision-header-right">
+          <span *ngIf="c.pagosMensualesPendientes > 0" class="badge-pendientes"
+                [ngClass]="badgePendientes(c.nivelColor)">
+            {{ c.pagosMensualesPendientes }} pago{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }} pendiente{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }}
+          </span>
           <span class="badge-estado" [ngClass]="badgeEstado(c.estado)">{{ c.estado }}</span>
           <span class="com-total">{{ simbolo(c.moneda) }} {{ c.montoComisionTotal | number:'1.2-2' }}</span>
         </div>
@@ -193,7 +220,7 @@
               appCurrencyFormatter
               [currencySymbol]="simbolo(c.moneda) + ' '"
               title="Monto del adelanto (editable)" />
-            <button class="btn-registrar" (click)="registrarAdelanto(c)" [disabled]="registrando">
+            <button class="btn-registrar" (click)="abrirModalAdelanto(c)" [disabled]="registrando">
               <i class="fas fa-money-bill-wave"></i> Registrar Adelanto
             </button>
           </div>
@@ -258,3 +285,12 @@
   </div>
 
 </div>
+
+<!-- Modal de registro de pago de comisión -->
+<app-pago-comision-modal #pagoComisionModal
+  [comision]="modalComision!"
+  [tipo]="modalTipo"
+  [letrasHabilitadas]="modalLetras"
+  (onClose)="onModalCerrado()"
+  (onPagoExitoso)="onPagoComisionExitoso()">
+</app-pago-comision-modal>
