@@ -54,40 +54,63 @@ $bg-white:   #ffffff;
   flex-wrap: wrap;
 }
 
-// ── Buscador (resalta, no filtra) ────────────────────────────────────────────
-.filtro-busqueda {
-  position: relative;
+// ── Buscador por Programa + MZ + LT (resalta, no filtra) ─────────────────────
+.busqueda-lote {
   display: flex;
   align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 
-  .filtro-icon {
-    position: absolute;
-    left: 10px;
-    color: $text-light;
-    font-size: .85rem;
-  }
-  .filtro-input {
-    padding: 8px 34px 8px 32px;
+  .select-programa {
+    padding: 8px 10px;
     border: 1px solid $border;
     border-radius: 6px;
-    font-size: .85rem;
-    width: 240px;
+    font-size: .82rem;
+    min-width: 180px;
+    max-width: 240px;
+    background: $bg-white;
     outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    &:focus {
-      border-color: $navy;
-      box-shadow: 0 0 0 3px rgba($navy, .12);
-    }
+    &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
   }
-  .filtro-clear {
-    position: absolute;
-    right: 8px;
-    border: none;
-    background: transparent;
+  .input-lote {
+    padding: 8px 10px;
+    border: 1px solid $border;
+    border-radius: 6px;
+    font-size: .82rem;
+    width: 70px;
+    text-align: center;
+    outline: none;
+    &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
+  }
+  .btn-buscar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid $navy;
+    background: $navy;
+    color: #fff;
+    border-radius: 6px;
+    font-size: .82rem;
+    cursor: pointer;
+    transition: opacity .2s;
+    &:hover { opacity: .85; }
+  }
+  .btn-clear-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid $border;
+    background: $bg-white;
+    border-radius: 6px;
     color: $text-light;
     cursor: pointer;
-    font-size: .8rem;
-    &:hover { color: $red; }
+    font-size: .85rem;
+    transition: all .2s;
+    &:hover { border-color: $red; color: $red; }
+    &.active { border-color: $orange; color: $orange; }
   }
 }
 

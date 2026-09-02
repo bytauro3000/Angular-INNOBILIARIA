@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComisionVendedorService } from '../../services/comision-vendedor.service';
+import { ProgramaService } from '../../services/programa.service';
+import { Programa } from '../../models/programa.model';
 import {
   ComisionVendedorDTO,
   PagoComisionMensualDTO
@@ -29,19 +31,27 @@ export class ComisionesComponent implements OnInit {
   /** Registrando para evitar doble clic. */
   registrando: boolean = false;
 
-  /** Término de búsqueda: Programa + MZ + LT (solo resalta, NO filtra). */
-  filtroBusqueda: string = '';
+  // ── Filtro por Programa + MZ + LT (resalta y hace scroll, NO filtra) ────────
+  programas: Programa[] = [];
+  programaSeleccionado: number | null = null;
+  manzanaBusqueda: string = '';
+  numeroLoteBusqueda: string = '';
   /** Id de comisión actualmente resaltada por el buscador. */
   resaltadaId: number | null = null;
   private resaltarTimeout: any = null;
 
   constructor(
     private comisionService: ComisionVendedorService,
+    private programaService: ProgramaService,
     private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.cargar();
+    this.programaService.listarProgramas().subscribe({
+      next: (data) => { this.programas = data; },
+      error: () => { this.toastr.warning('No se pudieron cargar los programas', 'Aviso'); }
+    });
   }
 
   cargar(): void {
@@ -65,19 +75,24 @@ export class ComisionesComponent implements OnInit {
 
   /** Busca la comisión cuyo programa+MZ+LT coincide y la resalta + scroll. */
   buscarYResaltar(): void {
-    const termino = (this.filtroBusqueda || '').trim().toLowerCase();
-    if (!termino) {
+    const programaNombre = this.programaSeleccionado
+      ? (this.programas.find(p => p.idPrograma === this.programaSeleccionado)?.nombrePrograma || '').toLowerCase()
+      : '';
+    const mz = this.manzanaBusqueda.trim().toLowerCase();
+    const lt = this.numeroLoteBusqueda.trim().toLowerCase();
+
+    if (!programaNombre && !mz && !lt) {
       this.resaltadaId = null;
       return;
     }
 
     // Coincidencia exacta primero; si no, coincidencia parcial (contains).
-    let encontrada = this.comisiones.find(c => this.coincidenciaExacta(c, termino))
-      || this.comisiones.find(c => this.coincidenciaParcial(c, termino));
+    let encontrada = this.comisiones.find(c => this.coincidenciaExacta(c, programaNombre, mz, lt))
+      || this.comisiones.find(c => this.coincidenciaParcial(c, programaNombre, mz, lt));
 
     if (!encontrada) {
       this.resaltadaId = null;
-      this.toastr.info(`No se encontró "${this.filtroBusqueda}" en las comisiones`, 'Buscar');
+      this.toastr.info('No se encontró esa comisión en la lista', 'Buscar');
       return;
     }
 
@@ -97,20 +112,30 @@ export class ComisionesComponent implements OnInit {
     }, 50);
   }
 
-  private coincidenciaExacta(c: ComisionVendedorDTO, termino: string): boolean {
-    return this.claveBusqueda(c) === termino;
+  private coincidenciaExacta(c: ComisionVendedorDTO, programaNombre: string, mz: string, lt: string): boolean {
+    const progCoincide = !programaNombre || (c.programa || '').toLowerCase() === programaNombre;
+    const mzCoincide = !mz || (c.manzanas || '').toLowerCase() === mz;
+    const ltCoincide = !lt || (c.numeroLotes || '').toLowerCase() === lt;
+    return progCoincide && mzCoincide && ltCoincide;
   }
 
-  private coincidenciaParcial(c: ComisionVendedorDTO, termino: string): boolean {
-    return this.claveBusqueda(c).includes(termino);
+  private coincidenciaParcial(c: ComisionVendedorDTO, programaNombre: string, mz: string, lt: string): boolean {
+    const progCoincide = !programaNombre || (c.programa || '').toLowerCase().includes(programaNombre);
+    const mzCoincide = !mz || (c.manzanas || '').toLowerCase().includes(mz);
+    const ltCoincide = !lt || (c.numeroLotes || '').toLowerCase().includes(lt);
+    return progCoincide && mzCoincide && ltCoincide;
   }
 
-  /** Clave normalizada: "programa · mz · lt" en minúsculas. */
-  private claveBusqueda(c: ComisionVendedorDTO): string {
-    const p = (c.programa || '').toLowerCase();
-    const mz = (c.manzanas || '').toLowerCase();
-    const lt = (c.numeroLotes || '').toLowerCase();
-    return `${p} ${mz} ${lt}`.replace(/\s+/g, ' ').trim();
+  limpiarBusqueda(): void {
+    this.programaSeleccionado = null;
+    this.manzanaBusqueda = '';
+    this.numeroLoteBusqueda = '';
+    this.resaltadaId = null;
+  }
+
+  get nombreProgramaSeleccionado(): string {
+    if (!this.programaSeleccionado) return '';
+    return this.programas.find(p => p.idPrograma === this.programaSeleccionado)?.nombrePrograma || '';
   }
 
   estaResaltada(idComision: number): boolean {
