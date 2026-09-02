@@ -119,8 +119,15 @@
         <!-- Detalles / avance -->
         <div class="com-detalles">
           <div class="com-detalle-item">
-            <span class="det-label">Comisión ({{ c.porcentajeComision }}% × {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }})</span>
-            <span class="det-valor">{{ simbolo(c.moneda) }} {{ c.montoComisionTotal | number:'1.2-2' }}</span>
+            <span class="det-label">
+              Comisión ({{ c.porcentajeComision }}% × {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }})
+            </span>
+            <span class="det-valor det-comision">
+              {{ simbolo(c.moneda) }} {{ c.montoComisionTotal | number:'1.2-2' }}
+              <i *ngIf="puedeEditarMonto(c)" class="fas fa-pencil-alt icono-editar"
+                 (click)="toggleEditarMonto(c)" [class.activo]="estaEditandoMonto(c)"
+                 title="Editar monto de comisión acordado"></i>
+            </span>
           </div>
           <div class="com-detalle-item">
             <span class="det-label">Adelanto pagado</span>
@@ -139,8 +146,8 @@
           </div>
         </div>
 
-        <!-- Monto acordado (negociado por el gerente) — editable mientras no haya pagos -->
-        <div class="com-monto-acordado" *ngIf="puedeEditarMonto(c)">
+        <!-- Monto acordado (negociado por el gerente) — aparece al presionar el lápiz -->
+        <div class="com-monto-acordado" *ngIf="puedeEditarMonto(c) && estaEditandoMonto(c)">
           <div class="acordado-msg">
             <i class="fas fa-handshake"></i>
             <span>
@@ -161,6 +168,9 @@
             </div>
             <button class="btn-registrar btn-guardar-monto" (click)="guardarMontoAcordado(c)" [disabled]="registrando">
               <i class="fas fa-save"></i> Guardar Monto
+            </button>
+            <button class="btn-cancelar" (click)="toggleEditarMonto(c)" title="Cancelar">
+              <i class="fas fa-times"></i> Cancelar
             </button>
           </div>
         </div>

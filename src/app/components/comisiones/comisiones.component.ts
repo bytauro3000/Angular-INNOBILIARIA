@@ -30,6 +30,8 @@ export class ComisionesComponent implements OnInit {
   adelantoEditable: Map<number, number> = new Map();
   /** Monto acordado editable (negociado por el gerente) por comisión. */
   montoAcordadoEditable: Map<number, number> = new Map();
+  /** Comisiones cuyo editor de monto acordado está abierto. */
+  editandoMontoAcordado: Set<number> = new Set();
   /** Registrando para evitar doble clic. */
   registrando: boolean = false;
 
@@ -66,6 +68,7 @@ export class ComisionesComponent implements OnInit {
         this.pagosPorComision = new Map();
         this.adelantoEditable = new Map();
         this.montoAcordadoEditable = new Map();
+        this.editandoMontoAcordado = new Set();
       },
       error: () => {
         this.toastr.error('Error al cargar las comisiones', 'Error');
@@ -233,6 +236,19 @@ export class ComisionesComponent implements OnInit {
   /** Editable solo mientras NO haya pagos registrados (estado PENDIENTE sin adelanto). */
   puedeEditarMonto(c: ComisionVendedorDTO): boolean {
     return c.estado === 'PENDIENTE' && c.montoAdelanto == null;
+  }
+
+  estaEditandoMonto(c: ComisionVendedorDTO): boolean {
+    return this.editandoMontoAcordado.has(c.idComision);
+  }
+
+  toggleEditarMonto(c: ComisionVendedorDTO): void {
+    if (!this.puedeEditarMonto(c)) return;
+    if (this.editandoMontoAcordado.has(c.idComision)) {
+      this.editandoMontoAcordado.delete(c.idComision);
+    } else {
+      this.editandoMontoAcordado.add(c.idComision);
+    }
   }
 
   guardarMontoAcordado(c: ComisionVendedorDTO): void {

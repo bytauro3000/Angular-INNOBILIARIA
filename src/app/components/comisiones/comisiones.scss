@@ -331,6 +331,23 @@ $bg-white:   #ffffff;
     .det-saldo { color: $orange; }
   }
 
+  .det-comision {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .icono-editar {
+      font-size: .85rem;
+      color: $text-light;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all .2s;
+      &:hover { color: $blue; background: rgba($blue, .1); }
+      &.activo { color: $blue; background: rgba($blue, .15); }
+    }
+  }
+
   .com-avance {
     .barra-avance {
       height: 8px;
@@ -372,6 +389,21 @@ $bg-white:   #ffffff;
 }
 
 .btn-guardar-monto { background: $blue; border-color: $blue; }
+
+.btn-cancelar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid $border;
+  background: $bg-white;
+  color: $text-light;
+  border-radius: 6px;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .2s;
+  &:hover { border-color: $red; color: $red; }
+}
 
 // ── Adelanto ───────────────────────────────────────────────────────────────
 .com-adelanto {
