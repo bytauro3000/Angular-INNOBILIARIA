@@ -1,0 +1,195 @@
+<div class="comisiones-container">
+
+  <!-- ── Encabezado ─────────────────────────────────────────────────────── -->
+  <div class="com-header">
+    <div class="com-title-block">
+      <h3 class="com-titulo">
+        <i class="bi bi-wallet2"></i> Comisiones de Vendedores
+      </h3>
+      <p class="com-subtitulo">
+        Comisión: % del valor del contrato. Adelanto al firmar y pagos mensuales del 10% de cada letra desde la letra 9.
+      </p>
+    </div>
+    <div class="com-actions">
+      <button class="btn-actualizar" (click)="cargar()" [disabled]="cargando" title="Actualizar datos">
+        <i class="fas fa-sync-alt" [class.fa-spin]="cargando"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Resumen general ─────────────────────────────────────────────────── -->
+  <div class="resumen-cards" *ngIf="!cargando && comisiones.length > 0">
+    <div class="resumen-card card-usd">
+      <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="card-info">
+        <span class="card-valor">$ {{ totalPendienteUsd | number:'1.2-2' }}</span>
+        <span class="card-label">Comisiones por pagar (USD)</span>
+      </div>
+    </div>
+    <div class="resumen-card card-pen">
+      <div class="card-icon"><i class="fas fa-soles"></i></div>
+      <div class="card-info">
+        <span class="card-valor">S/ {{ totalPendientePen | number:'1.2-2' }}</span>
+        <span class="card-label">Comisiones por pagar (PEN)</span>
+      </div>
+    </div>
+    <div class="resumen-card card-adelantos">
+      <div class="card-icon"><i class="fas fa-hand-holding-usd"></i></div>
+      <div class="card-info">
+        <span class="card-valor">{{ totalAdelantosPendientes }}</span>
+        <span class="card-label">Adelantos por registrar</span>
+      </div>
+    </div>
+    <div class="resumen-card card-completadas">
+      <div class="card-icon"><i class="fas fa-check-double"></i></div>
+      <div class="card-info">
+        <span class="card-valor">{{ totalCompletadas }}</span>
+        <span class="card-label">Comisiones completadas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  <div *ngIf="cargando" class="estado-cargando">
+    <div class="spinner-ring"></div>
+    <p>Cargando comisiones...</p>
+  </div>
+
+  <!-- ── Sin datos ──────────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && comisiones.length === 0" class="estado-vacio">
+    <i class="fas fa-check-circle"></i>
+    <p>No hay comisiones registradas. Se crean automáticamente al firmar un contrato financiado con vendedor.</p>
+  </div>
+
+  <!-- ── Lista de comisiones ────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && comisiones.length > 0" class="comisiones-lista">
+    <div class="comision-bloque" *ngFor="let c of comisiones">
+
+      <!-- Cabecera (clic = expandir/colapsar pagos mensuales) -->
+      <div class="comision-header" (click)="toggleComision(c)">
+        <div class="comision-header-left">
+          <i class="fas" [ngClass]="estaExpandida(c.idComision) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+          <div class="com-avatar" [title]="c.nombreVendedor">{{ c.nombreVendedor?.charAt(0) }}</div>
+          <div class="com-datos">
+            <h3>{{ c.nombreVendedor }}</h3>
+            <span class="com-detalle">
+              {{ c.nombreCliente }} · {{ c.programa }} · MZ {{ c.manzanas || '—' }} · LT {{ c.numeroLotes || '—' }} · Contrato #{{ c.idContrato }}
+            </span>
+          </div>
+        </div>
+        <div class="comision-header-right">
+          <span class="badge-estado" [ngClass]="badgeEstado(c.estado)">{{ c.estado }}</span>
+          <span class="com-total">{{ simbolo(c.moneda) }} {{ c.montoComisionTotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Cuerpo expandible -->
+      <div class="comision-body" *ngIf="estaExpandida(c.idComision)">
+
+        <!-- Detalles / avance -->
+        <div class="com-detalles">
+          <div class="com-detalle-item">
+            <span class="det-label">Comisión ({{ c.porcentajeComision }}% × {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }})</span>
+            <span class="det-valor">{{ simbolo(c.moneda) }} {{ c.montoComisionTotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="com-detalle-item">
+            <span class="det-label">Adelanto pagado</span>
+            <span class="det-valor">{{ c.montoAdelanto ? simbolo(c.moneda) + ' ' + (c.montoAdelanto | number:'1.2-2') : '—' }}</span>
+          </div>
+          <div class="com-detalle-item">
+            <span class="det-label">Saldo pendiente</span>
+            <span class="det-valor det-saldo">{{ simbolo(c.moneda) }} {{ c.saldoPendiente | number:'1.2-2' }}</span>
+          </div>
+          <div class="com-detalle-item com-avance">
+            <span class="det-label">Avance</span>
+            <div class="barra-avance">
+              <span class="barra-pagado" [style.width.%]="pctPagado(c)"></span>
+            </div>
+            <span class="av-texto">{{ pctPagado(c) }}%</span>
+          </div>
+        </div>
+
+        <!-- Adelanto habilitado -->
+        <div *ngIf="c.adelantoHabilitado" class="com-adelanto">
+          <div class="adelanto-msg">
+            <i class="fas fa-info-circle"></i>
+            El cliente ya pagó la primera letra. Registre el adelanto de la comisión
+            ({{ c.cantidadLetrasPagadas }} letra(s) pagada(s)).
+          </div>
+          <div class="adelanto-controls">
+            <div class="input-monto">
+              <span class="input-simbolo">{{ simbolo(c.moneda) }}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                [value]="montoAdelanto(c)"
+                (input)="setMontoAdelanto(c, $any($event.target).value)"
+                title="Monto del adelanto (editable)" />
+            </div>
+            <button class="btn-registrar" (click)="registrarAdelanto(c)" [disabled]="registrando">
+              <i class="fas fa-money-bill-wave"></i> Registrar Adelanto
+            </button>
+          </div>
+        </div>
+
+        <!-- Pagos mensuales habilitados -->
+        <div class="com-mensuales">
+          <div class="mensuales-titulo">
+            <i class="fas fa-calendar-check"></i> Pagos mensuales habilitados (10% de la letra)
+            <span class="mensuales-badge">{{ pagosDe(c).length }}</span>
+          </div>
+
+          <div *ngIf="pagosDe(c).length === 0" class="sin-mensuales">
+            Sin pagos mensuales habilitados. Se habilitan cuando el cliente pague 8 letras y esté al día.
+          </div>
+
+          <table class="tabla-mensuales" *ngIf="pagosDe(c).length > 0">
+            <thead>
+              <tr>
+                <th class="text-center"><input type="checkbox" title="Seleccionar todos" /></th>
+                <th>Letra</th>
+                <th>Vencimiento</th>
+                <th class="text-right">Importe letra</th>
+                <th class="text-right">Comisión (10%)</th>
+                <th class="text-center">Último</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of pagosDe(c)" [class.fila-seleccionada]="p.seleccionado">
+                <td class="text-center">
+                  <input type="checkbox" [checked]="p.seleccionado" (change)="togglePago(p)" />
+                </td>
+                <td>{{ p.numeroLetra }}</td>
+                <td>{{ formatFecha(p.fechaVencimiento) }}</td>
+                <td class="text-right">{{ simbolo(c.moneda) }} {{ p.importeLetra | number:'1.2-2' }}</td>
+                <td class="text-right">{{ simbolo(c.moneda) }} {{ p.montoComision | number:'1.2-2' }}</td>
+                <td class="text-center">
+                  <span *ngIf="p.ultimoPago" class="badge-ultimo" title="Último pago (saldo restante)">ÚLTIMO</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="seleccionadosDe(c).length > 0" class="mensuales-footer">
+            <span class="sel-resumen">
+              {{ seleccionadosDe(c).length }} pago(s) seleccionado(s) · Total:
+              <strong>{{ simbolo(c.moneda) }} {{ montoSeleccionado(c) | number:'1.2-2' }}</strong>
+              · Genera un único recibo de egresos (EG01).
+            </span>
+            <button class="btn-registrar btn-mensuales" (click)="registrarPagosMensuales(c)" [disabled]="registrando">
+              <i class="fas fa-file-invoice-dollar"></i> Registrar Pago(s)
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="c.estado === 'COMPLETADA'" class="com-completada-msg">
+          <i class="fas fa-check-circle"></i> Comisión completada: saldo pendiente en 0.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

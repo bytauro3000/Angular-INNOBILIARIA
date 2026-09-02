@@ -8,6 +8,7 @@ export interface Programa {
   areaTotal: number;
   precioM2?: number;
   costoTotal?: number;
+  adelantoVendedor?: number;
   parcelero?: Parcelero;
   distrito: Distrito;
 }

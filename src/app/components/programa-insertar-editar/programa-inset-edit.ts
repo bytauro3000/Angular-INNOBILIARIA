@@ -91,6 +91,8 @@ export class ProgramaInsertEdit implements OnInit, AfterViewInit {
       // ** COSTO TOTAL DESHABILITADO **
       costoTotal: [{ value: '', disabled: true }], 
 
+      adelantoVendedor: [100, [Validators.min(0)]], 
+
       distrito: this.fb.group({
         idDistrito: ['', Validators.required],
       }),
@@ -167,7 +169,8 @@ export class ProgramaInsertEdit implements OnInit, AfterViewInit {
         },
         parcelero: {
           idParcelero: programa.parcelero?.idParcelero
-        }
+        },
+        adelantoVendedor: programa.adelantoVendedor ?? 100
       });
 
       // Mostrar el nombre del distrito en el campo de búsqueda

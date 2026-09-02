@@ -77,6 +77,9 @@ import { LetrasVencidasComponent } from './components/letras-vencidas/letras-ven
 // Cuentas por Cobrar
 import { CuentasPorCobrarComponent } from './components/cuentas-por-cobrar/cuentas-por-cobrar.component';
 
+// Comisiones de Vendedores
+import { ComisionesComponent } from './components/comisiones/comisiones.component';
+
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
 
@@ -145,6 +148,7 @@ export const routes: Routes = [
       { path: 'programas', component: ProgramaListarComponent },
       { path: 'vendedores', component: VendedorListarComponent },
       { path: 'vendedores/ventas-por-vendedor', component: LotesVendidosComponent, data: { modo: 'secretaria' } },
+      { path: 'vendedores/comisiones', component: ComisionesComponent },
       { path: 'lotes', component: LoteLitarComponent },
       { path: 'lotes/reporte', component: ReporteLotesComponent },
       { path: 'parceleros', component: ParceleroListarComponent },

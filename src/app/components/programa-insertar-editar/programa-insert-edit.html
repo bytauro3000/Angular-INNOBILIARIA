@@ -72,8 +72,18 @@
                 <input type="text" id="costoTotal" placeholder="$ 0.00" readonly
                   [value]="(programaForm.get('costoTotal')?.value | currency:'USD':'symbol':'1.2-2':'en-US') || '$ 0.00'"
                   class="form-control" />
+
               </div>
 
+            </div>
+
+            <div class="form-row form-1-col">
+              <div class="form-group">
+                <label for="adelantoVendedor">Adelanto Vendedor ($)</label>
+                <input type="number" id="adelantoVendedor" formControlName="adelantoVendedor" min="0" step="1"
+                  placeholder="100" title="Adelanto sugerido al vendedor al firmar un contrato (si el cliente no paga inicial)" />
+                <small class="text-muted">Adelanto sugerido al vendedor al firmar un contrato (se usa si el cliente no paga inicial).</small>
+              </div>
             </div>
 
           </div>
