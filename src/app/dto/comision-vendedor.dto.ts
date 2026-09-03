@@ -1,6 +1,7 @@
 export interface ComisionVendedorDTO {
   idComision: number;
   idContrato: number;
+  idVendedor: number;
   nombreVendedor: string;
   nombreCliente: string;
   programa: string;

@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComisionVendedorService } from '../../services/comision-vendedor.service';
 import { ProgramaService } from '../../services/programa.service';
+import { VendedorService } from '../../services/vendedor.service';
 import { Programa } from '../../models/programa.model';
+import { Vendedor } from '../../models/vendedor.model';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { PagoComisionModal } from '../pago-comision-modal/pago-comision-modal.component';
 import {
@@ -11,6 +13,7 @@ import {
   PagoComisionMensualDTO
 } from '../../dto/comision-vendedor.dto';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-comisiones',
@@ -55,9 +58,21 @@ export class ComisionesComponent implements OnInit {
   resaltadaId: number | null = null;
   private resaltarTimeout: any = null;
 
+  // ── Filtro por Vendedor (autocomplete, tipo contrato-insertar) ─────────────
+  vendedores: Vendedor[] = [];
+  vendedoresFiltrados: Vendedor[] = [];
+  mostrarVendedores: boolean = false;
+  filtroVendedor: string = '';
+  vendedorSeleccionado: Vendedor | null = null;
+
+  // ── Filtro por Estado (chips, estilo api-sunat) ─────────────────────────────
+  filtroEstado: string = 'TODOS';
+  estadosDisponibles: string[] = ['PENDIENTE', 'EN_PAGO', 'COMPLETADA', 'ANULADA'];
+
   constructor(
     private comisionService: ComisionVendedorService,
     private programaService: ProgramaService,
+    private vendedorService: VendedorService,
     private toastr: ToastrService
   ) {}
 
@@ -66,6 +81,13 @@ export class ComisionesComponent implements OnInit {
     this.programaService.listarProgramas().subscribe({
       next: (data) => { this.programas = data; },
       error: () => { this.toastr.warning('No se pudieron cargar los programas', 'Aviso'); }
+    });
+    this.vendedorService.listarVendedores().subscribe({
+      next: (data) => {
+        this.vendedores = data;
+        this.vendedoresFiltrados = [...data];
+      },
+      error: () => { this.toastr.warning('No se pudieron cargar los vendedores', 'Aviso'); }
     });
   }
 
@@ -159,6 +181,56 @@ export class ComisionesComponent implements OnInit {
     return this.resaltadaId === idComision;
   }
 
+  // ── Filtro por Vendedor (autocomplete) ─────────────────────────────────────
+
+  filtrarVendedores(): void {
+    const f = this.filtroVendedor.toLowerCase().trim();
+    this.vendedoresFiltrados = this.vendedores.filter(v =>
+      `${v.nombre} ${v.apellidos}`.toLowerCase().includes(f) || (v.dni || '').includes(f));
+    this.mostrarVendedores = true;
+  }
+
+  seleccionarVendedor(v: Vendedor): void {
+    this.vendedorSeleccionado = v;
+    this.filtroVendedor = `${v.nombre} ${v.apellidos}`;
+    this.mostrarVendedores = false;
+  }
+
+  limpiarFiltroVendedor(): void {
+    this.vendedorSeleccionado = null;
+    this.filtroVendedor = '';
+    this.mostrarVendedores = false;
+  }
+
+  // ── Filtro por Estado (chips) ──────────────────────────────────────────────
+
+  setFiltroEstado(estado: string): void {
+    this.filtroEstado = estado;
+  }
+
+  /** Lista de comisiones aplicando filtros de vendedor y estado (combinables). */
+  get comisionesFiltradas(): ComisionVendedorDTO[] {
+    let lista = this.comisiones;
+    if (this.vendedorSeleccionado?.idVendedor) {
+      const id = this.vendedorSeleccionado.idVendedor;
+      lista = lista.filter(c => c.idVendedor === id);
+    }
+    if (this.filtroEstado !== 'TODOS') {
+      lista = lista.filter(c => c.estado === this.filtroEstado);
+    }
+    return lista;
+  }
+
+  // ── Cerrar dropdown de vendedor al hacer clic fuera ────────────────────────
+
+  @HostListener('document:click', ['$event'])
+  onClickFuera(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.custom-select-container')) {
+      this.mostrarVendedores = false;
+    }
+  }
+
   // ── Resumen ────────────────────────────────────────────────────────────────
 
   get totalPendienteUsd(): number {
@@ -228,9 +300,9 @@ export class ComisionesComponent implements OnInit {
 
   // ── Monto acordado (negociado por el gerente) ─────────────────────────────
 
-  /** Máximo permitido: 3% del monto total del contrato. */
+  /** Límite para el aviso: monto equivalente al % de comisión congelado del vendedor. */
   maximoComision(c: ComisionVendedorDTO): number {
-    return Math.floor((c.montoTotalContrato || 0) * 0.03);
+    return Math.floor((c.montoTotalContrato || 0) * (c.porcentajeComision || 0) / 100);
   }
 
   montoAcordado(c: ComisionVendedorDTO): number {
@@ -265,28 +337,50 @@ export class ComisionesComponent implements OnInit {
   guardarMontoAcordado(c: ComisionVendedorDTO): void {
     if (this.registrando) return;
     const monto = this.montoAcordado(c);
-    const maximo = this.maximoComision(c);
+    const limite = this.maximoComision(c);
     if (!monto || monto <= 0) {
       this.toastr.warning('Ingrese un monto mayor a 0', 'Atención');
       return;
     }
-    if (monto > maximo) {
-      this.toastr.warning(`El monto no puede superar el 3% del contrato (${this.simbolo(c.moneda)} ${maximo})`, 'Atención');
-      return;
+
+    const confirmarGuardado = () => {
+      this.registrando = true;
+      this.comisionService.actualizarMontoComision(c.idComision, monto).subscribe({
+        next: (actualizado) => {
+          this.registrando = false;
+          this.toastr.success('Monto de comisión actualizado', 'Éxito');
+          const idx = this.comisiones.findIndex(x => x.idComision === c.idComision);
+          if (idx >= 0) this.comisiones[idx] = actualizado;
+        },
+        error: (err) => {
+          this.registrando = false;
+          this.toastr.error(this.extraerError(err), 'Error');
+        }
+      });
+    };
+
+    // Si el monto supera el % de comisión congelado del vendedor → confirmación
+    if (monto > limite) {
+      Swal.fire({
+        title: 'Comisión por encima del % del vendedor',
+        html: `El monto ingresado (<strong>${this.simbolo(c.moneda)} ${monto.toLocaleString('es-PE')}</strong>)
+              supera el <strong>${c.porcentajeComision}%</strong> de comisión registrado
+              (${this.simbolo(c.moneda)} ${limite.toLocaleString('es-PE')}).<br/><br/>
+              ¿Desea aceptar este monto de todos modos?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, aceptar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d97706',
+        cancelButtonColor: '#6c757d'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          confirmarGuardado();
+        }
+      });
+    } else {
+      confirmarGuardado();
     }
-    this.registrando = true;
-    this.comisionService.actualizarMontoComision(c.idComision, monto).subscribe({
-      next: (actualizado) => {
-        this.registrando = false;
-        this.toastr.success('Monto de comisión actualizado', 'Éxito');
-        const idx = this.comisiones.findIndex(x => x.idComision === c.idComision);
-        if (idx >= 0) this.comisiones[idx] = actualizado;
-      },
-      error: (err) => {
-        this.registrando = false;
-        this.toastr.error(this.extraerError(err), 'Error');
-      }
-    });
   }
 
   // ── Modal de pago (adelanto o mensual) ─────────────────────────────────────

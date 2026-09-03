@@ -61,7 +61,122 @@ $bg-white:   #ffffff;
   min-width: 0;
 }
 
-// ── Buscador por Programa + MZ + LT (resalta, no filtra) ─────────────────────
+// ── Filtros secundarios (Vendedor + Estado) ─────────────────────────────────
+.filtros-secundarios {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: $bg-white;
+  border: 1px solid $border;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.filtro-vendedor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  .filtro-label { font-size: .8rem; font-weight: 600; color: $text-dark; white-space: nowrap; i { color: $navy; margin-right: 4px; } }
+
+  .custom-select-container {
+    position: relative;
+    min-width: 280px;
+    .custom-select-input {
+      width: 100%;
+      padding: 8px 34px 8px 10px;
+      border: 1px solid $border;
+      border-radius: 6px;
+      font-size: .85rem;
+      outline: none;
+      &:focus { border-color: $navy; box-shadow: 0 0 0 3px rgba($navy, .12); }
+    }
+    .custom-select-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      z-index: 1200;
+      background: $bg-white;
+      border: 1px solid $border;
+      border-radius: 6px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+      max-height: 220px;
+      overflow-y: auto;
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+      li {
+        padding: 8px 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        &:hover { background: rgba($navy, .08); }
+        .list-item-main { font-size: .82rem; color: $text-dark; i { color: $navy; margin-right: 6px; } }
+        .list-badge { font-size: .72rem; color: $text-light; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+        &.no-data { cursor: default; color: $text-light; justify-content: flex-start; font-size: .82rem; }
+      }
+    }
+    .btn-clear-vendedor {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+.filtro-estado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  .filtro-label { font-size: .8rem; font-weight: 600; color: $text-dark; white-space: nowrap; i { color: $navy; margin-right: 4px; } }
+  .chips-estado { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip-estado {
+    border: 1px solid $border;
+    background: $bg-white;
+    color: $text-light;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    &:hover { border-color: $navy; color: $navy; }
+    &.active {
+      background: $navy;
+      border-color: $navy;
+      color: #fff;
+    }
+  }
+}
+
+.filtro-resultado {
+  margin-left: auto;
+  .resultado-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    color: $text-light;
+    i { color: $navy; }
+  }
+  .btn-limpiar-filtros {
+    border: 1px solid $border;
+    background: $bg-white;
+    color: $red;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: .75rem;
+    cursor: pointer;
+    margin-left: 4px;
+    &:hover { border-color: $red; background: rgba($red, .06); }
+  }
+}
 .busqueda-lote {
   display: flex;
   align-items: center;

@@ -37,6 +37,51 @@
     </div>
   </div>
 
+  <!-- ── Fila 2: Filtro por Vendedor + Filtro por Estado ─────────────────── -->
+  <div class="filtros-secundarios">
+    <div class="filtro-vendedor">
+      <label class="filtro-label"><i class="bi bi-person-badge"></i> Vendedor</label>
+      <div class="custom-select-container">
+        <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
+          [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()" (focus)="mostrarVendedores = true"
+          [ngModelOptions]="{standalone: true}" autocomplete="off" />
+        <ul class="custom-select-list" *ngIf="mostrarVendedores">
+          <li *ngFor="let v of vendedoresFiltrados" (mousedown)="seleccionarVendedor(v)">
+            <span class="list-item-main"><i class="bi bi-person"></i> {{ v.nombre }} {{ v.apellidos }}</span>
+            <span class="list-badge">DNI: {{ v.dni }}</span>
+          </li>
+          <li *ngIf="vendedoresFiltrados.length === 0" class="no-data">
+            <i class="bi bi-search"></i> No se encontraron vendedores
+          </li>
+        </ul>
+        <button *ngIf="vendedorSeleccionado" class="btn-clear-inline btn-clear-vendedor"
+          (click)="limpiarFiltroVendedor()" title="Limpiar filtro de vendedor">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filtro-estado">
+      <label class="filtro-label"><i class="bi bi-funnel"></i> Estado</label>
+      <div class="chips-estado">
+        <button class="chip-estado" [class.active]="filtroEstado === 'TODOS'" (click)="setFiltroEstado('TODOS')">Todos</button>
+        <button *ngFor="let est of estadosDisponibles" class="chip-estado"
+          [class.active]="filtroEstado === est" (click)="setFiltroEstado(est)">{{ est }}</button>
+      </div>
+    </div>
+
+    <div class="filtro-resultado" *ngIf="vendedorSeleccionado || filtroEstado !== 'TODOS'">
+      <span class="resultado-info">
+        <i class="bi bi-funnel-fill"></i>
+        Mostrando {{ comisionesFiltradas.length }} de {{ comisiones.length }} comisiones
+        <button *ngIf="vendedorSeleccionado || filtroEstado !== 'TODOS'" class="btn-limpiar-filtros"
+          (click)="limpiarFiltroVendedor(); setFiltroEstado('TODOS')" title="Limpiar filtros">
+          <i class="fas fa-times"></i> Limpiar
+        </button>
+      </span>
+    </div>
+  </div>
+
   <!-- Barra de pago multi-lote (mensual) -->
   <div *ngIf="tieneSeleccionPago" class="barra-pagar-seleccion">
     <span class="sel-info">
@@ -108,7 +153,7 @@
 
   <!-- ── Lista de comisiones ────────────────────────────────────────────── -->
   <div *ngIf="!cargando && comisiones.length > 0" class="comisiones-lista">
-    <div class="comision-bloque" *ngFor="let c of comisiones"
+    <div class="comision-bloque" *ngFor="let c of comisionesFiltradas"
          [id]="'comision-' + c.idComision"
          [class.com-resaltada]="estaResaltada(c.idComision)"
          [class.nivel-verde]="c.nivelColor === 'VERDE'"
