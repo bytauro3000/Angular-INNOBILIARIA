@@ -173,7 +173,7 @@
           </div>
         </div>
         <div class="comision-header-right">
-          <span *ngIf="c.pagosMensualesPendientes > 0" class="badge-pendientes"
+          <span *ngIf="c.pagosMensualesPendientes > 0 && c.estado !== 'COMPLETADA'" class="badge-pendientes"
                 [ngClass]="badgePendientes(c.nivelColor)">
             {{ c.pagosMensualesPendientes }} pago{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }} pendiente{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }}
           </span>
@@ -186,7 +186,7 @@
       <div class="comision-body" *ngIf="estaExpandida(c.idComision)">
 
         <!-- Detalles / avance -->
-        <div class="com-detalles">
+        <div class="com-detalles" [class.detalle-completada]="c.estado === 'COMPLETADA'">
           <div class="com-detalle-item">
             <span class="det-label">
               Comisión ({{ c.porcentajeComision }}% × {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }})
@@ -268,8 +268,8 @@
           </div>
         </div>
 
-        <!-- Pagos mensuales habilitados -->
-        <div class="com-mensuales">
+        <!-- Pagos mensuales habilitados (oculto si la comisión ya fue cancelada en su totalidad) -->
+        <div class="com-mensuales" *ngIf="c.estado !== 'COMPLETADA'">
           <div class="mensuales-titulo">
             <i class="fas fa-calendar-check"></i> Pagos mensuales habilitados (10% de la letra)
             <span class="mensuales-badge">{{ pagosDe(c).length }}</span>

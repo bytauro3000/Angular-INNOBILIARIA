@@ -533,6 +533,20 @@ $bg-white:   #ffffff;
   }
 }
 
+// Detalle compacto para comisiones COMPLETADAS (canceladas en su totalidad)
+.detalle-completada {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+
+  .com-detalle-item {
+    padding: 6px 10px;
+    .det-label { font-size: .66rem; }
+    .det-valor { font-size: .85rem; }
+  }
+  .com-avance .barra-avance { height: 6px; margin: 2px 0; }
+}
+
 // ── Monto acordado (negociación) ────────────────────────────────────────────
 .com-monto-acordado {
   border: 1px dashed $blue;
