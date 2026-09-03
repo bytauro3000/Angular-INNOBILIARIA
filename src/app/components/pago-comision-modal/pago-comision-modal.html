@@ -118,6 +118,13 @@
           <small class="text-muted">Por defecto se registra con la fecha actual.</small>
         </div>
 
+        <!-- Observaciones -->
+        <div class="form-group">
+          <label for="observacion">Observaciones</label>
+          <textarea id="observacion" class="form-control" rows="2"
+            [(ngModel)]="observacion" name="observacion" placeholder="Opcional"></textarea>
+        </div>
+
         <!-- Voucher (solo bancario) -->
         <div class="form-group" *ngIf="!esEfectivo">
           <label>Voucher de pago</label>
@@ -129,13 +136,6 @@
             (filesChange)="onVoucherFilesChange($event)"
             name="vouchers">
           </app-voucher-preview>
-        </div>
-
-        <!-- Observaciones -->
-        <div class="form-group">
-          <label for="observacion">Observaciones</label>
-          <textarea id="observacion" class="form-control" rows="2"
-            [(ngModel)]="observacion" name="observacion" placeholder="Opcional"></textarea>
         </div>
 
       </div>
