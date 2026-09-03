@@ -52,6 +52,23 @@ $border:     #e2e8f0;
   }
 }
 
+// Recibo de egreso en la fila de monto/medio de pago
+.ctx-recibo-fila {
+  .recibo-preview {
+    display: flex;
+    align-items: center;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid rgba($navy, .35);
+    background: rgba($navy, .08);
+    border-radius: 6px;
+    color: $navy;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+  }
+}
+
   .detalle-lotes {
     border: 1px solid $border;
     border-radius: 8px;
@@ -112,7 +129,7 @@ $border:     #e2e8f0;
 // ── Responsive ──────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .contexto-pago { grid-template-columns: repeat(2, 1fr); }
-  .fila-monto-medio .col-md-6 { margin-bottom: 12px; }
+  .fila-monto-medio .form-group { margin-bottom: 12px; }
 }
 
 @media (max-width: 480px) {

@@ -17,10 +17,6 @@
         <!-- Contexto del pago -->
         <div class="contexto-pago">
           <!-- Fila 1 -->
-          <div class="ctx-item ctx-recibo">
-            <span class="ctx-label">Recibo de Egreso</span>
-            <span class="ctx-valor ctx-valor-recibo">{{ numeroEgresoPreview || 'EG01-?' }}</span>
-          </div>
           <div class="ctx-item">
             <span class="ctx-label">Vendedor</span>
             <span class="ctx-valor">{{ comision.nombreVendedor }}</span>
@@ -29,11 +25,11 @@
             <span class="ctx-label">Cliente</span>
             <span class="ctx-valor">{{ comision.nombreCliente }}</span>
           </div>
-          <!-- Fila 2 -->
           <div class="ctx-item">
             <span class="ctx-label">Contrato</span>
             <span class="ctx-valor">#{{ comision.idContrato }}</span>
           </div>
+          <!-- Fila 2 -->
           <div class="ctx-item">
             <span class="ctx-label">Programa</span>
             <span class="ctx-valor">{{ comision.programa }}</span>
@@ -42,7 +38,6 @@
             <span class="ctx-label">Lote</span>
             <span class="ctx-valor">MZ: {{ comision.manzanas || '—' }} · LT: {{ comision.numeroLotes || '—' }}</span>
           </div>
-          <!-- Fila 3 -->
           <div class="ctx-item">
             <span class="ctx-label">Saldo restante</span>
             <span class="ctx-valor ctx-saldo">{{ simbolo }} {{ comision.saldoPendiente | number:'1.2-2' }}</span>
@@ -78,9 +73,13 @@
           </table>
         </div>
 
-        <!-- Monto + Medio de pago (una sola fila) -->
+        <!-- Recibo + Monto + Medio de pago (una sola fila) -->
         <div class="row fila-monto-medio">
-          <div class="col-md-6 form-group">
+          <div class="col-md-3 form-group ctx-recibo-fila">
+            <label>Recibo de Egreso</label>
+            <div class="recibo-preview">{{ numeroEgresoPreview || 'EG01-?' }}</div>
+          </div>
+          <div class="col-md-4 form-group">
             <label>{{ tipo === 'ADELANTO' ? 'Monto del adelanto' : 'Monto total a pagar' }}</label>
             <div class="input-monto-wrap">
               <span class="input-simbolo">{{ simbolo }}</span>
@@ -92,7 +91,7 @@
               El monto mensual es el 10% de cada letra (fijo, no editable).
             </small>
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-5 form-group">
             <label for="medioPago">Medio de pago</label>
             <select id="medioPago" class="form-select" [(ngModel)]="medioPago" name="medioPago"
               (change)="onMedioPagoChange()">
