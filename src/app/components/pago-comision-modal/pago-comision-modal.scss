@@ -37,6 +37,19 @@ $border:     #e2e8f0;
     .ctx-valor { font-size: .85rem; font-weight: 600; color: $text-dark; overflow-wrap: anywhere; }
     .ctx-saldo { color: $orange; }
   }
+
+  .ctx-recibo {
+    background: rgba($navy, .08);
+    border: 1px solid rgba($navy, .25);
+    border-radius: 6px;
+    padding: 6px 8px;
+    .ctx-valor-recibo {
+      color: $navy;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+  }
 }
 
   .detalle-lotes {

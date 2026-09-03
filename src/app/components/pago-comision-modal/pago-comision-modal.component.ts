@@ -43,6 +43,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   observacion: string = '';
   voucherFiles: File[] = [];
   enviando: boolean = false;
+  /** Número del recibo de egreso que se generará (ej: EG01-7). */
+  numeroEgresoPreview: string = '';
 
   private ocrOperationNumbers: Map<string, string> = new Map();
 
@@ -77,6 +79,13 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     this.observacion = this.observacionDefecto();
     this.voucherFiles = [];
     this.ocrOperationNumbers = new Map();
+    this.numeroEgresoPreview = '';
+
+    // Preview del número de recibo de egreso que se generará (EG01-n)
+    this.comisionService.previewSiguienteEgreso().subscribe({
+      next: (num) => { this.numeroEgresoPreview = num; },
+      error: () => { this.numeroEgresoPreview = 'EG01-?'; }
+    });
 
     if (this.tipo === 'ADELANTO') {
       this.monto = this.comision.montoAdelantoSugerido || 0;
