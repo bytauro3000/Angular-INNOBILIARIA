@@ -758,11 +758,19 @@ $bg-white:   #ffffff;
 }
 
 // ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .com-header { flex-direction: column; align-items: flex-start; }
+  .com-actions { width: 100%; justify-content: flex-start; }
+  .busqueda-lote { flex-wrap: wrap; }
+  .filtros-secundarios { flex-direction: column; align-items: flex-start; }
+  .filtro-resultado { margin-left: 0; }
+}
+
 @media (max-width: 768px) {
   .comision-header {
     flex-direction: column;
     align-items: flex-start;
-    .comision-header-right { width: 100%; justify-content: space-between; }
+    .comision-header-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
     .com-datos .com-detalle { max-width: 100%; }
   }
   .com-detalles { grid-template-columns: 1fr; }
@@ -775,4 +783,31 @@ $bg-white:   #ffffff;
     border-bottom: none;
   }
   .tabla-mensuales tbody tr { border-bottom: 1px solid $border; }
+
+  // Fila 1 (Programa + MZ + LT + botones) apilada
+  .busqueda-lote {
+    flex-wrap: wrap;
+    width: 100%;
+    .select-programa { width: 100%; min-width: 0; max-width: 100%; }
+    .input-lote { flex: 1 1 auto; }
+    .btn-buscar { flex: 1 1 auto; justify-content: center; }
+  }
+
+  // Filtros vendedor + estado
+  .filtro-vendedor { width: 100%; .custom-select-container { min-width: 0; width: 100%; } }
+  .filtro-estado { width: 100%; flex-wrap: wrap; }
+
+  // Barra de pago multi-lote
+  .barra-pagar-seleccion { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 480px) {
+  .comisiones-container { padding: 12px; }
+  .filtros-secundarios { padding: 10px 12px; gap: 12px; }
+  .chip-estado { flex: 1 1 auto; text-align: center; }
+  .chips-estado { width: 100%; }
+  .comision-header-left { flex-wrap: wrap; }
+  .com-detalle { font-size: .74rem; }
+  .com-avatar { width: 34px; height: 34px; font-size: .9rem; }
+  .resumen-cards { grid-template-columns: 1fr 1fr; }
 }
