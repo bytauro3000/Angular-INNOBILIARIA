@@ -16,6 +16,7 @@
 
         <!-- Contexto del pago -->
         <div class="contexto-pago">
+          <!-- Fila 1 -->
           <div class="ctx-item">
             <span class="ctx-label">Vendedor</span>
             <span class="ctx-valor">{{ comision.nombreVendedor }}</span>
@@ -25,16 +26,17 @@
             <span class="ctx-valor">{{ comision.nombreCliente }}</span>
           </div>
           <div class="ctx-item">
+            <span class="ctx-label">Contrato</span>
+            <span class="ctx-valor">#{{ comision.idContrato }}</span>
+          </div>
+          <!-- Fila 2 -->
+          <div class="ctx-item">
             <span class="ctx-label">Programa</span>
             <span class="ctx-valor">{{ comision.programa }}</span>
           </div>
           <div class="ctx-item">
             <span class="ctx-label">Lote</span>
-            <span class="ctx-valor">MZ {{ comision.manzanas || '—' }} · LT {{ comision.numeroLotes || '—' }}</span>
-          </div>
-          <div class="ctx-item">
-            <span class="ctx-label">Contrato</span>
-            <span class="ctx-valor">#{{ comision.idContrato }}</span>
+            <span class="ctx-valor">MZ: {{ comision.manzanas || '—' }} · LT: {{ comision.numeroLotes || '—' }}</span>
           </div>
           <div class="ctx-item">
             <span class="ctx-label">Saldo restante</span>
@@ -71,47 +73,49 @@
           </table>
         </div>
 
-        <!-- Monto (adelanto editable; mensual se muestra como total) -->
-        <div class="form-group">
-          <label>{{ tipo === 'ADELANTO' ? 'Monto del adelanto' : 'Monto total a pagar' }}</label>
-          <div class="input-monto-wrap">
-            <span class="input-simbolo">{{ simbolo }}</span>
-            <input type="number" step="0.01" class="form-control input-monto"
-              [(ngModel)]="monto" name="monto"
-              [readonly]="tipo === 'MENSUAL'" [max]="comision.saldoPendiente" />
+        <!-- Monto + Medio de pago (una sola fila) -->
+        <div class="row fila-monto-medio">
+          <div class="col-md-6 form-group">
+            <label>{{ tipo === 'ADELANTO' ? 'Monto del adelanto' : 'Monto total a pagar' }}</label>
+            <div class="input-monto-wrap">
+              <span class="input-simbolo">{{ simbolo }}</span>
+              <input type="number" step="0.01" class="form-control input-monto"
+                [(ngModel)]="monto" name="monto"
+                [readonly]="tipo === 'MENSUAL'" [max]="comision.saldoPendiente" />
+            </div>
+            <small *ngIf="tipo === 'MENSUAL'" class="text-muted">
+              El monto mensual es el 10% de cada letra (fijo, no editable).
+            </small>
           </div>
-          <small *ngIf="tipo === 'MENSUAL'" class="text-muted">
-            El monto mensual es el 10% de cada letra (fijo, no editable).
-          </small>
+          <div class="col-md-6 form-group">
+            <label for="medioPago">Medio de pago</label>
+            <select id="medioPago" class="form-select" [(ngModel)]="medioPago" name="medioPago"
+              (change)="onMedioPagoChange()">
+              <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
+            </select>
+          </div>
         </div>
 
-        <!-- Medio de pago -->
-        <div class="form-group">
-          <label for="medioPago">Medio de pago</label>
-          <select id="medioPago" class="form-select" [(ngModel)]="medioPago" name="medioPago"
-            (change)="onMedioPagoChange()">
-            <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
-          </select>
-        </div>
-
-        <!-- N° operación y fechas (solo bancario) -->
-        <div class="row" *ngIf="!esEfectivo">
+        <!-- N° operación + fecha operación (solo bancario) -->
+        <div class="row fila-bancario" *ngIf="!esEfectivo">
           <div class="col-md-6 form-group">
             <label for="numeroOperacion">N° de operación</label>
             <input type="text" id="numeroOperacion" class="form-control"
               [(ngModel)]="numeroOperacion" name="numeroOperacion" placeholder="Ingrese N° operación" />
           </div>
-          <div class="col-md-3 form-group">
+          <div class="col-md-6 form-group">
             <label for="fechaOperacion">Fecha operación</label>
             <input type="date" id="fechaOperacion" class="form-control"
               [(ngModel)]="fechaOperacion" name="fechaOperacion" />
           </div>
-          <div class="col-md-3 form-group">
-            <label for="fechaPago">Fecha de pago</label>
-            <input type="date" id="fechaPago" class="form-control"
-              [(ngModel)]="fechaPago" name="fechaPago" [readonly]="!esSoporte" />
-            <small *ngIf="!esSoporte" class="text-muted">Solo SOPORTE puede modificarla.</small>
-          </div>
+        </div>
+
+        <!-- Fecha de pago: solo visible para rol SOPORTE -->
+        <div class="form-group" *ngIf="esSoporte">
+          <label for="fechaPago">Fecha de pago</label>
+          <input type="date" id="fechaPago" class="form-control"
+            [(ngModel)]="fechaPago" name="fechaPago" />
+          <small class="text-muted">Por defecto se registra con la fecha actual.</small>
         </div>
 
         <!-- Voucher (solo bancario) -->

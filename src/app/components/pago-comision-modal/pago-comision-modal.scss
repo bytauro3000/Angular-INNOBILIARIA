@@ -18,25 +18,26 @@ $border:     #e2e8f0;
     padding: 20px;
   }
 
-  .contexto-pago {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 10px;
-    background: #f8fafc;
-    border: 1px solid $border;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
+.contexto-pago {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
 
-    .ctx-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      .ctx-label { font-size: .7rem; color: $text-light; text-transform: uppercase; letter-spacing: .3px; }
-      .ctx-valor { font-size: .85rem; font-weight: 600; color: $text-dark; }
-      .ctx-saldo { color: $orange; }
-    }
+  .ctx-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    .ctx-label { font-size: .7rem; color: $text-light; text-transform: uppercase; letter-spacing: .3px; }
+    .ctx-valor { font-size: .85rem; font-weight: 600; color: $text-dark; overflow-wrap: anywhere; }
+    .ctx-saldo { color: $orange; }
   }
+}
 
   .detalle-lotes {
     border: 1px solid $border;
@@ -93,4 +94,14 @@ $border:     #e2e8f0;
       font-size: .95rem;
     }
   }
+}
+
+// ── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .contexto-pago { grid-template-columns: repeat(2, 1fr); }
+  .fila-monto-medio .col-md-6 { margin-bottom: 12px; }
+}
+
+@media (max-width: 480px) {
+  .contexto-pago { grid-template-columns: 1fr; }
 }

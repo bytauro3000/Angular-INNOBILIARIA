@@ -74,7 +74,7 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     this.fechaOperacion = '';
     this.numeroOperacion = '';
     this.medioPago = 'EFECTIVO';
-    this.observacion = '';
+    this.observacion = this.observacionDefecto();
     this.voucherFiles = [];
     this.ocrOperationNumbers = new Map();
 
@@ -85,6 +85,18 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
         .reduce((s, l) => s + (l.montoComision || 0), 0);
     }
     this.modal?.show();
+  }
+
+  /** Texto por defecto de observaciones según el tipo de pago. */
+  private observacionDefecto(): string {
+    const mz = this.comision.manzanas || '—';
+    const lt = this.comision.numeroLotes || '—';
+    const programa = this.comision.programa || '—';
+    const saldo = `${this.simbolo} ${this.comision.saldoPendiente ?? 0}`;
+    if (this.tipo === 'ADELANTO') {
+      return `Pago de la 1ra cuota de comisión de la MZ: ${mz} LT: ${lt} y programa: ${programa} - saldo: ${saldo}`;
+    }
+    return `Pago de comisión mensual de la MZ: ${mz} LT: ${lt} y programa: ${programa} - saldo: ${saldo}`;
   }
 
   cerrar(): void {
