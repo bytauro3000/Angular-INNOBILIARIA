@@ -83,6 +83,9 @@ import { ComisionesComponent } from './components/comisiones/comisiones.componen
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
 
+// Reporte Egresos
+import { ReporteEgresosComponent } from './components/reporteegresos/reporteegresos.component';
+
 // Reporte Historial de Moras (por contrato)
 import { HistorialMorasPickerComponent } from './components/historial-moras/historial-moras-picker.component';
 import { ReporteCajaComponent } from './components/reporte-caja/reporte-caja.component';
@@ -137,6 +140,7 @@ export const routes: Routes = [
       { path: 'letras-vencidas', component: LetrasVencidasComponent },
       { path: 'cuentas-por-cobrar', component: CuentasPorCobrarComponent },
       { path: 'reporte-ingresos', component: ReporteIngresosComponent },
+      { path: 'reporte-egresos', component: ReporteEgresosComponent },
       { path: 'reporte-caja', component: ReporteCajaComponent },
       { path: 'historial-moras', component: HistorialMorasPickerComponent },
 

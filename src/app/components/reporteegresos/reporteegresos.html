@@ -1,0 +1,177 @@
+<div class="re-container">
+
+  <!-- ── ENCABEZADO ──────────────────────────────────────────────────────── -->
+  <div class="re-header">
+    <div class="re-header-left">
+      <h2 class="re-titulo">
+        <i class="bi bi-cash-coin"></i>
+        Reporte de Egresos
+      </h2>
+      <p class="re-subtitulo">Recibos de egreso (EG01) por rango de fechas — comisiones a vendedores</p>
+    </div>
+  </div>
+
+  <!-- ── FILTROS DE FECHA ─────────────────────────────────────────────────── -->
+  <div class="re-filtros-card">
+    <div class="re-filtros-row">
+
+      <div class="re-field">
+        <label for="fechaDesde">
+          <i class="bi bi-calendar-event"></i> Desde
+        </label>
+        <input
+          id="fechaDesde"
+          type="date"
+          [(ngModel)]="fechaDesde"
+          class="re-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="re-field">
+        <label for="fechaHasta">
+          <i class="bi bi-calendar-event-fill"></i> Hasta
+        </label>
+        <input
+          id="fechaHasta"
+          type="date"
+          [(ngModel)]="fechaHasta"
+          class="re-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="re-actions">
+        <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+          <i class="bi bi-search" [class.spin]="cargando"></i>
+          {{ cargando ? 'Consultando...' : 'Consultar' }}
+        </button>
+        <button class="btn-limpiar" (click)="limpiar()" [disabled]="cargando">
+          <i class="bi bi-x-circle"></i> Limpiar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SKELETON (cargando) ─────────────────────────────────────────────── -->
+  <div *ngIf="cargando" class="re-skeleton-wrap">
+    <div class="re-skel-cards">
+      <div class="re-skel-card" *ngFor="let i of [1,2,3]">
+        <div class="skel-line skel-title"></div>
+        <div class="skel-line skel-amount"></div>
+        <div class="skel-line skel-qty"></div>
+      </div>
+    </div>
+    <div class="skel-line skel-table" *ngFor="let i of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- ── RESUMEN DE TOTALES ───────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && resumen && resumen.cantidadTotal > 0" class="re-totales-grid">
+
+    <div class="re-total-card tc-usd">
+      <div class="tc-icon"><i class="bi bi-currency-dollar"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Total USD</span>
+        <span class="tc-monto">$ {{ resumen.totalUsd | number:'1.2-2' }}</span>
+        <span class="tc-qty">{{ resumen.cantidadTotal }} egreso{{ resumen.cantidadTotal !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalUsd, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="re-total-card tc-pen">
+      <div class="tc-icon"><i class="bi bi-currency-exchange"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Total PEN</span>
+        <span class="tc-monto">S/ {{ resumen.totalPen | number:'1.2-2' }}</span>
+        <span class="tc-qty">{{ resumen.cantidadTotal }} egreso{{ resumen.cantidadTotal !== 1 ? 's' : '' }}</span>
+      </div>
+      <div class="tc-barra">
+        <div class="tc-barra-fill" [style.width.%]="pct(resumen.totalPen, resumen.totalGeneral)"></div>
+      </div>
+    </div>
+
+    <div class="re-total-card tc-general">
+      <div class="tc-icon"><i class="bi bi-bank2"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Total General</span>
+        <span class="tc-monto tc-monto-grande">$ {{ resumen.totalGeneral | number:'1.2-2' }}</span>
+        <span class="tc-qty">{{ resumen.cantidadTotal }} operación{{ resumen.cantidadTotal !== 1 ? 'es' : '' }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── TABLA DETALLE ────────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && resumen && resumen.cantidadTotal > 0" class="re-tabla-section">
+
+    <div class="re-tabla-header">
+      <h3 class="re-tabla-titulo">
+        <i class="bi bi-table"></i>
+        Detalle de egresos
+        <span class="re-badge-total">{{ resumen.detalle.length }}</span>
+      </h3>
+    </div>
+
+    <div class="re-tabla-wrap">
+      <table class="re-tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Recibo</th>
+            <th>Fecha</th>
+            <th>Vendedor</th>
+            <th>Concepto</th>
+            <th>Contrato</th>
+            <th>Medio de Pago</th>
+            <th class="col-monto">Importe</th>
+            <th>Registrado por</th>
+            <th>PDF</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of resumen.detalle; let i = index">
+            <td class="col-num" data-label="#">{{ i + 1 }}</td>
+            <td class="col-egreso" data-label="Recibo">
+              <span class="re-badge">{{ item.numeroEgreso }}</span>
+            </td>
+            <td class="col-fecha" data-label="Fecha">{{ formatFecha(item.fechaEmision) }}</td>
+            <td class="col-vendedor" data-label="Vendedor">{{ item.beneficiario ?? '—' }}</td>
+            <td class="col-concepto" data-label="Concepto" [title]="item.concepto">{{ item.concepto ?? '—' }}</td>
+            <td class="col-contrato" data-label="Contrato">{{ item.idContrato ? '#' + item.idContrato : '—' }}</td>
+            <td class="col-medio" data-label="Medio">{{ formatMedioPago(item.medioPago) }}</td>
+            <td class="col-monto" data-label="Importe">{{ formatMonto(item) }}</td>
+            <td class="col-usuario" data-label="Registrado por">{{ item.usuarioRegistro ?? '—' }}</td>
+            <td class="col-pdf" data-label="PDF">
+              <button class="btn-descargar" (click)="descargarEgreso(item)" title="Descargar recibo de egreso PDF">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="resumen.detalle.length > 0">
+          <tr class="fila-total">
+            <td colspan="10" class="total-label">
+              <i class="bi bi-calculator"></i>
+              Total General: {{ resumen.totalGeneral | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── SIN RESULTADOS ───────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && buscado && (!resumen || resumen.cantidadTotal === 0)" class="re-vacio">
+    <i class="bi bi-inbox"></i>
+    <p>No se encontraron egresos en el rango de fechas seleccionado.</p>
+  </div>
+
+  <!-- ── ESTADO INICIAL ───────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && !buscado" class="re-inicial">
+    <i class="bi bi-calendar-range"></i>
+    <p>Selecciona un rango de fechas y presiona <strong>Consultar</strong> para ver los egresos.</p>
+  </div>
+
+</div>
