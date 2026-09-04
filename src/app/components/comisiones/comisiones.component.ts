@@ -172,6 +172,11 @@ export class ComisionesComponent implements OnInit {
     this.resaltadaId = null;
   }
 
+  /** Desplaza suavemente hasta el inicio de la página (filtros de búsqueda). */
+  irAlInicio(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   get nombreProgramaSeleccionado(): string {
     if (!this.programaSeleccionado) return '';
     return this.programas.find(p => p.idPrograma === this.programaSeleccionado)?.nombrePrograma || '';

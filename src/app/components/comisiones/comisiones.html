@@ -328,6 +328,11 @@
 
 </div>
 
+<!-- Botón flotante: volver arriba (filtros de búsqueda) -->
+<button class="btn-flotante-arriba" (click)="irAlInicio()" title="Volver al inicio (filtros de búsqueda)">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
 <!-- Modal de registro de pago de comisión -->
 <app-pago-comision-modal *ngIf="modalComision" #pagoComisionModal
   [comision]="modalComision"
