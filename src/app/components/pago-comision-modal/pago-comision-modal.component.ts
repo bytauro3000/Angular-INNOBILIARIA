@@ -76,10 +76,18 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     this.fechaOperacion = '';
     this.numeroOperacion = '';
     this.medioPago = 'EFECTIVO';
-    this.observacion = this.observacionDefecto();
     this.voucherFiles = [];
     this.ocrOperationNumbers = new Map();
     this.numeroEgresoPreview = '';
+
+    // El monto se calcula ANTES de la observación (para restarlo del saldo).
+    if (this.tipo === 'ADELANTO') {
+      this.monto = this.comision.montoAdelantoSugerido || 0;
+    } else {
+      this.monto = this.letrasHabilitadas
+        .reduce((s, l) => s + (l.montoComision || 0), 0);
+    }
+    this.observacion = this.observacionDefecto();
 
     // Preview del número de recibo de egreso que se generará (EG01-n)
     this.comisionService.previewSiguienteEgreso().subscribe({
@@ -87,21 +95,18 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
       error: () => { this.numeroEgresoPreview = 'EG01-?'; }
     });
 
-    if (this.tipo === 'ADELANTO') {
-      this.monto = this.comision.montoAdelantoSugerido || 0;
-    } else {
-      this.monto = this.letrasHabilitadas
-        .reduce((s, l) => s + (l.montoComision || 0), 0);
-    }
     this.modal?.show();
   }
 
-  /** Texto por defecto de observaciones según el tipo de pago. */
+  /** Texto por defecto de observaciones según el tipo de pago. El saldo mostrado
+   *  es el saldo restante DESPUÉS de descontar el monto que se está pagando. */
   private observacionDefecto(): string {
     const mz = this.comision.manzanas || '—';
     const lt = this.comision.numeroLotes || '—';
     const programa = this.comision.programa || '—';
-    const saldo = `${this.simbolo} ${this.comision.saldoPendiente ?? 0}`;
+    const saldoBase = this.comision.saldoPendiente ?? 0;
+    const saldoDespues = Math.max(0, saldoBase - (this.monto || 0));
+    const saldo = `${this.simbolo} ${saldoDespues.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (this.tipo === 'ADELANTO') {
       return `Pago de la 1ra cuota de comisión de la MZ: ${mz} LT: ${lt} y programa: ${programa} - saldo: ${saldo}`;
     }
@@ -156,6 +161,11 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
 
   get simbolo(): string {
     return this.comision.moneda === 'PEN' ? 'S/' : '$';
+  }
+
+  /** Saldo restante después de descontar el monto que se está pagando en este modal. */
+  get saldoRestanteDespues(): number {
+    return Math.max(0, (this.comision.saldoPendiente ?? 0) - (this.monto || 0));
   }
 
   formatFecha(fecha: string): string {
