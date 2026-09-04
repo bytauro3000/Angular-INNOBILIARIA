@@ -73,13 +73,13 @@
           </table>
         </div>
 
-        <!-- Recibo + Monto + Medio de pago (una sola fila) -->
+        <!-- Recibo + Monto + Medio de pago + Fecha de pago (solo SOPORTE) en una fila -->
         <div class="row fila-monto-medio">
           <div class="col-md-3 form-group ctx-recibo-fila">
             <label>Recibo de Egreso</label>
             <div class="recibo-preview">{{ numeroEgresoPreview || 'EG01-?' }}</div>
           </div>
-          <div class="col-md-4 form-group">
+          <div [class]="esSoporte ? 'col-md-3 form-group' : 'col-md-4 form-group'">
             <label>{{ tipo === 'ADELANTO' ? 'Monto del adelanto' : 'Monto total a pagar' }}</label>
             <div class="input-monto-wrap">
               <span class="input-simbolo">{{ simbolo }}</span>
@@ -92,12 +92,17 @@
               El monto mensual es el 10% de cada letra (fijo, no editable).
             </small>
           </div>
-          <div class="col-md-5 form-group">
+          <div [class]="esSoporte ? 'col-md-3 form-group' : 'col-md-5 form-group'">
             <label for="medioPago">Medio de pago</label>
             <select id="medioPago" class="form-select" [(ngModel)]="medioPago" name="medioPago"
               (change)="onMedioPagoChange()">
               <option *ngFor="let opcion of medioPagoOptions" [value]="opcion">{{ opcion }}</option>
             </select>
+          </div>
+          <div class="col-md-3 form-group" *ngIf="esSoporte">
+            <label for="fechaPago">Fecha de pago</label>
+            <input type="date" id="fechaPago" class="form-control"
+              [(ngModel)]="fechaPago" name="fechaPago" />
           </div>
         </div>
 
@@ -113,14 +118,6 @@
             <input type="date" id="fechaOperacion" class="form-control"
               [(ngModel)]="fechaOperacion" name="fechaOperacion" />
           </div>
-        </div>
-
-        <!-- Fecha de pago: solo visible para rol SOPORTE -->
-        <div class="form-group" *ngIf="esSoporte">
-          <label for="fechaPago">Fecha de pago</label>
-          <input type="date" id="fechaPago" class="form-control"
-            [(ngModel)]="fechaPago" name="fechaPago" />
-          <small class="text-muted">Por defecto se registra con la fecha actual.</small>
         </div>
 
         <!-- Observaciones -->
