@@ -72,7 +72,15 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   }
 
   abrir(): void {
-    this.fechaPago = obtenerFechaPeru();
+    // Fecha de pago por defecto:
+    // - SOPORTE + ADELANTO (primer pago) → fecha del contrato (el primer pago se hace
+    //   al firmar el contrato).
+    // - Resto (MENSUAL, o secretaría que no edita la fecha) → fecha actual.
+    if (this.esSoporte && this.tipo === 'ADELANTO' && this.comision.fechaContrato) {
+      this.fechaPago = String(this.comision.fechaContrato).slice(0, 10);
+    } else {
+      this.fechaPago = obtenerFechaPeru();
+    }
     this.fechaOperacion = '';
     this.numeroOperacion = '';
     this.medioPago = 'EFECTIVO';
