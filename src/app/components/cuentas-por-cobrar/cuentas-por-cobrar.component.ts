@@ -128,12 +128,15 @@ export class CuentasPorCobrarComponent implements OnInit {
     return moneda === 'PEN' ? 'S/' : '$';
   }
 
-  formatFecha(fecha: string): string {
+  formatFecha(fecha: any): string {
     if (!fecha) return '—';
-    const d = new Date(fecha);
-    if (isNaN(d.getTime())) return fecha;
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    return `${dd}/${mm}/${d.getFullYear()}`;
+    if (Array.isArray(fecha) && fecha.length >= 3) {
+      const [y, m, d] = fecha;
+      return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+    }
+    const s = String(fecha);
+    const match = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+    return s;
   }
 }
