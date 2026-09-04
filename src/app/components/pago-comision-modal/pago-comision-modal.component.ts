@@ -77,7 +77,7 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     //   al firmar el contrato).
     // - Resto (MENSUAL, o secretaría que no edita la fecha) → fecha actual.
     if (this.esSoporte && this.tipo === 'ADELANTO' && this.comision.fechaContrato) {
-      this.fechaPago = String(this.comision.fechaContrato).slice(0, 10);
+      this.fechaPago = this.extraerFechaISO(this.comision.fechaContrato);
     } else {
       this.fechaPago = obtenerFechaPeru();
     }
@@ -123,6 +123,17 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
 
   cerrar(): void {
     this.modal?.hide();
+  }
+
+  /** Extrae yyyy-mm-dd de un LocalDate sin usar new Date() (evita zona horaria). */
+  private extraerFechaISO(fecha: any): string {
+    if (Array.isArray(fecha) && fecha.length >= 3) {
+      const [y, m, d] = fecha;
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    const s = String(fecha);
+    const match = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? match[0] : s.slice(0, 10);
   }
 
   onMedioPagoChange(): void {
