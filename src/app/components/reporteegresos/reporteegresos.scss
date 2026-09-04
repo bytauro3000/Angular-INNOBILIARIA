@@ -216,6 +216,7 @@ $shadow:     0 2px 12px rgba(0,0,0,.08);
     &.col-num { color: #999; width: 34px; }
     &.col-monto { font-weight: 600; white-space: nowrap; }
     &.col-concepto { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    &.col-pdf { text-align: center; }
   }
   tbody tr:hover { background: #f8fafc; }
   tfoot .fila-total td {

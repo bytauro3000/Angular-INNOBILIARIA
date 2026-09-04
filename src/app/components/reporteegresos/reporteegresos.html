@@ -122,16 +122,25 @@
             <th>Fecha</th>
             <th>Vendedor</th>
             <th>Concepto</th>
-            <th>Contrato</th>
             <th>Medio de Pago</th>
             <th class="col-monto">Importe</th>
             <th>Registrado por</th>
+            <th>PDF</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of resumen.detalle; let i = index">
             <td class="col-num" data-label="#">{{ i + 1 }}</td>
             <td class="col-egreso" data-label="Recibo">
+              <span class="re-badge">{{ item.numeroEgreso }}</span>
+            </td>
+            <td class="col-fecha" data-label="Fecha">{{ formatFecha(item.fechaEmision) }}</td>
+            <td class="col-vendedor" data-label="Vendedor">{{ item.beneficiario ?? '—' }}</td>
+            <td class="col-concepto" data-label="Concepto" [title]="item.concepto">{{ item.concepto ?? '—' }}</td>
+            <td class="col-medio" data-label="Medio">{{ formatMedioPago(item.medioPago) }}</td>
+            <td class="col-monto" data-label="Importe">{{ formatMonto(item) }}</td>
+            <td class="col-usuario" data-label="Registrado por">{{ item.usuarioRegistro ?? '—' }}</td>
+            <td class="col-pdf" data-label="PDF">
               <div class="comp-cell">
                 <button class="btn-descargar" (click)="descargarEgreso(item)" title="Descargar recibo de egreso PDF">
                   <i class="bi bi-file-earmark-pdf-fill"></i>
@@ -139,13 +148,6 @@
                 <span>{{ item.numeroEgreso }}</span>
               </div>
             </td>
-            <td class="col-fecha" data-label="Fecha">{{ formatFecha(item.fechaEmision) }}</td>
-            <td class="col-vendedor" data-label="Vendedor">{{ item.beneficiario ?? '—' }}</td>
-            <td class="col-concepto" data-label="Concepto" [title]="item.concepto">{{ item.concepto ?? '—' }}</td>
-            <td class="col-contrato" data-label="Contrato">{{ item.idContrato ? '#' + item.idContrato : '—' }}</td>
-            <td class="col-medio" data-label="Medio">{{ formatMedioPago(item.medioPago) }}</td>
-            <td class="col-monto" data-label="Importe">{{ formatMonto(item) }}</td>
-            <td class="col-usuario" data-label="Registrado por">{{ item.usuarioRegistro ?? '—' }}</td>
           </tr>
         </tbody>
         <tfoot *ngIf="resumen.detalle.length > 0">
