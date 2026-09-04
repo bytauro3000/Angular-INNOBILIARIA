@@ -163,9 +163,14 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     return this.comision.moneda === 'PEN' ? 'S/' : '$';
   }
 
-  /** Saldo restante después de descontar el monto que se está pagando en este modal. */
-  get saldoRestanteDespues(): number {
-    return Math.max(0, (this.comision.saldoPendiente ?? 0) - (this.monto || 0));
+  /** Saldo pendiente actual de la comisión (antes de este pago). */
+  get saldoPendienteActual(): number {
+    return this.comision.saldoPendiente ?? 0;
+  }
+
+  /** Al cambiar el monto del adelanto, recalcula la observación con el nuevo saldo. */
+  onMontoChange(): void {
+    this.observacion = this.observacionDefecto();
   }
 
   formatFecha(fecha: string): string {

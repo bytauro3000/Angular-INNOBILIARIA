@@ -40,7 +40,7 @@
           </div>
           <div class="ctx-item">
             <span class="ctx-label">Saldo restante</span>
-            <span class="ctx-valor ctx-saldo">{{ simbolo }} {{ saldoRestanteDespues | number:'1.2-2' }}</span>
+            <span class="ctx-valor ctx-saldo">{{ simbolo }} {{ saldoPendienteActual | number:'1.2-2' }}</span>
           </div>
         </div>
 
@@ -85,6 +85,7 @@
               <span class="input-simbolo">{{ simbolo }}</span>
               <input type="number" step="0.01" class="form-control input-monto"
                 [(ngModel)]="monto" name="monto"
+                (ngModelChange)="onMontoChange()"
                 [readonly]="tipo === 'MENSUAL'" [max]="comision.saldoPendiente" />
             </div>
             <small *ngIf="tipo === 'MENSUAL'" class="text-muted">
