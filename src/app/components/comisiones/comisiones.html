@@ -168,7 +168,7 @@
           <div class="com-datos">
             <h3>{{ c.nombreVendedor }}</h3>
             <span class="com-detalle">
-              {{ c.nombreCliente }} · <strong class="det-mz-lt">MZ {{ c.manzanas || '—' }} - LT {{ c.numeroLotes || '—' }}</strong> · {{ c.programa }} · Contrato #{{ c.idContrato }} · FC: {{ formatFecha(c.fechaContrato) }} · MT: {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }}
+              {{ c.nombreCliente }} · MZ <strong class="det-mz-lt">{{ c.manzanas || '—' }}</strong> - LT <strong class="det-mz-lt">{{ c.numeroLotes || '—' }}</strong> · {{ c.programa }} · Contrato #{{ c.idContrato }} · FC: {{ formatFecha(c.fechaContrato) }} · MT: {{ simbolo(c.moneda) }} {{ c.montoTotalContrato | number:'1.2-2' }}
             </span>
           </div>
         </div>
