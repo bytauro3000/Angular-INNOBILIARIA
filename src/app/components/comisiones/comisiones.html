@@ -248,7 +248,8 @@
         <div *ngIf="c.adelantoHabilitado" class="com-adelanto">
           <div class="adelanto-msg">
             <i class="fas fa-info-circle"></i>
-            El cliente ya pagó la primera letra. Registre el adelanto de la comisión
+            El cliente realizó un pago ({{ c.cantidadLetrasPagadas > 0 ? '1ra letra' : 'inicial' }}).
+            Registre el adelanto de la comisión
             ({{ c.cantidadLetrasPagadas }} letra(s) pagada(s)).
           </div>
           <div class="adelanto-controls">
