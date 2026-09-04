@@ -253,9 +253,9 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
         this.enviando = false;
         this.toastr.success(`Pago registrado (${res.numerosEgreso[0]})`, 'Éxito');
         this.cerrar();
-        if (res.numerosEgreso?.[0]) {
-          this.descargarEgreso(res.numerosEgreso[0]);
-        }
+        // if (res.numerosEgreso?.[0]) {
+        //   this.descargarEgreso(res.numerosEgreso[0]);
+        // }
         this.onPagoExitoso.emit();
       },
       error: (err) => {
