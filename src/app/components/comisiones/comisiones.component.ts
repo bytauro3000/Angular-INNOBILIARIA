@@ -46,6 +46,7 @@ export class ComisionesComponent implements OnInit {
   modalTipo: 'ADELANTO' | 'MENSUAL' = 'ADELANTO';
   modalComision: ComisionVendedorDTO | null = null;
   modalLetras: PagoComisionMensualDTO[] = [];
+  modalAdelantoMonto: number = 0;
   /** Comisiones seleccionadas para pago mensual multi-lote. */
   seleccionadasPago: Set<number> = new Set();
 
@@ -395,6 +396,7 @@ export class ComisionesComponent implements OnInit {
     if (!c.adelantoHabilitado) return;
     this.modalTipo = 'ADELANTO';
     this.modalComision = c;
+    this.modalAdelantoMonto = this.montoAdelanto(c);
     this.modalLetras = [];
     this.abrirModal();
   }
@@ -443,6 +445,7 @@ export class ComisionesComponent implements OnInit {
   onModalCerrado(): void {
     this.modalComision = null;
     this.modalLetras = [];
+    this.modalAdelantoMonto = 0;
   }
 
   onPagoComisionExitoso(): void {

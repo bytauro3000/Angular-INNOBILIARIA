@@ -29,6 +29,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   @Input() tipo: 'ADELANTO' | 'MENSUAL' = 'ADELANTO';
   /** Para MENSUAL: letras pagadas de la comisión (con montoComision calculado). */
   @Input() letrasHabilitadas: PagoComisionMensualDTO[] = [];
+  /** Monto del adelanto editable desde el input del componente padre. */
+  @Input() adelantoMonto: number = 0;
   @Output() onClose = new EventEmitter<void>();
   @Output() onPagoExitoso = new EventEmitter<void>();
 
@@ -90,7 +92,7 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
 
     // El monto se calcula ANTES de la observación (para restarlo del saldo).
     if (this.tipo === 'ADELANTO') {
-      this.monto = this.comision.montoAdelantoSugerido || 0;
+      this.monto = this.adelantoMonto || this.comision.montoAdelantoSugerido || 0;
     } else {
       this.monto = this.letrasHabilitadas
         .reduce((s, l) => s + (l.montoComision || 0), 0);
