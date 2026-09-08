@@ -142,12 +142,13 @@
                 <ng-container *ngIf="fila.celulares && fila.celulares.length > 1">
                   <div class="whatsapp-dropdown">
                     <button class="btn-whatsapp"
-                            (click)="toggleDropdown(fila.idContrato)"
+                            (click)="toggleDropdown(fila.idContrato, $event)"
                             title="Enviar recordatorio por WhatsApp">
                       <i class="fab fa-whatsapp"></i> WhatsApp
                     </button>
                     <div class="dropdown-menu"
-                         [class.show]="dropdownAbierto === fila.idContrato">
+                         *ngIf="dropdownAbierto === fila.idContrato"
+                         [ngStyle]="{ top: dropdownPos.top + 'px', left: dropdownPos.left + 'px' }">
                       <div *ngFor="let c of fila.celulares; let i = index"
                            class="dropdown-item"
                            (click)="abrirWhatsapp(fila, c)">

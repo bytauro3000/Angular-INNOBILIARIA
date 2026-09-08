@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteMoraService } from '../../services/reporte-mora.service';
 import { ReporteClientesMoraDTO, FilaClienteMora, DetalleLetraVencida } from '../../dto/reporte-mora.dto';
@@ -25,6 +25,7 @@ export class LetrasVencidasComponent implements OnInit {
   grupos: ReporteClientesMoraDTO[] = [];
   cargando = true;
   dropdownAbierto: number | null = null;
+  dropdownPos: { top: number; left: number } = { top: 0, left: 0 };
 
   constructor(
     private reporteMoraService: ReporteMoraService,
@@ -33,6 +34,12 @@ export class LetrasVencidasComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarLetrasVencidas();
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onWindowEvent(): void {
+    this.dropdownAbierto = null;
   }
 
   cargarLetrasVencidas(): void {
@@ -77,9 +84,20 @@ export class LetrasVencidasComponent implements OnInit {
     return moneda === 'USD' ? '$' : 'S/';
   }
 
-  /** Alterna el dropdown de celulares */
-  toggleDropdown(idContrato: number): void {
-    this.dropdownAbierto = this.dropdownAbierto === idContrato ? null : idContrato;
+  /** Alterna el dropdown de celulares con posicion fija */
+  toggleDropdown(idContrato: number, event: Event): void {
+    event.stopPropagation();
+    if (this.dropdownAbierto === idContrato) {
+      this.dropdownAbierto = null;
+      return;
+    }
+    const btn = event.currentTarget as HTMLElement;
+    const rect = btn.getBoundingClientRect();
+    this.dropdownPos = {
+      top: rect.bottom + 6,
+      left: rect.right - 220
+    };
+    this.dropdownAbierto = idContrato;
   }
 
   /** Obtiene el nombre del titular por índice (para el dropdown) */
