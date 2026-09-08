@@ -38,4 +38,10 @@ export class ReporteMoraService {
       moneda: fila.moneda
     });
   }
+
+  actualizarCelularCliente(idCliente: number, nuevoCelular: string): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/api/clientes/actualizar-celular/${idCliente}`, {
+      celular: nuevoCelular
+    });
+  }
 }

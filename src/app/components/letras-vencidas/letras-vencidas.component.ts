@@ -9,6 +9,7 @@ const WHATSAPP_WINDOW = 'WhatsAppWeb';
 let whatsappRef: Window | null = null;
 
 interface TelefonoOption {
+  idCliente: number;
   nombre: string;
   numero: string;
 }
@@ -134,6 +135,7 @@ export class LetrasVencidasComponent implements OnInit {
     // 2+ celulares: abrir modal de seleccion
     this.modalFila = fila;
     this.modalTelefono = celulares.map((c, i) => ({
+      idCliente: fila.idClientes?.[i] ?? 0,
       nombre: this.nombreTitular(fila, i),
       numero: c
     }));
@@ -178,9 +180,26 @@ export class LetrasVencidasComponent implements OnInit {
       this.toastr.warning('Ingrese un numero valido (minimo 6 digitos)', 'Celular');
       return;
     }
-    this.modalTelefono[index].numero = numLimpio;
-    this.cancelarEdicion();
-    this.toastr.success('Numero actualizado', 'Celular');
+
+    const tel = this.modalTelefono[index];
+    const idCliente = tel.idCliente;
+
+    if (!idCliente) {
+      this.toastr.error('No se pudo identificar el cliente', 'Error');
+      return;
+    }
+
+    this.reporteMoraService.actualizarCelularCliente(idCliente, numLimpio).subscribe({
+      next: () => {
+        tel.numero = numLimpio;
+        this.cancelarEdicion();
+        this.toastr.success('Numero actualizado correctamente', 'Celular');
+        this.cargarLetrasVencidas();
+      },
+      error: () => {
+        this.toastr.error('Error al actualizar el numero', 'Error');
+      }
+    });
   }
 
   cerrarModal(): void {

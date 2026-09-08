@@ -9,6 +9,7 @@ export interface FilaClienteMora {
   moneda: string;
   celular: string;
   celulares: string[];
+  idClientes: number[];
   idContrato: number;
   nombrePrograma: string;
   fechaVencimientoInicio: string;
