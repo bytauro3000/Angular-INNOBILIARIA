@@ -158,7 +158,7 @@
           <div class="telefono-info" *ngIf="editandoIndex !== i" (click)="seleccionarTelefono(tel.numero)">
             <div class="telefono-texto">
               <span class="telefono-nombre">{{ tel.nombre }}</span>
-              <span class="telefono-numero">{{ tel.numero }}</span>
+              <span class="telefono-numero">{{ formatTelefono(tel.numero) }}</span>
             </div>
             <div class="telefono-acciones">
               <button class="btn-editar" (click)="iniciarEdicion(i, $event)" title="Editar numero">
@@ -174,10 +174,10 @@
             <div class="edicion-input-row">
               <input class="edicion-input"
                      type="tel"
-                     [(ngModel)]="editandoValor"
                      [value]="editandoValor"
                      placeholder="Numero de celular"
                      autofocus
+                     (input)="onTelefonoInput($event)"
                      (keydown.enter)="guardarEdicion(i)"
                      (keydown.escape)="cancelarEdicion()" />
               <button class="btn-guardar" (click)="guardarEdicion(i)" title="Guardar">

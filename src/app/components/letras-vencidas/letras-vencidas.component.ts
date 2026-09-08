@@ -151,7 +151,20 @@ export class LetrasVencidasComponent implements OnInit {
   iniciarEdicion(index: number, event: Event): void {
     event.stopPropagation();
     this.editandoIndex = index;
-    this.editandoValor = this.modalTelefono[index].numero;
+    this.editandoValor = this.formatTelefono(this.modalTelefono[index].numero);
+  }
+
+  onTelefonoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/\D/g, '');
+    this.editandoValor = this.formatTelefono(limpio);
+  }
+
+  formatTelefono(num: string): string {
+    const limpio = num.replace(/\D/g, '');
+    if (limpio.length <= 3) return limpio;
+    if (limpio.length <= 6) return limpio.slice(0, 3) + '-' + limpio.slice(3);
+    return limpio.slice(0, 3) + '-' + limpio.slice(3, 6) + '-' + limpio.slice(6, 9);
   }
 
   cancelarEdicion(): void {
