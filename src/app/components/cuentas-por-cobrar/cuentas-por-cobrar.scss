@@ -111,7 +111,7 @@ $bg-white:   #ffffff;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
-  &:hover { background: darken($navy, 8%); }
+  &:hover { background: #012a6a; }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
@@ -213,7 +213,7 @@ $bg-white:   #ffffff;
   cursor: pointer;
   user-select: none;
   transition: background 0.2s;
-  &:hover { background: darken($navy, 5%); }
+  &:hover { background: #013478; }
 
   .programa-header-left {
     display: flex;
