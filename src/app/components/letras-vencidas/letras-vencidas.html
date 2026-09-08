@@ -122,33 +122,19 @@
               </td>
 
               <td class="td-celular" data-label="Celular">
-                <ng-container *ngIf="fila.celulares && fila.celulares.length">
-                  <span *ngFor="let c of fila.celulares; let last = last">
-                    {{ c }}<span *ngIf="!last"> / </span>
-                  </span>
-                </ng-container>
-                <span *ngIf="(!fila.celulares || !fila.celulares.length) && fila.celular">{{ fila.celular }}</span>
-                <span *ngIf="(!fila.celulares || !fila.celulares.length) && !fila.celular" class="sin-celular">—</span>
+                <span *ngIf="fila.celular">{{ fila.celular }}</span>
+                <span *ngIf="!fila.celular" class="sin-celular">—</span>
               </td>
 
               <td class="td-whatsapp text-center" data-label="WhatsApp">
-                <!-- 1 celular: boton directo -->
-                <button class="btn-whatsapp"
-                        *ngIf="getCelulares(fila).length === 1"
-                        (click)="abrirWhatsapp(fila, getCelulares(fila)[0])"
-                        title="Enviar recordatorio por WhatsApp">
-                  <i class="fab fa-whatsapp"></i> WhatsApp
-                </button>
-                <!-- 2+ celulares: dropdown selector -->
-                <div class="whatsapp-dropdown"
-                     *ngIf="getCelulares(fila).length > 1">
+                <div class="whatsapp-dropdown" *ngIf="fila.celular">
                   <button class="btn-whatsapp"
-                          (click)="toggleDropdown(fila.idContrato, $event)"
+                          (click)="onWhatsAppClick(fila, $event)"
                           title="Enviar recordatorio por WhatsApp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                   </button>
                   <div class="dropdown-menu"
-                       *ngIf="dropdownAbierto === fila.idContrato"
+                       *ngIf="getCelulares(fila).length > 1 && dropdownAbierto === fila.idContrato"
                        [ngStyle]="{ top: dropdownPos.top + 'px', left: dropdownPos.left + 'px' }">
                     <div *ngFor="let c of getCelulares(fila); let i = index"
                          class="dropdown-item"
@@ -157,8 +143,7 @@
                     </div>
                   </div>
                 </div>
-                <!-- Sin celulares -->
-                <span *ngIf="getCelulares(fila).length === 0" class="sin-whatsapp">—</span>
+                <span *ngIf="!fila.celular" class="sin-whatsapp">—</span>
               </td>
             </tr>
           </tbody>

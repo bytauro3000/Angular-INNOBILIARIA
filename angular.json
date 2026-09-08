@@ -51,7 +51,8 @@
               "sweetalert2",
               "google-libphonenumber",
               "tesseract.js",
-              "regenerator-runtime/runtime"
+              "regenerator-runtime/runtime",
+              "flatpickr/dist/l10n/es"
             ]
           },
           "configurations": {

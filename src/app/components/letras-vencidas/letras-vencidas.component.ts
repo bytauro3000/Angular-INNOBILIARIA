@@ -100,6 +100,20 @@ export class LetrasVencidasComponent implements OnInit {
     this.dropdownAbierto = idContrato;
   }
 
+  /**
+   * Maneja el click del boton WhatsApp.
+   * Si hay 1 solo celular → abre directo.
+   * Si hay 2+ celulares → muestra dropdown para elegir.
+   */
+  onWhatsAppClick(fila: FilaClienteMora, event: Event): void {
+    const celulares = this.getCelulares(fila);
+    if (celulares.length === 1) {
+      this.abrirWhatsapp(fila, celulares[0]);
+    } else if (celulares.length > 1) {
+      this.toggleDropdown(fila.idContrato, event);
+    }
+  }
+
   /** Obtiene el nombre del titular por índice (para el dropdown) */
   nombreTitular(fila: FilaClienteMora, index: number): string {
     const nombres = fila.nombreClientes.split('/').map(n => n.trim());
