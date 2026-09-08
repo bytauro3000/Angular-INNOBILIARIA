@@ -327,6 +327,42 @@ $bg-white:   #ffffff;
 .sin-whatsapp { color: $text-light; font-style: italic; font-size: 0.82rem; }
 .td-whatsapp { min-width: 100px; }
 
+// ── Dropdown de celulares ──────────────────────────────────────────────────
+.whatsapp-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  min-width: 220px;
+  padding: 4px 0;
+
+  &.show { display: block; }
+}
+
+.dropdown-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #334155;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+}
+
 // ── Responsive ────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .lv-header {

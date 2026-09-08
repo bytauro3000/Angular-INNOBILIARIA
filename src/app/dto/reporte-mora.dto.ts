@@ -8,6 +8,7 @@ export interface FilaClienteMora {
   importeTotal: number;
   moneda: string;
   celular: string;
+  celulares: string[];
   idContrato: number;
   nombrePrograma: string;
   fechaVencimientoInicio: string;

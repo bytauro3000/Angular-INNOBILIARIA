@@ -24,6 +24,7 @@ export class LetrasVencidasComponent implements OnInit {
 
   grupos: ReporteClientesMoraDTO[] = [];
   cargando = true;
+  dropdownAbierto: number | null = null;
 
   constructor(
     private reporteMoraService: ReporteMoraService,
@@ -74,6 +75,17 @@ export class LetrasVencidasComponent implements OnInit {
 
   simbolo(moneda: string): string {
     return moneda === 'USD' ? '$' : 'S/';
+  }
+
+  /** Alterna el dropdown de celulares */
+  toggleDropdown(idContrato: number): void {
+    this.dropdownAbierto = this.dropdownAbierto === idContrato ? null : idContrato;
+  }
+
+  /** Obtiene el nombre del titular por índice (para el dropdown) */
+  nombreTitular(fila: FilaClienteMora, index: number): string {
+    const nombres = fila.nombreClientes.split('/').map(n => n.trim());
+    return nombres[index] || `Titular ${index + 1}`;
   }
 
   /** "19/120" → 19 */
@@ -239,17 +251,19 @@ export class LetrasVencidasComponent implements OnInit {
 
   /**
    * Abre WhatsApp Web con el mensaje precargado para el cliente.
-   * Obtiene el detalle de letras vencidas del backend y construye
-   * el mensaje personalizado según la cantidad de titulares.
+   * Si se especifica celular, usa ese número; si no, usa el primero disponible.
    */
-  abrirWhatsapp(fila: FilaClienteMora): void {
-    if (!fila.celular) {
+  abrirWhatsapp(fila: FilaClienteMora, celularSeleccionado?: string): void {
+    this.dropdownAbierto = null;
+
+    const celular = celularSeleccionado || fila.celular || fila.celulares?.[0] || '';
+    if (!celular) {
       this.toastr.warning(`El cliente "${fila.nombreClientes}" no tiene celular registrado`, 'WhatsApp');
       return;
     }
-    const celular = fila.celular.replace(/\D/g, '');
-    const celularLimpio = celular.startsWith('51') ? celular : '51' + celular;
-    if (celularLimpio === '51' || celularLimpio.match(/^510+$/)) {
+    const celularLimpio = celular.replace(/\D/g, '');
+    const celularFormato = celularLimpio.startsWith('51') ? celularLimpio : '51' + celularLimpio;
+    if (celularFormato === '51' || celularFormato.match(/^510+$/)) {
       this.toastr.warning(`El celular de "${fila.nombreClientes}" no es válido`, 'WhatsApp');
       return;
     }
@@ -264,7 +278,7 @@ export class LetrasVencidasComponent implements OnInit {
         }
 
         const mensaje = this.construirMensaje(fila.nombreClientes, letras, fila.moneda);
-        const url = `https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`;
+        const url = `https://web.whatsapp.com/send?phone=${celularFormato}&text=${encodeURIComponent(mensaje)}`;
 
         if (whatsappWindowRef && !whatsappWindowRef.closed) {
           whatsappWindowRef.location.href = url;
