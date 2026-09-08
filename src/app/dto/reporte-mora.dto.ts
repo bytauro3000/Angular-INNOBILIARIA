@@ -26,5 +26,6 @@ export interface DetalleLetraVencida {
   montoMora: number;
   venceHoy: boolean;
   estado: string;
+  nombreEmpresa: string;
 }
  

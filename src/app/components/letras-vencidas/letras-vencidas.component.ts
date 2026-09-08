@@ -143,11 +143,12 @@ export class LetrasVencidasComponent implements OnInit {
   }
 
   /**
-   * Formatea el número de letra con ceros a la izquierda: "1" → "001".
+   * Formatea el número de letra: "1" → "1", "12" → "12".
+   * Sin ceros a la izquierda.
    */
   private formatearNumeroLetra(numero: string): string {
     const num = parseInt(numero, 10);
-    return isNaN(num) ? numero : String(num).padStart(3, '0');
+    return isNaN(num) ? numero : String(num);
   }
 
   /**
@@ -166,14 +167,13 @@ export class LetrasVencidasComponent implements OnInit {
 
     const letrasVencidas = letras.filter(l => !l.venceHoy);
     const letraHoy = letras.filter(l => l.venceHoy);
+    const nombreEmpresa = letras[0]?.nombreEmpresa || 'INMOBILIARIA IVAN SAC';
 
     const saludo = this.formatearSaludo(nombreClientes);
     let mensaje = `🔔 *RECORDATORIO DE PAGO*\n\n${saludo}\n\n`;
 
     if (letrasVencidas.length > 0) {
       // Escenario A: letras vencidas + la de hoy
-      const totalLetras = letras.length;
-      const textoPlural = totalLetras === 1 ? 'letra de cambio' : 'letras de cambio';
       const textoCuota = letraHoy.length === 1
         ? `, además su cuota N.° ${this.formatearNumeroLetra(letraHoy[0].numeroLetra)} vence el día de hoy`
         : '';
@@ -216,6 +216,7 @@ export class LetrasVencidasComponent implements OnInit {
       }
       mensaje += `💰 *Total a regularizar:* ${simb} ${totalRegularizar.toFixed(2)}\n\n`;
       mensaje += `Le agradeceremos acercarse a nuestra oficina para regularizar los pagos pendientes y evitar que continúe generándose mora sobre las letras vencidas.\n\n`;
+      mensaje += `Si ya realizó alguno de estos pagos, por favor comuníquenoslo o envíenos su constancia para actualizar nuestros registros.\n\n`;
 
     } else {
       // Escenario B: solo la letra que vence hoy
@@ -227,16 +228,14 @@ export class LetrasVencidasComponent implements OnInit {
       mensaje += `📅 *Fecha de vencimiento:* HOY, ${fechaHoy}\n`;
       mensaje += `💵 *Importe:* ${montoLetra}\n\n`;
       mensaje += `Le agradeceremos acercarse a nuestra oficina para regularizar su pago dentro de la fecha correspondiente y evitar la generación de mora.\n\n`;
+      mensaje += `Si ya realizó el pago, por favor omita este mensaje o envíenos su constancia para actualizar nuestros registros.\n\n`;
     }
 
-    mensaje += `Si ya realizó alguno de estos pagos, por favor comuníquenoslo o envíenos su constancia para actualizar nuestros registros.\n\n`;
     mensaje += `*Atentamente,*\n`;
-    mensaje += `*${this.nombreInmobiliaria}*`;
+    mensaje += `*${nombreEmpresa}*`;
 
     return mensaje;
   }
-
-  private nombreInmobiliaria = 'INMOBILIARIA IVAN SAC';
 
   /**
    * Abre WhatsApp Web con el mensaje precargado para el cliente.
