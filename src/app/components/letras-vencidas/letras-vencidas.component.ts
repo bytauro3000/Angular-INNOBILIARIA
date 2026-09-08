@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteMoraService } from '../../services/reporte-mora.service';
-import { ReporteClientesMoraDTO, FilaClienteMora } from '../../dto/reporte-mora.dto';
+import { ReporteClientesMoraDTO, FilaClienteMora, DetalleLetraVencida } from '../../dto/reporte-mora.dto';
 import { ToastrService } from 'ngx-toastr';
 
 // Nombre fijo de la ventana de WhatsApp Web. Al usar siempre el mismo nombre,
@@ -102,9 +102,146 @@ export class LetrasVencidasComponent implements OnInit {
     return 'Buenas noches';
   }
 
+  // ── Helpers para formato de mensaje WhatsApp ──────────────────────────────
+
+  /**
+   * Formatea el saludo según la cantidad de titulares:
+   * 1 titular  → "Estimado(a) JUAN PEREZ:"
+   * 2 titulares → "Estimados JUAN PEREZ y MARIA LOPEZ:"
+   * 3+ titulares → "Estimados A, B y C:"
+   */
+  private formatearSaludo(nombreClientes: string): string {
+    if (!nombreClientes || nombreClientes.trim() === '') {
+      return 'Estimado(a) cliente:';
+    }
+    const nombres = nombreClientes.split('/').map(n => n.trim()).filter(n => n.length > 0);
+    if (nombres.length === 1) {
+      return `Estimado(a) ${nombres[0]}:`;
+    }
+    if (nombres.length === 2) {
+      return `Estimados ${nombres[0]} y ${nombres[1]}:`;
+    }
+    const todosMenosUltimo = nombres.slice(0, -1).join(', ');
+    return `Estimados ${todosMenosUltimo} y ${nombres[nombres.length - 1]}:`;
+  }
+
+  /**
+   * Formatea la fecha de vencimiento para el mensaje.
+   * Si es hoy, muestra "HOY, DD/MM/YYYY".
+   * Si no, muestra "DD/MM/YYYY".
+   */
+  private formatearFecha(fechaStr: string): string {
+    const fecha = new Date(fechaStr + 'T00:00:00');
+    const hoy = new Date();
+    const esHoy = fecha.getFullYear() === hoy.getFullYear()
+      && fecha.getMonth() === hoy.getMonth()
+      && fecha.getDate() === hoy.getDate();
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    const yyyy = fecha.getFullYear();
+    return esHoy ? `HOY, ${dd}/${mm}/${yyyy}` : `${dd}/${mm}/${yyyy}`;
+  }
+
+  /**
+   * Formatea el número de letra con ceros a la izquierda: "1" → "001".
+   */
+  private formatearNumeroLetra(numero: string): string {
+    const num = parseInt(numero, 10);
+    return isNaN(num) ? numero : String(num).padStart(3, '0');
+  }
+
+  /**
+   * Construye el mensaje completo de WhatsApp según el escenario:
+   * - Escenario A: tiene letras vencidas + la que vence hoy
+   * - Escenario B: solo tiene la letra que vence hoy (sin vencidas)
+   */
+  private construirMensaje(
+    nombreClientes: string,
+    letras: DetalleLetraVencida[],
+    moneda: string
+  ): string {
+    const simb = this.simbolo(moneda);
+    const hoy = new Date();
+    const fechaHoy = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+
+    const letrasVencidas = letras.filter(l => !l.venceHoy);
+    const letraHoy = letras.filter(l => l.venceHoy);
+
+    const saludo = this.formatearSaludo(nombreClientes);
+    let mensaje = `🔔 *RECORDATORIO DE PAGO*\n\n${saludo}\n\n`;
+
+    if (letrasVencidas.length > 0) {
+      // Escenario A: letras vencidas + la de hoy
+      const totalLetras = letras.length;
+      const textoPlural = totalLetras === 1 ? 'letra de cambio' : 'letras de cambio';
+      const textoCuota = letraHoy.length === 1
+        ? `, además su cuota N.° ${this.formatearNumeroLetra(letraHoy[0].numeroLetra)} vence el día de hoy`
+        : '';
+
+      mensaje += `Le informamos que actualmente registra ${letrasVencidas.length} ${letrasVencidas.length === 1 ? 'letra de cambio vencida' : 'letras de cambio vencidas'} y pendientes de pago${textoCuota}.\n\n`;
+      mensaje += `📋 *Detalle de letras vencidas:*\n\n`;
+
+      for (const l of letrasVencidas) {
+        const numFormat = this.formatearNumeroLetra(l.numeroLetra);
+        const montoLetra = `${simb} ${l.importe.toFixed(2)}`;
+        const fecha = this.formatearFecha(l.fechaVencimiento);
+        const moraStr = l.montoMora > 0 ? ` | ⚠️ Mora: ${simb} ${l.montoMora.toFixed(2)}` : '';
+        const totalLetra = l.importe + l.montoMora;
+        mensaje += `• *Letra N.° ${numFormat}* — ${montoLetra}\n`;
+        mensaje += `  Vencimiento: ${fecha}${moraStr}\n`;
+        if (l.montoMora > 0) {
+          mensaje += `  *Total: ${simb} ${totalLetra.toFixed(2)}*\n`;
+        }
+        mensaje += `\n`;
+      }
+
+      if (letraHoy.length > 0) {
+        mensaje += `📅 *Cuota que vence hoy:*\n\n`;
+        for (const l of letraHoy) {
+          const numFormat = this.formatearNumeroLetra(l.numeroLetra);
+          const montoLetra = `${simb} ${l.importe.toFixed(2)}`;
+          mensaje += `• *Letra N.° ${numFormat}* — ${montoLetra}\n`;
+          mensaje += `  Vencimiento: HOY, ${fechaHoy}\n`;
+          mensaje += `  *Total: ${montoLetra}*\n\n`;
+        }
+      }
+
+      const importeTotalLetras = letras.reduce((s, l) => s + l.importe, 0);
+      const moraTotal = letras.reduce((s, l) => s + l.montoMora, 0);
+      const totalRegularizar = importeTotalLetras + moraTotal;
+
+      mensaje += `💵 *Importe total de letras:* ${simb} ${importeTotalLetras.toFixed(2)}\n`;
+      if (moraTotal > 0) {
+        mensaje += `⚠️ *Mora total:* ${simb} ${moraTotal.toFixed(2)}\n`;
+      }
+      mensaje += `💰 *Total a regularizar:* ${simb} ${totalRegularizar.toFixed(2)}\n\n`;
+      mensaje += `Le agradeceremos acercarse a nuestra oficina para regularizar los pagos pendientes y evitar que continúe generándose mora sobre las letras vencidas.\n\n`;
+
+    } else {
+      // Escenario B: solo la letra que vence hoy
+      const l = letraHoy[0];
+      const numFormat = this.formatearNumeroLetra(l.numeroLetra);
+      const montoLetra = `${simb} ${l.importe.toFixed(2)}`;
+
+      mensaje += `Le informamos que su cuota N.° ${numFormat} vence el día de hoy.\n\n`;
+      mensaje += `📅 *Fecha de vencimiento:* HOY, ${fechaHoy}\n`;
+      mensaje += `💵 *Importe:* ${montoLetra}\n\n`;
+      mensaje += `Le agradeceremos acercarse a nuestra oficina para regularizar su pago dentro de la fecha correspondiente y evitar la generación de mora.\n\n`;
+    }
+
+    mensaje += `Si ya realizó alguno de estos pagos, por favor comuníquenoslo o envíenos su constancia para actualizar nuestros registros.\n\n`;
+    mensaje += `*Atentamente,*\n`;
+    mensaje += `*${this.nombreInmobiliaria}*`;
+
+    return mensaje;
+  }
+
+  private nombreInmobiliaria = 'INMOBILIARIA IVAN SAC';
+
   /**
    * Abre WhatsApp Web con el mensaje precargado para el cliente.
-   * El número se normaliza al prefijo 51 (Perú).
+   * Obtiene el detalle de letras vencidas del backend y construye
+   * el mensaje personalizado según la cantidad de titulares.
    */
   abrirWhatsapp(fila: FilaClienteMora): void {
     if (!fila.celular) {
@@ -118,25 +255,30 @@ export class LetrasVencidasComponent implements OnInit {
       return;
     }
 
-    const cantidad = fila.cantidadLetrasAtrasadas;
-    const sustantivo = cantidad === 1 ? 'letra de cambio' : 'letras de cambio';
-    const importe = `${this.simbolo(fila.moneda)} ${(fila.importeTotal ?? 0).toFixed(2)}`;
+    this.toastr.info('Cargando detalle de letras...', 'WhatsApp', { timeOut: 1500 });
 
-    const mensaje = `${this.saludoSegunHora()}, estimado cliente se le informa que a la fecha usted adeuda ` +
-      `${cantidad} ${sustantivo} por un total de ${importe}. ` +
-      `Por favor acercarse a oficina a regularizar su pago y evite generar intereses.`;
+    this.reporteMoraService.obtenerDetalleLetras(fila.idContrato).subscribe({
+      next: (letras) => {
+        if (!letras || letras.length === 0) {
+          this.toastr.warning('No se encontraron letras pendientes para este contrato', 'WhatsApp');
+          return;
+        }
 
-    const url = `https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`;
+        const mensaje = this.construirMensaje(fila.nombreClientes, letras, fila.moneda);
+        const url = `https://web.whatsapp.com/send?phone=${celularLimpio}&text=${encodeURIComponent(mensaje)}`;
 
-    // Reutiliza la pestaña de WhatsApp Web si sigue abierta (referencia de módulo
-    // + nombre de ventana fijo). Solo abre una nueva si no existe o fue cerrada.
-    if (whatsappWindowRef && !whatsappWindowRef.closed) {
-      whatsappWindowRef.location.href = url;
-      whatsappWindowRef.focus();
-      return;
-    }
+        if (whatsappWindowRef && !whatsappWindowRef.closed) {
+          whatsappWindowRef.location.href = url;
+          whatsappWindowRef.focus();
+          return;
+        }
 
-    whatsappWindowRef = window.open(url, WHATSAPP_WEB_WINDOW_NAME);
-    whatsappWindowRef?.focus();
+        whatsappWindowRef = window.open(url, WHATSAPP_WEB_WINDOW_NAME);
+        whatsappWindowRef?.focus();
+      },
+      error: () => {
+        this.toastr.error('Error al obtener el detalle de letras', 'WhatsApp');
+      }
+    });
   }
 }

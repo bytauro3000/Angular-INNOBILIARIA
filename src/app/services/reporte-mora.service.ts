@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ReporteClientesMoraDTO, FilaClienteMora } from '../dto/reporte-mora.dto';
+import { ReporteClientesMoraDTO, FilaClienteMora, DetalleLetraVencida } from '../dto/reporte-mora.dto';
 
 @Injectable({ providedIn: 'root' })
 export class ReporteMoraService {
@@ -18,6 +18,10 @@ export class ReporteMoraService {
 
   obtenerClientesLetrasVencidas(): Observable<ReporteClientesMoraDTO[]> {
     return this.http.get<ReporteClientesMoraDTO[]>(`${this.apiUrl}/letras-vencidas`);
+  }
+
+  obtenerDetalleLetras(idContrato: number): Observable<DetalleLetraVencida[]> {
+    return this.http.get<DetalleLetraVencida[]>(`${this.apiUrl}/letras-detalle/${idContrato}`);
   }
 
   descargarPdf(): Observable<Blob> {

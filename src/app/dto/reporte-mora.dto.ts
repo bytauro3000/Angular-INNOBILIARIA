@@ -17,4 +17,14 @@ export interface ReporteClientesMoraDTO {
   nombrePrograma: string;
   clientes: FilaClienteMora[];
 }
+
+export interface DetalleLetraVencida {
+  numeroLetra: string;
+  importe: number;
+  fechaVencimiento: string;
+  diasMora: number;
+  montoMora: number;
+  venceHoy: boolean;
+  estado: string;
+}
  
