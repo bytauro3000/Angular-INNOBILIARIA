@@ -183,7 +183,7 @@ export class LetrasVencidasComponent implements OnInit {
     });
   }
 
-  // ── Construccion de mensaje ─────────────────────────────────────────────
+  // ── Construcción de mensaje ─────────────────────────────────────────────
 
   private construirMensaje(
     nombreClientes: string,
@@ -203,7 +203,7 @@ export class LetrasVencidasComponent implements OnInit {
 
     if (vencidas.length > 0) {
       const textoHoy = hoyLetras.length === 1
-        ? `, ademas su cuota N.\u{00B0} ${this.formatearNumeroLetra(hoyLetras[0].numeroLetra)} vence el dia de hoy`
+        ? `, además su cuota N.\u{00B0} ${this.formatearNumeroLetra(hoyLetras[0].numeroLetra)} vence el día de hoy`
         : '';
 
       msg += `Le informamos que actualmente registra ${vencidas.length} ${vencidas.length === 1 ? 'letra de cambio vencida' : 'letras de cambio vencidas'} y pendientes de pago${textoHoy}.\n\n`;
@@ -239,17 +239,17 @@ export class LetrasVencidasComponent implements OnInit {
         msg += `\u26A0\uFE0F *Mora total:* ${simb} ${moraTotal.toFixed(2)}\n`;
       }
       msg += `\u{1F4B0} *Total a regularizar:* ${simb} ${(importeTotal + moraTotal).toFixed(2)}\n\n`;
-      msg += `Le agradeceremos acercarse a nuestra oficina para regularizar los pagos pendientes y evitar que continue generandose mora sobre las letras vencidas.\n\n`;
-      msg += `Si ya realizo alguno de estos pagos, por favor comuniquenoslo o envienos su constancia para actualizar nuestros registros.\n\n`;
+      msg += `Le agradeceremos acercarse a nuestra oficina para regularizar los pagos pendientes y evitar que continúe generándose mora sobre las letras vencidas.\n\n`;
+      msg += `Si ya realizó alguno de estos pagos, por favor comuníquenoslo o envíenos su constancia para actualizar nuestros registros.\n\n`;
     } else {
       const l = hoyLetras[0];
       const num = this.formatearNumeroLetra(l.numeroLetra);
 
-      msg += `Le informamos que su cuota N.\u{00B0} ${num} vence el dia de hoy.\n\n`;
+      msg += `Le informamos que su cuota N.\u{00B0} ${num} vence el día de hoy.\n\n`;
       msg += `\u{1F4C5} *Fecha de vencimiento:* HOY, ${fechaHoy}\n`;
       msg += `\u{1F4B5} *Importe:* ${simb} ${l.importe.toFixed(2)}\n\n`;
-      msg += `Le agradeceremos regularizar su pago dentro de la fecha correspondiente y evitar la generacion de mora.\n\n`;
-      msg += `Si ya realizo el pago, por favor omita este mensaje o envienos su constancia para actualizar nuestros registros.\n\n`;
+      msg += `Le agradeceremos regularizar su pago dentro de la fecha correspondiente y evitar la generación de mora.\n\n`;
+      msg += `Si ya realizó el pago, por favor omita este mensaje o envíenos su constancia para actualizar nuestros registros.\n\n`;
     }
 
     msg += `*Atentamente,*\n*${nombreEmpresa}*`;
