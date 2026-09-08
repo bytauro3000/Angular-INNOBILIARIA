@@ -127,37 +127,38 @@
                     {{ c }}<span *ngIf="!last"> / </span>
                   </span>
                 </ng-container>
-                <span *ngIf="(!fila.celulares || !fila.celulares.length) && !fila.celular" class="sin-celular">—</span>
                 <span *ngIf="(!fila.celulares || !fila.celulares.length) && fila.celular">{{ fila.celular }}</span>
+                <span *ngIf="(!fila.celulares || !fila.celulares.length) && !fila.celular" class="sin-celular">—</span>
               </td>
 
               <td class="td-whatsapp text-center" data-label="WhatsApp">
-                <ng-container *ngIf="fila.celulares && fila.celulares.length === 1">
+                <!-- 1 celular: boton directo -->
+                <button class="btn-whatsapp"
+                        *ngIf="getCelulares(fila).length === 1"
+                        (click)="abrirWhatsapp(fila, getCelulares(fila)[0])"
+                        title="Enviar recordatorio por WhatsApp">
+                  <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <!-- 2+ celulares: dropdown selector -->
+                <div class="whatsapp-dropdown"
+                     *ngIf="getCelulares(fila).length > 1">
                   <button class="btn-whatsapp"
-                          (click)="abrirWhatsapp(fila, fila.celulares[0])"
+                          (click)="toggleDropdown(fila.idContrato, $event)"
                           title="Enviar recordatorio por WhatsApp">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                   </button>
-                </ng-container>
-                <ng-container *ngIf="fila.celulares && fila.celulares.length > 1">
-                  <div class="whatsapp-dropdown">
-                    <button class="btn-whatsapp"
-                            (click)="toggleDropdown(fila.idContrato, $event)"
-                            title="Enviar recordatorio por WhatsApp">
-                      <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                    <div class="dropdown-menu"
-                         *ngIf="dropdownAbierto === fila.idContrato"
-                         [ngStyle]="{ top: dropdownPos.top + 'px', left: dropdownPos.left + 'px' }">
-                      <div *ngFor="let c of fila.celulares; let i = index"
-                           class="dropdown-item"
-                           (click)="abrirWhatsapp(fila, c)">
-                        {{ nombreTitular(fila, i) }} — {{ c }}
-                      </div>
+                  <div class="dropdown-menu"
+                       *ngIf="dropdownAbierto === fila.idContrato"
+                       [ngStyle]="{ top: dropdownPos.top + 'px', left: dropdownPos.left + 'px' }">
+                    <div *ngFor="let c of getCelulares(fila); let i = index"
+                         class="dropdown-item"
+                         (click)="abrirWhatsapp(fila, c)">
+                      {{ nombreTitular(fila, i) }} — {{ c }}
                     </div>
                   </div>
-                </ng-container>
-                <span *ngIf="(!fila.celulares || !fila.celulares.length) && !fila.celular" class="sin-whatsapp">—</span>
+                </div>
+                <!-- Sin celulares -->
+                <span *ngIf="getCelulares(fila).length === 0" class="sin-whatsapp">—</span>
               </td>
             </tr>
           </tbody>

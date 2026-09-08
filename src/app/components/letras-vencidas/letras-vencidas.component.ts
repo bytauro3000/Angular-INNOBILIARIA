@@ -106,6 +106,17 @@ export class LetrasVencidasComponent implements OnInit {
     return nombres[index] || `Titular ${index + 1}`;
   }
 
+  /** Retorna la lista de celulares válidos (fallback a celular si celulares está vacío) */
+  getCelulares(fila: FilaClienteMora): string[] {
+    if (fila.celulares && fila.celulares.length) {
+      return fila.celulares.filter(c => c && c.trim() !== '');
+    }
+    if (fila.celular && fila.celular.trim()) {
+      return [fila.celular];
+    }
+    return [];
+  }
+
   /** "19/120" → 19 */
   numeroLetra(numeroLetra: string): string {
     if (!numeroLetra) return '';
