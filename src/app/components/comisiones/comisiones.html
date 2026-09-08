@@ -164,7 +164,7 @@
             <input type="checkbox" [checked]="estaSeleccionadaPago(c)" (change)="toggleSeleccionPago(c)" />
           </label>
           <i class="fas" [ngClass]="estaExpandida(c.idComision) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-          <div class="com-avatar" [title]="c.nombreVendedor">{{ c.nombreVendedor?.charAt(0) }}</div>
+          <div class="com-avatar" [title]="c.nombreVendedor">{{ c.nombreVendedor.charAt(0) }}</div>
           <div class="com-datos">
             <h3>{{ c.nombreVendedor }}</h3>
             <span class="com-detalle">
