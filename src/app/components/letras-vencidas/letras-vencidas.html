@@ -150,13 +150,46 @@
         </button>
       </div>
       <div class="modal-body">
-        <button class="telefono-option"
-                *ngFor="let tel of modalTelefono"
-                (click)="seleccionarTelefono(tel.numero)">
-          <i class="fab fa-whatsapp"></i>
-          <span>{{ tel.label }}</span>
-          <i class="fas fa-chevron-right"></i>
-        </button>
+        <div class="telefono-item"
+             *ngFor="let tel of modalTelefono; let i = index"
+             [class.editando]="editandoIndex === i">
+
+          <!-- Modo visualizacion -->
+          <div class="telefono-info" *ngIf="editandoIndex !== i" (click)="seleccionarTelefono(tel.numero)">
+            <div class="telefono-texto">
+              <span class="telefono-nombre">{{ tel.nombre }}</span>
+              <span class="telefono-numero">{{ tel.numero }}</span>
+            </div>
+            <div class="telefono-acciones">
+              <button class="btn-editar" (click)="iniciarEdicion(i, $event)" title="Editar numero">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <i class="fas fa-chevron-right telefono-arrow"></i>
+            </div>
+          </div>
+
+          <!-- Modo edicion -->
+          <div class="telefono-edicion" *ngIf="editandoIndex === i">
+            <span class="telefono-nombre-edicion">{{ tel.nombre }}</span>
+            <div class="edicion-input-row">
+              <input class="edicion-input"
+                     type="tel"
+                     [(ngModel)]="editandoValor"
+                     [value]="editandoValor"
+                     placeholder="Numero de celular"
+                     autofocus
+                     (keydown.enter)="guardarEdicion(i)"
+                     (keydown.escape)="cancelarEdicion()" />
+              <button class="btn-guardar" (click)="guardarEdicion(i)" title="Guardar">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn-cancelar" (click)="cancelarEdicion()" title="Cancelar">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>

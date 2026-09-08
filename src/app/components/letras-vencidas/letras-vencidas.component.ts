@@ -1,5 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ReporteMoraService } from '../../services/reporte-mora.service';
 import { ReporteClientesMoraDTO, FilaClienteMora, DetalleLetraVencida } from '../../dto/reporte-mora.dto';
 import { ToastrService } from 'ngx-toastr';
@@ -8,14 +9,14 @@ const WHATSAPP_WINDOW = 'WhatsAppWeb';
 let whatsappRef: Window | null = null;
 
 interface TelefonoOption {
-  label: string;
+  nombre: string;
   numero: string;
 }
 
 @Component({
   selector: 'app-letras-vencidas',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './letras-vencidas.html',
   styleUrls: ['./letras-vencidas.scss']
 })
@@ -28,6 +29,8 @@ export class LetrasVencidasComponent implements OnInit {
   modalVisible = false;
   modalTelefono: TelefonoOption[] = [];
   modalFila: FilaClienteMora | null = null;
+  editandoIndex: number | null = null;
+  editandoValor: string = '';
 
   constructor(
     private reporteMoraService: ReporteMoraService,
@@ -40,7 +43,11 @@ export class LetrasVencidasComponent implements OnInit {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    this.cerrarModal();
+    if (this.editandoIndex !== null) {
+      this.cancelarEdicion();
+    } else {
+      this.cerrarModal();
+    }
   }
 
   // ── Carga de datos ──────────────────────────────────────────────────────
@@ -127,23 +134,48 @@ export class LetrasVencidasComponent implements OnInit {
     // 2+ celulares: abrir modal de seleccion
     this.modalFila = fila;
     this.modalTelefono = celulares.map((c, i) => ({
-      label: `${this.nombreTitular(fila, i)} — ${c}`,
+      nombre: this.nombreTitular(fila, i),
       numero: c
     }));
     this.modalVisible = true;
   }
 
   seleccionarTelefono(numero: string): void {
+    if (this.editandoIndex !== null) return;
     if (this.modalFila) {
       this.abrirWhatsapp(this.modalFila, numero);
     }
     this.cerrarModal();
   }
 
+  iniciarEdicion(index: number, event: Event): void {
+    event.stopPropagation();
+    this.editandoIndex = index;
+    this.editandoValor = this.modalTelefono[index].numero;
+  }
+
+  cancelarEdicion(): void {
+    this.editandoIndex = null;
+    this.editandoValor = '';
+  }
+
+  guardarEdicion(index: number): void {
+    const numLimpio = this.editandoValor.replace(/\D/g, '');
+    if (numLimpio.length < 6) {
+      this.toastr.warning('Ingrese un numero valido (minimo 6 digitos)', 'Celular');
+      return;
+    }
+    this.modalTelefono[index].numero = numLimpio;
+    this.cancelarEdicion();
+    this.toastr.success('Numero actualizado', 'Celular');
+  }
+
   cerrarModal(): void {
     this.modalVisible = false;
     this.modalFila = null;
     this.modalTelefono = [];
+    this.editandoIndex = null;
+    this.editandoValor = '';
   }
 
   // ── Abrir WhatsApp Web ──────────────────────────────────────────────────

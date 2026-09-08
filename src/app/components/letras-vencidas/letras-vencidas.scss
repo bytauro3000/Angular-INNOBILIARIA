@@ -343,7 +343,7 @@ $bg-white:   #ffffff;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
-  width: 360px;
+  width: 380px;
   max-width: 92vw;
   overflow: hidden;
   animation: scaleUp 0.15s ease;
@@ -367,7 +367,7 @@ $bg-white:   #ffffff;
   margin: 4px 0 0;
   font-size: 0.78rem;
   color: #64748b;
-  max-width: 260px;
+  max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -389,45 +389,141 @@ $bg-white:   #ffffff;
   padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.telefono-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+// ── Item de telefono ────────────────────────────────────────────────────────
+.telefono-item {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  &.editando {
+    border-color: #25d366;
+  }
+}
+
+.telefono-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
   cursor: pointer;
-  transition: all 0.15s;
-  font-size: 0.88rem;
-  color: #334155;
-
-  i:first-child {
-    color: #25d366;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-
-  span {
-    flex: 1;
-    text-align: left;
-  }
-
-  .fa-chevron-right {
-    color: #cbd5e1;
-    font-size: 0.7rem;
-    flex-shrink: 0;
-  }
+  transition: background 0.15s;
 
   &:hover {
     background: #f0fdf4;
-    border-color: #25d366;
-    color: #166534;
-    .fa-chevron-right { color: #25d366; }
+    .telefono-arrow { color: #25d366; }
   }
+}
+
+.telefono-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.telefono-nombre {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.telefono-numero {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #334155;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.telefono-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-editar {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 4px 7px;
+  transition: all 0.15s;
+
+  &:hover {
+    color: #023e8a;
+    border-color: #023e8a;
+    background: #eff6ff;
+  }
+}
+
+.telefono-arrow {
+  color: #cbd5e1;
+  font-size: 0.7rem;
+  transition: color 0.15s;
+}
+
+// ── Modo edicion ────────────────────────────────────────────────────────────
+.telefono-edicion {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.telefono-nombre-edicion {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.edicion-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edicion-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #25d366;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
+  }
+}
+
+.btn-guardar, .btn-cancelar {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 6px 8px;
+  transition: all 0.15s;
+}
+
+.btn-guardar {
+  background: #25d366;
+  color: #fff;
+  &:hover { background: #16a34a; }
+}
+
+.btn-cancelar {
+  background: #f1f5f9;
+  color: #64748b;
+  &:hover { background: #e2e8f0; color: #dc2626; }
 }
 
 @keyframes fadeIn {
@@ -628,14 +724,39 @@ $bg-white:   #ffffff;
   .modal-title { color: #f1f5f9; }
   .modal-subtitle { color: #64748b; }
   .modal-close { color: #64748b; &:hover { color: #f87171; } }
-  .telefono-option {
+
+  .telefono-item {
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    &.editando { border-color: #25d366; }
+  }
+
+  .telefono-info:hover { background: rgba(37, 211, 102, 0.08); }
+
+  .telefono-nombre { color: #f1f5f9; }
+  .telefono-numero { color: #cbd5e1; }
+
+  .btn-editar {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #64748b;
     &:hover {
-      background: rgba(37, 211, 102, 0.1);
-      border-color: #25d366;
-      color: #4ade80;
+      color: #c9952e;
+      border-color: #c9952e;
+      background: rgba(201, 149, 46, 0.1);
     }
+  }
+
+  .telefono-nombre-edicion { color: #f1f5f9; }
+
+  .edicion-input {
+    background: #0f172a;
+    border-color: #25d366;
+    color: #f1f5f9;
+  }
+
+  .btn-cancelar {
+    background: #334155;
+    color: #94a3b8;
+    &:hover { background: #475569; color: #f87171; }
   }
 
   // Tarjetas responsive en modo oscuro
