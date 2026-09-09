@@ -53,13 +53,14 @@
   <div *ngIf="!cargando && grupos.length > 0">
     <div class="programa-bloque" *ngFor="let grupo of grupos">
 
-      <div class="programa-header">
+      <div class="programa-header" (click)="toggleGrupo(grupo)" style="cursor:pointer">
         <i class="fas fa-map-marked-alt"></i>
         <h3>{{ grupo.nombrePrograma }}</h3>
         <span class="programa-badge">{{ grupo.clientes.length }} contrato{{ grupo.clientes.length !== 1 ? 's' : '' }}</span>
+        <i class="fas fa-chevron-down programa-chevron" [class.rotado]="!grupo.colapsado"></i>
       </div>
 
-      <div class="tabla-wrapper">
+      <div class="tabla-wrapper" *ngIf="!grupo.colapsado">
         <table class="tabla-mora">
           <thead>
             <tr>

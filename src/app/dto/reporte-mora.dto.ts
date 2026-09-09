@@ -18,6 +18,7 @@ export interface FilaClienteMora {
 export interface ReporteClientesMoraDTO {
   nombrePrograma: string;
   clientes: FilaClienteMora[];
+  colapsado?: boolean;
 }
 
 export interface DetalleLetraVencida {

@@ -59,6 +59,7 @@ export class ReporteMoraComponent implements OnInit {
       next: (data) => {
         this.grupos = data.map(grupo => ({
           ...grupo,
+          colapsado: false,
           clientes: [...grupo.clientes].sort((a, b) => {
             const mzA = a.manzanas?.[0] ?? '';
             const mzB = b.manzanas?.[0] ?? '';
@@ -83,6 +84,10 @@ export class ReporteMoraComponent implements OnInit {
 
   get totalClientes(): number {
     return this.grupos.reduce((sum, g) => sum + g.clientes.length, 0);
+  }
+
+  toggleGrupo(grupo: any): void {
+    grupo.colapsado = !grupo.colapsado;
   }
 
   simbolo(moneda: string): string {
