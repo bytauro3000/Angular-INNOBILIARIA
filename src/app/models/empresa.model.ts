@@ -36,8 +36,6 @@ export interface EmpresaResponse {
   moraPorcentaje?: number;
   moraMontoDiario?: number;
   moraTasaDiaria?: number;
-  apisperuEnvironment?: string;
-  whatsappDeviceId?: string;
   notificacionEmail?: string;
   activa: boolean;
   fechaRegistro: string;
@@ -67,7 +65,5 @@ export interface EmpresaRequest {
   moraPorcentaje?: number;
   moraMontoDiario?: number;
   moraTasaDiaria?: number;
-  apisperuEnvironment?: string;
-  whatsappDeviceId?: string;
   notificacionEmail?: string;
 }
