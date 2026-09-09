@@ -152,11 +152,6 @@ export class ReporteMoraComponent implements OnInit {
       return;
     }
 
-    if (celulares.length === 1) {
-      this.abrirWhatsapp(fila, celulares[0]);
-      return;
-    }
-
     this.modalFila = fila;
     this.modalTelefono = celulares.map((c, i) => ({
       idCliente: fila.idClientes?.[i] ?? 0,

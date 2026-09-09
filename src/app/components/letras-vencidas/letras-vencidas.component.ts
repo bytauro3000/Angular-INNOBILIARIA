@@ -127,12 +127,6 @@ export class LetrasVencidasComponent implements OnInit {
       return;
     }
 
-    if (celulares.length === 1) {
-      this.abrirWhatsapp(fila, celulares[0]);
-      return;
-    }
-
-    // 2+ celulares: abrir modal de seleccion
     this.modalFila = fila;
     this.modalTelefono = celulares.map((c, i) => ({
       idCliente: fila.idClientes?.[i] ?? 0,
