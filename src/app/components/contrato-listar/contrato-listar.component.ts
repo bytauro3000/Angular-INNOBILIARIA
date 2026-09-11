@@ -432,11 +432,23 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
         this.toastr.success('Contrato descargado con éxito', 'Éxito');
       },
       error: (err) => {
-        let msg = 'No se pudo obtener el PDF.';
-        if (err.error && typeof err.error === 'object' && err.error.message) {
-          msg = err.error.message;
+        const extraerMensaje = (blob: Blob) => {
+          blob.text().then((texto: string) => {
+            try {
+              const parsed = JSON.parse(texto);
+              this.toastr.error(parsed.message || 'No se pudo obtener el PDF.', 'Error');
+            } catch {
+              this.toastr.error('No se pudo obtener el PDF.', 'Error');
+            }
+          });
+        };
+        if (err.error instanceof Blob) {
+          extraerMensaje(err.error);
+        } else if (err.error && typeof err.error === 'object' && err.error.message) {
+          this.toastr.error(err.error.message, 'Error');
+        } else {
+          this.toastr.error('No se pudo obtener el PDF.', 'Error');
         }
-        this.toastr.error(msg, 'Error');
       }
     });
   }
