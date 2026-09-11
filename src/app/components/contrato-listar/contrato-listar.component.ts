@@ -431,7 +431,13 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
         window.URL.revokeObjectURL(url);
         this.toastr.success('Contrato descargado con éxito', 'Éxito');
       },
-      error: () => { this.toastr.error('No se pudo obtener el PDF.', 'Error'); }
+      error: (err) => {
+        let msg = 'No se pudo obtener el PDF.';
+        if (err.error && typeof err.error === 'object' && err.error.message) {
+          msg = err.error.message;
+        }
+        this.toastr.error(msg, 'Error');
+      }
     });
   }
 
