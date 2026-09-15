@@ -9,13 +9,14 @@ import { DistritoService } from '../../services/distrito.service';
 import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
 import { environment } from '../../../environments/environment';
+import { AiAssistantComponent } from '../ai-assistant/ai-assistant.component';
 
 type SubmenuKey = 'clientes' | 'contrato' | 'vendedores' | 'lotes' | 'servicios' | 'reportes';
 
 @Component({
   selector: 'app-secretaria-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet, AsyncPipe],
+  imports: [CommonModule, RouterLink, RouterOutlet, AsyncPipe, AiAssistantComponent],
   templateUrl: './secretaria-menu.html',
   styleUrls: ['./secretaria-menu.scss']
 })

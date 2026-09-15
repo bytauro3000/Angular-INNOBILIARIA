@@ -1,0 +1,81 @@
+<div class="ai-assistant" [class.open]="abierto()">
+
+  <!-- Panel de chat -->
+  <div class="chat-panel" *ngIf="abierto()">
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-info">
+        <div class="header-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div>
+          <h3>Asistente IA</h3>
+          <span class="header-status">Siempre disponible</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggle()" title="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="messages-area" #messagesContainer>
+      <div *ngFor="let msg of mensajes"
+           class="message"
+           [class.user]="msg.tipo === 'usuario'"
+           [class.bot]="msg.tipo === 'asistente'">
+
+        <div class="message-avatar" *ngIf="msg.tipo === 'asistente'">
+          <i class="fas fa-robot"></i>
+        </div>
+
+        <div class="message-bubble">
+          <p>{{ msg.texto }}</p>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div class="message bot" *ngIf="cargando()">
+        <div class="message-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-bubble loading">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions (solo mostrar si hay pocos mensajes) -->
+    <div class="quick-actions" *ngIf="mensajes.length <= 1">
+      <button *ngFor="let action of quickActions"
+              class="quick-action-btn"
+              (click)="enviarMensaje(action.pregunta)">
+        <i class="fas" [ngClass]="action.icon"></i>
+        <span>{{ action.label }}</span>
+      </button>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <input type="text"
+             [(ngModel)]="mensaje"
+             (keypress)="onKeyPress($event)"
+             placeholder="Escribe tu pregunta..."
+             [disabled]="cargando()"
+             class="message-input" />
+      <button class="send-btn"
+              (click)="enviarMensaje()"
+              [disabled]="!mensaje.trim() || cargando()"
+              title="Enviar">
+        <i class="fas" [ngClass]="cargando() ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- FAB Button -->
+  <button class="fab-button" (click)="toggle()" [title]="abierto() ? 'Cerrar asistente' : 'Abrir asistente IA'">
+    <i class="fas" [ngClass]="abierto() ? 'fa-times' : 'fa-robot'"></i>
+  </button>
+</div>
