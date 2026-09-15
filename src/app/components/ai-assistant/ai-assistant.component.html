@@ -10,12 +10,24 @@
         </div>
         <div>
           <h3>Asistente IA</h3>
-          <span class="header-status">Siempre disponible</span>
+          <span class="header-status" *ngIf="!modoVoz()">Siempre disponible</span>
+          <span class="header-status voice-active" *ngIf="modoVoz()">
+            <i class="fas fa-volume-up"></i> Modo voz activo
+          </span>
         </div>
       </div>
-      <button class="close-btn" (click)="toggle()" title="Cerrar">
-        <i class="fas fa-times"></i>
-      </button>
+      <div class="header-actions">
+        <!-- Toggle modo voz -->
+        <button class="voice-toggle"
+                [class.active]="modoVoz()"
+                (click)="toggleModoVoz()"
+                title="{{ modoVoz() ? 'Desactivar modo voz' : 'Activar modo voz (conversacion continua)' }}">
+          <i class="fas" [ngClass]="modoVoz() ? 'fa-phone-slash' : 'fa-phone'"></i>
+        </button>
+        <button class="close-btn" (click)="toggle()" title="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Mensajes -->
@@ -58,7 +70,7 @@
         </div>
       </div>
 
-      <!-- Indicador de escucha -->
+      <!-- Indicador de escuchando -->
       <div class="message bot" *ngIf="escuchando()">
         <div class="message-avatar listening-avatar">
           <i class="fas fa-microphone"></i>
@@ -70,10 +82,23 @@
           <p>Escuchando... habla ahora</p>
         </div>
       </div>
+
+      <!-- Indicador de hablando (TTS) -->
+      <div class="message bot" *ngIf="hablando()">
+        <div class="message-avatar speaking-avatar">
+          <i class="fas fa-volume-up"></i>
+        </div>
+        <div class="message-bubble speaking-bubble">
+          <div class="speaking-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p>Hablando...</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Quick Actions (solo mostrar si hay pocos mensajes) -->
-    <div class="quick-actions" *ngIf="mensajes.length <= 1">
+    <!-- Quick Actions (solo si no hay muchos mensajes y no esta en modo voz) -->
+    <div class="quick-actions" *ngIf="mensajes.length <= 1 && !modoVoz()">
       <button *ngFor="let action of quickActions"
               class="quick-action-btn"
               (click)="enviarMensaje(action.pregunta)">
@@ -88,21 +113,21 @@
              [(ngModel)]="mensaje"
              (keypress)="onKeyPress($event)"
              placeholder="{{ escuchando() ? 'Hablando...' : 'Escribe tu pregunta...' }}"
-             [disabled]="cargando()"
+             [disabled]="cargando() || hablando()"
              class="message-input" />
 
       <!-- Boton microfono -->
       <button class="mic-btn"
               [class.active]="escuchando()"
               (click)="toggleDictado()"
-              [disabled]="cargando()"
+              [disabled]="cargando() || hablando()"
               title="{{ escuchando() ? 'Detener microfono' : 'Hablar por microfono' }}">
         <i class="fas" [ngClass]="escuchando() ? 'fa-stop' : 'fa-microphone'"></i>
       </button>
 
       <button class="send-btn"
               (click)="enviarMensaje()"
-              [disabled]="!mensaje.trim() || cargando()"
+              [disabled]="!mensaje.trim() || cargando() || hablando()"
               title="Enviar">
         <i class="fas" [ngClass]="cargando() ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
       </button>

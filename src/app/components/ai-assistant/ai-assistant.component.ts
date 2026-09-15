@@ -29,6 +29,8 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
   abierto = signal(false);
   cargando = signal(false);
   escuchando = signal(false);
+  modoVoz = signal(false);
+  hablando = signal(false);
   mensaje = '';
   mensajes: ChatMessage[] = [];
 
@@ -37,6 +39,8 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
   private shouldScroll = false;
   private recognition: any = null;
   private speechSupported = false;
+  private ttsSupported = false;
+  private utterance: any = null;
 
   private readonly rutaLabels: Record<string, string> = {
     '/secretaria-menu/clientes': 'Ir a Clientes',
@@ -77,6 +81,8 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
     private router: Router
   ) {
     const w = window as any;
+
+    // Speech Recognition (escuchar voz)
     this.speechSupported = !!(w.SpeechRecognition || w.webkitSpeechRecognition);
     if (this.speechSupported) {
       const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
@@ -105,11 +111,17 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
         this.escuchando.set(false);
       };
     }
+
+    // Text-to-Speech (hablar respuesta)
+    this.ttsSupported = !!w.speechSynthesis;
   }
 
   ngOnDestroy(): void {
     if (this.recognition) {
       this.recognition.abort();
+    }
+    if (this.ttsSupported) {
+      window.speechSynthesis.cancel();
     }
   }
 
@@ -125,27 +137,125 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
     if (this.abierto() && this.mensajes.length === 0) {
       this.mensajes.push({
         tipo: 'asistente',
-        texto: 'Hola! Soy tu asistente virtual. En que puedo ayudarte? Puedes preguntarme como usar el sistema, elegir una de las opciones rapidas, o usar el microfono para hablar.',
+        texto: 'Hola! Soy tu asistente virtual. En que puedo ayudarte? Puedes escribir o usar el microfono para hablar.',
         fecha: new Date()
       });
     }
+    if (!this.abierto()) {
+      this.detenerTodo();
+    }
   }
 
+  // ─── Modo Voz ────────────────────────────────────────
+  toggleModoVoz(): void {
+    if (!this.speechSupported || !this.ttsSupported) {
+      alert('Tu navegador no soporta reconocimiento de voz o sintesis de voz. Usa Chrome o Edge.');
+      return;
+    }
+    if (this.modoVoz()) {
+      this.detenerTodo();
+    } else {
+      this.modoVoz.set(true);
+      this.iniciarDictado();
+    }
+  }
+
+  // ─── Dictado (Speech-to-Text) ────────────────────────
+  iniciarDictado(): void {
+    if (!this.speechSupported || this.escuchando() || this.hablando() || this.cargando()) return;
+    this.mensaje = '';
+    try {
+      this.recognition.start();
+      this.escuchando.set(true);
+    } catch (e) {
+      // ya esta iniciado
+    }
+  }
+
+  detenerDictado(): void {
+    if (this.recognition) {
+      this.recognition.stop();
+    }
+    this.escuchando.set(false);
+  }
+
+  // ─── Text-to-Speech (respuesta en voz alta) ──────────
+  hablar(texto: string): void {
+    if (!this.ttsSupported) return;
+
+    window.speechSynthesis.cancel();
+
+    // Limpiar texto de caracteres especiales para TTS
+    const textoLimpio = texto
+      .replace(/[\*_#`]/g, '')
+      .replace(/\[IR\]\/[^\s\]]+/g, '')
+      .replace(/\n+/g, '. ')
+      .trim();
+
+    this.utterance = new SpeechSynthesisUtterance(textoLimpio);
+    this.utterance.lang = 'es-PE';
+    this.utterance.rate = 1;
+    this.utterance.pitch = 1;
+
+    // Elegir voz en español si esta disponible
+    const voces = window.speechSynthesis.getVoices();
+    const vozES = voces.find(v => v.lang.startsWith('es')) || voces[0];
+    if (vozES) {
+      this.utterance.voice = vozES;
+    }
+
+    this.utterance.onstart = () => {
+      this.hablando.set(true);
+    };
+
+    this.utterance.onend = () => {
+      this.hablando.set(false);
+      this.utterance = null;
+      // En modo voz, auto-activar microfono despues de hablar
+      if (this.modoVoz()) {
+        setTimeout(() => this.iniciarDictado(), 300);
+      }
+    };
+
+    this.utterance.onerror = () => {
+      this.hablando.set(false);
+      this.utterance = null;
+      if (this.modoVoz()) {
+        setTimeout(() => this.iniciarDictado(), 300);
+      }
+    };
+
+    window.speechSynthesis.speak(this.utterance);
+  }
+
+  detenerHablar(): void {
+    if (this.ttsSupported) {
+      window.speechSynthesis.cancel();
+    }
+    this.hablando.set(false);
+    this.utterance = null;
+  }
+
+  detenerTodo(): void {
+    this.detenerDictado();
+    this.detenerHablar();
+    this.modoVoz.set(false);
+  }
+
+  // ─── Toggle microfono (modo manual) ──────────────────
   toggleDictado(): void {
     if (!this.speechSupported) {
-      alert('Tu navegador no soporte reconocimiento de voz. Usa Chrome o Edge.');
+      alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.');
       return;
     }
     if (this.escuchando()) {
-      this.recognition.stop();
-      this.escuchando.set(false);
+      this.detenerDictado();
     } else {
-      this.mensaje = '';
-      this.recognition.start();
-      this.escuchando.set(true);
+      this.iniciarDictado();
     }
   }
 
+  // ─── Enviar mensaje ──────────────────────────────────
   enviarMensaje(texto?: string): void {
     const textoAEnviar = texto || this.mensaje.trim();
     if (!textoAEnviar || this.cargando()) return;
@@ -171,15 +281,25 @@ export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
         });
         this.cargando.set(false);
         this.shouldScroll = true;
+
+        // En modo voz, leer la respuesta en voz alta
+        if (this.modoVoz()) {
+          this.hablar(textoLimpio);
+        }
       },
       error: () => {
+        const errorMsg = 'Lo siento, ocurrio un error al procesar tu pregunta. Intenta de nuevo.';
         this.mensajes.push({
           tipo: 'asistente',
-          texto: 'Lo siento, ocurrio un error al procesar tu pregunta. Intenta de nuevo.',
+          texto: errorMsg,
           fecha: new Date()
         });
         this.cargando.set(false);
         this.shouldScroll = true;
+
+        if (this.modoVoz()) {
+          this.hablar(errorMsg);
+        }
       }
     });
   }
