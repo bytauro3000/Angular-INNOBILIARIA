@@ -497,19 +497,6 @@ export class ComisionesComponent implements OnInit {
 
   // ── PDF ────────────────────────────────────────────────────────────────────
 
-  descargarReporte(c: ComisionVendedorDTO): void {
-    this.comisionService.descargarReporteComisionPdf(c.idVendedor).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
-      },
-      error: () => {
-        this.toastr.error('No se pudo descargar el reporte de comisiones', 'Error');
-      }
-    });
-  }
-
   descargarEgreso(numeroEgreso: string): void {
     this.comisionService.descargarEgresoPdf(numeroEgreso).subscribe({
       next: (blob) => {

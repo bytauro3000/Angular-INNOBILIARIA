@@ -79,6 +79,7 @@ import { CuentasPorCobrarComponent } from './components/cuentas-por-cobrar/cuent
 
 // Comisiones de Vendedores
 import { ComisionesComponent } from './components/comisiones/comisiones.component';
+import { ReporteComisionesComponent } from './components/reporte-comisiones/reporte-comisiones.component';
 
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
@@ -153,6 +154,7 @@ export const routes: Routes = [
       { path: 'vendedores', component: VendedorListarComponent },
       { path: 'vendedores/ventas-por-vendedor', component: LotesVendidosComponent, data: { modo: 'secretaria' } },
       { path: 'vendedores/comisiones', component: ComisionesComponent },
+      { path: 'vendedores/reporte-comisiones', component: ReporteComisionesComponent },
       { path: 'lotes', component: LoteLitarComponent },
       { path: 'lotes/reporte', component: ReporteLotesComponent },
       { path: 'parceleros', component: ParceleroListarComponent },

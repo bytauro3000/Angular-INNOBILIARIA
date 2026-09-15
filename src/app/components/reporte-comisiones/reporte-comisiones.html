@@ -1,0 +1,50 @@
+<div class="reporte-container" (click)="onClickFuera($event)">
+
+  <div class="reporte-header">
+    <h3 class="reporte-titulo">
+      <i class="fas fa-file-pdf"></i> Reporte de Comisiones por Vendedor
+    </h3>
+    <p class="reporte-subtitulo">
+      Descargue el historial completo de comisiones y pagos de un vendedor en formato PDF.
+    </p>
+  </div>
+
+  <div class="reporte-form">
+    <div class="form-group">
+      <label class="form-label"><i class="bi bi-person-badge"></i> Seleccionar Vendedor</label>
+      <div class="custom-select-container">
+        <input type="text" placeholder="Buscar por nombre, apellido o DNI" class="custom-select-input"
+          [(ngModel)]="filtroVendedor" (input)="filtrarVendedores()" (focus)="mostrarVendedores = true"
+          autocomplete="off" />
+        <ul class="custom-select-list" *ngIf="mostrarVendedores && vendedoresFiltrados.length > 0">
+          <li *ngFor="let v of vendedoresFiltrados" (mousedown)="seleccionarVendedor(v)">
+            <span class="list-item-main"><i class="bi bi-person"></i> {{ v.nombre }} {{ v.apellidos }}</span>
+            <span class="list-badge">DNI: {{ v.dni }}</span>
+          </li>
+        </ul>
+        <ul class="custom-select-list" *ngIf="mostrarVendedores && vendedoresFiltrados.length === 0">
+          <li class="no-data"><i class="bi bi-search"></i> No se encontraron vendedores</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="vendedor-seleccionado" *ngIf="vendedorSeleccionado">
+      <div class="vendedor-info-card">
+        <div class="v-avatar">{{ vendedorSeleccionado.nombre.charAt(0) }}</div>
+        <div class="v-datos">
+          <span class="v-nombre">{{ vendedorSeleccionado.nombre }} {{ vendedorSeleccionado.apellidos }}</span>
+          <span class="v-dni">DNI: {{ vendedorSeleccionado.dni }}</span>
+        </div>
+        <button class="btn-limpiar" (click)="limpiarSeleccion()" title="Cambiar vendedor">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-descargar" (click)="descargarPdf()" [disabled]="!vendedorSeleccionado || descargando">
+      <i class="fas" [ngClass]="descargando ? 'fa-spinner fa-spin' : 'fa-download'"></i>
+      {{ descargando ? 'Generando PDF...' : 'Descargar Reporte PDF' }}
+    </button>
+  </div>
+
+</div>

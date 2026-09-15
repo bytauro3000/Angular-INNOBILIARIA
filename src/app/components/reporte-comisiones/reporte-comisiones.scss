@@ -1,0 +1,210 @@
+$navy:       #023e8a;
+$blue:       #2980b9;
+$green:      #27ae60;
+$red:        #dc2626;
+$orange:     #d97706;
+$text-dark:  #1e293b;
+$text-light: #475569;
+$border:     #e2e8f0;
+$bg-white:   #ffffff;
+
+.reporte-container {
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.reporte-header {
+  margin-bottom: 28px;
+
+  .reporte-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $text-dark;
+    font-weight: 600;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 1.3rem;
+    margin: 0 0 6px;
+    i { color: $red; }
+  }
+
+  .reporte-subtitulo {
+    margin: 0;
+    color: $text-light;
+    font-size: 0.88rem;
+  }
+}
+
+.reporte-form {
+  background: $bg-white;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 8px;
+    font-size: .9rem;
+    i { color: $navy; }
+  }
+}
+
+.custom-select-container {
+  position: relative;
+
+  .custom-select-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s;
+    &:focus { border-color: $blue; }
+  }
+
+  .custom-select-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    list-style: none;
+    padding: 0;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background .15s;
+      &:hover { background: #f1f5f9; }
+    }
+
+    .list-item-main {
+      font-weight: 500;
+      color: $text-dark;
+      i { color: $navy; margin-right: 6px; }
+    }
+
+    .list-badge {
+      font-size: .75rem;
+      color: $text-light;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .no-data {
+      justify-content: center;
+      color: $text-light;
+      cursor: default;
+      &:hover { background: transparent; }
+      i { margin-right: 6px; }
+    }
+  }
+}
+
+.vendedor-seleccionado {
+  margin-bottom: 20px;
+
+  .vendedor-info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 12px 16px;
+
+    .v-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: $navy;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .v-datos {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .v-nombre {
+        font-weight: 600;
+        color: $text-dark;
+        font-size: .95rem;
+      }
+
+      .v-dni {
+        font-size: .8rem;
+        color: $text-light;
+      }
+    }
+
+    .btn-limpiar {
+      background: transparent;
+      border: none;
+      color: $text-light;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all .2s;
+      &:hover { background: #fee2e2; color: $red; }
+    }
+  }
+}
+
+.btn-descargar {
+  width: 100%;
+  padding: 12px 20px;
+  background: $red;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .2s;
+
+  &:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($red, .3);
+  }
+
+  &:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  i { font-size: .95rem; }
+}
