@@ -29,8 +29,20 @@
           <i class="fas fa-robot"></i>
         </div>
 
-        <div class="message-bubble">
-          <p>{{ msg.texto }}</p>
+        <div class="message-content">
+          <div class="message-bubble">
+            <p>{{ msg.texto }}</p>
+          </div>
+
+          <!-- Botones de navegacion -->
+          <div class="nav-buttons" *ngIf="msg.rutas && msg.rutas.length > 0">
+            <button *ngFor="let ruta of msg.rutas"
+                    class="nav-btn"
+                    (click)="irARuta(ruta.ruta)">
+              <i class="fas fa-arrow-right"></i>
+              {{ ruta.label }}
+            </button>
+          </div>
         </div>
       </div>
 
