@@ -173,6 +173,10 @@
           </div>
         </div>
         <div class="comision-header-right">
+          <button class="btn-reporte-comision" (click)="descargarReporte(c); $event.stopPropagation()"
+                  title="Descargar reporte de comisiones del vendedor">
+            <i class="fas fa-file-pdf"></i>
+          </button>
           <span *ngIf="c.pagosMensualesPendientes > 0 && c.estado !== 'COMPLETADA'" class="badge-pendientes"
                 [ngClass]="badgePendientes(c.nivelColor)">
             {{ c.pagosMensualesPendientes }} pago{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }} pendiente{{ c.pagosMensualesPendientes !== 1 ? 's' : '' }}

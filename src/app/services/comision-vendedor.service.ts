@@ -54,4 +54,8 @@ export class ComisionVendedorService {
   previewSiguienteEgreso(): Observable<string> {
     return this.http.get(`${this.apiUrl}/egresos/preview-siguiente`, { responseType: 'text' });
   }
+
+  descargarReporteComisionPdf(idVendedor: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reporte/${idVendedor}/pdf`, { responseType: 'blob' });
+  }
 }
