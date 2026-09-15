@@ -57,6 +57,19 @@
           <span class="dot"></span>
         </div>
       </div>
+
+      <!-- Indicador de escucha -->
+      <div class="message bot" *ngIf="escuchando()">
+        <div class="message-avatar listening-avatar">
+          <i class="fas fa-microphone"></i>
+        </div>
+        <div class="message-bubble listening-bubble">
+          <div class="listening-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p>Escuchando... habla ahora</p>
+        </div>
+      </div>
     </div>
 
     <!-- Quick Actions (solo mostrar si hay pocos mensajes) -->
@@ -74,9 +87,19 @@
       <input type="text"
              [(ngModel)]="mensaje"
              (keypress)="onKeyPress($event)"
-             placeholder="Escribe tu pregunta..."
+             placeholder="{{ escuchando() ? 'Hablando...' : 'Escribe tu pregunta...' }}"
              [disabled]="cargando()"
              class="message-input" />
+
+      <!-- Boton microfono -->
+      <button class="mic-btn"
+              [class.active]="escuchando()"
+              (click)="toggleDictado()"
+              [disabled]="cargando()"
+              title="{{ escuchando() ? 'Detener microfono' : 'Hablar por microfono' }}">
+        <i class="fas" [ngClass]="escuchando() ? 'fa-stop' : 'fa-microphone'"></i>
+      </button>
+
       <button class="send-btn"
               (click)="enviarMensaje()"
               [disabled]="!mensaje.trim() || cargando()"

@@ -1,4 +1,4 @@
-import { Component, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, signal, ElementRef, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,16 +24,19 @@ interface QuickAction {
   templateUrl: './ai-assistant.component.html',
   styleUrls: ['./ai-assistant.component.scss']
 })
-export class AiAssistantComponent implements AfterViewChecked {
+export class AiAssistantComponent implements AfterViewChecked, OnDestroy {
 
   abierto = signal(false);
   cargando = signal(false);
+  escuchando = signal(false);
   mensaje = '';
   mensajes: ChatMessage[] = [];
 
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   private shouldScroll = false;
+  private recognition: any = null;
+  private speechSupported = false;
 
   private readonly rutaLabels: Record<string, string> = {
     '/secretaria-menu/clientes': 'Ir a Clientes',
@@ -72,7 +75,43 @@ export class AiAssistantComponent implements AfterViewChecked {
   constructor(
     private aiService: AiAssistantService,
     private router: Router
-  ) {}
+  ) {
+    const w = window as any;
+    this.speechSupported = !!(w.SpeechRecognition || w.webkitSpeechRecognition);
+    if (this.speechSupported) {
+      const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
+      this.recognition = new SpeechRecognition();
+      this.recognition.lang = 'es-PE';
+      this.recognition.interimResults = true;
+      this.recognition.continuous = false;
+
+      this.recognition.onresult = (event: any) => {
+        let textoFinal = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          textoFinal += event.results[i][0].transcript;
+        }
+        this.mensaje = textoFinal;
+        if (event.results[event.results.length - 1].isFinal) {
+          this.escuchando.set(false);
+          this.enviarMensaje();
+        }
+      };
+
+      this.recognition.onerror = () => {
+        this.escuchando.set(false);
+      };
+
+      this.recognition.onend = () => {
+        this.escuchando.set(false);
+      };
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.recognition) {
+      this.recognition.abort();
+    }
+  }
 
   ngAfterViewChecked(): void {
     if (this.shouldScroll) {
@@ -86,9 +125,24 @@ export class AiAssistantComponent implements AfterViewChecked {
     if (this.abierto() && this.mensajes.length === 0) {
       this.mensajes.push({
         tipo: 'asistente',
-        texto: 'Hola! Soy tu asistente virtual. En que puedo ayudarte? Puedes preguntarme como usar el sistema o elegir una de las opciones rapidas.',
+        texto: 'Hola! Soy tu asistente virtual. En que puedo ayudarte? Puedes preguntarme como usar el sistema, elegir una de las opciones rapidas, o usar el microfono para hablar.',
         fecha: new Date()
       });
+    }
+  }
+
+  toggleDictado(): void {
+    if (!this.speechSupported) {
+      alert('Tu navegador no soporte reconocimiento de voz. Usa Chrome o Edge.');
+      return;
+    }
+    if (this.escuchando()) {
+      this.recognition.stop();
+      this.escuchando.set(false);
+    } else {
+      this.mensaje = '';
+      this.recognition.start();
+      this.escuchando.set(true);
     }
   }
 
