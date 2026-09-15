@@ -13,7 +13,7 @@ import { Moneda } from '../../dto/moneda.enum';
 import { Router } from '@angular/router';
 import { CurrencyFormatterDirective } from '../../directives/currency-formatter';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
-import { environment } from '../../../environments/environment';
+import { EmpresaService } from '../../services/empresa.service';
 
 @Component({
   selector: 'app-letracambio-insertar',
@@ -40,7 +40,7 @@ export class LetracambioInsertarComponent implements OnInit {
   cargando = false;
   success: string | null = null;
 
-  isMerruic = environment.apiUrl.includes('ms-gateway-latest');
+  isMerruic = false;
 
   constructor(
     private distritoService: DistritoService,
@@ -48,12 +48,27 @@ export class LetracambioInsertarComponent implements OnInit {
     private toastr: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
-    private contratoService: ContratoService
+    private contratoService: ContratoService,
+    private empresaService: EmpresaService
   ) { }
 
   ngOnInit(): void {
+    this.detectarEmpresa();
     this.obtenerIdContratoDesdeRuta();
     this.cargarDistritos();
+  }
+
+  detectarEmpresa(): void {
+    this.empresaService.obtenerEmpresa().subscribe({
+      next: (empresa) => {
+        this.isMerruic = empresa.ruc === '20552273223';
+        // Actualizar distrito por defecto segun la empresa
+        this.generarLetrasRequest.idDistrito = this.isMerruic ? 28 : 8;
+      },
+      error: () => {
+        this.isMerruic = false;
+      }
+    });
   }
 
   /** Llamado por ngModel cuando la directiva actualiza el valor numérico del importe */
@@ -121,8 +136,8 @@ export class LetracambioInsertarComponent implements OnInit {
     const fechaHoyPeru = obtenerFechaPeru();
 
     return {
-      // Merruic → Carabayllo (28) · Iván → Los Olivos (8)
-      idDistrito: this.isMerruic ? 28 : 8,
+      // Default Los Olivos (8), se actualiza al cargar empresa
+      idDistrito: 8,
       fechaGiro: fechaHoyPeru,
       fechaVencimientoInicial: fechaHoyPeru,
       importe: '',
