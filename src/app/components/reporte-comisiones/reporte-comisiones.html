@@ -41,6 +41,17 @@
       </div>
     </div>
 
+    <div class="filtro-pendientes" *ngIf="vendedorSeleccionado">
+      <label class="toggle-label">
+        <input type="checkbox" [(ngModel)]="soloPendientes" class="toggle-input" />
+        <span class="toggle-switch"></span>
+        <span class="toggle-text">
+          <i class="fas fa-clock"></i> Solo comisiones pendientes de pago
+        </span>
+      </label>
+      <p class="toggle-hint">Muestra solo los lotes donde el cliente ya pago la letra 8 o mas y aun se le debe al vendedor.</p>
+    </div>
+
     <button class="btn-descargar" (click)="descargarPdf()" [disabled]="!vendedorSeleccionado || descargando">
       <i class="fas" [ngClass]="descargando ? 'fa-spinner fa-spin' : 'fa-download'"></i>
       {{ descargando ? 'Generando PDF...' : 'Descargar Reporte PDF' }}

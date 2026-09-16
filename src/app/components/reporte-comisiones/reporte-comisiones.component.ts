@@ -21,6 +21,7 @@ export class ReporteComisionesComponent implements OnInit {
   vendedorSeleccionado: Vendedor | null = null;
   mostrarVendedores: boolean = false;
   descargando: boolean = false;
+  soloPendientes: boolean = false;
 
   constructor(
     private vendedorService: VendedorService,
@@ -64,7 +65,7 @@ export class ReporteComisionesComponent implements OnInit {
       return;
     }
     this.descargando = true;
-    this.comisionService.descargarReporteComisionPdf(this.vendedorSeleccionado.idVendedor).subscribe({
+    this.comisionService.descargarReporteComisionPdf(this.vendedorSeleccionado.idVendedor, this.soloPendientes).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         window.open(url, '_blank');
