@@ -1,0 +1,97 @@
+<div class="lista-contratos-container">
+  <h2 class="page-title">Lista de Contratos</h2>
+
+  <!-- Filtros -->
+  <div class="filtros-card">
+    <div class="filtro-group">
+      <label>Programa:</label>
+      <select [(ngModel)]="programaSeleccionado" class="select-programa">
+        <option [ngValue]="null">Todos los programas</option>
+        <option *ngFor="let p of programas" [ngValue]="p.idPrograma">{{ p.nombrePrograma }}</option>
+      </select>
+    </div>
+
+    <div class="filtro-group">
+      <label>Estado:</label>
+      <div class="chips-container">
+        <button class="chip" [class.active]="isSelected('TODOS')" (click)="toggleEstado('TODOS')">TODOS</button>
+        <button *ngFor="let e of estadosDisponibles" class="chip" [class.active]="isSelected(e)" (click)="toggleEstado(e)">{{ e }}</button>
+      </div>
+    </div>
+
+    <div class="acciones-filtro">
+      <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+        <i class="fas fa-search"></i> Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Resultados -->
+  <div class="resultados-card" *ngIf="contratos.length > 0">
+    <div class="header-resultados">
+      <span class="total-contratos">{{ contratos.length }} contratos encontrados</span>
+      <div class="exportar-btns">
+        <button class="btn-export pdf" (click)="descargarPdf()" [disabled]="generando">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+        <button class="btn-export excel" (click)="descargarExcel()" [disabled]="generando">
+          <i class="fas fa-file-excel"></i> Excel
+        </button>
+        <button class="btn-export word" (click)="descargarWord()" [disabled]="generando">
+          <i class="fas fa-file-word"></i> Word
+        </button>
+      </div>
+    </div>
+
+    <div class="tabla-responsive">
+      <table class="tabla-contratos">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>NOMBRE Y APELLIDOS</th>
+            <th>MZ</th>
+            <th>LT</th>
+            <th>AREA</th>
+            <th>CELULAR 1</th>
+            <th>CELULAR 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let grupo of agruparPorPrograma()">
+            <tr class="fila-programa">
+              <td colspan="7">PROGRAMA: {{ grupo.programa }}</td>
+            </tr>
+            <tr *ngFor="let c of grupo.contratos; let i = index" [class.fila-alternada]="i % 2 === 0">
+              <td>{{ i + 1 }}</td>
+              <td>
+                {{ c.nombreCliente1 }}
+                <span *ngIf="c.nombreCliente2"> / {{ c.nombreCliente2 }}</span>
+              </td>
+              <td>
+                {{ c.manzana }}
+                <span *ngIf="c.manzana2"><br>{{ c.manzana2 }}</span>
+              </td>
+              <td>
+                {{ c.numeroLote }}
+                <span *ngIf="c.numeroLote2"><br>{{ c.numeroLote2 }}</span>
+              </td>
+              <td>{{ c.areaTotal }} m2</td>
+              <td>{{ c.celular1 || '—' }}</td>
+              <td>{{ c.celular2 || '—' }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Sin resultados -->
+  <div class="sin-resultados" *ngIf="!cargando && contratos.length === 0">
+    <p>No se encontraron contratos con los filtros seleccionados.</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="cargando">
+    <i class="fas fa-spinner fa-spin"></i> Cargando contratos...
+  </div>
+</div>

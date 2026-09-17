@@ -1,0 +1,201 @@
+.lista-contratos-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e4080;
+  margin-bottom: 20px;
+}
+
+.filtros-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .filtro-group {
+    margin-bottom: 15px;
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+  }
+
+  .select-programa {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  .chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .chip {
+      padding: 6px 16px;
+      border: 1px solid #1e4080;
+      border-radius: 20px;
+      background: white;
+      color: #1e4080;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #e8eef6;
+      }
+
+      &.active {
+        background: #1e4080;
+        color: white;
+      }
+    }
+  }
+
+  .acciones-filtro {
+    margin-top: 15px;
+
+    .btn-buscar {
+      padding: 10px 24px;
+      background: #1e4080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #163270;
+      }
+
+      &:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      i {
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+.resultados-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .header-resultados {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+
+    .total-contratos {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .exportar-btns {
+      display: flex;
+      gap: 8px;
+
+      .btn-export {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: white;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.85;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        i {
+          margin-right: 4px;
+        }
+
+        &.pdf { background: #dc3545; }
+        &.excel { background: #28a745; }
+        &.word { background: #007bff; }
+      }
+    }
+  }
+}
+
+.tabla-responsive {
+  overflow-x: auto;
+}
+
+.tabla-contratos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th, td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+  }
+
+  th {
+    background: #3c3c3c;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .fila-programa td {
+    background: #1e4080;
+    color: white;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .fila-alternada {
+    background: #f5f8fc;
+  }
+}
+
+.sin-resultados {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #1e4080;
+  font-size: 1rem;
+
+  i {
+    margin-right: 8px;
+  }
+}

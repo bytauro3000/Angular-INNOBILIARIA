@@ -142,4 +142,34 @@ export class ContratoService {
       { motivo }
     );
   }
+
+  // ── Lista de Contratos por programa y estado ────────────────────────────
+
+  listaContratos(idPrograma: number | null, estados: string[]): Observable<any[]> {
+    let params: any = {};
+    if (idPrograma != null) params.idPrograma = idPrograma;
+    if (estados && estados.length > 0) params.estados = estados;
+    return this.http.get<any[]>(`${this.apiUrl}/lista-programa`, { params });
+  }
+
+  descargarListaExcel(idPrograma: number | null, estados: string[]): Observable<Blob> {
+    let params: any = {};
+    if (idPrograma != null) params.idPrograma = idPrograma;
+    if (estados && estados.length > 0) params.estados = estados;
+    return this.http.get(`${this.apiUrl}/lista-programa/excel`, { params, responseType: 'blob' });
+  }
+
+  descargarListaWord(idPrograma: number | null, estados: string[]): Observable<Blob> {
+    let params: any = {};
+    if (idPrograma != null) params.idPrograma = idPrograma;
+    if (estados && estados.length > 0) params.estados = estados;
+    return this.http.get(`${this.apiUrl}/lista-programa/word`, { params, responseType: 'blob' });
+  }
+
+  descargarListaPdf(idPrograma: number | null, estados: string[]): Observable<Blob> {
+    let params: any = {};
+    if (idPrograma != null) params.idPrograma = idPrograma;
+    if (estados && estados.length > 0) params.estados = estados;
+    return this.http.get(`${this.apiUrl}/lista-programa/pdf`, { params, responseType: 'blob' });
+  }
 }

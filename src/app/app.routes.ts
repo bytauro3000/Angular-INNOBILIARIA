@@ -43,6 +43,9 @@ import { ContratoEditarComponent } from './components/contrato-editar/contrato-e
 import { PagoletraListarComponent } from './components/pagoletra-listar/pagoletra-listar.component';
 import { PagoletraInsertarComponent } from './components/pagoletra-insertar/pagoletra-insertar.component';
 
+// Lista de Contratos
+import { ListaContratosComponent } from './components/lista-contratos/lista-contratos.component';
+
 // Separaciones
 import { SeparacionComponent } from './components/separacion-crud/separacion-crud.component';
 import { SeparacionInsertEdit } from './components/separacion-insert-edit/separacion-insert-edit';
@@ -148,6 +151,9 @@ export const routes: Routes = [
       // Pago Letras
       { path: 'pagoletras', component: PagoletraListarComponent },
       { path: 'pagoletras/insertar', component: PagoletraInsertarComponent },
+
+      // Lista de Contratos
+      { path: 'contratos/lista-contratos', component: ListaContratosComponent },
 
       // Otros
       { path: 'programas', component: ProgramaListarComponent },
