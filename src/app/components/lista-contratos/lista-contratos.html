@@ -1,43 +1,59 @@
 <div class="lista-contratos-container">
-  <h2 class="page-title">Lista de Contratos</h2>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="fas fa-file-contract"></i>
+      Lista de Contratos
+    </h2>
+  </div>
 
   <!-- Filtros -->
   <div class="filtros-card">
-    <div class="filtro-group">
-      <label>Programa:</label>
-      <select [(ngModel)]="programaSeleccionado" class="select-programa">
-        <option [ngValue]="null">Todos los programas</option>
-        <option *ngFor="let p of programas" [ngValue]="p.idPrograma">{{ p.nombrePrograma }}</option>
-      </select>
-    </div>
+    <div class="filtros-row">
 
-    <div class="filtro-group">
-      <label>Estado:</label>
-      <div class="chips-container">
-        <button class="chip" [class.active]="isSelected('TODOS')" (click)="toggleEstado('TODOS')">TODOS</button>
-        <button *ngFor="let e of estadosDisponibles" class="chip" [class.active]="isSelected(e)" (click)="toggleEstado(e)">{{ e }}</button>
+      <div class="filtro-group">
+        <label class="filtro-label">Programa</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="programaSeleccionado" class="select-programa">
+            <option [ngValue]="null">Todos los programas</option>
+            <option *ngFor="let p of programas" [ngValue]="p.idPrograma">{{ p.nombrePrograma }}</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
+        </div>
       </div>
-    </div>
 
-    <div class="acciones-filtro">
-      <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
-        <i class="fas fa-search"></i> Buscar
-      </button>
+      <div class="filtro-group filtro-estado">
+        <div class="chips-container">
+          <button class="chip" [class.active]="isSelected('TODOS')" (click)="toggleEstado('TODOS')">TODOS</button>
+          <button *ngFor="let e of estadosDisponibles" class="chip" [class.active]="isSelected(e)" (click)="toggleEstado(e)">{{ e }}</button>
+        </div>
+      </div>
+
+      <div class="filtro-group filtro-buscar">
+        <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </div>
+
     </div>
   </div>
 
   <!-- Resultados -->
   <div class="resultados-card" *ngIf="contratos.length > 0">
     <div class="header-resultados">
-      <span class="total-contratos">{{ contratos.length }} contratos encontrados</span>
+      <span class="total-contratos">
+        <i class="fas fa-list-ul"></i>
+        {{ contratos.length }} contratos encontrados
+      </span>
       <div class="exportar-btns">
-        <button class="btn-export pdf" (click)="descargarPdf()" [disabled]="generando">
+        <button class="btn-export btn-pdf" (click)="descargarPdf()" [disabled]="generando">
           <i class="fas fa-file-pdf"></i> PDF
         </button>
-        <button class="btn-export excel" (click)="descargarExcel()" [disabled]="generando">
+        <button class="btn-export btn-excel" (click)="descargarExcel()" [disabled]="generando">
           <i class="fas fa-file-excel"></i> Excel
         </button>
-        <button class="btn-export word" (click)="descargarWord()" [disabled]="generando">
+        <button class="btn-export btn-word" (click)="descargarWord()" [disabled]="generando">
           <i class="fas fa-file-word"></i> Word
         </button>
       </div>
@@ -47,37 +63,34 @@
       <table class="tabla-contratos">
         <thead>
           <tr>
-            <th>N°</th>
-            <th>NOMBRE Y APELLIDOS</th>
-            <th>MZ</th>
-            <th>LT</th>
-            <th>AREA</th>
-            <th>CELULAR 1</th>
-            <th>CELULAR 2</th>
+            <th class="th-num">N°</th>
+            <th class="th-nombre">NOMBRE Y APELLIDOS</th>
+            <th class="th-mz">MZ</th>
+            <th class="th-lt">LT</th>
+            <th class="th-area">AREA</th>
+            <th class="th-cel">CELULAR 1</th>
+            <th class="th-cel">CELULAR 2</th>
           </tr>
         </thead>
         <tbody>
           <ng-container *ngFor="let grupo of agruparPorPrograma()">
             <tr class="fila-programa">
-              <td colspan="7">PROGRAMA: {{ grupo.programa }}</td>
+              <td colspan="7">
+                <i class="fas fa-map-marker-alt"></i>
+                PROGRAMA: {{ grupo.programa }}
+              </td>
             </tr>
-            <tr *ngFor="let c of grupo.contratos; let i = index" [class.fila-alternada]="i % 2 === 0">
-              <td>{{ i + 1 }}</td>
-              <td>
+            <tr *ngFor="let c of grupo.contratos; let i = index" class="data-row" [class.fila-alternada]="i % 2 === 0">
+              <td class="td-num">{{ i + 1 }}</td>
+              <td class="td-nombre">
                 {{ c.nombreCliente1 }}
-                <span *ngIf="c.nombreCliente2"> / {{ c.nombreCliente2 }}</span>
+                <span *ngIf="c.nombreCliente2" class="cliente-sep"> / {{ c.nombreCliente2 }}</span>
               </td>
-              <td>
-                {{ c.manzana }}
-                <span *ngIf="c.manzana2"><br>{{ c.manzana2 }}</span>
-              </td>
-              <td>
-                {{ c.numeroLote }}
-                <span *ngIf="c.numeroLote2"><br>{{ c.numeroLote2 }}</span>
-              </td>
-              <td>{{ c.areaTotal }} m2</td>
-              <td>{{ c.celular1 || '—' }}</td>
-              <td>{{ c.celular2 || '—' }}</td>
+              <td class="td-center">{{ c.manzana }}<span *ngIf="c.manzana2"><br>{{ c.manzana2 }}</span></td>
+              <td class="td-center">{{ c.numeroLote }}<span *ngIf="c.numeroLote2"><br>{{ c.numeroLote2 }}</span></td>
+              <td class="td-center td-area">{{ c.areaTotal }} m2</td>
+              <td class="td-center">{{ c.celular1 }}</td>
+              <td class="td-center">{{ c.celular2 }}</td>
             </tr>
           </ng-container>
         </tbody>
@@ -86,12 +99,16 @@
   </div>
 
   <!-- Sin resultados -->
-  <div class="sin-resultados" *ngIf="!cargando && contratos.length === 0">
-    <p>No se encontraron contratos con los filtros seleccionados.</p>
+  <div class="empty-state" *ngIf="!cargando && contratos.length === 0">
+    <i class="fas fa-search empty-icon"></i>
+    <p class="empty-title">Sin resultados</p>
+    <p class="empty-text">No se encontraron contratos con los filtros seleccionados</p>
   </div>
 
   <!-- Loading -->
-  <div class="loading" *ngIf="cargando">
-    <i class="fas fa-spinner fa-spin"></i> Cargando contratos...
+  <div class="loading-state" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p class="loading-text">Cargando contratos...</p>
   </div>
+
 </div>
