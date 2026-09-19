@@ -852,3 +852,194 @@ $bg-white:   #ffffff;
   .com-avatar { width: 34px; height: 34px; font-size: .9rem; }
   .resumen-cards { grid-template-columns: 1fr 1fr; }
 }
+
+// ── DARK MODE ──────────────────────────────────────────────────────────────
+:host-context(body.dark-mode) {
+  .com-title-block {
+    .com-titulo { color: #e2e8f0; i { color: #06b6d4; } }
+    .com-subtitulo { color: #94a3b8; }
+  }
+
+  .filtros-secundarios {
+    background: #1a2430;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .filtro-vendedor {
+    .filtro-label { color: #94a3b8; i { color: #06b6d4; } }
+    .custom-select-container {
+      .custom-select-input {
+        background: #252932;
+        border-color: rgba(255,255,255,0.08);
+        color: #e2e8f0;
+        &:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+        &::placeholder { color: #64748b; }
+      }
+      .custom-select-list {
+        background: #1e293b;
+        border-color: rgba(255,255,255,0.08);
+        li {
+          &:hover { background: rgba(6,182,212,0.1); }
+          .list-item-main { color: #e2e8f0; i { color: #06b6d4; } }
+          .list-badge { background: #2d3748; color: #94a3b8; }
+          &.no-data { color: #64748b; }
+        }
+      }
+    }
+  }
+
+  .filtro-estado {
+    .filtro-label { color: #94a3b8; i { color: #06b6d4; } }
+    .chip-estado {
+      background: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #94a3b8;
+      &:hover { border-color: #06b6d4; color: #06b6d4; }
+      &.active { background: #06b6d4; border-color: #06b6d4; color: #fff; }
+    }
+  }
+
+  .filtro-resultado {
+    .resultado-info { color: #94a3b8; i { color: #06b6d4; } }
+    .btn-limpiar-filtros {
+      background: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #ef4444;
+      &:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+    }
+  }
+
+  .busqueda-lote {
+    .select-programa {
+      background-color: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #e2e8f0;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      &:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); background-color: #1a334d; }
+      option { background: #1e293b; color: #e2e8f0; }
+    }
+    .input-lote {
+      background: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #e2e8f0;
+      &:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    }
+    .btn-clear-inline {
+      background: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #94a3b8;
+      &:hover { border-color: #ef4444; color: #ef4444; }
+    }
+  }
+
+  .busqueda-info {
+    background: rgba(6,182,212,0.08);
+    border-color: rgba(6,182,212,0.2);
+    color: #94a3b8;
+    i { color: #06b6d4; }
+    strong { color: #06b6d4; }
+  }
+
+  .resumen-card {
+    background: #1a2430;
+    border-color: rgba(255,255,255,0.06);
+    .card-valor { color: #e2e8f0; }
+    .card-label { color: #94a3b8; }
+  }
+
+  .estado-cargando, .estado-vacio { color: #94a3b8; }
+
+  .comision-bloque {
+    background: #1a2430;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .comision-header {
+    &:hover { background: rgba(6,182,212,0.05); }
+    .com-datos h3 { color: #e2e8f0; }
+    .com-datos .com-detalle { color: #94a3b8; .det-mz-lt { color: #06b6d4; } }
+    .com-total { color: #e2e8f0; }
+    .comision-header-left > i { color: #64748b; }
+  }
+
+  .badge-estado {
+    &.badge-pendiente { background: rgba(217,119,6,0.15); color: #f59e0b; }
+    &.badge-enpago { background: rgba(6,182,212,0.15); color: #06b6d4; }
+    &.badge-completada { background: rgba(34,197,94,0.15); color: #22c55e; }
+    &.badge-anulada { background: rgba(239,68,68,0.12); color: #ef4444; }
+  }
+
+  .comision-body {
+    background: #111927;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .com-detalles .com-detalle-item {
+    background: #252932;
+    border-color: rgba(255,255,255,0.06);
+    .det-label { color: #94a3b8; }
+    .det-valor { color: #e2e8f0; }
+  }
+
+  .barra-pagar-seleccion {
+    background: rgba(34,197,94,0.08);
+    border-color: rgba(34,197,94,0.3);
+    .sel-info { color: #e2e8f0; i { color: #22c55e; } strong { color: #22c55e; } }
+  }
+
+  .com-monto-acordado {
+    border-color: rgba(6,182,212,0.3);
+    background: rgba(6,182,212,0.06);
+    .acordado-msg { color: #e2e8f0; i { color: #06b6d4; } strong { color: #06b6d4; } }
+  }
+
+  .com-adelanto {
+    border-color: rgba(245,158,11,0.3);
+    background: rgba(245,158,11,0.06);
+    .adelanto-msg { color: #e2e8f0; i { color: #f59e0b; } }
+  }
+
+  .input-monto {
+    background: #252932;
+    border-color: rgba(255,255,255,0.08);
+    .input-simbolo { background: #1e293b; color: #94a3b8; border-color: rgba(255,255,255,0.06); }
+    input { background: transparent; color: #e2e8f0; &::placeholder { color: #64748b; } }
+  }
+
+  .input-monto-currency {
+    background: #252932;
+    border-color: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    &:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    &::placeholder { color: #64748b; }
+  }
+
+  .btn-cancelar {
+    background: #252932;
+    border-color: rgba(255,255,255,0.08);
+    color: #94a3b8;
+    &:hover { border-color: #ef4444; color: #ef4444; }
+  }
+
+  .com-mensuales {
+    background: #1a2430;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .mensuales-titulo { color: #e2e8f0; i { color: #06b6d4; } }
+  .sin-mensuales { color: #64748b; }
+
+  .tabla-mensuales {
+    thead th { background: #1e293b; color: #94a3b8; border-color: rgba(255,255,255,0.06); }
+    tbody td { color: #e2e8f0; border-color: rgba(255,255,255,0.04); }
+    tr.fila-seleccionada td { background: rgba(34,197,94,0.06); }
+  }
+
+  .mensuales-footer {
+    border-color: rgba(255,255,255,0.06);
+    .sel-resumen { color: #e2e8f0; strong { color: #22c55e; } }
+  }
+
+  .com-completada-msg { color: #22c55e; }
+  .badge-ultimo { background: rgba(245,158,11,0.15); color: #f59e0b; }
+}

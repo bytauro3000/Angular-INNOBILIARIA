@@ -269,3 +269,67 @@ $bg-white:   #ffffff;
 
   i { font-size: .95rem; }
 }
+
+// ── DARK MODE ──────────────────────────────────────────────────────────────
+:host-context(body.dark-mode) {
+  .reporte-header {
+    .reporte-titulo { color: #e2e8f0; i { color: #ef4444; } }
+    .reporte-subtitulo { color: #94a3b8; }
+  }
+
+  .reporte-form {
+    background: #1a2430;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .form-group .form-label {
+    color: #e2e8f0;
+    i { color: #06b6d4; }
+  }
+
+  .custom-select-container {
+    .custom-select-input {
+      background: #252932;
+      border-color: rgba(255,255,255,0.08);
+      color: #e2e8f0;
+      &:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+      &::placeholder { color: #64748b; }
+    }
+    .custom-select-list {
+      background: #1e293b;
+      border-color: rgba(255,255,255,0.08);
+      li {
+        &:hover { background: rgba(6,182,212,0.1); }
+      }
+      .list-item-main { color: #e2e8f0; i { color: #06b6d4; } }
+      .list-badge { background: #2d3748; color: #94a3b8; }
+      .no-data { color: #64748b; }
+    }
+  }
+
+  .vendedor-seleccionado .vendedor-info-card {
+    background: rgba(6,182,212,0.08);
+    border-color: rgba(6,182,212,0.2);
+    .v-datos {
+      .v-nombre { color: #e2e8f0; }
+      .v-dni { color: #94a3b8; }
+    }
+    .btn-limpiar {
+      color: #94a3b8;
+      &:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+    }
+  }
+
+  .filtro-pendientes {
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.2);
+    .toggle-label {
+      .toggle-switch {
+        background: #475569;
+        &::after { background: #e2e8f0; }
+      }
+      .toggle-text { color: #e2e8f0; i { color: #f59e0b; } }
+    }
+    .toggle-hint { color: #94a3b8; }
+  }
+}
