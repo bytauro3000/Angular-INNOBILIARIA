@@ -15,6 +15,8 @@ export interface PagoMoraResponse {
   urlsVoucher: string[];
   sunatAceptado?: boolean;
   sunatMensaje?: string;
+  sunatAdvertencia?: string;
+  estadoSunat?: string;
   anulado?: boolean;
   motivoAnulacion?: string;
   fechaAnulacion?: string;

@@ -230,6 +230,8 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
         let mensaje = 'Mora pagada correctamente';
         if (res.sunatAceptado) {
           mensaje += '. Boleta enviada a SUNAT: ACEPTADA';
+        } else if (res.sunatAdvertencia) {
+          this.toastr.warning(res.sunatAdvertencia, 'Aviso SUNAT', { timeOut: 10000 });
         }
         this.toastr.success(mensaje, 'Éxito', { timeOut: 6000 });
         this.enviando = false;

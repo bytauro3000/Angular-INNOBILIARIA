@@ -503,9 +503,13 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
           : (res?.numeroComprobanteGenerado ?? null);
 
         const sunatOk = res?.pagos?.some((p: any) => p.sunatAceptado);
+        const sunatAdvertencia = res?.pagos?.find((p: any) => p.sunatAdvertencia)?.sunatAdvertencia;
         let msg = 'Pagos múltiples registrados correctamente';
         if (sunatOk) msg += '. Boleta enviada a SUNAT: ACEPTADA';
         this.toastr.success(msg, 'Éxito', { timeOut: 6000 });
+        if (sunatAdvertencia) {
+          this.toastr.warning(sunatAdvertencia, 'Aviso SUNAT', { timeOut: 10000 });
+        }
         this.enviando = false;
         this.pagoExitosoAlCerrar = true;
         this.cerrarModal();

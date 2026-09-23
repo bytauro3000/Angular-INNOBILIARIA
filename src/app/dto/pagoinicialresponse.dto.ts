@@ -13,6 +13,10 @@ export interface PagoInicialResponseDTO {
   motivoAnulacion?: string;
   fechaAnulacion?: string;
   anuladoPor?: string;
+  // SUNAT
+  sunatAceptado?: boolean;
+  sunatAdvertencia?: string;
+  estadoSunat?: string;
   // Contexto admin
   idContrato?: number;
   nombreCliente?: string;

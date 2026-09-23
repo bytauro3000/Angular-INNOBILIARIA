@@ -644,6 +644,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     }
     if (response.sunatAceptado) {
       mensaje += '. Boleta enviada a SUNAT: ACEPTADA';
+    } else if (response.sunatAdvertencia) {
+      this.toastr.warning(response.sunatAdvertencia, 'Aviso SUNAT', { timeOut: 10000 });
     }
     this.toastr.success(mensaje, titulo, { timeOut: 6000 });
 

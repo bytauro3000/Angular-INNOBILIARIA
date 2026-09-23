@@ -91,9 +91,15 @@
           <td>
             <div class="acciones">
             <button class="btn-icon btn-pdf" title="Descargar comprobante"
+                    [disabled]="pago.estadoSunat === 'RECHAZADA'"
+                    [class.btn-pdf-disabled]="pago.estadoSunat === 'RECHAZADA'"
                     (click)="descargarComprobante(pago)">
               <i class="fas fa-file-pdf"></i>
             </button>
+            <span *ngIf="pago.estadoSunat === 'RECHAZADA'" class="badge-sunat-pendiente"
+                  title="Pendiente de aceptación SUNAT">
+              <i class="fas fa-clock"></i> SUNAT
+            </span>
             <button class="btn-icon btn-nc-pdf" title="Descargar Nota de Crédito"
                     *ngIf="pago.anulado"
                     (click)="descargarNotaCredito(pago)">

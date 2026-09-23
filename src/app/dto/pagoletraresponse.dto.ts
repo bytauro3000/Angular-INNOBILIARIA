@@ -20,6 +20,9 @@ export interface PagoLetraResponse {
   esPagoAcuenta?: boolean;
   sunatAceptado?: boolean;
   sunatMensaje?: string;
+  sunatHash?: string;
+  sunatAdvertencia?: string;
+  estadoSunat?: string;
   anulado?: boolean;
   motivoAnulacion?: string;
   fechaAnulacion?: string;
