@@ -322,6 +322,18 @@
         <div *ngIf="c.estado === 'COMPLETADA'" class="com-completada-msg">
           <i class="fas fa-check-circle"></i> Comisión completada: saldo pendiente en 0.
         </div>
+
+        <div *ngIf="c.estado === 'ANULADA'" class="com-anulada-msg">
+          <i class="fas fa-ban"></i> Comisión anulada.
+        </div>
+
+        <!-- Anular comisión manualmente -->
+        <div *ngIf="puedeAnular(c)" class="com-acciones">
+          <button class="btn-anular" (click)="anularComision(c)" [disabled]="registrando"
+                  title="Anular esta comisión">
+            <i class="fas fa-ban"></i> Anular Comisión
+          </button>
+        </div>
       </div>
 
     </div>

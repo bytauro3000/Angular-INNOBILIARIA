@@ -495,6 +495,47 @@ export class ComisionesComponent implements OnInit {
     this.abrirModalMensual(c);
   }
 
+  // ── Anular comisión manualmente ──────────────────────────────────────────
+
+  /** Anula manualmente una comisión (con confirmación). Solo si no está COMPLETADA ni ANULADA. */
+  anularComision(c: ComisionVendedorDTO): void {
+    if (c.estado === 'COMPLETADA' || c.estado === 'ANULADA') return;
+
+    Swal.fire({
+      title: '¿Anular comisión?',
+      html: `Se anulará la comisión de <strong>${c.nombreVendedor}</strong>
+             (Contrato #${c.idContrato}) por
+             <strong>${this.simbolo(c.moneda)} ${(c.montoComisionTotal || 0).toLocaleString('es-PE')}</strong>.<br/><br/>
+             Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, anular',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.registrando = true;
+      this.comisionService.anularComision(c.idComision).subscribe({
+        next: (actualizada) => {
+          this.registrando = false;
+          this.toastr.success('Comisión anulada correctamente', 'Éxito');
+          const idx = this.comisiones.findIndex(x => x.idComision === c.idComision);
+          if (idx >= 0) this.comisiones[idx] = actualizada;
+        },
+        error: (err) => {
+          this.registrando = false;
+          this.toastr.error(this.extraerError(err), 'Error');
+        }
+      });
+    });
+  }
+
+  /** true si la comisión puede anularse manualmente. */
+  puedeAnular(c: ComisionVendedorDTO): boolean {
+    return c.estado !== 'COMPLETADA' && c.estado !== 'ANULADA';
+  }
+
   // ── PDF ────────────────────────────────────────────────────────────────────
 
   descargarEgreso(numeroEgreso: string): void {

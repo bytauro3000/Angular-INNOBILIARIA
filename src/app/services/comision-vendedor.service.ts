@@ -47,6 +47,11 @@ export class ComisionVendedorService {
     return this.http.post<PagoComisionResultadoDTO>(`${this.apiUrl}/pagos`, request);
   }
 
+  /** Anula manualmente una comisión por su ID. */
+  anularComision(idComision: number): Observable<ComisionVendedorDTO> {
+    return this.http.patch<ComisionVendedorDTO>(`${this.apiUrl}/${idComision}/anular`, {});
+  }
+
   descargarEgresoPdf(numeroEgreso: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/egresos/${numeroEgreso}/pdf`, { responseType: 'blob' });
   }

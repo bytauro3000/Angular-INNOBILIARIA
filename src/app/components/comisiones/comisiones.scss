@@ -772,6 +772,47 @@ $bg-white:   #ffffff;
   i { font-size: 1.1rem; }
 }
 
+.com-anulada-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: .85rem;
+  color: $red;
+  font-weight: 600;
+  i { font-size: 1.1rem; }
+}
+
+.com-acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+
+  .btn-anular {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid $red;
+    border-radius: 8px;
+    background: transparent;
+    color: $red;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s ease;
+
+    &:hover:not(:disabled) {
+      background: $red;
+      color: #fff;
+    }
+    &:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+  }
+}
+
 // ── Botón flotante "volver arriba" ──────────────────────────────────────────
 .btn-flotante-arriba {
   position: fixed;
@@ -1041,5 +1082,11 @@ $bg-white:   #ffffff;
   }
 
   .com-completada-msg { color: #22c55e; }
+  .com-anulada-msg { color: #ef4444; }
+  .com-acciones .btn-anular {
+    border-color: #ef4444;
+    color: #ef4444;
+    &:hover:not(:disabled) { background: #ef4444; color: #fff; }
+  }
   .badge-ultimo { background: rgba(245,158,11,0.15); color: #f59e0b; }
 }
