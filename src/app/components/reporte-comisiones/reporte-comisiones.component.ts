@@ -65,18 +65,33 @@ export class ReporteComisionesComponent implements OnInit {
       return;
     }
     this.descargando = true;
+    const nombreVendedor = `${this.vendedorSeleccionado.nombre} ${this.vendedorSeleccionado.apellidos}`.trim();
     this.comisionService.descargarReporteComisionPdf(this.vendedorSeleccionado.idVendedor, this.soloPendientes).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `REPORTE DE COMISIONES (${this.sanitizarNombre(nombreVendedor)}).pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
         this.descargando = false;
+        this.toastr.success('Reporte descargado correctamente', 'Éxito');
       },
       error: () => {
         this.toastr.error('No se pudo generar el reporte', 'Error');
         this.descargando = false;
       }
     });
+  }
+
+  private sanitizarNombre(nombre: string): string {
+    return nombre
+      .replace(/[\\/:*?"<>|]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toUpperCase();
   }
 
   onClickFuera(event: Event): void {
