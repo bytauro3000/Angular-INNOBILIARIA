@@ -381,7 +381,7 @@ $bg-white:   #ffffff;
   &.pend-rojo    { background: rgba($red, .15); color: $red; }
 }
 
-// Barra de pago multi-lote
+// Barra de pago multi-lote (universal: siempre visible al seleccionar contratos)
 .barra-pagar-seleccion {
   display: flex;
   align-items: center;
@@ -393,12 +393,30 @@ $bg-white:   #ffffff;
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 18px;
+  position: sticky;
+  bottom: 12px;
+  z-index: 40;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  backdrop-filter: blur(4px);
+  background-color: rgba(255, 255, 255, .95);
 
   .sel-info {
     font-size: .85rem;
     color: $text-dark;
     i { color: $green; margin-right: 6px; }
     strong { color: $green; }
+  }
+
+  .btn-registrar.btn-mensuales {
+    background: $navy;
+    border-color: $navy;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    &:hover:not(:disabled) { opacity: .9; }
+    i { margin-right: 6px; }
   }
 }
 
@@ -1024,6 +1042,7 @@ $bg-white:   #ffffff;
 
   .barra-pagar-seleccion {
     background: rgba(34,197,94,0.08);
+    background-color: rgba(30, 41, 59, 0.95);
     border-color: rgba(34,197,94,0.3);
     .sel-info { color: #e2e8f0; i { color: #22c55e; } strong { color: #22c55e; } }
   }

@@ -29,6 +29,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   @Input() tipo: 'ADELANTO' | 'MENSUAL' = 'ADELANTO';
   /** Para MENSUAL: letras pagadas de la comisión (con montoComision calculado). */
   @Input() letrasHabilitadas: PagoComisionMensualDTO[] = [];
+  /** Grupos por contrato para multi-lote: cada uno con su descripción y letras. */
+  @Input() grupos: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }[] = [];
   /** Monto del adelanto editable desde el input del componente padre. */
   @Input() adelantoMonto: number = 0;
   @Output() onClose = new EventEmitter<void>();
@@ -111,15 +113,23 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   /** Texto por defecto de observaciones según el tipo de pago. El saldo mostrado
    *  es el saldo restante DESPUÉS de descontar el monto que se está pagando. */
   private observacionDefecto(): string {
-    const mz = this.comision.manzanas || '—';
-    const lt = this.comision.numeroLotes || '—';
-    const programa = this.comision.programa || '—';
     const saldoBase = this.comision.saldoPendiente ?? 0;
     const saldoDespues = Math.max(0, saldoBase - (this.monto || 0));
     const saldo = `${this.simbolo} ${saldoDespues.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (this.tipo === 'ADELANTO') {
+      const mz = this.comision.manzanas || '—';
+      const lt = this.comision.numeroLotes || '—';
+      const programa = this.comision.programa || '—';
       return `Pago de la 1ra cuota de comisión de la MZ: ${mz} LT: ${lt} y programa: ${programa} - saldo: ${saldo}`;
     }
+    // Multi-lote: listar contratos; single: descripción clásica.
+    if (this.grupos.length > 1) {
+      const ids = this.grupos.map(g => '#' + g.comision.idContrato).join(', ');
+      return `Pago de comisiones mensuales de los contratos ${ids} (${this.letrasHabilitadas.length} letra(s))`;
+    }
+    const mz = this.comision.manzanas || '—';
+    const lt = this.comision.numeroLotes || '—';
+    const programa = this.comision.programa || '—';
     return `Pago de comisión mensual de la MZ: ${mz} LT: ${lt} y programa: ${programa} - saldo: ${saldo}`;
   }
 
@@ -208,6 +218,22 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
 
   get totalMensualSeleccionado(): number {
     return this.letrasHabilitadas.reduce((s, l) => s + (l.montoComision || 0), 0);
+  }
+
+  /** Descripción corta de un grupo (MZ · LT · programa) para el título de sección. */
+  descripcionGrupo(g: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }): string {
+    const c = g.comision;
+    return `#${c.idContrato} · MZ ${c.manzanas || '—'} · LT ${c.numeroLotes || '—'} · ${c.programa || '—'}`;
+  }
+
+  /** Subtotal de comisión de un grupo de contrato. */
+  subtotalGrupo(g: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }): number {
+    return g.letras.reduce((s, l) => s + (l.montoComision || 0), 0);
+  }
+
+  /** Simbolo de moneda de un grupo (para multi-lote con la misma moneda). */
+  simboloGrupo(g: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }): string {
+    return this.simbolo;
   }
 
   guardar(): void {

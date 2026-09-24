@@ -47,6 +47,8 @@ export class ComisionesComponent implements OnInit {
   modalComision: ComisionVendedorDTO | null = null;
   modalLetras: PagoComisionMensualDTO[] = [];
   modalAdelantoMonto: number = 0;
+  /** Grupos por contrato para el detalle del modal (multi-lote). */
+  modalGrupos: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }[] = [];
   /** Comisiones seleccionadas para pago mensual multi-lote. */
   seleccionadasPago: Set<number> = new Set();
 
@@ -407,6 +409,7 @@ export class ComisionesComponent implements OnInit {
     this.modalTipo = 'MENSUAL';
     this.modalComision = c;
     this.modalLetras = this.pagosDe(c).filter(p => p.seleccionado);
+    this.modalGrupos = this.modalLetras.length > 0 ? [{ comision: c, letras: this.modalLetras }] : [];
     this.abrirModal();
   }
 
@@ -417,11 +420,11 @@ export class ComisionesComponent implements OnInit {
       this.toastr.warning('Seleccione al menos una comisión', 'Atención');
       return;
     }
-    // Multi-lote: toma la primera comisión para el contexto del modal; el backend
-    // genera UN solo egreso con el detalle de todos los lotes.
+    // Multi-lote: una fila por contrato en el detalle; el backend genera UN solo EG01.
     this.modalTipo = 'MENSUAL';
     this.modalComision = seleccionadas[0];
-    this.modalLetras = seleccionadas.flatMap(c => this.pagosDe(c));
+    this.modalGrupos = seleccionadas.map(c => ({ comision: c, letras: this.pagosDe(c) }));
+    this.modalLetras = this.modalGrupos.flatMap(g => g.letras);
     this.abrirModal();
   }
 
@@ -445,6 +448,7 @@ export class ComisionesComponent implements OnInit {
   onModalCerrado(): void {
     this.modalComision = null;
     this.modalLetras = [];
+    this.modalGrupos = [];
     this.modalAdelantoMonto = 0;
   }
 

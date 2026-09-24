@@ -26,17 +26,17 @@
             <span class="ctx-valor">{{ comision.nombreCliente }}</span>
           </div>
           <div class="ctx-item">
-            <span class="ctx-label">Contrato</span>
-            <span class="ctx-valor">#{{ comision.idContrato }}</span>
+            <span class="ctx-label">Contratos</span>
+            <span class="ctx-valor">{{ grupos.length > 1 ? grupos.length + ' seleccionados' : '#' + comision.idContrato }}</span>
           </div>
           <!-- Fila 2 -->
           <div class="ctx-item">
             <span class="ctx-label">Programa</span>
-            <span class="ctx-valor">{{ comision.programa }}</span>
+            <span class="ctx-valor">{{ grupos.length > 1 ? 'Varios' : comision.programa }}</span>
           </div>
           <div class="ctx-item">
             <span class="ctx-label">Lote</span>
-            <span class="ctx-valor">MZ: {{ comision.manzanas || '—' }} · LT: {{ comision.numeroLotes || '—' }}</span>
+            <span class="ctx-valor">{{ grupos.length > 1 ? 'Multi-lote' : 'MZ: ' + (comision.manzanas || '—') + ' · LT: ' + (comision.numeroLotes || '—') }}</span>
           </div>
           <div class="ctx-item">
             <span class="ctx-label">Saldo restante</span>
@@ -44,33 +44,44 @@
           </div>
         </div>
 
-        <!-- Detalle por lote (mensual multi-lote) -->
-        <div class="detalle-lotes" *ngIf="tipo === 'MENSUAL' && letrasHabilitadas.length > 0">
+        <!-- Detalle por contrato y letra (mensual multi-lote) -->
+        <div class="detalle-lotes" *ngIf="tipo === 'MENSUAL' && (grupos.length > 0 || letrasHabilitadas.length > 0)">
           <div class="detalle-titulo">
             <i class="bi bi-list-check"></i> Detalle de pagos mensuales (10% de cada letra)
+            <span *ngIf="grupos.length > 1"> · {{ grupos.length }} contratos · UN solo EG01</span>
           </div>
-          <table class="table table-sm detalle-tabla">
-            <thead>
-              <tr>
-                <th>Letra</th>
-                <th>Vencimiento</th>
-                <th class="text-right">Importe letra</th>
-                <th class="text-right">Comisión (10%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let l of letrasHabilitadas">
-                <td>{{ l.numeroLetra }}</td>
-                <td>{{ formatFecha(l.fechaVencimiento) }}</td>
-                <td class="text-right">{{ simbolo }} {{ l.importeLetra | number:'1.2-2' }}</td>
-                <td class="text-right">{{ simbolo }} {{ l.montoComision | number:'1.2-2' }}</td>
-              </tr>
-              <tr class="fila-total">
-                <td colspan="3" class="text-right">Total a pagar</td>
-                <td class="text-right"><strong>{{ simbolo }} {{ totalMensualSeleccionado | number:'1.2-2' }}</strong></td>
-              </tr>
-            </tbody>
-          </table>
+
+          <!-- Una sección por contrato (multi o single) -->
+          <div class="grupo-contrato" *ngFor="let g of grupos.length > 0 ? grupos : [{ comision: comision, letras: letrasHabilitadas }]">
+            <div class="grupo-header">
+              <span class="grupo-desc">{{ descripcionGrupo(g) }}</span>
+              <span class="grupo-sub">{{ simbolo }} {{ subtotalGrupo(g) | number:'1.2-2' }}</span>
+            </div>
+            <table class="table table-sm detalle-tabla">
+              <thead>
+                <tr>
+                  <th>Letra</th>
+                  <th>Vencimiento</th>
+                  <th class="text-right">Importe letra</th>
+                  <th class="text-right">Comisión (10%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let l of g.letras">
+                  <td>{{ l.numeroLetra }}</td>
+                  <td>{{ formatFecha(l.fechaVencimiento) }}</td>
+                  <td class="text-right">{{ simbolo }} {{ l.importeLetra | number:'1.2-2' }}</td>
+                  <td class="text-right">{{ simbolo }} {{ l.montoComision | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Total general -->
+          <div class="detalle-total-general">
+            <span>Total a pagar ({{ letrasHabilitadas.length }} letra(s) · {{ grupos.length || 1 }} contrato(s))</span>
+            <strong>{{ simbolo }} {{ totalMensualSeleccionado | number:'1.2-2' }}</strong>
+          </div>
         </div>
 
         <!-- Recibo + Monto + Medio de pago + Fecha de pago (solo SOPORTE) en una fila -->
