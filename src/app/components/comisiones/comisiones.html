@@ -283,7 +283,11 @@
           <table class="tabla-mensuales" *ngIf="pagosDe(c).length > 0">
             <thead>
               <tr>
-                <th class="text-center"><input type="checkbox" title="Seleccionar todos" /></th>
+                <th class="text-center">
+                  <input type="checkbox" title="Seleccionar todos"
+                         [checked]="todosSeleccionados(c)"
+                         (change)="toggleTodosPagos(c)" />
+                </th>
                 <th>Letra</th>
                 <th>Vencimiento</th>
                 <th class="text-right">Importe letra</th>

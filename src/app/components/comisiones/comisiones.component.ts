@@ -483,6 +483,17 @@ export class ComisionesComponent implements OnInit {
     p.seleccionado = !p.seleccionado;
   }
 
+  toggleTodosPagos(c: ComisionVendedorDTO): void {
+    const pagos = this.pagosDe(c);
+    const marcar = !pagos.every(p => p.seleccionado);
+    pagos.forEach(p => p.seleccionado = marcar);
+  }
+
+  todosSeleccionados(c: ComisionVendedorDTO): boolean {
+    const pagos = this.pagosDe(c);
+    return pagos.length > 0 && pagos.every(p => p.seleccionado);
+  }
+
   seleccionadosDe(c: ComisionVendedorDTO): PagoComisionMensualDTO[] {
     return this.pagosDe(c).filter(p => p.seleccionado);
   }
