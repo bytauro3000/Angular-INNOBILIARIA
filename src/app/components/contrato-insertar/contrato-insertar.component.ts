@@ -33,6 +33,7 @@ import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.comp
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
 import { loteCoincide } from '../../utils/lote-filtro';
+import { TokenService } from '../../auth/token.service';
 
 /** Cliente agregado al contrato con su rol (TITULAR, AVAL, etc.). */
 export interface ClienteSeleccionado extends Cliente {
@@ -121,6 +122,9 @@ export class ContratoInsertarComponent implements OnInit {
   // se conserva la fecha más alta detectada entre todos los vouchers.
   private ocrOperationNumbers: Map<string, string> = new Map();
   private ocrVoucherFechas: Map<string, string> = new Map();
+  private ocrVoucherHoras: Map<string, string> = new Map();
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null = null;
 
   // Estado del guardado (para el flujo de 2 pasos: guardar contrato → subir voucher)
   idContratoGuardado: number | null = null;
@@ -182,8 +186,13 @@ export class ContratoInsertarComponent implements OnInit {
     private route: ActivatedRoute,
     private toastr: ToastrService,
     private tipoCambioService: TipoCambioService,
-    private pagoLetraService: PagoLetraService
+    private pagoLetraService: PagoLetraService,
+    private tokenSvc: TokenService
   ) {}
+
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
 
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent): void {
@@ -221,6 +230,8 @@ export class ContratoInsertarComponent implements OnInit {
     return {
       importePagado: 0,
       fechaPago: obtenerFechaPeru(),
+      fechaOperacion: '',
+      horaOperacion: null,
       medioPago: null,
       numeroOperacion: null,
       observaciones: null,
@@ -284,8 +295,11 @@ export class ContratoInsertarComponent implements OnInit {
   onMedioPagoInicialChange(): void {
     if (this.pagoInicialRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoInicialRequest.numeroOperacion = null;
+      this.pagoInicialRequest.fechaOperacion = '';
       this.voucherInicialFiles = [];
       this.limpiarOcrInicial();
+    } else if (!this.pagoInicialRequest.fechaOperacion) {
+      this.pagoInicialRequest.fechaOperacion = obtenerFechaPeru();
     }
   }
 
@@ -307,7 +321,13 @@ export class ContratoInsertarComponent implements OnInit {
     if (data.fechaPago && data.fileName) {
       this.ocrVoucherFechas.set(data.fileName, data.fechaPago);
       this.actualizarFechaInicial();
-      cambios.push(`Fecha: ${data.fechaPago}`);
+      cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+
+    if (data.horaOperacion && data.fileName) {
+      this.ocrVoucherHoras.set(data.fileName, data.horaOperacion);
+      this.actualizarFechaInicial();
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
 
     if (cambios.length > 0) {
@@ -332,6 +352,13 @@ export class ContratoInsertarComponent implements OnInit {
     for (const fileName of this.ocrVoucherFechas.keys()) {
       if (!nombresActuales.has(fileName)) this.ocrVoucherFechas.delete(fileName);
     }
+    for (const fileName of this.ocrVoucherHoras.keys()) {
+      if (!nombresActuales.has(fileName)) this.ocrVoucherHoras.delete(fileName);
+    }
+    if (files.length === 0) {
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
+    }
     this.actualizarNumeroOperacionInicial();
     this.actualizarFechaInicial();
   }
@@ -342,15 +369,20 @@ export class ContratoInsertarComponent implements OnInit {
   }
 
   private actualizarFechaInicial(): void {
-    const fechas = Array.from(this.ocrVoucherFechas.values());
-    if (fechas.length === 0) return;
-    const max = fechas.reduce((a, b) => (a > b ? a : b));
-    this.pagoInicialRequest.fechaPago = max;
+    const entries = Array.from(this.ocrVoucherFechas.entries());
+    if (entries.length === 0) return;
+    const maxEntry = entries.reduce((a, b) => (a[1] > b[1] ? a : b));
+    this.pagoInicialRequest.fechaOperacion = maxEntry[1];
+    this.ocrFechaOperacion = maxEntry[1];
+    this.ocrHoraOperacion = this.ocrVoucherHoras.get(maxEntry[0]) ?? null;
   }
 
   private limpiarOcrInicial(): void {
     this.ocrOperationNumbers.clear();
     this.ocrVoucherFechas.clear();
+    this.ocrVoucherHoras.clear();
+    this.ocrFechaOperacion = null;
+    this.ocrHoraOperacion = null;
   }
 
   confirmarPagoInicial(): void {
@@ -371,6 +403,18 @@ export class ContratoInsertarComponent implements OnInit {
       this.toastr.warning('Ingrese el N° de operación', 'Validación');
       return;
     }
+    if (this.requiereNumeroOperacion && !this.pagoInicialRequest.fechaOperacion) {
+      this.toastr.warning('La fecha de operación es obligatoria para este medio de pago', 'Validación');
+      return;
+    }
+
+    // La hora del voucher solo aplica si la fecha de operación sigue siendo la detectada por OCR
+    this.pagoInicialRequest.horaOperacion =
+      this.ocrHoraOperacion && this.ocrFechaOperacion &&
+        this.pagoInicialRequest.fechaOperacion === this.ocrFechaOperacion
+        ? this.ocrHoraOperacion
+        : null;
+
     this.cerrarModalPagoInicial();
     this.toastr.success('Datos del pago de inicial registrados', 'Listo');
   }

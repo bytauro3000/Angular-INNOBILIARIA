@@ -16,6 +16,7 @@ import { PagoLetraService } from '../../services/pagoletra.service';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
+import { TokenService } from '../../auth/token.service';
 
 @Component({
   selector: 'app-mora-pagar',
@@ -41,6 +42,8 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   // Archivos de voucher seleccionados
   voucherFiles: File[] = [];
   private ocrOperationNumbers: Map<string, string> = new Map();
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null = null;
 
   // Preview readonly del número que se emitirá
   numeroComprobantePreview: string = '';
@@ -54,6 +57,7 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
     idMora: 0,
     montoPagado: 0,
     fechaPago: '',
+    fechaOperacion: '',
     medioPago: MedioPago.EFECTIVO,
     numeroOperacion: '',
     tipoComprobante: undefined,
@@ -65,13 +69,19 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   constructor(
     private moraService: MoraService,
     private toastr: ToastrService,
-    private pagoLetraService: PagoLetraService
+    private pagoLetraService: PagoLetraService,
+    private tokenSvc: TokenService
   ) {}
+
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
 
   ngOnInit(): void {
     this.request.idMora      = this.mora.idMora;
     this.request.montoPagado = this.mora.montoMoraTotal;
     this.request.fechaPago   = obtenerFechaPeru();
+    this.request.fechaOperacion = '';
     this.request.observaciones = `Pago de mora - Letra N° ${this.mora.numeroLetra}`;
   }
 
@@ -100,6 +110,12 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
   onMedioPagoChange(): void {
     if (this.request.medioPago === MedioPago.EFECTIVO) {
       this.request.numeroOperacion = '';
+      this.request.fechaOperacion = '';
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
+      this.voucherFiles = [];
+    } else if (!this.request.fechaOperacion) {
+      this.request.fechaOperacion = obtenerFechaPeru();
     }
   }
 
@@ -119,8 +135,14 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
     }
 
     if (data.fechaPago) {
-      this.request.fechaPago = data.fechaPago;
-      cambios.push(`Fecha: ${data.fechaPago}`);
+      this.request.fechaOperacion = data.fechaPago;
+      this.ocrFechaOperacion = data.fechaPago;
+      cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+
+    if (data.horaOperacion) {
+      this.ocrHoraOperacion = data.horaOperacion;
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
 
     if (cambios.length > 0) {
@@ -142,6 +164,10 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
       if (!nombresActuales.has(fileName)) {
         this.ocrOperationNumbers.delete(fileName);
       }
+    }
+    if (files.length === 0) {
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
     }
     this.actualizarNumeroOperacion();
   }
@@ -211,18 +237,31 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
       this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
       return;
     }
-    if (this.request.medioPago !== MedioPago.EFECTIVO && !this.request.numeroOperacion?.trim()) {
-      this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
-      return;
-    }
-    if (this.request.medioPago !== MedioPago.EFECTIVO && this.voucherFiles.length === 0) {
-      this.toastr.warning('Debe adjuntar al menos un voucher para este medio de pago', 'Validación');
-      return;
+    if (this.request.medioPago !== MedioPago.EFECTIVO) {
+      if (!this.request.numeroOperacion?.trim()) {
+        this.toastr.warning('El número de operación es obligatorio para este medio de pago', 'Validación');
+        return;
+      }
+      if (!this.request.fechaOperacion) {
+        this.toastr.warning('La fecha de operación es obligatoria para este medio de pago', 'Validación');
+        return;
+      }
+      if (this.voucherFiles.length === 0) {
+        this.toastr.warning('Debe adjuntar al menos un voucher para este medio de pago', 'Validación');
+        return;
+      }
     }
     if (!this.request.tipoComprobante) {
       this.toastr.warning('Debe seleccionar el tipo de comprobante', 'Validación');
       return;
     }
+
+    // La hora del voucher solo aplica si la fecha de operación sigue siendo la detectada por OCR
+    this.request.horaOperacion =
+      this.ocrHoraOperacion && this.ocrFechaOperacion &&
+        this.request.fechaOperacion === this.ocrFechaOperacion
+        ? this.ocrHoraOperacion
+        : undefined;
 
     this.enviando = true;
     this.moraService.pagarMora(this.request, this.voucherFiles).subscribe({

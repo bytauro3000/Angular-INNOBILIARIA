@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
 import { obtenerFechaPeru } from '../../utils/fecha-peru';
 import { VoucherOcrData } from '../../services/ocr-voucher.service';
+import { TokenService } from '../../auth/token.service';
 
 @Component({
   selector: 'app-inscripcion-servicios-insertar',
@@ -55,8 +56,12 @@ export class InscripcionServiciosInsertarComponent {
   medioPago: MedioPago               = MedioPago.EFECTIVO;
   tipoComprobante?: TipoComprobante;
   fechaPago: string                  = obtenerFechaPeru();
+  fechaOperacion: string             = '';
   numeroOperacion: string            = '';
   observaciones: string              = '';
+
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null  = null;
 
   numeroComprobantePreview: string   = '';
   cargandoPreview: boolean           = false;
@@ -74,8 +79,13 @@ export class InscripcionServiciosInsertarComponent {
 
   constructor(
     private inscripcionService: InscripcionService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tokenSvc: TokenService
   ) {}
+
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
 
   /**
    * Abre el modal.
@@ -142,6 +152,9 @@ export class InscripcionServiciosInsertarComponent {
     this.medioPago                = MedioPago.EFECTIVO;
     this.tipoComprobante          = undefined;
     this.fechaPago                = obtenerFechaPeru();
+    this.fechaOperacion           = '';
+    this.ocrFechaOperacion        = null;
+    this.ocrHoraOperacion         = null;
     this.numeroOperacion          = '';
     this.observaciones            = '';
     this.numeroComprobantePreview = '';
@@ -199,7 +212,12 @@ export class InscripcionServiciosInsertarComponent {
   onMedioPagoChange(): void {
     if (this.medioPago === MedioPago.EFECTIVO) {
       this.numeroOperacion = '';
+      this.fechaOperacion = '';
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
       this.voucherInscripcionFiles = [];
+    } else if (!this.fechaOperacion) {
+      this.fechaOperacion = obtenerFechaPeru();
     }
   }
 
@@ -218,8 +236,14 @@ export class InscripcionServiciosInsertarComponent {
     }
 
     if (data.fechaPago) {
-      this.fechaPago = data.fechaPago;
-      cambios.push(`Fecha: ${data.fechaPago}`);
+      this.fechaOperacion = data.fechaPago;
+      this.ocrFechaOperacion = data.fechaPago;
+      cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+
+    if (data.horaOperacion) {
+      this.ocrHoraOperacion = data.horaOperacion;
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
 
     if (cambios.length > 0) {
@@ -302,19 +326,28 @@ export class InscripcionServiciosInsertarComponent {
       this.toastr.warning('Debe seleccionar el tipo de comprobante.', 'Validación');
       return;
     }
-    if (this.medioPago !== MedioPago.EFECTIVO && !this.numeroOperacion.trim()) {
-      this.toastr.warning(
-        'El número de operación es obligatorio para este medio de pago.',
-        'Validación'
-      );
-      return;
-    }
-    if (this.medioPago !== MedioPago.EFECTIVO && this.voucherInscripcionFiles.length === 0) {
-      this.toastr.warning(
-        'Debe adjuntar al menos un voucher para este medio de pago.',
-        'Validación'
-      );
-      return;
+    if (this.medioPago !== MedioPago.EFECTIVO) {
+      if (!this.numeroOperacion.trim()) {
+        this.toastr.warning(
+          'El número de operación es obligatorio para este medio de pago.',
+          'Validación'
+        );
+        return;
+      }
+      if (!this.fechaOperacion) {
+        this.toastr.warning(
+          'La fecha de operación es obligatoria para este medio de pago.',
+          'Validación'
+        );
+        return;
+      }
+      if (this.voucherInscripcionFiles.length === 0) {
+        this.toastr.warning(
+          'Debe adjuntar al menos un voucher para este medio de pago.',
+          'Validación'
+        );
+        return;
+      }
     }
 
     const request: AbonoInscripcionRequest = {
@@ -323,6 +356,13 @@ export class InscripcionServiciosInsertarComponent {
       tipoServicio:                   this.tipoServicio,
       montoPagado:                    this.montoAbono,
       fechaPago:                      this.fechaPago,
+      fechaOperacion:                 this.fechaOperacion || undefined,
+      // La hora del voucher solo aplica si la fecha de operación sigue siendo la detectada por OCR
+      horaOperacion:
+        this.ocrHoraOperacion && this.ocrFechaOperacion &&
+          this.fechaOperacion === this.ocrFechaOperacion
+          ? this.ocrHoraOperacion
+          : undefined,
       medioPago:                      this.medioPago,
       numeroOperacion:                this.numeroOperacion || undefined,
       observaciones:                  this.observaciones

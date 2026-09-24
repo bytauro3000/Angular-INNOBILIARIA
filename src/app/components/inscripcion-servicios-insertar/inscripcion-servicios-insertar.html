@@ -120,10 +120,21 @@
           </p>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" *ngIf="esSoporte">
           <label class="form-label">Fecha de Pago <span class="req">*</span></label>
           <input type="date" class="form-control"
                  [(ngModel)]="fechaPago" name="fechaPago">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Fecha Operación (voucher)
+            <span class="req" *ngIf="medioPago !== 'EFECTIVO'">*</span>
+          </label>
+          <input type="date" class="form-control"
+                 [(ngModel)]="fechaOperacion" name="fechaOperacion"
+                 [disabled]="medioPago === 'EFECTIVO'"
+                 [placeholder]="medioPago === 'EFECTIVO' ? 'N/A' : ''">
         </div>
       </div>
 

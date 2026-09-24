@@ -5,6 +5,8 @@ export interface PagoMoraRequest {
   idMora: number;
   montoPagado: number;
   fechaPago: string;
+  fechaOperacion?: string;
+  horaOperacion?: string;
   medioPago: MedioPago;
   numeroOperacion?: string;
   tipoComprobante?: TipoComprobante;

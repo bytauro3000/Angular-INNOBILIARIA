@@ -442,10 +442,21 @@
                  [(ngModel)]="pagoInicialRequest.importePagado"
                  class="pi-input" />
         </div>
-        <div class="pi-form-group">
+        <div class="pi-form-group" *ngIf="esSoporte">
           <label><i class="bi bi-calendar-event"></i> Fecha de Pago <span class="req">*</span></label>
           <input type="date"
                  [(ngModel)]="pagoInicialRequest.fechaPago"
+                 class="pi-input" />
+        </div>
+        <div class="pi-form-group">
+          <label>
+            <i class="bi bi-calendar-event"></i> Fecha Operación (voucher)
+            <span class="req" *ngIf="requiereNumeroOperacion">*</span>
+          </label>
+          <input type="date"
+                 [(ngModel)]="pagoInicialRequest.fechaOperacion"
+                 [disabled]="!requiereNumeroOperacion"
+                 [placeholder]="requiereNumeroOperacion ? '' : 'N/A — Efectivo'"
                  class="pi-input" />
         </div>
       </div>

@@ -7,6 +7,8 @@ export interface AbonoInscripcionRequest {
   tipoServicio:                   string;
   montoPagado:                    number;
   fechaPago:                      string;
+  fechaOperacion?:                string;
+  horaOperacion?:                 string;
   medioPago:                      MedioPago | string;
   numeroOperacion?:               string;
   observaciones?:                 string;
