@@ -9,6 +9,10 @@ const ENG_TO_SPA: Record<string, string> = {
   sep: 'set', dec: 'dic'
 };
 
+const MONTH_ALT = 'ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|set|sep(?:t(?:iembre)?)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?';
+
+const FECHA_HORA = /\b(?:fecha|hora)\b/i;
+
 export interface VoucherFields {
   numeroOperacion: string | null;
   fechaPago: string | null;
@@ -22,8 +26,6 @@ export function extractVoucherData(text: string): VoucherFields {
 }
 
 function extractNumeroOperacion(text: string): string | null {
-  const lines = text.split('\n');
-
   const keywords = /OP(?:ERACI[OÓ]N|\.\s*ERACI[OÓ]N)|N[°ºo0RO.\-]*\s*OP|N[úu]mero\s*Op|N[úu]mero.*[Oo]peraci|C[oó]digo.*[Oo]peraci|ID\s*[Oo]peraci|ID\s*[Tt]ransacci|COMPROBANTE\s*N[°ºo0]|NRO[.:\s]*OP/i;
 
   const labelPatterns = [
@@ -37,37 +39,84 @@ function extractNumeroOperacion(text: string): string | null {
     /N[°ºo0RO.\-]*\s*OP(?:ERACI[OÓ]N)?/i,
     /OP(?:ERACI[OÓ]N|)\s*N[°ºo0]/i,
     /operaci[oó]n\s+n[úu]mero/i,
-    /comprobante\s+n[úu]mero/i
+    /comprobante\s+n[úu]mero/i,
+    /operaci[oó]n(?=\s*[:.])/i
   ];
 
   for (const pattern of labelPatterns) {
-    const match = text.match(pattern);
+    const match = pattern.exec(text);
     if (!match || typeof match.index !== 'number') continue;
-
-    const afterLabel = text.substring(match.index + match[0].length);
-    const numMatch = afterLabel.match(/[:\-]?\s*(\d{4,})/);
-    if (numMatch && numMatch[1]) {
-      const cleaned = numMatch[1].replace(/[^\d]/g, '');
-      if (cleaned.length >= 4) return cleaned;
-    }
+    const num = extraerTrasLabel(text, match.index + match[0].length);
+    if (num) return num;
   }
 
-  for (const line of lines) {
+  for (const line of text.split('\n')) {
     const trimmed = line.trim();
     if (!keywords.test(trimmed)) continue;
-    const nums = trimmed.match(/\b(\d{4,})\b/g);
-    if (!nums) continue;
-    const valid = nums.filter(n => {
-      const num = n.replace(/[^\d]/g, '');
-      return num.length >= 4 && num.length <= 10;
-    });
-    if (valid.length > 0) return valid[0];
+    const num = extraerEnLinea(trimmed, 0, 10);
+    if (num) return num;
   }
 
   return null;
 }
 
-const MONTH_ALT = 'ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|set|sep(?:t(?:iembre)?)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?';
+function extraerTrasLabel(text: string, finLabel: number): string | null {
+  const salto = text.indexOf('\n', finLabel);
+  const finLinea = salto === -1 ? text.length : salto;
+  const inicioLinea = text.lastIndexOf('\n', finLabel) + 1;
+  const linea = text.substring(inicioLinea, finLinea);
+  const num = extraerEnLinea(linea, finLabel - inicioLinea, null);
+  if (num) return num;
+
+  let cursor = finLinea + 1;
+  for (let i = 0; i < 2 && cursor <= text.length; i++) {
+    const sig = text.indexOf('\n', cursor);
+    const finSig = sig === -1 ? text.length : sig;
+    const lineaSig = text.substring(cursor, finSig);
+    const m = lineaSig.match(/^\s*[:\-]?\s*(\d{4,})/);
+    if (m && !esParteDeFecha(lineaSig, lineaSig.indexOf(m[1]), m[1])) return m[1];
+    cursor = finSig + 1;
+  }
+  return null;
+}
+
+function extraerEnLinea(linea: string, desde: number, tope: number | null): string | null {
+  const region = linea.substring(desde);
+
+  const sep = /[:\-]\s*(\d{4,})/g;
+  let m: RegExpExecArray | null;
+  while ((m = sep.exec(region)) !== null) {
+    const pos = desde + m.index + m[0].length - m[1].length;
+    if (esNumeroOperacionValido(linea, pos, m[1], tope)) return m[1];
+  }
+
+  if (FECHA_HORA.test(region)) return null;
+
+  const suelto = /(\d{4,})/g;
+  while ((m = suelto.exec(region)) !== null) {
+    const pos = desde + m.index;
+    if (esNumeroOperacionValido(linea, pos, m[1], tope)) return m[1];
+  }
+
+  return null;
+}
+
+function esNumeroOperacionValido(linea: string, pos: number, cand: string, tope: number | null): boolean {
+  if (tope !== null && cand.length > tope) return false;
+  if (esParteDeFecha(linea, pos, cand)) return false;
+  if (FECHA_HORA.test(linea.substring(0, pos)) && /^(?:19|20)\d{2}$/.test(cand)) return false;
+  return true;
+}
+
+function esParteDeFecha(linea: string, inicio: number, num: string): boolean {
+  const antes = linea.substring(0, inicio).trimEnd();
+  const despues = linea.substring(inicio + num.length);
+  if (/(?:\d{1,2}[\/\-\.])+$/.test(antes)) return true;
+  if (/^[-\/\.]\d{1,2}/.test(despues)) return true;
+  if (new RegExp(`(?:${MONTH_ALT})\\b(?:\\s+d[ei])?\\s*$`, 'i').test(antes)) return true;
+  if (new RegExp(`^\\s*(?:d[ei]\\s+)?(?:${MONTH_ALT})\\b`, 'i').test(despues)) return true;
+  return false;
+}
 
 function extractFechaPago(text: string): string | null {
   const spanishPattern = new RegExp(
@@ -103,8 +152,4 @@ function extractFechaPago(text: string): string | null {
   }
 
   return null;
-}
-
-function cleanNumber(raw: string): string {
-  return raw.replace(/[.\s,]/g, '').replace(/[^\d]/g, '').trim();
 }
