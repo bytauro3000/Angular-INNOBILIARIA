@@ -69,6 +69,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
   voucherFiles: File[] = [];
   private ocrOperationNumbers: Map<string, string> = new Map();
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null = null;
   enviando: boolean = false;
   recalculandoMora: boolean = false;
 
@@ -253,6 +255,8 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     if (this.pagoRequest.medioPago === MedioPago.EFECTIVO) {
       this.pagoRequest.numeroOperacion = '';
       this.pagoRequest.fechaOperacion = undefined;
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
       this.voucherFiles = [];
     } else if (!this.pagoRequest.fechaOperacion) {
       this.pagoRequest.fechaOperacion = obtenerFechaPeru();
@@ -277,7 +281,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
 
     if (data.fechaPago) {
       this.pagoRequest.fechaOperacion = data.fechaPago;
+      this.ocrFechaOperacion = data.fechaPago;
       cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+
+    if (data.horaOperacion) {
+      this.ocrHoraOperacion = data.horaOperacion;
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
 
     if (cambios.length > 0) {
@@ -300,6 +310,10 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
       if (!nombresActuales.has(fileName)) {
         this.ocrOperationNumbers.delete(fileName);
       }
+    }
+    if (files.length === 0) {
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
     }
     this.actualizarNumeroOperacion();
   }
@@ -505,6 +519,13 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
         this.pagoRequest.pin = this.pinCachePorContrato.get(idContrato);
       }
     }
+
+    // La hora del voucher solo aplica si la fecha de operación sigue siendo la detectada por OCR
+    this.pagoRequest.horaOperacion =
+      this.ocrHoraOperacion && this.ocrFechaOperacion &&
+        this.pagoRequest.fechaOperacion === this.ocrFechaOperacion
+        ? this.ocrHoraOperacion
+        : undefined;
 
     this.enviando = true;
 

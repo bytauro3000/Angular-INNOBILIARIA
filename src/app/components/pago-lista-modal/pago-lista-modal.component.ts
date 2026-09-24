@@ -44,13 +44,16 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   editandoVoucher = false;
   voucherPago: PagoLetraResponse | null = null;
   voucherFechaOperacion: string = '';
+  voucherHoraOperacion: string | null = null;
   voucherNumeroOperacion: string = '';
   /** Archivos del voucher en edición (controlados por voucher-preview). */
   voucherFiles: File[] = [];
   /** Números de operación detectados por OCR, por nombre de archivo. */
   private ocrOperationNumbers: Map<string, string> = new Map();
-  /** Fechas detectadas por OCR. */
-  private ocrFechas: string[] = [];
+  /** Fechas (y hora cuando existe) detectadas por OCR. */
+  private ocrFechas: { fecha: string; hora: string | null }[] = [];
+  /** Fecha a la que pertenece voucherHoraOperacion (para no aplicar hora de otro día). */
+  private ocrFechaConHora: string | null = null;
   /** Para evitar re-asignar el ngModel cada render. */
   voucherFilesModel: File[] = [];
 
@@ -221,6 +224,8 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   editarVoucher(pago: PagoLetraResponse): void {
     this.voucherPago = pago;
     this.voucherFechaOperacion = pago.fechaOperacion ? pago.fechaOperacion.slice(0, 10) : '';
+    this.voucherHoraOperacion = null;
+    this.ocrFechaConHora = null;
     this.voucherNumeroOperacion = pago.numeroOperacion || '';
     this.voucherFiles = [];
     this.voucherFilesModel = [];
@@ -236,11 +241,11 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
 
   /**
    * OCR: autollena la fecha de operación (la MÁS ALTA detectada entre todos los
-   * vouchers) y el número de operación separado por coma (igual que el registro).
+   * vouchers, con su hora si existe) y el número de operación separado por coma.
    */
   onVoucherOcr(data: VoucherOcrData): void {
     if (data.fechaPago) {
-      this.ocrFechas.push(data.fechaPago);
+      this.ocrFechas.push({ fecha: data.fechaPago, hora: data.horaOperacion });
       this.actualizarFechaOperacionDesdeOcr();
     }
     if (data.numeroOperacion && data.fileName) {
@@ -250,11 +255,13 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   }
 
   private actualizarFechaOperacionDesdeOcr(): void {
-    const fechasValidas = this.ocrFechas.filter(f => !!f && !isNaN(new Date(f).getTime()));
+    const fechasValidas = this.ocrFechas.filter(f => !!f.fecha && !isNaN(new Date(f.fecha).getTime()));
     if (fechasValidas.length === 0) return;
-    // La fecha más alta (más reciente) de los vouchers
-    const max = fechasValidas.reduce((a, b) => (new Date(b) > new Date(a) ? b : a));
-    this.voucherFechaOperacion = max.slice(0, 10);
+    // La fecha más alta (más reciente) de los vouchers, con su hora detectada
+    const max = fechasValidas.reduce((a, b) => (new Date(b.fecha) > new Date(a.fecha) ? b : a));
+    this.voucherFechaOperacion = max.fecha.slice(0, 10);
+    this.voucherHoraOperacion = max.hora;
+    this.ocrFechaConHora = max.hora ? max.fecha : null;
   }
 
   private actualizarNumeroOperacionDesdeOcr(): void {
@@ -270,6 +277,8 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     this.voucherFilesModel = [];
     this.ocrOperationNumbers.clear();
     this.ocrFechas = [];
+    this.voucherHoraOperacion = null;
+    this.ocrFechaConHora = null;
   }
 
   /** Sube los vouchers recortados con la fecha y número de operación. */
@@ -284,6 +293,10 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
       numeroOperacion: this.voucherNumeroOperacion || this.voucherPago.numeroOperacion,
       fechaPago: this.voucherPago.fechaPago,
       fechaOperacion: this.voucherFechaOperacion || undefined,
+      horaOperacion: this.voucherHoraOperacion && this.ocrFechaConHora &&
+        this.voucherFechaOperacion === this.ocrFechaConHora.slice(0, 10)
+        ? this.voucherHoraOperacion
+        : undefined,
       observaciones: this.voucherPago.observaciones
     };
 

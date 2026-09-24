@@ -10,6 +10,8 @@ export interface PagoLetraRequest {
   fechaPago?: string;
   /** Fecha del voucher (solo referencial, opcional) */
   fechaOperacion?: string;
+  /** Hora exacta del voucher (HH:mm:ss), solo si la fecha de operación viene del OCR */
+  horaOperacion?: string;
   tipoComprobante?: TipoComprobante;
   numeroComprobantePersonalizado?: string;
   observaciones?: string;

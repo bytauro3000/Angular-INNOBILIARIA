@@ -70,3 +70,55 @@ describe('voucher-parser - fecha de pago', () => {
     expect(extractVoucherData('Fecha: 24/09/2026').fechaPago).toBe('2026-09-24');
   });
 });
+
+describe('voucher-parser - hora de operacion', () => {
+  const hora = (text: string): string | null => extractVoucherData(text).horaOperacion;
+
+  it('Label "Hora:" con hh:mm:ss', () => {
+    expect(hora('Transferencia exitosa\nFecha: 24/09/2026\nHora: 14:35:22')).toBe('14:35:22');
+  });
+
+  it('Label "Hora:" con hh:mm agrega segundos en cero', () => {
+    expect(hora('Hora: 09:05')).toBe('09:05:00');
+  });
+
+  it('Fecha y hora en una sola línea', () => {
+    expect(hora('Operación realizada el 24/09/2026 14:35')).toBe('14:35:00');
+  });
+
+  it('Formato con puntos (14.35.22)', () => {
+    expect(hora('14.35.22')).toBe('14:35:22');
+  });
+
+  it('Formato 12h con p. m.', () => {
+    expect(hora('Realizado a las 2:35 p. m.')).toBe('14:35:00');
+  });
+
+  it('Formato 12h con a. m. y las 12', () => {
+    expect(hora('12:05 a.m.')).toBe('00:05:00');
+  });
+
+  it('No confunde la fecha con puntos (20.09.2026) con una hora', () => {
+    expect(hora('Fecha: 20.09.2026')).toBeNull();
+  });
+
+  it('Descarta horarios de atención (varias horas)', () => {
+    expect(hora('Horario: 08:00 - 18:00')).toBeNull();
+    expect(hora('Llegó 10:00 y salió 18:00')).toBeNull();
+  });
+
+  it('Linea de atención con una sola hora también se descarta', () => {
+    expect(hora('Atención al cliente: 08:00')).toBeNull();
+  });
+
+  it('Voucher sin hora devuelve null', () => {
+    expect(hora('Pago realizado\nFecha: 24/09/2026\nOperación: 123456')).toBeNull();
+  });
+
+  it('La hora no afecta los demás campos', () => {
+    const d = extractVoucherData('Operación: 30313233\nFecha: 24/09/2026\nHora: 14:35:22');
+    expect(d.numeroOperacion).toBe('30313233');
+    expect(d.fechaPago).toBe('2026-09-24');
+    expect(d.horaOperacion).toBe('14:35:22');
+  });
+});

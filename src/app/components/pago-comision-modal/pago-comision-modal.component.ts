@@ -51,6 +51,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
   numeroEgresoPreview: string = '';
 
   private ocrOperationNumbers: Map<string, string> = new Map();
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null = null;
 
   constructor(
     private comisionService: ComisionVendedorService,
@@ -90,6 +92,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     this.medioPago = 'EFECTIVO';
     this.voucherFiles = [];
     this.ocrOperationNumbers = new Map();
+    this.ocrFechaOperacion = null;
+    this.ocrHoraOperacion = null;
     this.numeroEgresoPreview = '';
 
     // El monto se calcula ANTES de la observación (para restarlo del saldo).
@@ -154,6 +158,8 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
       this.fechaOperacion = '';
       this.voucherFiles = [];
       this.ocrOperationNumbers = new Map();
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
     } else if (!this.fechaOperacion) {
       this.fechaOperacion = obtenerFechaPeru();
     }
@@ -168,7 +174,12 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     }
     if (data.fechaPago) {
       this.fechaOperacion = data.fechaPago;
+      this.ocrFechaOperacion = data.fechaPago;
       cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+    if (data.horaOperacion) {
+      this.ocrHoraOperacion = data.horaOperacion;
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
     if (cambios.length > 0) {
       this.toastr.info(`Detectado (${data.confidence.toFixed(0)}% conf.): ${cambios.join(' | ')}`, 'OCR');
@@ -181,6 +192,10 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
     const nombresActuales = new Set(files.map(f => f.name));
     for (const fileName of this.ocrOperationNumbers.keys()) {
       if (!nombresActuales.has(fileName)) this.ocrOperationNumbers.delete(fileName);
+    }
+    if (files.length === 0) {
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
     }
     this.actualizarNumeroOperacion();
   }
@@ -264,6 +279,10 @@ export class PagoComisionModal implements OnInit, AfterViewInit {
       medioPago: this.medioPago,
       numeroOperacion: esBancario ? this.numeroOperacion : undefined,
       fechaOperacion: esBancario ? this.fechaOperacion : undefined,
+      horaOperacion: esBancario && this.ocrHoraOperacion && this.ocrFechaOperacion &&
+        this.fechaOperacion === this.ocrFechaOperacion
+        ? this.ocrHoraOperacion
+        : undefined,
       fechaPago: this.fechaPago,
       observacion: this.observacion || undefined
     };

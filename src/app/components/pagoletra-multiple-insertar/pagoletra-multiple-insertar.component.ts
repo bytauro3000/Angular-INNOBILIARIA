@@ -68,6 +68,8 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
   voucherFiles: File[] = [];
   private ocrOperationNumbers: Map<string, string> = new Map();
+  private ocrFechaOperacion: string | null = null;
+  private ocrHoraOperacion: string | null = null;
   enviando: boolean = false;
 
   // ── Control de cierre limpio ───────────────────────────────────────────────
@@ -242,6 +244,8 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
     if (this.datosComunes.medioPago === MedioPago.EFECTIVO) {
       this.datosComunes.numeroOperacion = '';
       this.datosComunes.fechaOperacion = '';
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
       this.voucherFiles = [];
     } else if (!this.datosComunes.fechaOperacion) {
       this.datosComunes.fechaOperacion = obtenerFechaPeru();
@@ -265,7 +269,13 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
 
     if (data.fechaPago) {
       this.datosComunes.fechaOperacion = data.fechaPago;
+      this.ocrFechaOperacion = data.fechaPago;
       cambios.push(`Fecha op: ${data.fechaPago}`);
+    }
+
+    if (data.horaOperacion) {
+      this.ocrHoraOperacion = data.horaOperacion;
+      cambios.push(`Hora op: ${data.horaOperacion}`);
     }
 
     if (cambios.length > 0) {
@@ -287,6 +297,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       if (!nombresActuales.has(fileName)) {
         this.ocrOperationNumbers.delete(fileName);
       }
+    }
+    if (files.length === 0) {
+      this.ocrFechaOperacion = null;
+      this.ocrHoraOperacion = null;
     }
     this.actualizarNumeroOperacion();
   }
@@ -467,6 +481,10 @@ export class PagoletraMultipleInsertarComponent implements OnInit, AfterViewInit
       numeroOperacion: this.datosComunes.numeroOperacion || undefined,
       fechaPago: this.datosComunes.fechaPago || obtenerFechaPeru(),
       fechaOperacion: this.datosComunes.fechaOperacion,
+      horaOperacion: this.ocrHoraOperacion && this.ocrFechaOperacion &&
+        this.datosComunes.fechaOperacion === this.ocrFechaOperacion
+        ? this.ocrHoraOperacion
+        : undefined,
       tipoComprobante: this.datosComunes.tipoComprobante,
       numeroComprobantePersonalizado: this.modoManualComprobante && this.numeroComprobanteManual
         ? this.numeroComprobanteManual

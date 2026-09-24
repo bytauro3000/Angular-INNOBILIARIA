@@ -16,12 +16,15 @@ const FECHA_HORA = /\b(?:fecha|hora)\b/i;
 export interface VoucherFields {
   numeroOperacion: string | null;
   fechaPago: string | null;
+  /** Hora exacta del voucher en formato HH:mm:ss (null si no se detectó o no es válida). */
+  horaOperacion: string | null;
 }
 
 export function extractVoucherData(text: string): VoucherFields {
   return {
     numeroOperacion: extractNumeroOperacion(text),
-    fechaPago: extractFechaPago(text)
+    fechaPago: extractFechaPago(text),
+    horaOperacion: extractHoraOperacion(text)
   };
 }
 
@@ -152,4 +155,69 @@ function extractFechaPago(text: string): string | null {
   }
 
   return null;
+}
+
+/**
+ * Detecta la hora exacta del voucher (HH:mm:ss).
+ *
+ * Estrategia:
+ *  1) Línea con label de hora ("Hora:", "Fecha y hora:") y exactamente una hora
+ *     válida → esa hora (prioridad).
+ *  2) Se descartan líneas de horario ("Horario", "Atención") y líneas con 2+
+ *     horas (rangos como "08:00 - 18:00").
+ *  3) Candidatas que caen dentro de una fecha (24.09.2026) se ignoran.
+ *  4) Si tras filtrar queda EXACTAMENTE una hora en todo el texto → esa;
+ *     0 o varias → null (no se inventa hora).
+ */
+function extractHoraOperacion(text: string): string | null {
+  const candidatas: string[] = [];
+
+  for (const linea of text.split('\n')) {
+    const horas = horasValidasDeLinea(linea);
+    if (horas.length === 0) continue;
+    if (/\b(?:horario|atenci[oó]n|cierre|apertura)\b/i.test(linea)) continue;
+    if (horas.length > 1) continue;
+    if (/\b(?:fecha\s*[y\/]\s*)?hora\b/i.test(linea)) return horas[0];
+    candidatas.push(horas[0]);
+  }
+
+  return candidatas.length === 1 ? candidatas[0] : null;
+}
+
+function horasValidasDeLinea(linea: string): string[] {
+  const fechas: { ini: number; fin: number }[] = [];
+  const reFecha = /\b\d{1,2}[\/\-.](?:0[1-9]|1[0-2])[\/\-.]\d{2,4}\b/g;
+  let f: RegExpExecArray | null;
+  while ((f = reFecha.exec(linea)) !== null) {
+    fechas.push({ ini: f.index, fin: f.index + f[0].length });
+  }
+
+  const res: string[] = [];
+  const reHora = /\b(\d{1,2})\s*[:.]\s*(\d{2})(?:\s*[:.]\s*(\d{2}))?\s*(a\.?\s*m\.?|p\.?\s*m\.?)?/gi;
+  let m: RegExpExecArray | null;
+  while ((m = reHora.exec(linea)) !== null) {
+    const ini = m.index;
+    const fin = m.index + m[0].length;
+    if (fechas.some(fc => ini < fc.fin && fin > fc.ini)) continue;
+    const hora = normalizarHora(m[1], m[2], m[3], m[4]);
+    if (hora) res.push(hora);
+  }
+  return res;
+}
+
+function normalizarHora(h: string, min: string, seg: string | undefined, marker: string | undefined): string | null {
+  let hh = parseInt(h, 10);
+  const mm = parseInt(min, 10);
+  const ss = seg ? parseInt(seg, 10) : 0;
+  if (mm > 59 || ss > 59) return null;
+
+  const mk = (marker || '').toLowerCase().replace(/[\s.]/g, '');
+  if (mk) {
+    if (hh > 12) return null;
+    if (mk === 'pm' && hh < 12) hh += 12;
+    if (mk === 'am' && hh === 12) hh = 0;
+  }
+  if (hh > 23) return null;
+
+  return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
 }

@@ -62,6 +62,8 @@ export interface PagoComisionRequest {
   medioPago?: string;
   numeroOperacion?: string;
   fechaOperacion?: string;
+  /** Hora exacta del voucher (HH:mm:ss), solo si la fecha de operación viene del OCR */
+  horaOperacion?: string;
   fechaPago?: string;
   observacion?: string;
 }

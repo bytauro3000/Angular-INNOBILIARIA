@@ -440,7 +440,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
       this.ocrData.emit({ ...data, fileName: fileEntry.file.name });
     } catch (err) {
       console.error('OCR error:', err);
-      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, rawText: '', confidence: 0, fileName: fileEntry.file.name });
+      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, horaOperacion: null, rawText: '', confidence: 0, fileName: fileEntry.file.name });
     } finally {
       this.ocrProcessing = false;
       this.ocrProcessed = true;
