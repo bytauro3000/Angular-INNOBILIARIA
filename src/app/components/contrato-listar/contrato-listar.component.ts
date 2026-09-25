@@ -12,6 +12,7 @@ import { TipoContrato } from '../../enums/tipocontrato.enum';
 import { EstadoContrato } from '../../enums/Estadocontrato.enum';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { TokenService } from '../../auth/token.service';
 
 @Component({
   selector: 'app-contrato-listar',
@@ -72,7 +73,8 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     private programaService: ProgramaService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private tokenSvc: TokenService
   ) { }
 
   ngOnInit(): void {
@@ -491,19 +493,56 @@ export class ContratoListarComponent implements OnInit, OnDestroy, AfterViewInit
     return pages;
   }
 
-  // ─── ELIMINAR ────────────────────────────────────────────────────────
-  eliminarContrato(id: number): void {
+  // ─── ELIMINAR (rol SOPORTE) ─────────────────────────────────────────
+  get esSoporte(): boolean {
+    return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
+  }
+
+  /** Descripción de los lotes del contrato: "MZ.B1 LT.16" (varios separados por " · "). */
+  private descripcionLotes(contrato: ContratoListItemDTO): string {
+    const lotes = contrato.lotes ?? [];
+    if (lotes.length === 0) return `el contrato N° ${contrato.idContrato}`;
+    return lotes
+      .map(l => `MZ.${l.manzana} LT.${l.numeroLote}`)
+      .join(' · ');
+  }
+
+  eliminarContrato(contrato: ContratoListItemDTO): void {
+    const lote = this.descripcionLotes(contrato);
+
     Swal.fire({
-      title: '¿Estás seguro?', text: '¡No podrás revertir esto!', icon: 'warning',
-      showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
+      title: `¿Estás seguro de eliminar el contrato de ${lote}?`,
+      text: 'Esta acción no se puede deshacer. Se eliminarán el contrato, sus letras, pagos, moras y comisiones.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.contratoService.eliminarContrato(id).subscribe({
-          next: () => { this.toastr.success('Contrato eliminado exitosamente', 'Éxito'); this.cargarContratos(); },
-          error: (err) => { this.toastr.error(err.error?.message || 'Error al eliminar el contrato', 'Error'); }
-        });
-      }
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: 'Eliminando contrato...',
+        text: 'Este proceso puede tardar unos segundos',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      this.contratoService.eliminarContrato(contrato.idContrato).subscribe({
+        next: () => {
+          Swal.close();
+          this.toastr.success('Contrato eliminado exitosamente', 'Éxito');
+          this.cargarContratos();
+        },
+        error: (err) => {
+          Swal.close();
+          const mensaje = err?.status === 403
+            ? 'No tienes permiso para eliminar contratos (solo rol SOPORTE)'
+            : err.error?.message || 'Error al eliminar el contrato';
+          this.toastr.error(mensaje, 'Error');
+        }
+      });
     });
   }
 

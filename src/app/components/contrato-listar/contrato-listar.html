@@ -181,7 +181,7 @@
                   <i class="bi bi-pencil"></i>
                 </button>
 
-                <button (click)="eliminarContrato(contrato.idContrato)" class="btn-action btn-delete"
+                <button *ngIf="esSoporte" (click)="eliminarContrato(contrato)" class="btn-action btn-delete"
                   title="Eliminar contrato">
                   <i class="bi bi-trash"></i>
                 </button>
