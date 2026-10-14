@@ -874,6 +874,9 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     this.letrasService.actualizarLetra(letra.idLetra, letra).subscribe({
       next: () => {
         this.toastr.success('Letra actualizada correctamente.', 'Éxito');
+        // Recargar la lista para reflejar el reordenamiento automático del
+        // cronograma (las letras siguientes cambian de fecha/estado en el backend).
+        this.cargarLetras();
       },
       error: () => {
         this.toastr.error('Error al actualizar la letra.', 'Error');
