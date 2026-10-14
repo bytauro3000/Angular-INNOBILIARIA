@@ -354,3 +354,21 @@ $border-color: #e9ecef;
     }
   }
 }
+
+// ── Edición en línea: celda con ícono de lápiz ─────────────────────────────
+.celda-editable {
+  cursor: pointer;
+}
+
+.icono-editar {
+  margin-left: 6px;
+  font-size: 0.78em;
+  color: #94a3b8;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.celda-editable:hover .icono-editar {
+  opacity: 1;
+  color: #0d6efd;
+}

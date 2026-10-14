@@ -13,7 +13,7 @@ import { ReporteCronogramaPagosClientesDTO } from '../../dto/reportecronogramapa
 //Importa el módulo y la librería
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 //Importa los iconos específicos
-import { faPrint, faCalendarAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPrint, faCalendarAlt, faTrash, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-letracambio-listar',
   standalone: true,
@@ -48,6 +48,7 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
   faPrint = faPrint;
   faCalendarAlt = faCalendarAlt;
   faTrash = faTrash;
+  faPencilAlt = faPencilAlt;
 
   // Edición en línea
   editingLetraId: number | null = null;
@@ -66,7 +67,7 @@ export class LetracambioListarComponent implements OnInit, AfterViewInit {
     library: FaIconLibrary
   ) {
     //Registra los iconos instalados
-    library.addIcons(faPrint, faCalendarAlt, faTrash);
+    library.addIcons(faPrint, faCalendarAlt, faTrash, faPencilAlt);
   }
 
   ngOnInit(): void {

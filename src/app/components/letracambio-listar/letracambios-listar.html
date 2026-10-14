@@ -80,8 +80,10 @@
               type="date"
               autofocus
             />
-            <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento')">
+            <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'fechaVencimiento')" class="celda-editable"
+                  (click)="iniciarEdicion(letra, 'fechaVencimiento')" title="Clic para editar la fecha">
               {{ letra.fechaVencimiento | date: 'dd/MM/yyyy' : 'UTC' }}
+              <fa-icon [icon]="faPencilAlt" class="icono-editar"></fa-icon>
             </span>
           </td>
 
@@ -98,8 +100,10 @@
               step="0.01"
               autofocus
             />
-            <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'importe')">
+            <span *ngIf="!(editingLetraId === letra.idLetra && campoEditando === 'importe')" class="celda-editable"
+                  (click)="iniciarEdicion(letra, 'importe')" title="Clic para editar el importe">
               {{ letra.monedaContrato === 'PEN' ? 'S/' : '$' }}{{ letra.importe | number: '1.2-2' }}
+              <fa-icon [icon]="faPencilAlt" class="icono-editar"></fa-icon>
             </span>
           </td>
 
