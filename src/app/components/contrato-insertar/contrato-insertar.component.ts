@@ -516,7 +516,7 @@ export class ContratoInsertarComponent implements OnInit {
 
     this.contratoForm.get('tipoContrato')?.valueChanges.subscribe(tipo => {
       if (tipo === 'CONTADO') {
-        this.contratoForm.get('inicial')?.setValue(this.montoTotalNum, { emitEvent: false });
+        this.contratoForm.get('inicial')?.setValue(0, { emitEvent: false });
         this.contratoForm.get('cantidadLetras')?.setValue(0, { emitEvent: false });
         this.actualizarSaldo();
         this.pagoInicialRequest = this.resetPagoInicial();
