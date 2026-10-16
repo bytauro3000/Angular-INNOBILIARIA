@@ -221,6 +221,19 @@ export class PagoletraInsertarComponent implements OnInit, AfterViewInit, OnDest
     return this.pagoRequest.importePagado;
   }
 
+  /** true cuando la empresa calcula mora por tasa diaria (% del importe) — MERRUIC */
+  get esTasaDiaria(): boolean {
+    return !!this.calculoMora && this.calculoMora.montoPorcentaje === 0;
+  }
+
+  /** Tasa diaria efectiva en % (p. ej. 1 = 1% por día), derivada del cálculo del backend */
+  get tasaDiariaPorcentaje(): number {
+    if (!this.calculoMora || !this.esTasaDiaria || this.calculoMora.diasMora <= 0 || this.calculoMora.importeLetra <= 0) {
+      return 0;
+    }
+    return Math.round((this.calculoMora.montoDiario / (this.calculoMora.importeLetra * this.calculoMora.diasMora)) * 10000) / 100;
+  }
+
   togglePagarMora(): void {
     this.pagarMoraTambien = !this.pagarMoraTambien;
     this.moraDecisionTomada = true;

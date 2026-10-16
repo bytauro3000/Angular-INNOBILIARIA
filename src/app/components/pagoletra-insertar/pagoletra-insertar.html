@@ -81,7 +81,8 @@
               <strong>{{ simboloMoneda }} {{ calculoMora.montoPorcentaje | number:'1.2-2' }}</strong>
             </div>
             <div class="mora-row">
-              <span>Recargo diario ({{ calculoMora.diasMora }} × $1.00)</span>
+              <span *ngIf="!esTasaDiaria">Recargo diario ({{ calculoMora.diasMora }} × $1.00)</span>
+              <span *ngIf="esTasaDiaria">Recargo diario ({{ tasaDiariaPorcentaje | number:'1.2-2' }}% del importe)</span>
               <strong>{{ simboloMoneda }} {{ calculoMora.montoDiario | number:'1.2-2' }}</strong>
             </div>
             <div class="mora-row mora-subtotal">

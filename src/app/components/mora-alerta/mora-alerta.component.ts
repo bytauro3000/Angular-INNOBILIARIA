@@ -74,6 +74,19 @@ export class MoraAlertaComponent implements OnInit {
     return null;
   }
 
+  /** true cuando la empresa calcula mora por tasa diaria (% del importe) — MERRUIC */
+  get esTasaDiaria(): boolean {
+    return !!this.calculo && this.calculo.montoPorcentaje === 0;
+  }
+
+  /** Tasa diaria efectiva en % (p. ej. 1 = 1% por día), derivada del cálculo del backend */
+  get tasaDiariaPorcentaje(): number {
+    if (!this.calculo || !this.esTasaDiaria || this.calculo.diasMora <= 0 || this.calculo.importeLetra <= 0) {
+      return 0;
+    }
+    return Math.round((this.calculo.montoDiario / (this.calculo.importeLetra * this.calculo.diasMora)) * 10000) / 100;
+  }
+
   /**
    * Botón "Pagar Mora": si ya existe una mora pendiente la pasa directamente
    * al componente mora-pagar; si no, la crea primero y luego la pasa.
