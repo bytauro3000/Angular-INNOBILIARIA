@@ -1,0 +1,185 @@
+// Layout del PORTAL DEL CLIENTE: header + nav + outlet
+
+$verde: #2e7d32;
+
+.portal-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+.portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    img {
+      height: 40px;
+      width: auto;
+    }
+
+    .marca-texto {
+      strong {
+        display: block;
+        font-size: 1rem;
+        color: #111827;
+      }
+
+      span {
+        font-size: 0.72rem;
+        color: $verde;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+    }
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    .btn-icono {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #374151;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.15s;
+
+      &:hover {
+        border-color: $verde;
+        color: $verde;
+      }
+    }
+
+    .saludo {
+      font-size: 0.85rem;
+      color: #374151;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// ── Nav ──────────────────────────────────────────────────────────────────────
+.portal-nav {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &:hover {
+      background: #f0fdf4;
+      color: $verde;
+    }
+
+    &.activo {
+      background: $verde;
+      color: #fff;
+    }
+  }
+}
+
+// ── Contenido ────────────────────────────────────────────────────────────────
+.portal-contenido {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+// ── Dark mode ────────────────────────────────────────────────────────────────
+:host-context(body.dark-mode) {
+  .portal-layout {
+    background: #0f172a;
+  }
+
+  .portal-header,
+  .portal-nav {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .portal-header .marca-texto strong {
+    color: #f1f5f9;
+  }
+
+  .portal-header .acciones .btn-icono {
+    background: #0f172a;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+
+  .portal-header .acciones .saludo {
+    color: #cbd5e1;
+  }
+
+  .portal-nav a {
+    color: #94a3b8;
+
+    &:hover {
+      background: rgba(46, 125, 50, 0.15);
+    }
+  }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .portal-header {
+    padding: 0.6rem 1rem;
+    flex-wrap: wrap;
+
+    .acciones .saludo {
+      display: none;
+    }
+  }
+
+  .portal-nav {
+    padding: 0.5rem 1rem;
+  }
+
+  .portal-contenido {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,85 @@
+<section class="portal-vista">
+  <div class="vista-header">
+    <h1>Mis letras</h1>
+    <p>Estado de sus letras: pagadas, vencidas y próximas a vencer.</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <button [class.activo]="filtro === 'TODAS'"     (click)="cambiarFiltro('TODAS')">Todas</button>
+    <button [class.activo]="filtro === 'VENCIDAS'"  (click)="cambiarFiltro('VENCIDAS')">Vencidas</button>
+    <button [class.activo]="filtro === 'PROXIMAS'"  (click)="cambiarFiltro('PROXIMAS')">Próximas</button>
+    <button [class.activo]="filtro === 'PAGADAS'"   (click)="cambiarFiltro('PAGADAS')">Pagadas</button>
+  </div>
+
+  <div *ngIf="cargando" class="estado-carga">
+    <div class="spinner"></div>
+    <p>Cargando sus letras...</p>
+  </div>
+
+  <div *ngIf="!cargando && error" class="estado-error">
+    <i class="bi bi-exclamation-circle-fill"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!cargando && !error && sinLetras" class="estado-vacio">
+    <i class="bi bi-inbox"></i>
+    <p>No tiene letras en esta categoría.</p>
+  </div>
+
+  <ng-container *ngIf="!cargando && !error && !sinLetras">
+
+    <article class="contrato-bloque" *ngFor="let c of contratos">
+      <header class="bloque-header" *ngIf="letrasDe(c).length > 0">
+        <div>
+          <h2>Contrato N° {{ c.idContrato }}</h2>
+          <p *ngIf="c.lote">{{ c.lote }}</p>
+        </div>
+        <span class="moneda-badge">{{ simbolo(c.moneda) }} {{ c.moneda }}</span>
+      </header>
+
+      <div class="tabla-wrap" *ngIf="letrasDe(c).length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Letra</th>
+              <th>Vencimiento</th>
+              <th>Importe</th>
+              <th class="col-saldo">Saldo</th>
+              <th>Estado</th>
+              <th class="col-dias">Días vencida</th>
+              <th class="col-mora">Mora</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of letrasDe(c); trackBy: trackById" [ngClass]="claseEstado(l.estado)">
+              <td class="num-letra">{{ l.numeroLetra }}</td>
+              <td>{{ formatoFecha(l.fechaVencimiento) }}</td>
+              <td>{{ simbolo(c.moneda) }} {{ formato(l.importe) }}</td>
+              <td class="col-saldo">
+                <ng-container *ngIf="l.estado === 'PARCIAL'; else importeCompleto">
+                  {{ simbolo(c.moneda) }} {{ formato(l.saldoPendiente) }}
+                </ng-container>
+                <ng-template #importeCompleto>
+                  <span class="saldo-cero" *ngIf="l.estado === 'PAGADA'">—</span>
+                  <span *ngIf="l.estado !== 'PAGADA'">{{ simbolo(c.moneda) }} {{ formato(l.importe) }}</span>
+                </ng-template>
+              </td>
+              <td>
+                <span class="badge-estado" [ngClass]="claseEstado(l.estado)">{{ textoEstado(l.estado) }}</span>
+              </td>
+              <td class="col-dias">{{ l.estado === 'VENCIDA' ? l.diasVencida : '—' }}</td>
+              <td class="col-mora">
+                <span *ngIf="l.estado === 'VENCIDA' && l.moraAcumulada > 0" class="mora">
+                  {{ simbolo(c.moneda) }} {{ formato(l.moraAcumulada) }}
+                </span>
+                <span *ngIf="l.estado !== 'VENCIDA' || l.moraAcumulada <= 0" class="saldo-cero">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+  </ng-container>
+</section>

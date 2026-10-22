@@ -1,0 +1,255 @@
+// Vista: Mis letras (portal del cliente)
+
+$verde: #2e7d32;
+$rojo: #dc2626;
+$ambar: #d97706;
+$azul: #2563eb;
+
+.portal-vista {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.vista-header {
+  margin-bottom: 1.25rem;
+
+  h1 {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    color: #6b7280;
+    font-size: 0.92rem;
+  }
+}
+
+// ── Filtros ──────────────────────────────────────────────────────────────────
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  button {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+      border-color: $verde;
+      color: $verde;
+    }
+
+    &.activo {
+      background: $verde;
+      border-color: $verde;
+      color: #fff;
+    }
+  }
+}
+
+// ── Bloque por contrato ──────────────────────────────────────────────────────
+.contrato-bloque {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.bloque-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+
+  h2 {
+    font-size: 1rem;
+    color: #111827;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin: 0.15rem 0 0;
+  }
+
+  .moneda-badge {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+// ── Tabla ────────────────────────────────────────────────────────────────────
+.tabla-wrap {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+
+    th {
+      text-align: left;
+      padding: 0.7rem 1rem;
+      background: #f9fafb;
+      color: #6b7280;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid #f3f4f6;
+      color: #1f2937;
+      white-space: nowrap;
+    }
+
+    tr.vencida td {
+      background: #fef2f2;
+    }
+
+    tr.pagada td {
+      color: #6b7280;
+    }
+  }
+}
+
+.num-letra {
+  font-weight: 600;
+}
+
+.saldo-cero {
+  color: #9ca3af;
+}
+
+.mora {
+  color: $rojo;
+  font-weight: 600;
+}
+
+.badge-estado {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &.pagada    { background: #dcfce7; color: #166534; }
+  &.vencida   { background: #fee2e2; color: #991b1b; }
+  &.pendiente { background: #dbeafe; color: #1e40af; }
+  &.parcial   { background: #fef3c7; color: #92400e; }
+  &.anulado   { background: #f3f4f6; color: #6b7280; }
+}
+
+// ── Estados (carga / error / vacío) ──────────────────────────────────────────
+.estado-carga,
+.estado-error,
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e5e7eb;
+    border-top-color: $verde;
+    border-radius: 50%;
+    animation: giro 0.8s linear infinite;
+  }
+
+  p {
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.estado-error i,
+.estado-vacio i {
+  font-size: 2rem;
+  color: $ambar;
+}
+
+.estado-error i {
+  color: $rojo;
+}
+
+@keyframes giro {
+  to { transform: rotate(360deg); }
+}
+
+// ── Responsive: ocultar columnas secundarias en móvil ────────────────────────
+@media (max-width: 720px) {
+  .col-saldo,
+  .col-dias {
+    display: none;
+  }
+}
+
+// ── Dark mode ────────────────────────────────────────────────────────────────
+:host-context(body.dark-mode) {
+  .vista-header h1 {
+    color: #f1f5f9;
+  }
+
+  .filtros button {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+
+  .contrato-bloque {
+    background: #1e293b;
+  }
+
+  .bloque-header {
+    border-color: #334155;
+
+    h2 {
+      color: #f1f5f9;
+    }
+
+    .moneda-badge {
+      background: rgba(20, 184, 166, 0.12);
+      border-color: rgba(20, 184, 166, 0.4);
+      color: #5eead4;
+    }
+  }
+
+  .tabla-wrap table {
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+    }
+
+    td {
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+
+    tr.vencida td {
+      background: rgba(220, 38, 38, 0.12);
+    }
+  }
+}

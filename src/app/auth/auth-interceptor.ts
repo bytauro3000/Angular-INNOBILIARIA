@@ -35,8 +35,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
           return next(retryRequest);
         }),
         catchError(() => {
+          // El portal del cliente no tiene refresh: al fallar, vuelve a su login
+          const esCliente = tokenService.getRole() === 'ROLE_CLIENTE' || req.url.includes('/api/portal');
           tokenService.removeToken();
-          router.navigate(['/login']);
+          router.navigate(esCliente ? ['/portal/login'] : ['/login']);
           return throwError(() => error);
         })
       );

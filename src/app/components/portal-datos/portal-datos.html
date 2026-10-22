@@ -1,0 +1,79 @@
+<section class="portal-vista">
+  <div class="vista-header">
+    <h1>Mis datos</h1>
+    <p>Información registrada en la inmobiliaria. Para modificarla, contáctenos.</p>
+  </div>
+
+  <div *ngIf="cargando" class="estado-carga">
+    <div class="spinner"></div>
+    <p>Cargando sus datos...</p>
+  </div>
+
+  <div *ngIf="!cargando && error" class="estado-error">
+    <i class="bi bi-exclamation-circle-fill"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!cargando && !error && datos">
+    <article class="ficha">
+      <header class="ficha-header">
+        <div class="avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div>
+          <h2>{{ nombreCompleto || 'Cliente' }}</h2>
+          <p *ngIf="datos.tipoCliente">{{ datos.tipoCliente === 'NATURAL' ? 'Persona natural' : datos.tipoCliente }}</p>
+        </div>
+      </header>
+
+      <div class="ficha-grid">
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-id-card"></i> Documento</span>
+          <span class="dato-valor">{{ datos.numDocEnmascarado || '—' }}</span>
+          <span class="dato-nota">enmascarado por seguridad</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-envelope"></i> Correo</span>
+          <span class="dato-valor">{{ datos.email || '—' }}</span>
+          <span class="dato-nota">correo de acceso al portal</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-mobile-alt"></i> Celular</span>
+          <span class="dato-valor">{{ datos.celularEnmascarado || '—' }}</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-phone"></i> Teléfono</span>
+          <span class="dato-valor">{{ datos.telefonoEnmascarado || '—' }}</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-map-marker-alt"></i> Dirección</span>
+          <span class="dato-valor">{{ datos.direccion || '—' }}</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-city"></i> Distrito</span>
+          <span class="dato-valor">{{ ubicacion || '—' }}</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-venus-mars"></i> Género</span>
+          <span class="dato-valor">{{ datos.genero || '—' }}</span>
+        </div>
+
+        <div class="dato">
+          <span class="dato-label"><i class="fas fa-heart"></i> Estado civil</span>
+          <span class="dato-valor">{{ datos.estadoCivil || '—' }}</span>
+        </div>
+      </div>
+
+      <footer class="ficha-footer">
+        <i class="fas fa-lock"></i>
+        <span>Sus datos sensibles se muestran parcialmente ocultos. Solo el personal autorizado ve la información completa.</span>
+      </footer>
+    </article>
+  </ng-container>
+</section>

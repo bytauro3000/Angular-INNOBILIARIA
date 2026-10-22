@@ -1,0 +1,65 @@
+<div class="portal-login" [class.portal-login-merruic]="isMerruic">
+  <aside class="branding-panel">
+    <div class="brand">
+      <img [src]="logoBranding" [alt]="nombreEmpresa" class="brand-logo" />
+    </div>
+
+    <a routerLink="/" class="back-home">
+      <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+
+    <div class="branding-content">
+      <h1>Portal del Cliente</h1>
+      <p>Consulta tus letras, pagos y deuda al día desde cualquier dispositivo.</p>
+      <ul class="branding-features">
+        <li><i class="fas fa-check-circle"></i><span>Estado de tus letras: pagadas, vencidas y próximas</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Deuda total y deuda inmediata con mora al día</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Tus datos personales siempre actualizados</span></li>
+        <li><i class="fas fa-check-circle"></i><span>Acceso seguro con tu cuenta de Google</span></li>
+      </ul>
+    </div>
+
+    <div class="branding-footer">
+      <p>© {{ anioActual }} {{ nombreEmpresa }}</p>
+    </div>
+
+    <div class="branding-bg">
+      <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop"
+           alt="" aria-hidden="true" />
+      <div class="branding-overlay"></div>
+    </div>
+  </aside>
+
+  <main class="form-panel">
+    <div class="form-wrapper">
+      <div class="form-header">
+        <h2>Ingresa a tu portal</h2>
+        <p>Usa el correo con el que estás registrado como cliente</p>
+      </div>
+
+      <div *ngIf="cargando && !error" class="portal-loading">
+        <div class="spinner"></div>
+        <p>Cargando acceso seguro...</p>
+      </div>
+
+      <div *ngIf="error" class="portal-error">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="!cargando && !error" #botonGoogle class="google-button"></div>
+
+      <div class="form-hint">
+        <i class="fas fa-shield-alt"></i>
+        <span>
+          Tu correo debe coincidir con el registrado en la inmobiliaria.
+          Si no tienes correo registrado, contáctanos.
+        </span>
+      </div>
+
+      <div class="staff-link">
+        <a routerLink="/login">¿Eres personal de la inmobiliaria? Ingresa aquí</a>
+      </div>
+    </div>
+  </main>
+</div>

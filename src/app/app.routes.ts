@@ -5,6 +5,14 @@ import { LandingMerruicComponent } from './components/landing-merruic/landing-me
 import { HomeComponent } from './components/home/home';
 import { authGuard } from './auth/auth.guard';
 import { roleGuard } from './auth/role.guard';
+import { portalGuard } from './auth/portal.guard';
+
+// Portal del cliente (solo lectura, login con Google)
+import { PortalLoginComponent } from './components/portal-login/portal-login.component';
+import { PortalMenuComponent } from './components/portal-menu/portal-menu.component';
+import { PortalResumenComponent } from './components/portal-resumen/portal-resumen.component';
+import { PortalLetrasComponent } from './components/portal-letras/portal-letras.component';
+import { PortalDatosComponent } from './components/portal-datos/portal-datos.component';
 
 // Importacion de Mensajeria
 import { MensajeriaComponent } from './components/mensajeria/mensajeria.component';
@@ -103,6 +111,19 @@ import { SeleccionMenuComponent } from './components/seleccion-menu/seleccion-me
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginLayoutComponent },
+
+  // ── Portal del Cliente (solo lectura, ROLE_CLIENTE) ────────────────────────
+  { path: 'portal/login', component: PortalLoginComponent },
+  {
+    path: 'portal',
+    component: PortalMenuComponent,
+    canActivate: [portalGuard],
+    children: [
+      { path: '', component: PortalResumenComponent },
+      { path: 'letras', component: PortalLetrasComponent },
+      { path: 'datos', component: PortalDatosComponent }
+    ]
+  },
 
   // ── Seleccion de Menu (Soporte) ──────────────────────────────────────────
   {
