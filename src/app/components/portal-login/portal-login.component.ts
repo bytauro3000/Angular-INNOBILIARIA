@@ -86,21 +86,34 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
           auto_select: false,
           callback: (respuesta: { credential: string }) => this.onCredential(respuesta.credential)
         });
-        if (this.botonGoogle?.nativeElement) {
-          google.accounts.id.renderButton(this.botonGoogle.nativeElement, {
-            theme: 'outline',
-            size: 'large',
-            width: 320,
-            text: 'continue_with'
-          });
-        }
         this.cargando = false;
+        // El contenedor está tras un *ngIf: renderizar recién cuando Angular lo pinte
+        this.renderizarBotonGoogle();
       } else if (intentos >= 20) {
         clearInterval(this.reintentosTimer);
         this.cargando = false;
         this.error = 'No se pudo cargar el acceso con Google. Recargue la página.';
       }
     }, 300);
+  }
+
+  /** Renderiza el botón de Google cuando su contenedor ya existe en el DOM. */
+  private renderizarBotonGoogle(intentos = 0): void {
+    const contenedor = this.botonGoogle?.nativeElement;
+    if (contenedor) {
+      google.accounts.id.renderButton(contenedor, {
+        theme: 'outline',
+        size: 'large',
+        width: 320,
+        text: 'continue_with'
+      });
+      return;
+    }
+    if (intentos < 15) {
+      setTimeout(() => this.renderizarBotonGoogle(intentos + 1), 150);
+    } else {
+      this.error = 'No se pudo mostrar el botón de Google. Recargue la página.';
+    }
   }
 
   private onCredential(credential: string): void {
