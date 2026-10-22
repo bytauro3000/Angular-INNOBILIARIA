@@ -12,9 +12,9 @@
 
 .portal-layout {
   // ── Tokens base (marca Iván / claro) ───────────────────────────────────────
-  --p-bg: #f4faf5;
-  --p-glow-1: rgba(46, 125, 50, 0.09);
-  --p-glow-2: rgba(22, 101, 52, 0.06);
+  --p-bg: #f4f7fb;
+  --p-glow-1: rgba(59, 130, 246, 0.05);
+  --p-glow-2: rgba(15, 23, 42, 0.04);
   --p-surface: rgba(255, 255, 255, 0.72);
   --p-surface-2: rgba(255, 255, 255, 0.5);
   --p-border: rgba(255, 255, 255, 0.75);
@@ -62,11 +62,11 @@
   }
 }
 
-// ── Marca MERRUIC (teal) ─────────────────────────────────────────────────────
+// ── Marca MERRUIC (teal en acentos, mismo fondo azul neutro) ────────────────
 .portal-layout.marca-merruic {
-  --p-bg: #f2fbfa;
-  --p-glow-1: rgba(20, 184, 166, 0.11);
-  --p-glow-2: rgba(15, 118, 110, 0.07);
+  --p-bg: #f4f7fb;
+  --p-glow-1: rgba(59, 130, 246, 0.05);
+  --p-glow-2: rgba(15, 23, 42, 0.04);
   --p-border-soft: rgba(15, 118, 110, 0.13);
   --p-primary: #0f766e;
   --p-primary-strong: #115e59;
