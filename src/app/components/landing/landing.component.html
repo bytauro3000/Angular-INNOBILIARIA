@@ -21,6 +21,9 @@
         <i class="fas fa-phone-alt"></i>
         <span>{{ telefono }}</span>
       </a>
+      <a routerLink="/portal/login" class="btn-portal">
+        <i class="fas fa-file-invoice-dollar"></i> Portal del cliente
+      </a>
       <a routerLink="/login" class="btn-login">
         <i class="fas fa-user"></i> Iniciar Sesión
       </a>
@@ -42,6 +45,9 @@
     <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
     <a href="#beneficios" (click)="scrollA('beneficios', $event)">Beneficios</a>
     <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
+    <a routerLink="/portal/login" (click)="toggleMenu()" class="btn-portal-mobile">
+      <i class="fas fa-file-invoice-dollar"></i> Portal del cliente
+    </a>
     <a routerLink="/login" (click)="toggleMenu()" class="btn-login-mobile">
       <i class="fas fa-user"></i> Iniciar Sesión
     </a>
@@ -549,6 +555,7 @@
         <a href="#proyectos" (click)="scrollA('proyectos', $event)">Proyectos</a>
         <a href="#contacto" (click)="scrollA('contacto', $event)">Contacto</a>
         <a routerLink="/login">Iniciar Sesión</a>
+        <a routerLink="/portal/login">Portal del cliente</a>
       </div>
 
       <div class="footer-col">

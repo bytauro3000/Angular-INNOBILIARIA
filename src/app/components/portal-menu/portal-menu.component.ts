@@ -8,6 +8,8 @@ import { TokenService } from '../../auth/token.service';
 import { ThemeService } from '../../services/theme.service';
 import { environment } from '../../../environments/environment';
 
+declare const google: any;
+
 /**
  * Layout del PORTAL DEL CLIENTE: header de marca + navegación de solo lectura
  * + router-outlet para resumen / letras / datos.
@@ -58,6 +60,14 @@ export class PortalMenuComponent implements OnInit {
 
   cerrarSesion(): void {
     this.tokenService.removeToken();
+    // Para poder elegir OTRA cuenta de Google la próxima vez (no auto-ingresar)
+    try {
+      if (typeof google !== 'undefined' && (google as any)?.accounts?.id?.disableAutoSelect) {
+        (google as any).accounts.id.disableAutoSelect();
+      }
+    } catch {
+      // GIS no disponible; sin efecto
+    }
     this.router.navigate(['/portal/login']);
   }
 

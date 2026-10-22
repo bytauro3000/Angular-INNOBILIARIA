@@ -83,6 +83,7 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
         clearInterval(this.reintentosTimer);
         google.accounts.id.initialize({
           client_id: clientId,
+          auto_select: false,
           callback: (respuesta: { credential: string }) => this.onCredential(respuesta.credential)
         });
         if (this.botonGoogle?.nativeElement) {
@@ -114,10 +115,27 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.cargando = false;
         const mensaje: string = err?.error?.message || 'No se pudo iniciar sesión. Intente de nuevo.';
-        this.error = mensaje;
-        this.toastr.warning(mensaje, 'Portal del cliente');
+        this.error = mensaje.toLowerCase().includes('no registrado')
+          ? `${mensaje} Si esa no es su cuenta, vuelva a pulsar el botón de Google y elija "Usar otra cuenta".`
+          : mensaje;
+        this.deshabilitarAutoIngreso();
+        this.toastr.warning(this.error, 'Portal del cliente');
       }
     });
+  }
+
+  /**
+   * Tras un fallo (p. ej. correo no registrado), desactiva el ingreso automático
+   * para que la próxima pulsación muestre el selector de cuentas de Google.
+   */
+  private deshabilitarAutoIngreso(): void {
+    try {
+      if (typeof google !== 'undefined' && google?.accounts?.id?.disableAutoSelect) {
+        google.accounts.id.disableAutoSelect();
+      }
+    } catch {
+      // GIS aún no cargado; sin efecto
+    }
   }
 
   get nombreEmpresa(): string {
