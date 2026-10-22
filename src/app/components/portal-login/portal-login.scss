@@ -181,26 +181,6 @@ $teal: #14b8a6;
   min-height: 44px;
 }
 
-.cambiar-cuenta {
-  background: none;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  color: #6b7280;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: underline dotted;
-  transition: color 0.15s;
-
-  &:hover {
-    color: $verde;
-  }
-}
-
-.portal-login-merruic .cambiar-cuenta:hover {
-  color: $teal;
-}
-
 .portal-loading,
 .portal-error {
   display: flex;
