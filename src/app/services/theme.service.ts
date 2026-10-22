@@ -19,6 +19,11 @@ export class ThemeService {
     this.setActive(!this.isActiveSubject.value);
   }
 
+  /** Fuerza modo claro (lo usa el login del portal al cargar). */
+  claro(): void {
+    this.setActive(false);
+  }
+
   private setActive(active: boolean): void {
     this.isActiveSubject.next(active);
     if (isPlatformBrowser(this.platformId)) {

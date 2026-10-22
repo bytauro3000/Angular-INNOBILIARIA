@@ -12,12 +12,12 @@ $teal: #14b8a6;
 
 .portal-login {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
 
   @media (max-width: 900px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
 
     .branding-panel {
       display: none;
@@ -126,7 +126,8 @@ $teal: #14b8a6;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 2rem);
   background: #f8faf9;
 
   .form-wrapper {
@@ -134,7 +135,7 @@ $teal: #14b8a6;
     max-width: 420px;
     background: #fff;
     border-radius: 16px;
-    padding: 2.5rem 2rem;
+    padding: clamp(1.6rem, 5vw, 2.5rem) clamp(1.2rem, 5vw, 2rem);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   }
 
@@ -143,7 +144,7 @@ $teal: #14b8a6;
     margin-bottom: 1.75rem;
 
     h2 {
-      font-size: 1.5rem;
+      font-size: clamp(1.25rem, 4vw, 1.5rem);
       color: #1f2937;
       margin-bottom: 0.4rem;
     }
@@ -267,30 +268,43 @@ $teal: #14b8a6;
   }
 }
 
-// ── Dark mode ────────────────────────────────────────────────────────────────
-:host-context(body.dark-mode) .form-panel {
-  background: #0f172a;
+// ── Elementos solo móvil (el panel de branding se oculta ≤900px) ─────────────
+.logo-mobile {
+  display: none;
+}
 
+.back-mobile {
+  display: none;
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+
+  a {
+    color: #6b7280;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .logo-mobile {
+    display: block;
+    height: 56px;
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto 1.25rem;
+  }
+
+  .back-mobile {
+    display: block;
+  }
+}
+
+@media (max-width: 400px) {
   .form-wrapper {
-    background: #1e293b;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-
-    .form-header h2 {
-      color: #f1f5f9;
-    }
-
-    .form-header p {
-      color: #94a3b8;
-    }
-  }
-
-  .form-hint {
-    background: rgba(46, 125, 50, 0.12);
-    border-color: rgba(46, 125, 50, 0.35);
-    color: #bbf7d0;
-  }
-
-  .staff-link a {
-    color: #94a3b8;
+    border-radius: 12px;
   }
 }

@@ -6,6 +6,7 @@ import { EmpresaService } from '../../services/empresa.service';
 import { EmpresaPublic } from '../../models/empresa.model';
 import { PortalAuthService } from '../../auth/portal-auth.service';
 import { TokenService } from '../../auth/token.service';
+import { ThemeService } from '../../services/theme.service';
 import { environment } from '../../../environments/environment';
 
 declare const google: any;
@@ -37,6 +38,7 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
     private empresaService: EmpresaService,
     private portalAuth: PortalAuthService,
     private tokenService: TokenService,
+    private tema: ThemeService,
     private toastr: ToastrService,
     private router: Router
   ) {}
@@ -52,6 +54,9 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
       this.router.navigate(['/portal']);
       return;
     }
+
+    // El login siempre arranca en modo claro (la preferencia oscura se reactiva dentro del portal)
+    this.tema.claro();
 
     this.portalAuth.obtenerConfig().subscribe({
       next: (config) => {
@@ -101,10 +106,13 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
   private renderizarBotonGoogle(intentos = 0): void {
     const contenedor = this.botonGoogle?.nativeElement;
     if (contenedor) {
+      const ancho = contenedor.clientWidth > 0
+        ? Math.min(320, contenedor.clientWidth)
+        : 320;
       google.accounts.id.renderButton(contenedor, {
         theme: 'outline',
         size: 'large',
-        width: 320,
+        width: ancho,
         text: 'continue_with'
       });
       return;

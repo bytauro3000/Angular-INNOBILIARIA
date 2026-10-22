@@ -32,6 +32,8 @@
 
   <main class="form-panel">
     <div class="form-wrapper">
+      <img [src]="logoBranding" [alt]="nombreEmpresa" class="logo-mobile" />
+
       <div class="form-header">
         <h2>Ingresa a tu portal</h2>
         <p>Usa el correo con el que estás registrado como cliente</p>
@@ -61,6 +63,10 @@
 
       <div class="staff-link">
         <a routerLink="/login">¿Eres personal de la inmobiliaria? Ingresa aquí</a>
+      </div>
+
+      <div class="back-mobile">
+        <a routerLink="/"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
       </div>
     </div>
   </main>
