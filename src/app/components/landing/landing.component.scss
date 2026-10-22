@@ -241,25 +241,6 @@ $font-mono:     'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
   @media (max-width: 880px) { display: none; }
 }
 
-.btn-portal {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: transparent;
-  color: $gold;
-  border: 1.5px solid $gold;
-  border-radius: $radius;
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 600;
-  transition: background 0.25s, transform 0.25s, color 0.25s;
-
-  &:hover { background: $gold; color: $ink; transform: translateY(-1px); }
-
-  @media (max-width: 880px) { display: none; }
-}
-
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -312,17 +293,6 @@ $font-mono:     'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
     align-items: center;
     gap: 8px;
     color: $gold;
-  }
-
-  .btn-portal-mobile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: $gold;
-    color: $ink;
-    border-bottom: none;
-    font-weight: 700;
   }
 
   @media (min-width: 1025px) { display: none; }

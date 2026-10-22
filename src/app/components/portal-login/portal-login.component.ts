@@ -125,6 +125,18 @@ export class PortalLoginComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Botón visible "Usar otra cuenta": desactiva el ingreso automático para que
+   * la próxima pulsación del botón de Google muestre el selector de cuentas.
+   */
+  usarOtraCuenta(): void {
+    this.deshabilitarAutoIngreso();
+    this.toastr.info(
+      'Vuelva a pulsar el botón de Google y elija "Usar otra cuenta".',
+      'Portal del cliente'
+    );
+  }
+
+  /**
    * Tras un fallo (p. ej. correo no registrado), desactiva el ingreso automático
    * para que la próxima pulsación muestre el selector de cuentas de Google.
    */

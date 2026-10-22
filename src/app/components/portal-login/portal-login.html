@@ -47,7 +47,12 @@
         <p>{{ error }}</p>
       </div>
 
-      <div *ngIf="!cargando && !error" #botonGoogle class="google-button"></div>
+      <div *ngIf="!cargando && !error" class="google-button-wrap">
+        <div #botonGoogle class="google-button"></div>
+        <button type="button" class="cambiar-cuenta" (click)="usarOtraCuenta()">
+          <i class="fas fa-user-circle"></i> ¿No es tu cuenta? Usar otra cuenta de Google
+        </button>
+      </div>
 
       <div class="form-hint">
         <i class="fas fa-shield-alt"></i>
