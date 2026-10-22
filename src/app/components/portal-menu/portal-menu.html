@@ -1,46 +1,49 @@
-<header class="portal-header" [class.merruic]="isMerruic">
-  <div class="header-left">
-    <img [src]="logoBranding" [alt]="nombreEmpresa" class="header-logo" />
-    <div class="header-titles">
-      <span class="header-empresa">{{ nombreEmpresa }}</span>
-      <span class="header-portal">Portal del Cliente</span>
-    </div>
-  </div>
-
-  <nav class="header-nav" [class.abierto]="menuAbierto">
-    <a routerLink="/portal" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }"
-       (click)="menuAbierto = false">
-      <i class="fas fa-home"></i> Resumen
-    </a>
-    <a routerLink="/portal/letras" routerLinkActive="activo" (click)="menuAbierto = false">
-      <i class="fas fa-file-invoice-dollar"></i> Mis letras
-    </a>
-    <a routerLink="/portal/datos" routerLinkActive="activo" (click)="menuAbierto = false">
-      <i class="fas fa-user"></i> Mis datos
-    </a>
-  </nav>
-
-  <div class="header-right">
-    <button class="icon-btn" (click)="toggleTema()" title="Cambiar tema">
-      <i class="fas fa-moon"></i>
-    </button>
-
-    <div class="usuario">
-      <i class="fas fa-user-circle"></i>
-      <span>{{ nombreCliente || 'Cliente' }}</span>
+<div class="portal-layout" [class.marca-merruic]="isMerruic">
+  <header class="portal-header">
+    <div class="header-left">
+      <img [src]="logoBranding" [alt]="nombreEmpresa" class="header-logo" />
+      <div class="header-titles">
+        <span class="header-empresa">{{ nombreEmpresa }}</span>
+        <span class="header-portal">Portal del Cliente</span>
+      </div>
     </div>
 
-    <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar sesión">
-      <i class="fas fa-sign-out-alt"></i>
-      <span class="logout-texto">Salir</span>
-    </button>
+    <nav class="header-nav" [class.abierto]="menuAbierto" aria-label="Navegación del portal">
+      <a routerLink="/portal" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }"
+         (click)="menuAbierto = false">
+        <i class="fas fa-home"></i> Resumen
+      </a>
+      <a routerLink="/portal/letras" routerLinkActive="activo" (click)="menuAbierto = false">
+        <i class="fas fa-file-invoice-dollar"></i> Mis letras
+      </a>
+      <a routerLink="/portal/datos" routerLinkActive="activo" (click)="menuAbierto = false">
+        <i class="fas fa-user"></i> Mis datos
+      </a>
+    </nav>
 
-    <button class="icon-btn hamburguesa" (click)="menuAbierto = !menuAbierto" title="Menú">
-      <i class="fas fa-bars"></i>
-    </button>
-  </div>
-</header>
+    <div class="header-right">
+      <button class="icon-btn" (click)="toggleTema()" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
+        <i class="fas fa-moon"></i>
+      </button>
 
-<main class="portal-body">
-  <router-outlet></router-outlet>
-</main>
+      <div class="usuario">
+        <i class="fas fa-user-circle"></i>
+        <span>{{ nombreCliente || 'Cliente' }}</span>
+      </div>
+
+      <button class="logout-btn" (click)="cerrarSesion()" title="Cerrar sesión">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="logout-texto">Salir</span>
+      </button>
+
+      <button class="icon-btn hamburguesa" (click)="menuAbierto = !menuAbierto" title="Menú"
+              [attr.aria-expanded]="menuAbierto" aria-label="Abrir menú de navegación">
+        <i class="fas" [ngClass]="menuAbierto ? 'fa-times' : 'fa-bars'"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="portal-body">
+    <router-outlet></router-outlet>
+  </main>
+</div>
