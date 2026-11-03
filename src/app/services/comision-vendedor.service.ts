@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
@@ -9,7 +9,8 @@ import {
   PagoComisionResponse,
   PagoComisionResultadoDTO,
   RegistrarAdelantoRequest,
-  RegistrarPagosMensualesRequest
+  RegistrarPagosMensualesRequest,
+  ReportePagosVendedorDTO
 } from '../dto/comision-vendedor.dto';
 
 @Injectable({ providedIn: 'root' })
@@ -63,5 +64,26 @@ export class ComisionVendedorService {
   descargarReporteComisionPdf(idVendedor: number, soloPendientes: boolean = false): Observable<Blob> {
     const params = soloPendientes ? '?soloPendientes=true' : '';
     return this.http.get(`${this.apiUrl}/reporte/${idVendedor}/pdf${params}`, { responseType: 'blob' });
+  }
+
+  /** Reporte de pagos efectuados a vendedores (adelantos y cuotas). */
+  reportePagos(idVendedor?: number | null, tipo: string = 'TODOS'): Observable<ReportePagosVendedorDTO> {
+    return this.http.get<ReportePagosVendedorDTO>(`${this.apiUrl}/pagos-reporte`, {
+      params: this.paramsPagos(idVendedor, tipo)
+    });
+  }
+
+  /** PDF del reporte de pagos a vendedores. */
+  descargarReportePagosPdf(idVendedor?: number | null, tipo: string = 'TODOS'): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/pagos-reporte/pdf`, {
+      params: this.paramsPagos(idVendedor, tipo),
+      responseType: 'blob'
+    });
+  }
+
+  private paramsPagos(idVendedor?: number | null, tipo: string = 'TODOS'): HttpParams {
+    let params = new HttpParams().set('tipo', tipo || 'TODOS');
+    if (idVendedor) params = params.set('idVendedor', idVendedor);
+    return params;
   }
 }

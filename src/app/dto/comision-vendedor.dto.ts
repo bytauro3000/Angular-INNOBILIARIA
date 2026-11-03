@@ -77,3 +77,37 @@ export interface PagoComisionResponse {
   urlsVoucher: string[];
   conceptoDetalle: string;
 }
+
+export interface ReportePagosVendedorDTO {
+  idVendedor: number | null;
+  todosVendedores: boolean;
+  filtroTipo: string;
+  nombreVendedor: string;
+  apellidosVendedor: string;
+  dniVendedor: string | null;
+  totalPagos: number;
+  totalAdelantos: number;
+  totalMensuales: number;
+  totalGeneral: number;
+  moneda: string;
+  fechaEmision: string;
+  pagos: FilaPagoVendedor[];
+}
+
+export interface FilaPagoVendedor {
+  numero: number;
+  idVendedor: number | null;
+  nombreVendedor: string;
+  tipo: string;
+  fechaPago: string;
+  numeroLetra: string | null;
+  idContrato: number | null;
+  manzana: string;
+  numeroLote: string;
+  programa: string;
+  monto: number;
+  medioPago: string | null;
+  numeroOperacion: string | null;
+  numeroEgreso: string | null;
+  moneda: string;
+}
