@@ -49,7 +49,7 @@ export class ComisionesComponent implements OnInit {
   modalAdelantoMonto: number = 0;
   /** Grupos por contrato para el detalle del modal (multi-lote). */
   modalGrupos: { comision: ComisionVendedorDTO; letras: PagoComisionMensualDTO[] }[] = [];
-  /** Comisiones seleccionadas para pago mensual multi-lote. */
+  /** Comisiones con al menos una letra marcada para pago mensual multi-lote. */
   seleccionadasPago: Set<number> = new Set();
 
   // ── Filtro por Programa + MZ + LT (resalta y hace scroll, NO filtra) ────────
@@ -265,8 +265,8 @@ export class ComisionesComponent implements OnInit {
 
   toggleComision(c: ComisionVendedorDTO): void {
     if (this.expandidas.has(c.idComision)) {
+      // Al colapsar se conservan los pagos cargados para no perder la selección de letras.
       this.expandidas.delete(c.idComision);
-      this.pagosPorComision.delete(c.idComision);
       return;
     }
     this.expandidas.add(c.idComision);
@@ -278,13 +278,14 @@ export class ComisionesComponent implements OnInit {
   }
 
   private cargarPagosHabilitados(c: ComisionVendedorDTO): void {
+    if (this.pagosPorComision.has(c.idComision)) return; // ya cargados (conserva selección)
     this.comisionService.pagosMensualesHabilitados(c.idComision).subscribe({
       next: (pagos) => {
-        this.pagosPorComision.set(c.idComision, pagos);
+        this.pagosPorComision.set(c.idComision, pagos.map(p => ({ ...p, seleccionado: false })));
       },
       error: () => {
         this.toastr.error('Error al cargar los pagos habilitados', 'Error');
-        this.pagosPorComision.set(c.idComision, []);
+        this.pagosPorComision.delete(c.idComision);
       }
     });
   }
@@ -413,18 +414,21 @@ export class ComisionesComponent implements OnInit {
     this.abrirModal();
   }
 
-  /** Abre el modal para pagar las comisiones mensuales de varias comisiones (multi-lote). */
+  /** Abre el modal para pagar las letras marcadas de varias comisiones (multi-lote). */
   abrirModalPagarSeleccionadas(): void {
-    const seleccionadas = this.comisiones.filter(c => this.seleccionadasPago.has(c.idComision));
-    if (seleccionadas.length === 0) {
-      this.toastr.warning('Seleccione al menos una comisión', 'Atención');
+    const grupos = this.comisiones
+      .filter(c => this.seleccionadasPago.has(c.idComision))
+      .map(c => ({ comision: c, letras: this.seleccionadosDe(c) }))
+      .filter(g => g.letras.length > 0);
+    if (grupos.length === 0) {
+      this.toastr.warning('Marque al menos una letra para pagar', 'Atención');
       return;
     }
     // Multi-lote: una fila por contrato en el detalle; el backend genera UN solo EG01.
     this.modalTipo = 'MENSUAL';
-    this.modalComision = seleccionadas[0];
-    this.modalGrupos = seleccionadas.map(c => ({ comision: c, letras: this.pagosDe(c) }));
-    this.modalLetras = this.modalGrupos.flatMap(g => g.letras);
+    this.modalComision = grupos[0].comision;
+    this.modalGrupos = grupos;
+    this.modalLetras = grupos.flatMap(g => g.letras);
     this.abrirModal();
   }
 
@@ -437,12 +441,21 @@ export class ComisionesComponent implements OnInit {
     }, 60);
   }
 
+  /** Check del grupo: marca/desmarca TODAS las letras del contrato y despliega la
+   *  tabla para que el usuario pueda desmarcar las letras que no quiera pagar. */
   toggleSeleccionPago(c: ComisionVendedorDTO): void {
-    if (this.seleccionadasPago.has(c.idComision)) {
-      this.seleccionadasPago.delete(c.idComision);
-    } else {
-      this.seleccionadasPago.add(c.idComision);
-    }
+    const pagos = this.pagosDe(c);
+    if (pagos.length === 0) return;
+    const marcar = !pagos.every(p => p.seleccionado);
+    pagos.forEach(p => p.seleccionado = marcar);
+    this.sincronizarGrupo(c);
+    if (marcar) this.expandidas.add(c.idComision);
+  }
+
+  /** Limpia todas las letras marcadas y la selección multi-lote. */
+  limpiarSeleccionPago(): void {
+    this.pagosPorComision.forEach(pagos => pagos.forEach(p => p.seleccionado = false));
+    this.seleccionadasPago.clear();
   }
 
   onModalCerrado(): void {
@@ -465,14 +478,26 @@ export class ComisionesComponent implements OnInit {
     return this.seleccionadasPago.size > 0;
   }
 
+  /** Suma SOLO las letras marcadas de los contratos seleccionados. */
   get totalSeleccionadoPago(): number {
     let total = 0;
     this.comisiones.forEach(c => {
       if (this.seleccionadasPago.has(c.idComision)) {
-        total += this.pagosDe(c).reduce((s, p) => s + (p.montoComision || 0), 0);
+        total += this.montoSeleccionado(c);
       }
     });
     return total;
+  }
+
+  /** Cantidad total de letras marcadas en todos los contratos seleccionados. */
+  get letrasSeleccionadasPago(): number {
+    let n = 0;
+    this.comisiones.forEach(c => {
+      if (this.seleccionadasPago.has(c.idComision)) {
+        n += this.seleccionadosDe(c).length;
+      }
+    });
+    return n;
   }
 
   /** Símbolo de moneda de la primera comisión seleccionada (para la barra de pago). */
@@ -483,14 +508,25 @@ export class ComisionesComponent implements OnInit {
 
   // ── Pagos mensuales (multiselección) ───────────────────────────────────────
 
-  togglePago(p: PagoComisionMensualDTO): void {
+  togglePago(c: ComisionVendedorDTO, p: PagoComisionMensualDTO): void {
     p.seleccionado = !p.seleccionado;
+    this.sincronizarGrupo(c);
   }
 
   toggleTodosPagos(c: ComisionVendedorDTO): void {
     const pagos = this.pagosDe(c);
     const marcar = !pagos.every(p => p.seleccionado);
     pagos.forEach(p => p.seleccionado = marcar);
+    this.sincronizarGrupo(c);
+  }
+
+  /** El grupo queda en la selección solo si tiene al menos una letra marcada. */
+  private sincronizarGrupo(c: ComisionVendedorDTO): void {
+    if (this.seleccionadosDe(c).length > 0) {
+      this.seleccionadasPago.add(c.idComision);
+    } else {
+      this.seleccionadasPago.delete(c.idComision);
+    }
   }
 
   todosSeleccionados(c: ComisionVendedorDTO): boolean {
