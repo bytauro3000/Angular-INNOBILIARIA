@@ -95,6 +95,7 @@ import { ReportePagosVendedoresComponent } from './components/reporte-pagos-vend
 
 // Reporte Ingresos
 import { ReporteIngresosComponent } from './components/reporteingresos/reporteingresos.component';
+import { IngresoDetalladoComponent } from './components/ingreso-detallado/ingreso-detallado.component';
 
 // Reporte Egresos
 import { ReporteEgresosComponent } from './components/reporteegresos/reporteegresos.component';
@@ -166,6 +167,7 @@ export const routes: Routes = [
       { path: 'letras-vencidas', component: LetrasVencidasComponent },
       { path: 'cuentas-por-cobrar', component: CuentasPorCobrarComponent },
       { path: 'reporte-ingresos', component: ReporteIngresosComponent },
+      { path: 'ingreso-detallado', component: IngresoDetalladoComponent },
       { path: 'reporte-egresos', component: ReporteEgresosComponent },
       { path: 'reporte-caja', component: ReporteCajaComponent },
       { path: 'historial-moras', component: HistorialMorasPickerComponent },

@@ -1,0 +1,215 @@
+<div class="idt-container">
+
+  <!-- ── ENCABEZADO ──────────────────────────────────────────────────────── -->
+  <div class="idt-header">
+    <div class="idt-header-left">
+      <h2 class="idt-titulo">
+        <i class="bi bi-receipt-cutoff"></i>
+        Ingreso Detallado
+      </h2>
+      <p class="idt-subtitulo">Comprobantes emitidos por rango de fechas — Boletas · Recibos</p>
+    </div>
+  </div>
+
+  <!-- ── FILTROS ─────────────────────────────────────────────────────────── -->
+  <div class="idt-filtros-card">
+    <div class="idt-filtros-row">
+
+      <div class="idt-field">
+        <label for="tipoComprobante">
+          <i class="bi bi-funnel"></i> Tipo
+        </label>
+        <select
+          id="tipoComprobante"
+          [(ngModel)]="tipo"
+          class="idt-select-tipo"
+          (keydown.enter)="buscar()">
+          <option value="TODOS">Todos (Boletas y Recibos)</option>
+          <option value="BOLETA">Boletas</option>
+          <option value="RECIBO">Recibos</option>
+        </select>
+      </div>
+
+      <div class="idt-field">
+        <label for="fechaDesde">
+          <i class="bi bi-calendar-event"></i> Desde
+        </label>
+        <input
+          id="fechaDesde"
+          type="date"
+          [(ngModel)]="fechaDesde"
+          class="idt-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="idt-field">
+        <label for="fechaHasta">
+          <i class="bi bi-calendar-event-fill"></i> Hasta
+        </label>
+        <input
+          id="fechaHasta"
+          type="date"
+          [(ngModel)]="fechaHasta"
+          class="idt-input-fecha"
+          (keydown.enter)="buscar()" />
+      </div>
+
+      <div class="idt-actions">
+        <button class="btn-buscar" (click)="buscar()" [disabled]="cargando">
+          <i class="bi bi-search" [class.spin]="cargando"></i>
+          {{ cargando ? 'Consultando...' : 'Consultar' }}
+        </button>
+        <button class="btn-limpiar" (click)="limpiar()" [disabled]="cargando">
+          <i class="bi bi-x-circle"></i> Limpiar
+        </button>
+        <button
+          class="btn-export btn-export-pdf"
+          (click)="descargar('pdf')"
+          [disabled]="cargando || exportando || !reporte || reporte.detalle.length === 0"
+          title="Descargar PDF">
+          <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+        </button>
+        <button
+          class="btn-export btn-export-excel"
+          (click)="descargar('excel')"
+          [disabled]="cargando || exportando || !reporte || reporte.detalle.length === 0"
+          title="Descargar Excel">
+          <i class="bi bi-file-earmark-excel-fill"></i> Excel
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SKELETON (cargando) ─────────────────────────────────────────────── -->
+  <div *ngIf="cargando" class="idt-skeleton-wrap">
+    <div class="idt-skel-cards">
+      <div class="idt-skel-card" *ngFor="let i of [1,2,3]">
+        <div class="skel-line skel-title"></div>
+        <div class="skel-line skel-amount"></div>
+        <div class="skel-line skel-qty"></div>
+      </div>
+    </div>
+    <div class="skel-line skel-table" *ngFor="let i of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- ── RESUMEN DE TOTALES ──────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && reporte && reporte.cantidadTotal > 0" class="idt-totales-grid">
+
+    <div class="idt-total-card tc-comprobantes">
+      <div class="tc-icon"><i class="bi bi-files"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Comprobantes</span>
+        <span class="tc-monto tc-monto-grande">{{ reporte.cantidadTotal }}</span>
+        <span class="tc-qty">{{ reporte.cantidadAnuladas }} anulado{{ reporte.cantidadAnuladas !== 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+
+    <div class="idt-total-card tc-moneda" *ngFor="let t of reporte.totales">
+      <div class="tc-icon"><i class="bi bi-cash-coin"></i></div>
+      <div class="tc-body">
+        <span class="tc-label">Neto {{ t.moneda }}</span>
+        <span class="tc-monto tc-monto-grande">{{ formatMonto(t.neto, t.moneda) }}</span>
+        <span class="tc-qty">Bruto {{ formatMonto(t.bruto, t.moneda) }} · Anulado {{ formatMonto(t.anulada, t.moneda) }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── TABLA DETALLE ───────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && reporte && reporte.cantidadTotal > 0" class="idt-tabla-section">
+
+    <div class="idt-tabla-header">
+      <h3 class="idt-tabla-titulo">
+        <i class="bi bi-table"></i>
+        Detalle de comprobantes
+        <span class="idt-badge-total">{{ reporte.detalle.length }}</span>
+      </h3>
+      <span class="idt-leyenda-anulados" *ngIf="tieneAnulados">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Filas tachadas: anuladas (NC o pago anulado) — no entran al neto
+      </span>
+    </div>
+
+    <div class="idt-tabla-wrap">
+      <table class="idt-tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nro. CPE</th>
+            <th>Receptor</th>
+            <th class="col-monto">Importe Total</th>
+            <th>Fecha de Emisión</th>
+            <th>Nota de Crédito</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filasPagina; let i = index"
+              [class.anulado]="item.estado !== 'VIGENTE'">
+            <td class="col-num" data-label="#">
+              {{ (paginaActual - 1) * pageSize + i + 1 }}
+            </td>
+            <td data-label="Nro. CPE">
+              <span class="idt-badge" [ngClass]="claseTipo(item.tipoComprobante)">
+                {{ etiquetaTipo(item.tipoComprobante) }}
+              </span>
+              <span class="idt-cpe">{{ item.numeroCompleto }}</span>
+              <span class="idt-badge badge-anulado" *ngIf="item.estado !== 'VIGENTE'">
+                {{ etiquetaEstado(item.estado) }}
+              </span>
+            </td>
+            <td class="col-receptor" data-label="Receptor">{{ item.receptor }}</td>
+            <td class="col-monto" data-label="Importe">{{ formatMonto(item.monto, item.moneda) }}</td>
+            <td class="col-fecha" data-label="Fecha">{{ formatFecha(item.fechaEmision) }}</td>
+            <td class="col-nc" data-label="NC">{{ item.ncNumeroCompleto ?? '—' }}</td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="reporte.totales.length > 0">
+          <tr class="fila-total" *ngFor="let t of reporte.totales">
+            <td colspan="3" class="total-label">
+              <i class="bi bi-calculator"></i>
+              Totales {{ t.moneda }}
+            </td>
+            <td class="col-monto total-neto">Neto: {{ formatMonto(t.neto, t.moneda) }}</td>
+            <td colspan="2" class="total-detalles">
+              Bruto {{ formatMonto(t.bruto, t.moneda) }} · Anulado {{ formatMonto(t.anulada, t.moneda) }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- ── PAGINACIÓN ────────────────────────────────────────────────────── -->
+    <div *ngIf="totalPaginas > 1" class="paginacion-controles">
+      <button (click)="previousPage()" [disabled]="paginaActual === 1" class="btn-paginacion">
+        Anterior
+      </button>
+      <ng-container *ngFor="let page of getPagesArray()">
+        <button *ngIf="page !== '...'"
+                (click)="goToPage($any(page))"
+                class="btn-paginacion"
+                [class.active]="page === paginaActual">
+          {{ page }}
+        </button>
+        <span *ngIf="page === '...'" class="ellipsis-spacer">...</span>
+      </ng-container>
+      <button (click)="nextPage()" [disabled]="paginaActual === totalPaginas" class="btn-paginacion">
+        Siguiente
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── SIN RESULTADOS ──────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && buscado && (!reporte || reporte.cantidadTotal === 0)" class="idt-vacio">
+    <i class="bi bi-inbox"></i>
+    <p>No se encontraron comprobantes en el rango de fechas seleccionado.</p>
+  </div>
+
+  <!-- ── ESTADO INICIAL ──────────────────────────────────────────────────── -->
+  <div *ngIf="!cargando && !buscado" class="idt-inicial">
+    <i class="bi bi-calendar-range"></i>
+    <p>Selecciona tipo y rango de fechas, presiona <strong>Consultar</strong> para ver los comprobantes.</p>
+  </div>
+
+</div>
