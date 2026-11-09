@@ -97,10 +97,13 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- ══════════════════════════════════════════════════════════════
      MODAL EDITOR DE VOUCHER (recorte + rotación libre + OCR)
+     IMPORTANTE: este overlay vive DENTRO de .modal a propósito.
+     El focus trap de Bootstrap 5.3 solo permite enfocar elementos
+     dentro del modal; si estuviera fuera, roba el foco de los campos
+     de fecha y número de operación al hacer click (no se puede escribir).
      ══════════════════════════════════════════════════════════════ -->
 <div class="voucher-editor-overlay" *ngIf="editandoVoucher">
   <div class="voucher-editor-modal">
@@ -144,4 +147,5 @@
       </button>
     </div>
   </div>
+</div>
 </div>
