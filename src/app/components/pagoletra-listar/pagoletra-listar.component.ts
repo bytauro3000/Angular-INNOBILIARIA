@@ -748,6 +748,15 @@ formatearNumeroLote(): void {
     }
   }
 
+  /** Tras editar un voucher: la mora puede haber cambiado, recargar todo. */
+  onPagoActualizado(): void {
+    if (this.contratoEncontrado) {
+      this.cargarLetrasPendientes(this.contratoEncontrado.idContrato);
+      this.cargarResumenMora(this.contratoEncontrado.idContrato);
+      this.refrescarContrato();
+    }
+  }
+
   cerrarModalPagoMultiple(): void {
     this.modoPagoMultiple = false;
     this.letrasSeleccionadasTemp = [];

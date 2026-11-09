@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnDestroy, forwardRef, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnDestroy, forwardRef, inject, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.service';
@@ -27,9 +27,13 @@ import { OcrVoucherService, VoucherOcrData } from '../../services/ocr-voucher.se
           <button class="crop-btn" (click)="openCrop(i)" title="Recortar / girar">
             <i class="bi bi-crop"></i>
           </button>
-          <div class="ocr-badge" *ngIf="enableOcr && i === 0" [class.ocr-processing]="ocrProcessing" [class.ocr-done]="!ocrProcessing && ocrProcessed">
-            <i class="bi" [class.bi-hourglass-split]="ocrProcessing" [class.bi-check-circle-fill]="!ocrProcessing && ocrProcessed"></i>
-            <span>{{ ocrProcessing ? 'Analizando...' : (ocrProcessed ? 'OCR listo' : '') }}</span>
+          <div class="ocr-badge" *ngIf="enableOcr && ocrStateOf(file) !== undefined"
+               [class.ocr-processing]="ocrStateOf(file) === 'processing'"
+               [class.ocr-done]="ocrStateOf(file) === 'done'">
+            <i class="bi" [class.bi-hourglass-split]="ocrStateOf(file) === 'processing'"
+               [class.bi-check-circle-fill]="ocrStateOf(file) === 'done'"></i>
+            <span *ngIf="ocrStateOf(file) === 'processing'">{{ ocrProgress > 0 ? 'Analizando… ' + (ocrProgress * 100 | number:'1.0-0') + '%' : 'Analizando...' }}</span>
+            <span *ngIf="ocrStateOf(file) === 'done'">OCR listo</span>
           </div>
           <button class="remove-btn" (click)="removeFile(i)" [disabled]="disabled" title="Eliminar">
             <i class="bi bi-x"></i>
@@ -102,8 +106,12 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   files: { file: File; url: string }[] = [];
   lightboxIndex: number | null = null;
-  ocrProcessing: boolean = false;
-  ocrProcessed: boolean = false;
+  /** Estado del OCR por nombre de archivo (badge individual por foto). */
+  ocrStates: Map<string, 'processing' | 'done'> = new Map();
+  /** Progreso (0 a 1) del OCR en curso. */
+  ocrProgress = 0;
+  /** Id de la última corrida de OCR (para no limpiar el progreso de otra). */
+  private ocrRunId = 0;
 
   isDragging = false;
   @ViewChild('cropCanvas') cropCanvas!: ElementRef<HTMLCanvasElement>;
@@ -112,6 +120,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   private cropImageElement: HTMLImageElement | null = null;
 
   private ocrService = inject(OcrVoucherService);
+  private zone = inject(NgZone);
   private ocrDoneForFileNames: Set<string> = new Set();
 
   private onChange: (value: File[]) => void = () => {};
@@ -421,6 +430,7 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
     this.emitChange();
     if (removed) {
       this.ocrDoneForFileNames.delete(removed.file.name);
+      this.ocrStates.delete(removed.file.name);
     }
   }
 
@@ -433,18 +443,37 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
   }
 
   private async runOcr(fileEntry: { file: File; url: string }): Promise<void> {
-    this.ocrProcessing = true;
-    this.ocrProcessed = false;
+    const fileName = fileEntry.file.name;
+    const runId = ++this.ocrRunId;
+    this.zone.run(() => {
+      this.ocrStates.set(fileName, 'processing');
+      this.ocrProgress = 0;
+    });
+    this.ocrService.setProgressListener(progress => {
+      this.zone.run(() => {
+        if (runId === this.ocrRunId) this.ocrProgress = progress;
+      });
+    });
     try {
       const data = await this.ocrService.extractFromImage(fileEntry.url);
-      this.ocrData.emit({ ...data, fileName: fileEntry.file.name });
+      this.ocrData.emit({ ...data, fileName });
     } catch (err) {
       console.error('OCR error:', err);
-      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, horaOperacion: null, rawText: '', confidence: 0, fileName: fileEntry.file.name });
+      this.ocrData.emit({ numeroOperacion: null, fechaPago: null, horaOperacion: null, rawText: '', confidence: 0, fileName });
     } finally {
-      this.ocrProcessing = false;
-      this.ocrProcessed = true;
+      if (runId === this.ocrRunId) {
+        this.ocrService.setProgressListener(null);
+      }
+      this.zone.run(() => {
+        this.ocrStates.set(fileName, 'done');
+        if (runId === this.ocrRunId) this.ocrProgress = 0;
+      });
     }
+  }
+
+  /** Estado del OCR de una foto (para el badge de cada miniatura). */
+  ocrStateOf(file: { file: File; url: string }): 'processing' | 'done' | undefined {
+    return this.ocrStates.get(file.file.name);
   }
 
   private emitChange(): void {
@@ -455,7 +484,9 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
 
   ngOnDestroy(): void {
     this.files.forEach(f => URL.revokeObjectURL(f.url));
-    this.ocrService.terminate();
+    // El worker OCR es un singleton de la app: NO se destruye aquí para que el
+    // siguiente uso (editar voucher, registrar pago, etc.) no tenga que volver
+    // a cargar el wasm y el idioma desde cero.
   }
 
   writeValue(obj: any): void {
@@ -463,7 +494,8 @@ export class VoucherPreviewComponent implements ControlValueAccessor, OnDestroy 
       this.files.forEach(f => URL.revokeObjectURL(f.url));
       this.files = [];
       this.ocrDoneForFileNames.clear();
-      this.ocrProcessed = false;
+      this.ocrStates.clear();
+      this.ocrProgress = 0;
     }
   }
   registerOnChange(fn: any): void { this.onChange = fn; }

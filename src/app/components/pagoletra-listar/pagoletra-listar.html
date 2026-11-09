@@ -631,7 +631,8 @@
   [idContrato]="idContratoParaLista"
   [monedaContrato]="contratoEncontrado?.moneda || 'USD'"
   (onClose)="cerrarListaPagos()"
-  (onPagoEliminado)="onPagoEliminado()">
+  (onPagoEliminado)="onPagoEliminado()"
+  (onPagoActualizado)="onPagoActualizado()">
 </app-pago-lista-modal>
 
 <!-- Modal historial de moras -->

@@ -13,7 +13,7 @@ import { Moneda } from '../../dto/moneda.enum';
 import { TokenService } from '../../auth/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { VoucherPreviewComponent } from '../voucher-preview/voucher-preview.componente';
-import { VoucherOcrData } from '../../services/ocr-voucher.service';
+import { VoucherOcrData, OcrVoucherService } from '../../services/ocr-voucher.service';
 
 @Component({
   selector: 'app-pago-lista-modal',
@@ -30,6 +30,8 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   @Input() monedaContrato: Moneda = 'USD';
   @Output() onClose = new EventEmitter<void>();
   @Output() onPagoEliminado = new EventEmitter<void>();
+  /** Se emite tras guardar el voucher para que la vista de letras/moras recargue. */
+  @Output() onPagoActualizado = new EventEmitter<void>();
 
   pagos: PagoLetraResponse[] = [];
   cargando = false;
@@ -54,13 +56,17 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   private ocrFechas: { fecha: string; hora: string | null }[] = [];
   /** Fecha a la que pertenece voucherHoraOperacion (para no aplicar hora de otro día). */
   private ocrFechaConHora: string | null = null;
+  /** true si el usuario editó manualmente los campos: el OCR ya no los pisa. */
+  fechaEditadaManual = false;
+  numeroEditadoManual = false;
   /** Para evitar re-asignar el ngModel cada render. */
   voucherFilesModel: File[] = [];
 
   constructor(
     private pagoService: PagoLetraService,
     private toastr: ToastrService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private ocrService: OcrVoucherService
   ) {}
 
   ngOnInit(): void {
@@ -231,7 +237,12 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     this.voucherFilesModel = [];
     this.ocrOperationNumbers.clear();
     this.ocrFechas = [];
+    this.fechaEditadaManual = false;
+    this.numeroEditadoManual = false;
     this.editandoVoucher = true;
+    // Precarga el worker OCR mientras el usuario elige/recorta la foto:
+    // el primer reconocimiento no espera la descarga de wasm + idioma.
+    this.ocrService.warmup();
   }
 
   /** Recibe los archivos del voucher (después de recorte) desde voucher-preview. */
@@ -255,6 +266,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   }
 
   private actualizarFechaOperacionDesdeOcr(): void {
+    if (this.fechaEditadaManual) return;
     const fechasValidas = this.ocrFechas.filter(f => !!f.fecha && !isNaN(new Date(f.fecha).getTime()));
     if (fechasValidas.length === 0) return;
     // La fecha más alta (más reciente) de los vouchers, con su hora detectada
@@ -265,6 +277,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
   }
 
   private actualizarNumeroOperacionDesdeOcr(): void {
+    if (this.numeroEditadoManual) return;
     const numeros = Array.from(this.ocrOperationNumbers.values()).filter(Boolean);
     this.voucherNumeroOperacion = numeros.length > 0 ? Array.from(new Set(numeros)).join(', ') : '';
   }
@@ -279,18 +292,28 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
     this.ocrFechas = [];
     this.voucherHoraOperacion = null;
     this.ocrFechaConHora = null;
+    this.fechaEditadaManual = false;
+    this.numeroEditadoManual = false;
   }
 
-  /** Sube los vouchers recortados con la fecha y número de operación. */
+  /**
+   * Sube los vouchers recortados (si los hay) con la fecha y número de
+   * operación. Se permite guardar sin foto nueva: solo corrige datos y
+   * recalcula la mora en el backend.
+   */
   guardarVoucher(): void {
-    if (!this.voucherPago || this.voucherFiles.length === 0 || this.subiendoVoucher) return;
+    if (!this.voucherPago || this.subiendoVoucher) return;
     this.subiendoVoucher = true;
 
     const request: PagoLetraRequest = {
       idLetra: this.voucherPago.idLetra ?? 0,
       importePagado: this.voucherPago.importePagado ?? 0,
       medioPago: (this.voucherPago.medioPago as MedioPago) ?? 'EFECTIVO',
-      numeroOperacion: this.voucherNumeroOperacion || this.voucherPago.numeroOperacion,
+      // Si el usuario lo editó a mano, se respeta lo suyo (aunque esté vacío);
+      // si no, el OCR o el valor previo del pago.
+      numeroOperacion: this.numeroEditadoManual
+        ? (this.voucherNumeroOperacion || undefined)
+        : (this.voucherNumeroOperacion || this.voucherPago.numeroOperacion),
       fechaPago: this.voucherPago.fechaPago,
       fechaOperacion: this.voucherFechaOperacion || undefined,
       horaOperacion: this.voucherHoraOperacion && this.ocrFechaConHora &&
@@ -306,6 +329,7 @@ export class PagoListaModalComponent implements OnInit, AfterViewInit {
         this.subiendoVoucher = false;
         this.cancelarEditarVoucher();
         this.cargarPagos();
+        this.onPagoActualizado.emit();
       },
       error: (err) => {
         const msg = err?.error?.message || 'No se pudo actualizar el voucher';

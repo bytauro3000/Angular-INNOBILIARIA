@@ -127,11 +127,11 @@
       <div class="voucher-fields" *ngIf="voucherPago">
         <div class="voucher-field">
           <label>Fecha de operación</label>
-          <input type="date" [(ngModel)]="voucherFechaOperacion" class="voucher-input" />
+          <input type="date" [(ngModel)]="voucherFechaOperacion" (ngModelChange)="fechaEditadaManual = true" class="voucher-input" />
         </div>
         <div class="voucher-field">
           <label>Número de operación</label>
-          <input type="text" [(ngModel)]="voucherNumeroOperacion" class="voucher-input"
+          <input type="text" [(ngModel)]="voucherNumeroOperacion" (ngModelChange)="numeroEditadoManual = true" class="voucher-input"
                  placeholder="N° de operación del voucher" />
         </div>
       </div>
@@ -139,8 +139,8 @@
 
     <div class="voucher-editor-foot">
       <button class="voucher-btn-cancel" (click)="cancelarEditarVoucher()">Cancelar</button>
-      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher || voucherFiles.length === 0">
-        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : 'Guardar voucher' + (voucherFiles.length > 1 ? 's' : '') }}
+      <button class="voucher-btn-save" (click)="guardarVoucher()" [disabled]="subiendoVoucher">
+        <i class="bi bi-check-lg"></i> {{ subiendoVoucher ? 'Guardando...' : (voucherFiles.length > 0 ? 'Guardar voucher' + (voucherFiles.length > 1 ? 's' : '') : 'Guardar cambios') }}
       </button>
     </div>
   </div>
