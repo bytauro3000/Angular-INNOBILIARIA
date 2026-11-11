@@ -16,6 +16,8 @@ export interface MoraResponse {
   montoMoraTotal: number;
   fechaGeneracion: string;
   estadoMora: EstadoMora;
+  /** Saldo aún pendiente de pago (montoMoraTotal - pagos activos, mín. 0). */
+  saldoPendiente?: number;
   motivoAnulacion?: string;
   fechaAnulacion?: string;
   anuladoPor?: string;

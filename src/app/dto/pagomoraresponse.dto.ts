@@ -13,6 +13,10 @@ export interface PagoMoraResponse {
   idComprobante: number | null;
   observaciones: string | null;
   urlsVoucher: string[];
+  /** Descuento negociado proporcional aplicado a este pago. */
+  descuentoAplicado?: number;
+  /** Saldo restante de la mora después de este pago. */
+  saldoRestante?: number;
   sunatAceptado?: boolean;
   sunatMensaje?: string;
   sunatAdvertencia?: string;

@@ -11,12 +11,13 @@ import { jwtDecode } from 'jwt-decode';
 import { MoraService } from '../../services/mora.service';
 import { MoraResponse } from '../../dto/moraresponse.dto';
 import { MoraPagarComponent } from '../mora-pagar/mora-pagar.component';
+import { MoraMultiplePagarComponent } from '../mora-multiple-pagar/mora-multiple-pagar.component';
 import { TokenService } from '../../auth/token.service';
 
 @Component({
   selector: 'app-mora-listar',
   standalone: true,
-  imports: [CommonModule, MoraPagarComponent],
+  imports: [CommonModule, MoraPagarComponent, MoraMultiplePagarComponent],
   templateUrl: './mora-listar.html',
   styleUrls: ['./mora-listar.scss']
 })
@@ -33,6 +34,11 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   moraParaPagar: MoraResponse | null = null;
   esAdministrador = false;
   esSoporte = false;
+
+  // ── Pago múltiple ──────────────────────────────────────────────────────────
+  seleccionadasMap: Set<number> = new Set();
+  modoPagoMultiple = false;
+  morasSeleccionadasTemp: MoraResponse[] = [];
 
   constructor(
     private moraService: MoraService,
@@ -69,7 +75,15 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   cargarMoras(): void {
     this.cargando = true;
     this.moraService.listarPorContrato(this.idContrato).subscribe({
-      next: (data) => { this.moras = data; this.cargando = false; },
+      next: (data) => {
+        this.moras = data;
+        // Conservar solo la selección de moras que siguen pendientes
+        const pendientes = new Set(
+          data.filter(m => m.estadoMora === 'PENDIENTE').map(m => m.idMora));
+        this.seleccionadasMap = new Set(
+          [...this.seleccionadasMap].filter(id => pendientes.has(id)));
+        this.cargando = false;
+      },
       error: () => { this.toastr.error('Error al cargar las moras', 'Error'); this.cargando = false; }
     });
   }
@@ -77,11 +91,66 @@ export class MoraListarComponent implements OnInit, AfterViewInit {
   get morasPendientes(): MoraResponse[] { return this.moras.filter(m => m.estadoMora === 'PENDIENTE'); }
   get morasPagadas(): MoraResponse[]    { return this.moras.filter(m => m.estadoMora === 'PAGADO'); }
   get morasAnuladas(): MoraResponse[]   { return this.moras.filter(m => m.estadoMora === 'ANULADO'); }
-  get totalPendiente(): number { return this.morasPendientes.reduce((s, m) => s + m.montoMoraTotal, 0); }
+  get totalPendiente(): number {
+    return this.morasPendientes.reduce((s, m) => s + (m.saldoPendiente ?? m.montoMoraTotal), 0);
+  }
 
   obtenerNumeroLetra(numeroLetra: string): string {
     if (!numeroLetra) return '';
     return numeroLetra.split('/')[0];
+  }
+
+  // ── Selección múltiple ─────────────────────────────────────────────────────
+
+  toggleSeleccion(mora: MoraResponse): void {
+    if (this.seleccionadasMap.has(mora.idMora)) {
+      this.seleccionadasMap.delete(mora.idMora);
+    } else {
+      this.seleccionadasMap.add(mora.idMora);
+    }
+  }
+
+  isSeleccionada(idMora: number): boolean {
+    return this.seleccionadasMap.has(idMora);
+  }
+
+  get cantidadSeleccionadas(): number {
+    return this.seleccionadasMap.size;
+  }
+
+  get morasSeleccionadas(): MoraResponse[] {
+    return this.morasPendientes.filter(m => this.seleccionadasMap.has(m.idMora));
+  }
+
+  get totalSeleccionado(): number {
+    return this.morasSeleccionadas.reduce((s, m) => s + (m.saldoPendiente ?? m.montoMoraTotal), 0);
+  }
+
+  abrirPagoMultiple(): void {
+    if (this.cantidadSeleccionadas < 2) {
+      this.toastr.warning('Seleccione al menos dos moras pendientes', 'Atención');
+      return;
+    }
+    this.morasSeleccionadasTemp = this.morasSeleccionadas;
+    this.modoPagoMultiple = true;
+  }
+
+  cerrarPagoMultiple(): void {
+    this.modoPagoMultiple = false;
+    this.morasSeleccionadasTemp = [];
+  }
+
+  onPagoMultipleRegistrado(numeroComprobante: string | null): void {
+    this.cerrarPagoMultiple();
+    this.seleccionadasMap.clear();
+    this.cargarMoras();
+
+    if (numeroComprobante) {
+      this.moraService.descargarComprobanteMultiple(numeroComprobante).subscribe({
+        next: (blob) => window.open(URL.createObjectURL(blob), '_blank'),
+        error: () => this.toastr.warning('El pago se registró pero no se pudo abrir el comprobante', 'Aviso')
+      });
+    }
   }
 
   abrirPagarMora(mora: MoraResponse): void { this.moraParaPagar = mora; }

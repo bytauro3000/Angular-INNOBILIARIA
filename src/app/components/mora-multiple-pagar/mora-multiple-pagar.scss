@@ -1,0 +1,590 @@
+// ═══════════════════════════════════════════════════════════
+//  PAGO MÚLTIPLE DE MORAS — MODAL
+//  Paleta: navy profundo + verde para descuento
+// ═══════════════════════════════════════════════════════════
+$navy:         #0a2540;
+$navy-mid:     #1e4db7;
+$navy-light:   #3b82f6;
+$green:        #059669;
+$green-pale:   #d1fae5;
+$orange:       #d97706;
+$red:          #dc2626;
+$text-dark:    #0f172a;
+$text-mid:     #334155;
+$text-soft:    #64748b;
+$border:       #e2e8f0;
+$surface:      #f8fafc;
+$white:        #ffffff;
+
+// ── Modal shell ─────────────────────────────────────────────
+.modal-dialog {
+  max-width: 580px;
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.modal-content {
+  background: $white;
+  border-radius: 20px;
+  border: 1px solid $border;
+  box-shadow:
+    0 32px 64px rgba(10, 37, 64, 0.16),
+    0 8px 24px rgba(10, 37, 64, 0.08);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── Header ──────────────────────────────────────────────────
+.modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border;
+  background: linear-gradient(135deg, #f0f9ff 0%, $surface 100%);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, $green 0%, #047857 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      color: $white;
+      font-size: 1.1rem;
+    }
+  }
+
+  .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .header-subtitle {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $text-soft;
+    }
+  }
+
+  .modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  .btn-close-custom {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-soft;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+
+    i { font-size: 0.85rem; }
+
+    &:hover {
+      background: #f1f5f9;
+      color: $text-dark;
+    }
+  }
+}
+
+// ── Body ────────────────────────────────────────────────────
+.modal-body {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  color: $text-dark;
+  background: $white;
+}
+
+// ── Panel de moras ──────────────────────────────────────────
+.moras-panel {
+  background: $surface;
+  border: 1.5px solid $border;
+  border-radius: 14px;
+  overflow: clip;
+  min-height: fit-content;
+  flex-shrink: 0;
+}
+
+.moras-panel-header {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, $surface 100%);
+  border-bottom: 1px solid $border;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.6px;
+  color: $green !important;
+
+  i { font-size: 0.9rem; }
+}
+
+.moras-list {
+  padding: 0.4rem 0.75rem;
+  color: $text-dark;
+}
+
+.mora-item {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px dashed $border;
+  color: $text-dark !important;
+
+  &:last-child { border-bottom: none; }
+}
+
+.mora-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mora-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mora-num {
+  display: inline-block !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: $text-dark !important;
+
+  &::before {
+    content: 'N° ';
+    font-weight: 500;
+    color: $text-soft;
+  }
+}
+
+.mora-dias-chip {
+  display: inline-flex !important;
+  align-items: center;
+  font-size: 0.58rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  color: $orange !important;
+  background: #fffbeb !important;
+  border: 1px solid #fde68a;
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+
+.mora-saldo {
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  color: $text-soft !important;
+  white-space: nowrap;
+}
+
+// Monto editable por mora (pago parcial)
+.mora-monto {
+  width: 110px !important;
+  height: 32px !important;
+  padding: 4px 8px !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  text-align: right;
+
+  &.monto-invalido {
+    border-color: $red !important;
+    box-shadow: 0 0 0 2px rgba($red, 0.15) !important;
+    color: $red !important;
+  }
+}
+
+// Barra de total
+.moras-total-bar {
+  border-top: 1.5px solid $border;
+  padding: 0.6rem 1rem;
+  background: #f0fdf4;
+  color: $text-mid;
+}
+
+.total-row {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem !important;
+  color: $text-mid !important;
+  padding: 2px 0;
+
+  &.descuento-row { color: $green !important; }
+
+  &.total-final {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: $text-dark !important;
+    padding-top: 6px;
+    border-top: 1px solid $border;
+    margin-top: 4px;
+
+    strong {
+      font-size: 1rem !important;
+      color: $green !important;
+    }
+  }
+}
+
+.text-green { color: $green !important; font-weight: 700; }
+
+.panel-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 6px 0 0;
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: $text-soft;
+
+  i { margin-top: 1px; flex-shrink: 0; }
+}
+
+// ── Secciones extra ──────────────────────────────────────────
+.extra-section {
+  border: 1.5px solid $border;
+  border-radius: 14px;
+  overflow: clip;
+  min-height: fit-content;
+  flex-shrink: 0;
+
+  &.section-active { border-color: #6ee7b7; }
+}
+
+.extra-section-header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  background: $surface;
+
+  &:hover { background: #f1f5f9; }
+}
+
+.extra-section-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.extra-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+
+  &.descuento-icon {
+    background: $green-pale;
+    color: $green !important;
+    border: 1px solid rgba($green, 0.2);
+  }
+}
+
+.extra-section-title {
+  display: block !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  color: $text-dark !important;
+}
+
+.extra-section-sub {
+  display: block !important;
+  font-size: 0.68rem !important;
+  color: $text-soft !important;
+}
+
+.extra-section-body {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid $border;
+  background: $white;
+}
+
+// ── Toggle switch ────────────────────────────────────────────
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+  padding: 0;
+  pointer-events: none; // el click lo maneja el header
+
+  .toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: left 0.25s ease;
+  }
+
+  &.active {
+    background: $green;
+    .toggle-knob { left: 23px; }
+  }
+}
+
+// ── Separador sección pago ───────────────────────────────────
+.form-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.25rem 0 0;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border;
+  }
+
+  span {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: $text-soft;
+    white-space: nowrap;
+  }
+}
+
+// ── Formulario ───────────────────────────────────────────────
+.form-row {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.55rem;
+  width: 100%;
+}
+
+.form-2-col { grid-template-columns: repeat(2, 1fr); }
+.width-100  { grid-column: 1 / -1; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+
+  label {
+    color: $text-soft;
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+
+    span { color: $red; margin-left: 2px; }
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: row !important;
+    align-items: stretch;
+    width: 100%;
+    flex-wrap: nowrap;
+
+    input.form-control {
+      width: 100% !important;
+      flex: 1;
+      min-width: 0;
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      border-right: none !important;
+    }
+
+    .input-group-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      background-color: $surface;
+      border: 1.5px solid $border;
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+      min-width: 38px;
+      height: 38px;
+    }
+  }
+}
+
+input, select, textarea {
+  background-color: $surface !important;
+  border: 1.5px solid $border !important;
+  color: $text-dark !important;
+  border-radius: 10px !important;
+  padding: 7px 12px !important;
+  font-size: 0.875rem !important;
+  height: 38px !important;
+  width: 100% !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    outline: none !important;
+    border-color: $navy-light !important;
+    box-shadow: 0 0 0 3px rgba($navy-mid, 0.1) !important;
+    background-color: $white !important;
+  }
+
+  &:disabled, &[disabled] {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+    color: #64748b !important;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+}
+
+textarea {
+  height: auto !important;
+  min-height: 54px !important;
+  resize: vertical;
+}
+
+// ── Badges ──────────────────────────────────────────────────
+.badge-manual {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: $navy-mid;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+
+.btn-toggle-manual {
+  cursor: pointer;
+  user-select: none;
+  min-width: 38px;
+  justify-content: center;
+  transition: background-color 0.15s;
+
+  &:hover { background-color: #e9ecef; }
+
+  &.active {
+    background-color: #eff6ff;
+    border-color: $navy-light;
+    color: $navy-mid;
+  }
+}
+
+.input-manual {
+  border-color: $navy-light !important;
+  box-shadow: 0 0 0 2px rgba($navy-mid, 0.15) !important;
+}
+
+// ── Footer ──────────────────────────────────────────────────
+.modal-footer {
+  border-top: 1px solid $border;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  background: $surface;
+
+  .btn {
+    padding: 9px 22px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.83rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+
+    &:disabled { opacity: 0.65; cursor: not-allowed; }
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, $green 0%, #047857 100%);
+    color: $white;
+    box-shadow: 0 4px 12px rgba($green, 0.3);
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba($green, 0.35);
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: $text-mid;
+    border: 1.5px solid $border !important;
+
+    &:hover:not(:disabled) { background: #f1f5f9; }
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────
+@media (max-width: 520px) {
+  .modal-dialog { width: 100%; }
+  .form-2-col   { grid-template-columns: 1fr; }
+
+  .mora-item {
+    flex-wrap: wrap;
+
+    .mora-item-right { width: 100%; justify-content: space-between; }
+    .mora-monto { width: 130px !important; }
+  }
+}

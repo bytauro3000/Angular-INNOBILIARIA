@@ -7,6 +7,7 @@ import { MoraResponse } from '../dto/moraresponse.dto';
 import { MoraResumenContratoDTO } from '../dto/moraresumencontrato.dto';
 import { PagoMoraRequest } from '../dto/pagomorarequest.dto';
 import { PagoMoraResponse } from '../dto/pagomoraresponse.dto';
+import { MoraPagosMultiplesRequest, MoraPagosMultiplesResponse } from '../dto/moraspagosmultiplesrequest.dto';
 
 @Injectable({ providedIn: 'root' })
 export class MoraService {
@@ -47,6 +48,13 @@ export class MoraService {
     return this.http.post<PagoMoraResponse>(`${this.apiUrl}/pagar`, formData);
   }
 
+  pagarMorasMultiples(request: MoraPagosMultiplesRequest, vouchers?: File[]): Observable<MoraPagosMultiplesResponse> {
+    const formData = new FormData();
+    formData.append('pago', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+    if (vouchers?.length) vouchers.forEach(v => formData.append('vouchers', v));
+    return this.http.post<MoraPagosMultiplesResponse>(`${this.apiUrl}/pagar-multiple`, formData);
+  }
+
   anularMora(idMora: number, motivo: string): Observable<MoraResponse> {
     return this.http.patch<MoraResponse>(
       `${this.apiUrl}/${idMora}/anular`,
@@ -69,6 +77,10 @@ export class MoraService {
 
   descargarComprobante(idPagoMora: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/pago/${idPagoMora}/comprobante-pdf`, { responseType: 'blob' });
+  }
+
+  descargarComprobanteMultiple(numeroComprobante: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/comprobante-multiple/${numeroComprobante}`, { responseType: 'blob' });
   }
 
   crearMoraPendiente(idLetra: number): Observable<any> {

@@ -30,13 +30,24 @@
               pendiente{{ morasPendientes.length > 1 ? 's' : '' }}
             </strong>
             <span>Total acumulado: {{ simboloMoneda }} {{ totalPendiente | number:'1.2-2' }}</span>
+            <span *ngIf="cantidadSeleccionadas > 1" class="seleccion-info">
+              Seleccionadas: {{ cantidadSeleccionadas }}
+              ({{ simboloMoneda }} {{ totalSeleccionado | number:'1.2-2' }})
+            </span>
           </div>
+          <button *ngIf="cantidadSeleccionadas > 1"
+                  class="btn-pagar-multiple"
+                  (click)="abrirPagoMultiple()">
+            <i class="bi bi-cash-stack"></i>
+            Pagar {{ cantidadSeleccionadas }} moras
+          </button>
         </div>
 
         <div *ngIf="!cargando && moras.length > 0" class="tabla-wrapper">
           <table class="tabla-moras">
             <thead>
               <tr>
+                <th class="col-check" title="Seleccionar moras para pago múltiple"></th>
                 <th>Letra</th>
                 <th>F. Vencimiento</th>
                 <th>F. Referencia</th>
@@ -55,6 +66,13 @@
                 'row-pagado':    mora.estadoMora === 'PAGADO',
                 'row-anulado':   mora.estadoMora === 'ANULADO'
               }">
+                <td data-label="Sel." class="col-check">
+                  <input type="checkbox"
+                         *ngIf="mora.estadoMora === 'PENDIENTE'"
+                         [checked]="isSeleccionada(mora.idMora)"
+                         (change)="toggleSeleccion(mora)"
+                         title="Seleccionar para pago múltiple">
+                </td>
                 <td data-label="Letra">{{ obtenerNumeroLetra(mora.numeroLetra) }}</td>
                 <td data-label="F. Vencimiento">{{ mora.fechaVencimientoLetra | date:'dd/MM/yyyy' : 'UTC' }}</td>
                 <td data-label="F. Referencia">{{ mora.fechaGeneracion | date:'dd/MM/yyyy' : 'UTC' }}</td>
@@ -150,3 +168,11 @@
   (onClose)="cerrarPagarMora()"
   (onPagoExitoso)="onMoraPagada($event)">
 </app-mora-pagar>
+
+<app-mora-multiple-pagar
+  *ngIf="modoPagoMultiple"
+  [moras]="morasSeleccionadasTemp"
+  [simboloMoneda]="simboloMoneda"
+  (onClose)="cerrarPagoMultiple()"
+  (onPagoExitoso)="onPagoMultipleRegistrado($event)">
+</app-mora-multiple-pagar>

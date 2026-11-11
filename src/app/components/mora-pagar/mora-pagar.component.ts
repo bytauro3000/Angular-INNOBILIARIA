@@ -77,9 +77,20 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
     return this.tokenSvc.getRole() === 'ROLE_SOPORTE';
   }
 
+  /** Saldo pendiente de la mora (permite pagos parciales). */
+  get saldoPendiente(): number {
+    return this.mora.saldoPendiente ?? this.mora.montoMoraTotal;
+  }
+
+  /** true si el monto ingresado no cubre el saldo completo (pago parcial). */
+  get esPagoParcial(): boolean {
+    return (this.saldoPendiente - (this.request.montoPagado || 0)) > 0.009;
+  }
+
   ngOnInit(): void {
     this.request.idMora      = this.mora.idMora;
-    this.request.montoPagado = this.mora.montoMoraTotal;
+    // Por defecto se paga el saldo pendiente (permite pago parcial si se edita)
+    this.request.montoPagado = this.mora.saldoPendiente ?? this.mora.montoMoraTotal;
     this.request.fechaPago   = obtenerFechaPeru();
     this.request.fechaOperacion = '';
     this.request.observaciones = `Pago de mora - Letra N° ${this.mora.numeroLetra}`;
@@ -233,6 +244,16 @@ export class MoraPagarComponent implements OnInit, AfterViewInit {
 
   guardarPago(): void {
     if (this.enviando) return;
+    if (!this.request.montoPagado || this.request.montoPagado <= 0) {
+      this.toastr.warning('El monto pagado debe ser mayor a cero', 'Validación');
+      return;
+    }
+    if (this.request.montoPagado > this.saldoPendiente + 0.009) {
+      this.toastr.warning(
+        `El monto no puede superar el saldo pendiente (${this.simboloMoneda} ${this.saldoPendiente.toFixed(2)})`,
+        'Validación');
+      return;
+    }
     if (!this.request.medioPago) {
       this.toastr.warning('Debe seleccionar un medio de pago', 'Validación');
       return;

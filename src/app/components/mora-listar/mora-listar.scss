@@ -93,6 +93,40 @@ $border:     #e2e8f0;
     gap: 2px;
     strong { color: #92400e; font-size: 0.92rem; }
     span   { color: #b45309; }
+
+    .seleccion-info {
+      color: $green;
+      font-weight: 600;
+    }
+  }
+
+  // Botón de pago múltiple (a la derecha del resumen)
+  .btn-pagar-multiple {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 16px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg, $green, #219150);
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 8px rgba($green, 0.3);
+    white-space: nowrap;
+
+    i { font-size: 1rem; }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba($green, 0.35);
+      filter: brightness(1.05);
+    }
+
+    &:active { transform: scale(0.96); }
   }
 }
 
@@ -106,6 +140,19 @@ $border:     #e2e8f0;
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+
+  // Columna de selección (pago múltiple)
+  .col-check {
+    width: 34px;
+    text-align: center;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: $green;
+      cursor: pointer;
+    }
+  }
 
   thead tr { background: linear-gradient(135deg, $navy, #0353a4); }
 
