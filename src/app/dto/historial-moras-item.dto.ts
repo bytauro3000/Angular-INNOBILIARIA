@@ -37,6 +37,12 @@ export interface HistorialMorasItem {
   /** Total: montoPorcentaje + montoDiario */
   montoMoraTotal: number;
 
+  /** Saldo aún pendiente de la mora (total - pagos activos). En calculadas = montoMoraTotal. */
+  saldoPendiente: number;
+
+  /** Monto ya pagado de la mora (descuento negociado incluido). 0 en calculadas. */
+  montoPagado: number;
+
   /** Para el footer: total acumulado */
   tipoComprobante: string | null;
   numeroComprobante: string | null;

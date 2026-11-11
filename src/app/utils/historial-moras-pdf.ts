@@ -333,6 +333,11 @@ export class HistorialMorasPdf {
     }
     // Comprobante: vacío para moras PENDIENTES (la celda queda en blanco).
     const compStr = i.bloque === 'PENDIENTE' ? '' : (comp.trim() || '—');
+    // Mora: total; si tiene pagos parciales agrega anotación Pagado → Saldo.
+    let moraStr = `${simbolo} ${this.fmtNumero(i.montoMoraTotal)}`;
+    if (!tachado && !i.pagada && (i.montoPagado || 0) > 0.009) {
+      moraStr += `\nPagado: ${simbolo} ${this.fmtNumero(i.montoPagado)}  →  Saldo: ${simbolo} ${this.fmtNumero(i.saldoPendiente)}`;
+    }
     // Orden de columnas: LETRAS (numero, venc, pago, comp) | MORAS (dias, 5%, diar, mora)
     return [
       i.numeroLetra,
@@ -342,7 +347,7 @@ export class HistorialMorasPdf {
       String(i.diasMora),
       `${simbolo} ${this.fmtNumero(i.montoPorcentaje)}`,
       `${simbolo} ${this.fmtNumero(i.montoDiario)}`,
-      `${simbolo} ${this.fmtNumero(i.montoMoraTotal)}`
+      moraStr
     ];
   }
 

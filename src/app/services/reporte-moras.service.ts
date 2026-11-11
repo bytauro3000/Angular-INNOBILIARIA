@@ -100,6 +100,15 @@ export class ReporteMorasService {
       const anulada = m.estadoMora === 'ANULADO' || todosPagosAnulados;
       const pagada = !anulada && m.estadoMora === 'PAGADO';
 
+      // Pagos parciales / descuentos: el saldo pendiente es la fuente de verdad
+      // (lo calcula el backend); si no viene, se deriva de los pagos activos.
+      const total = m.montoMoraTotal || 0;
+      const pagadoCalc = pagosMoraValidos
+        .filter(p => !p.anulado)
+        .reduce((s, p) => s + (p.montoPagado || 0) + (p.descuentoAplicado || 0), 0);
+      const saldo = m.saldoPendiente ?? Math.max(0, total - pagadoCalc);
+      const montoPagado = Math.max(0, total - saldo);
+
       const item: HistorialMorasItem = {
         bloque:           'REGISTRADA',
         numeroLetra:      m.numeroLetra,
@@ -108,7 +117,9 @@ export class ReporteMorasService {
         diasMora:         m.diasMora,
         montoPorcentaje:  m.montoPorcentaje,
         montoDiario:      m.montoDiario,
-        montoMoraTotal:   m.montoMoraTotal,
+        montoMoraTotal:   total,
+        saldoPendiente:   saldo,
+        montoPagado,
         tipoComprobante:  tipoComp,
         numeroComprobante: numComp,
         anulada,
@@ -153,6 +164,8 @@ export class ReporteMorasService {
           montoPorcentaje:  calc.montoPorcentaje,
           montoDiario:      calc.montoDiario,
           montoMoraTotal:   calc.montoMoraTotal,
+          saldoPendiente:   calc.montoMoraTotal,
+          montoPagado:      0,
           tipoComprobante:  null,
           numeroComprobante: null,
           anulada:          false,
@@ -164,9 +177,9 @@ export class ReporteMorasService {
 
     bloqueB.sort((a, b) => this.compararNumero(a.numeroLetra, b.numeroLetra));
 
-    // ── 5) Total: solo pendientes (bloqueA registradas + bloqueB calculadas) ──
-    const totalBloqueA = bloqueA.reduce((s, i) => s + (i.montoMoraTotal || 0), 0);
-    const totalBloqueB = bloqueB.reduce((s, i) => s + (i.montoMoraTotal || 0), 0);
+    // ── 5) Total: solo pendientes (bloqueA por SALDO + bloqueB calculadas) ──
+    const totalBloqueA = bloqueA.reduce((s, i) => s + (i.saldoPendiente || 0), 0);
+    const totalBloqueB = bloqueB.reduce((s, i) => s + (i.saldoPendiente || 0), 0);
     const totalMora    = totalBloqueA + totalBloqueB;
 
     return {

@@ -189,10 +189,10 @@ export class HistorialMorasPdfComponent implements OnInit {
     return `${t} ${n}`.trim();
   }
   get totalRegistrado(): number {
-    return this.data?.bloqueA.reduce((s, i) => s + (i.montoMoraTotal || 0), 0) ?? 0;
+    return this.data?.bloqueA.reduce((s, i) => s + (i.saldoPendiente || 0), 0) ?? 0;
   }
   get totalPendiente(): number {
-    return this.data?.bloqueB.reduce((s, i) => s + (i.montoMoraTotal || 0), 0) ?? 0;
+    return this.data?.bloqueB.reduce((s, i) => s + (i.saldoPendiente || 0), 0) ?? 0;
   }
   get hayContenido(): boolean {
     return !!this.data && (this.data.bloqueA.length > 0 || this.data.bloqueAPagadas.length > 0 || this.data.bloqueB.length > 0 || this.data.bloqueAAnuladas.length > 0);

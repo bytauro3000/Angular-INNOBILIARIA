@@ -290,6 +290,15 @@ $gray-500:    #64748b;
   margin-top:  8px;
 }
 
+// Anotación de pago parcial en filas de moras registradas
+.pago-parcial {
+  display:     block;
+  font-size:   9.5px;
+  font-weight: 600;
+  color:       #c2410c;   // orange-700
+  line-height: 1.3;
+}
+
 .doc-total-mora {
   text-align:      right;
   margin-top:      16px;

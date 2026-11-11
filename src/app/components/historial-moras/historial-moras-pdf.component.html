@@ -228,7 +228,13 @@
                 <td>{{ i.diasMora }}</td>
                 <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoPorcentaje) }}</td>
                 <td class="num">{{ data.simboloMoneda }} {{ fmtNumero(i.montoDiario) }}</td>
-                <td class="num strong">{{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}</td>
+                <td class="num strong">
+                  {{ data.simboloMoneda }} {{ fmtNumero(i.montoMoraTotal) }}
+                  <span class="pago-parcial" *ngIf="i.montoPagado > 0">
+                    Pagado {{ data.simboloMoneda }} {{ fmtNumero(i.montoPagado) }}
+                    → Saldo {{ data.simboloMoneda }} {{ fmtNumero(i.saldoPendiente) }}
+                  </span>
+                </td>
               </tr>
               <tr *ngIf="data.bloqueA.length === 0">
                 <td colspan="8" class="empty">— Sin moras pendientes registradas —</td>
@@ -355,7 +361,12 @@
                 <td>{{ i.diasMora }}</td>
                 <td class="num">{{ fmtNumero(i.montoPorcentaje) }}</td>
                 <td class="num">{{ fmtNumero(i.montoDiario) }}</td>
-                <td class="num strong">{{ fmtNumero(i.montoMoraTotal) }}</td>
+                <td class="num strong">
+                  {{ fmtNumero(i.montoMoraTotal) }}
+                  <span class="pago-parcial" *ngIf="i.montoPagado > 0">
+                    Pagado {{ fmtNumero(i.montoPagado) }} → Saldo {{ fmtNumero(i.saldoPendiente) }}
+                  </span>
+                </td>
               </tr>
               <tr *ngFor="let i of data.bloqueB" class="row-pendiente">
                 <td><span class="badge bg-orange">B</span></td>
